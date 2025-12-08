@@ -1,0 +1,74 @@
+```python
+import matplotlib.pyplot as plt
+import os
+
+data = {
+    "Blank": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.0, 9.5, 10.0, 9.5, 10.0, 10.0, 9.5, 9.0],
+        "marker": 'x',
+        "linestyle": '-'
+    },
+    "COL 0.125µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.0, 7.0, 8.5, 9.5, 10.0, 10.0, 10.0, 10.0],
+        "marker": 's',
+        "linestyle": '--'
+    },
+    "MINO 1µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.0, 8.0, 8.5, 9.0, 9.0, 9.0, 9.0, 9.0],
+        "marker": '^',
+        "linestyle": '-.'
+    },
+    "COL 0.125µg/mL + MEM 4µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        "marker": 'o',
+        "linestyle": ':'
+    },
+    "MEM 4µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 9.0],
+        "marker": 'D',
+        "linestyle": '-'
+    },
+    "RFP 0.06µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.0, 0.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0],
+        "marker": 'v',
+        "linestyle": '--'
+    },
+    "COL 0.125µg/mL + MINO 1µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.0, 8.0, 8.0, 8.5, 9.0, 9.0, 9.0, 9.0],
+        "marker": '>',
+        "linestyle": '-.'
+    },
+    "COL 0.125µg/mL + RFP 0.06µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.0, 0.0, 0.0, 0.0, 0.5, 1.0, 1.5, 2.0],
+        "marker": '<',
+        "linestyle": ':'
+    }
+}
+
+plt.figure(figsize=(8, 6))
+for label, values in data.items():
+    plt.plot(values["x"], values["y"],
+             label=label,
+             marker=values["marker"],
+             linestyle=values["linestyle"],
+             color='k')
+
+plt.xlabel('Time (h)')
+plt.ylabel('Log cfu/mL')
+plt.title('A')
+plt.ylim(0, 16)
+plt.xlim(0, 26)
+plt.legend()
+
+os.makedirs("first_examples/Single/A", exist_ok=True)
+plt.savefig("first_examples/Single/A/A-1-replot.png")
+plt.close()
+```

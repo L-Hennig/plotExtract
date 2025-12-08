@@ -1,7 +1,6 @@
 import base64, sys, re, os, requests, json, traceback, cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import anthropic
 
 ######## 
 from mistralai import Mistral
@@ -106,19 +105,16 @@ def encode_image(image_path):
   with open(image_path, "rb") as image_file:
     return base64.b64encode(image_file.read()).decode('utf-8')
 
-def prompt_claude(Q):
+def prompt_mistral(Q):
   #print(Q)
-  ########### Changed from message = client.messages.create to response = client.chat.completions.create to impliment change from anthropic to mistral
-  ########### Also changed max tokens from 2048 to 500 and model from claude-3-5-sonnet-20241022 to pixtral-large-latest
-  ########### Apparently max tokens is 4096
-  response = client.chat.completions.create(
-    model = "pixtral-large-latest",
-    max_tokens = 500,
-    temperature = 0,
-    messages = Q
-  )
+  response = client.chat.complete(
+        model="mistral-large-2512",
+        messages=Q,
+        max_tokens=4096,
+        temperature=0,
+    )
   #print(message)
-  return(Q,message.content[0].text)
+  return Q, response.choices[0].message.content
 
 def create_Q_2p(convo):
   Q = []
@@ -128,7 +124,14 @@ def create_Q_2p(convo):
     else:
       role = 'assistant'
     if isinstance(c,list):
-      Q.append({'role': role, 'content': [{"type": "image","source": {"type": "base64","media_type": "image/"+pngjpg,"data": c[0]}},{"type": "image","source": {"type": "base64","media_type": "image/"+pngjpg,"data": c[1]}},{'type': 'text', 'text': c[2]}]})
+      Q.append({
+                'role': role,
+                'content': [
+                    {"type": "text", "text": c[2]},
+                    {"type": "image_url", "image_url": {"url": f"data:image/{pngjpg};base64,{c[0]}"}},
+                    {"type": "image_url", "image_url": {"url": f"data:image/{pngjpg};base64,{c[1]}"}}
+                ]
+            })
     else:
       Q.append({'role': role, 'content': c})
   return Q
@@ -141,7 +144,13 @@ def create_Q_1p(convo):
     else:
       role = 'assistant'
     if isinstance(c,list):
-      Q.append({'role': role, 'content': [{"type": "image","source": {"type": "base64","media_type": "image/"+pngjpg,"data": c[0]},},{'type': 'text', 'text': c[1]}]})
+      Q.append({
+                'role': role,
+                'content': [
+                    {"type": "text", "text": c[1]},
+                    {"type": "image_url", "image_url": {"url": f"data:image/{pngjpg};base64,{c[0]}"}}
+                ]
+            })
     else:
       Q.append({'role': role, 'content': c})
   return Q
@@ -150,14 +159,14 @@ pngjpg = os.path.splitext(input_plot)[-1].lstrip('.')
 if pngjpg == 'jpg':
   pngjpg = 'jpeg'
 base64_image = encode_image(input_plot)
-output_out = input_plot+'.claude.out'
+output_out = input_plot+'.mistral.out'
 print(f"Input plot: {input_plot}")
 
 
 QQ = create_Q_1p([[base64_image, prompts['extract']]])
 
 print("Extracting data... ", end = '', flush=True)
-QQ, data = prompt_claude(QQ)
+QQ, data = prompt_mistral(QQ)
 QQ.append({'role': 'assistant', 'content': data})
 with open(output_out+'_data', 'w') as file:
   file.write(data)
@@ -171,7 +180,7 @@ if 'none' in data.lower():
 
 print("Generating replot code... ", end = '', flush=True)
 QQ.append({'role': 'user', 'content': code_prompt['code_plot']})
-QQ, code = prompt_claude(QQ)
+QQ, code = prompt_mistral(QQ)
 print(f"FINISHED")
 
 error_output = None
@@ -185,7 +194,7 @@ if error_output:
   print(f"ERROR in replot code, fixing error...")
   QQ.append({'role': 'assistant', 'content': code})
   QQ.append({'role': 'user', 'content': error_output+prompts['code_fix']})
-  QQ, code = prompt_claude(QQ)
+  QQ, code = prompt_mistral(QQ)
   try:
     exec(code)
     print(f"SUCCESS, error fixed")
@@ -197,7 +206,7 @@ if error_output:
   print(f"ERROR in replot code, fixing error...")
   QQ.append({'role': 'assistant', 'content': code})
   QQ.append({'role': 'user', 'content': error_output+prompts['code_fix']})
-  QQ, code = prompt_claude(QQ)
+  QQ, code = prompt_mistral(QQ)
   try:
     exec(code)
     print(f"SUCCESS, error fixed")
@@ -223,7 +232,7 @@ wrong = False
 wrong_why = ""
 
 QQ = create_Q_1p([[encode_image(stacked), prompts['compare_x']]])
-QQ, validate = prompt_claude(QQ)
+QQ, validate = prompt_mistral(QQ)
 print(f"\n\nAxis x (result: {validate})")
 if 'no' in validate.lower().strip()[:10]:
   wrong = True
@@ -233,7 +242,7 @@ with open(output_out+'_conversation', 'a') as file:
   json.dump(QQ, file)
 
 QQ = create_Q_1p([[encode_image(stacked), prompts['compare_y']]])
-QQ, validate = prompt_claude(QQ)
+QQ, validate = prompt_mistral(QQ)
 print(f"Axis y (result: {validate})")
 if 'no' in validate.lower().strip()[:10]:
   wrong = True
@@ -243,7 +252,7 @@ with open(output_out+'_conversation', 'a') as file:
   json.dump(QQ, file)
 
 QQ = create_Q_1p([[encode_image(stacked), prompts['compare_number']]])
-QQ, validate = prompt_claude(QQ)
+QQ, validate = prompt_mistral(QQ)
 print(f"Points n (result: {validate})")
 if 'no' in validate.lower().strip()[:10]:
   wrong = True
@@ -253,7 +262,7 @@ with open(output_out+'_conversation', 'a') as file:
   json.dump(QQ, file)
 
 QQ = create_Q_1p([[encode_image(stacked), prompts['compare_trend']]])
-QQ, validate = prompt_claude(QQ)
+QQ, validate = prompt_mistral(QQ)
 print(f"Trends (result: {validate})")
 if 'no' in validate.lower().strip()[:10]:
   wrong = True
