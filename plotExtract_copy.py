@@ -2,11 +2,11 @@ import base64, sys, re, os, requests, json, traceback, cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-######## 
+# Changed from "import Anthropic" to the below line
 from mistralai import Mistral
 
 
-######## This allows the API key to be stored in a .env file for security
+# This allows the API key to be stored in a .env file for security
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
@@ -14,6 +14,7 @@ if len(sys.argv) < 2:
   print("Usage: python plotExtract.py <path_to_plot_image>\nError: Missing required argument. Please provide the path to the plot image.")
   sys.exit(1)
 
+# Loads API key from .env file
 api_key = os.getenv("API_KEY_1")
 
 input_plot = sys.argv[1]
@@ -54,7 +55,7 @@ Remember: The sole output should be either the CSV table (with all columns for t
 'compare_number': 'You are provided with two images of research plots extracted from academic papers. Do these two plots have the same number of points (for point plots)? Do the curves look like they connect the same amount of pointis (for line plots)?. Answer with a single word, "yes" or "no" only."',
 'compare_trend': 'You are provided with two images of research plots extracted from academic papers. Do these sets of points or curves on these two plots represent the same trends? Do they follow the same patterns? Are points distributed in the same way? Answer with a single word, "yes" or "no" only."'}
 
-##### Changed from anthropic.Anthropic to Mistral
+# Changed from anthropic.Anthropic to Mistral
 client = Mistral(api_key=api_key)
 
 def stack_images_vertically(image1_path, image2_path, border_color, border_size=30):
@@ -105,8 +106,13 @@ def encode_image(image_path):
   with open(image_path, "rb") as image_file:
     return base64.b64encode(image_file.read()).decode('utf-8')
 
+# Changed from "prompt_claude" to "prompt_mistral"
+# This change was made throughout the script
 def prompt_mistral(Q):
   #print(Q)
+  # Changed from "client.messages.create" to "client.chat.complete"
+  # Changed model to an appropriate Mistral model
+  # Increased max_tokens to the limit for Mistral
   response = client.chat.complete(
         model="mistral-large-2512",
         messages=Q,
@@ -114,6 +120,7 @@ def prompt_mistral(Q):
         temperature=0,
     )
   #print(message)
+  # Changed from "return(Q,message.content[0].text)" to the below line
   return Q, response.choices[0].message.content
 
 def create_Q_2p(convo):
@@ -124,6 +131,7 @@ def create_Q_2p(convo):
     else:
       role = 'assistant'
     if isinstance(c,list):
+      # Changed to support Mistral message format
       Q.append({
                 'role': role,
                 'content': [
@@ -144,6 +152,7 @@ def create_Q_1p(convo):
     else:
       role = 'assistant'
     if isinstance(c,list):
+      # Changed to support Mistral message format
       Q.append({
                 'role': role,
                 'content': [
