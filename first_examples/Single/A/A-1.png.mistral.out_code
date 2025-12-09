@@ -3,72 +3,41 @@ import matplotlib.pyplot as plt
 import os
 
 data = {
-    "Blank": {
-        "x": [0, 2, 4, 6, 8, 10, 12, 24],
-        "y": [6.0, 9.5, 10.0, 9.5, 10.0, 10.0, 9.5, 9.0],
-        "marker": 'x',
-        "linestyle": '-'
-    },
-    "COL 0.125µg/mL": {
-        "x": [0, 2, 4, 6, 8, 10, 12, 24],
-        "y": [6.0, 7.0, 8.5, 9.5, 10.0, 10.0, 10.0, 10.0],
-        "marker": 's',
-        "linestyle": '--'
-    },
-    "MINO 1µg/mL": {
-        "x": [0, 2, 4, 6, 8, 10, 12, 24],
-        "y": [6.0, 8.0, 8.5, 9.0, 9.0, 9.0, 9.0, 9.0],
-        "marker": '^',
-        "linestyle": '-.'
-    },
-    "COL 0.125µg/mL + MEM 4µg/mL": {
-        "x": [0, 2, 4, 6, 8, 10, 12, 24],
-        "y": [6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-        "marker": 'o',
-        "linestyle": ':'
-    },
-    "MEM 4µg/mL": {
-        "x": [0, 2, 4, 6, 8, 10, 12, 24],
-        "y": [6.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 9.0],
-        "marker": 'D',
-        "linestyle": '-'
-    },
-    "RFP 0.06µg/mL": {
-        "x": [0, 2, 4, 6, 8, 10, 12, 24],
-        "y": [6.0, 0.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0],
-        "marker": 'v',
-        "linestyle": '--'
-    },
-    "COL 0.125µg/mL + MINO 1µg/mL": {
-        "x": [0, 2, 4, 6, 8, 10, 12, 24],
-        "y": [6.0, 8.0, 8.0, 8.5, 9.0, 9.0, 9.0, 9.0],
-        "marker": '>',
-        "linestyle": '-.'
-    },
-    "COL 0.125µg/mL + RFP 0.06µg/mL": {
-        "x": [0, 2, 4, 6, 8, 10, 12, 24],
-        "y": [6.0, 0.0, 0.0, 0.0, 0.5, 1.0, 1.5, 2.0],
-        "marker": '<',
-        "linestyle": ':'
-    }
+    "Blank": [6.2, 9.5, 9.8, 10.0, 10.2, 10.3, 10.0, 10.0],
+    "COL 0.125µg/mL": [6.2, 7.0, 8.5, 9.0, 9.5, 10.0, 10.0, 10.0],
+    "MINO 1µg/mL": [6.2, 8.0, 8.5, 9.0, 9.5, 9.8, 9.5, 9.0],
+    "COL 0.125µg/mL + MEM 4µg/mL": [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "COL 0.125µg/mL + MINO 1µg/mL": [6.2, 8.0, 8.5, 9.0, 9.5, 9.8, 9.5, 8.0],
+    "MEM 4µg/mL": [6.2, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5],
+    "RFP 0.06µg/mL": [6.2, 9.0, 9.5, 10.0, 10.0, 10.0, 9.8, 9.5],
+    "COL 0.125µg/mL + RFP 0.06µg/mL": [6.2, 0.0, 1.0, 1.5, 2.0, 1.0, 0.0, 0.0]
+}
+
+time = [0, 2, 4, 6, 8, 10, 12, 24]
+
+styles = {
+    "Blank": {'color': 'k', 'marker': 'x', 'linestyle': ':', 'linewidth': 1, 'markersize': 6},
+    "COL 0.125µg/mL": {'color': 'k', 'marker': 's', 'linestyle': '-', 'linewidth': 1, 'markersize': 6},
+    "MINO 1µg/mL": {'color': 'k', 'marker': '^', 'linestyle': '--', 'linewidth': 1, 'markersize': 6},
+    "COL 0.125µg/mL + MEM 4µg/mL": {'color': 'k', 'marker': 'o', 'linestyle': ':', 'linewidth': 1, 'markersize': 6},
+    "COL 0.125µg/mL + MINO 1µg/mL": {'color': 'k', 'marker': '^', 'linestyle': '-.', 'linewidth': 1, 'markersize': 6},
+    "MEM 4µg/mL": {'color': 'k', 'marker': 'o', 'linestyle': '--', 'linewidth': 1, 'markersize': 6},
+    "RFP 0.06µg/mL": {'color': 'k', 'marker': 'v', 'linestyle': ':', 'linewidth': 1, 'markersize': 6},
+    "COL 0.125µg/mL + RFP 0.06µg/mL": {'color': 'k', 'marker': 'v', 'linestyle': '-.', 'linewidth': 1, 'markersize': 6}
 }
 
 plt.figure(figsize=(8, 6))
-for label, values in data.items():
-    plt.plot(values["x"], values["y"],
-             label=label,
-             marker=values["marker"],
-             linestyle=values["linestyle"],
-             color='k')
+
+for label, y_values in data.items():
+    plt.plot(time, y_values, label=label, **styles[label])
 
 plt.xlabel('Time (h)')
 plt.ylabel('Log cfu/mL')
-plt.title('A')
 plt.ylim(0, 16)
 plt.xlim(0, 26)
-plt.legend()
+plt.legend(loc='upper right', frameon=False)
 
 os.makedirs("first_examples/Single/A", exist_ok=True)
-plt.savefig("first_examples/Single/A/A-1-replot.png")
+plt.savefig("first_examples/Single/A/A-1-replot.png", dpi=300, bbox_inches='tight')
 plt.close()
 ```
