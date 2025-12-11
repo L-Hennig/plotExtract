@@ -42,9 +42,11 @@ yrange = data1["y"].max()-data1["y"].min()
 xrange = data1["x"].max()-data1["x"].min()
 xrange = float(sys.argv[4])-float(sys.argv[3])
 yrange = float(sys.argv[6])-float(sys.argv[5])
+output_dir = os.path.dirname(sys.argv[1])
 f1 = os.path.basename(sys.argv[1])
 f2 = os.path.basename(sys.argv[2])
-with open(f"interpolated_{f1}_VS_{f2}.stats", 'w') as file:
+output_base = os.path.join(output_dir, f"interpolated_{f1}_VS_{f2}")
+with open(f"{output_base}.stats", 'w') as file:
   file.write(f'MAE {average_difference_overlap/yrange} LeftMissed {left_miss/xrange} RightMissed {right_miss/xrange}\n')
 
 plt.figure(figsize=(10, 6))
@@ -70,6 +72,6 @@ topY    = max(float(sys.argv[6]), plt.ylim()[1])
 plt.xlim(leftX,rightX)
 plt.ylim(bottomY,topY)
 
-plt.savefig(f"interpolated_{f1}_VS_{f2}.png")
+plt.savefig(f"{output_base}.png")
 plt.close()
 
