@@ -1,3 +1,4 @@
+# Added "Do NOT use triple backticks anywhere."
 prompts = {'extract': """The image depicts a figure from a research paper. Please carefully analyze the figure and extract the horizontal ("x") and vertical ("y") coordinates of each individual data point from each curve. Pay extremely close attention to the axes:
 - Identify the tick marks and labels on both axes, and use them to determine the numeric values for every point.
 - Read the labels of both axes (the text or symbols denoting what each axis represents).
@@ -25,11 +26,11 @@ x-axis label,y-axis label (Curve 1),x-axis label,y-axis label (Curve 2)
 
 (Or "None" if you cannot extract the data.)
 
-Remember: The sole output should be either the CSV table (with all columns for the curves) or "None". Nothing else.
+Remember: The sole output should be either the CSV table (with all columns for the curves) or "None". Nothing else. Do NOT use triple backticks anywhere.
 """,
 'code_fix': f'The text above is an error produced by your code, please fix the code so that this error does not appear. Repeat the whole code and only the code so that your whole response can be directly copied and executed. Do not explain and do not say anything else, respond with just the code.',
 'compare_x': 'You are provided with two images of research plots extracted from academic papers. Do these two plots have the same x-axis (horizontal)? Do they have the same ranges, labels, etc.? Answer with a single word, "yes" or "no" only."',
 'compare_y': 'You are provided with two images of research plots extracted from academic papers. Do these two plots have the same y-axis (vertical)? Do they have the same ranges, labels, etc.? Answer with a single word, "yes" or "no" only."',
 'compare_number': 'You are provided with two images of research plots extracted from academic papers. Do these two plots have the same number of points (for point plots)? Do the curves look like they connect the same amount of pointis (for line plots)?. Answer with a single word, "yes" or "no" only."',
 'compare_trend': 'You are provided with two images of research plots extracted from academic papers. Do these sets of points or curves on these two plots represent the same trends? Do they follow the same patterns? Are points distributed in the same way? Answer with a single word, "yes" or "no" only."',
-'code_plot': 'Please analyze the figure and create a python code that will reproduce the plot exactly, including colors, line types, point shapes, axis labels, axis ranges, etc. Save the plot as a file "{replot_plot}" only and do not show it. Respond with the code only so that it can be directly copied and executed.\n\nUse the following data on the plot: {data}'}
+'code_plot': 'Please analyze the figure and create a python code that will reproduce the plot exactly, including colors, line types, point shapes, axis labels, axis ranges, etc. Save the plot as a file "{replot_plot}" only and do not show it. Respond with the code only so that it can be directly copied and executed. Do NOT use triple backticks anywhere. \n\nUse the following data on the plot: {data}'}

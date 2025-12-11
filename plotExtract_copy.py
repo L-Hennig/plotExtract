@@ -157,14 +157,14 @@ with open(output_out+'_data', 'w') as file:
   file.write(data)
 print(f"FINISHED")
 
-code_prompt = {'code_plot': f'Please analyze the figure and create a python code that will reproduce the plot exactly, including colors, line types, point shapes, axis labels, axis ranges, etc. Save the plot as a file "{replot_plot}" only and do not show it. Respond with the code only so that it can be directly copied and executed.\n\nUse the following data on the plot: {data}'}
+code_prompt = prompts['code_plot'].format(replot_plot=replot_plot, data=data)
 
 if 'none' in data.lower():
   print(f"NO DATA EXTRACTED")
   exit()
 
 print("Generating replot code... ", end = '', flush=True)
-QQ.append({'role': 'user', 'content': code_prompt['code_plot']})
+QQ.append({'role': 'user', 'content': code_prompt})
 QQ, code = prompt_mistral(QQ)
 print(f"FINISHED")
 

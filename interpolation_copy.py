@@ -2,16 +2,17 @@ import sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 if len(sys.argv) < 7:
   print("Usage: python interpolation.py <original.csv> <extracted.csv> leftX rightX bottomY topY")
   sys.exit(1)
 # Load the data from both files
 # data1 is reference
-data1 = pd.read_csv(sys.argv[2], header=None, skiprows=1, names=['x', 'y'])
-data2 = pd.read_csv(sys.argv[1], header=None, skiprows=1, names=['x', 'y'])
-h_data1 = pd.read_csv(sys.argv[2], nrows=0).columns
-h_data2 = pd.read_csv(sys.argv[1], nrows=0).columns
+data1 = pd.read_csv(sys.argv[2], header=None, skiprows=1, names=['x', 'y'], encoding='latin1')
+data2 = pd.read_csv(sys.argv[1], header=None, skiprows=1, names=['x', 'y'], encoding='latin1')
+h_data1 = pd.read_csv(sys.argv[2], nrows=0, encoding='latin1').columns
+h_data2 = pd.read_csv(sys.argv[1], nrows=0, encoding='latin1').columns
 
 data1 = data1.sort_values(by='x').reset_index(drop=True)
 data2 = data2.sort_values(by='x').reset_index(drop=True)
@@ -41,7 +42,9 @@ yrange = data1["y"].max()-data1["y"].min()
 xrange = data1["x"].max()-data1["x"].min()
 xrange = float(sys.argv[4])-float(sys.argv[3])
 yrange = float(sys.argv[6])-float(sys.argv[5])
-with open("interpolated_"+sys.argv[1]+"_VS_"+sys.argv[2]+'.stats', 'w') as file:
+f1 = os.path.basename(sys.argv[1])
+f2 = os.path.basename(sys.argv[2])
+with open(f"interpolated_{f1}_VS_{f2}.stats", 'w') as file:
   file.write(f'MAE {average_difference_overlap/yrange} LeftMissed {left_miss/xrange} RightMissed {right_miss/xrange}\n')
 
 plt.figure(figsize=(10, 6))
@@ -67,6 +70,6 @@ topY    = max(float(sys.argv[6]), plt.ylim()[1])
 plt.xlim(leftX,rightX)
 plt.ylim(bottomY,topY)
 
-plt.savefig("interpolated_"+sys.argv[1]+"_VS_"+sys.argv[2]+".png")
+plt.savefig(f"interpolated_{f1}_VS_{f2}.png")
 plt.close()
 
