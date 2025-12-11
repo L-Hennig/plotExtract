@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 if len(sys.argv) < 7:
-    print("Usage: python interpolation_multi.py <original.csv> <extracted.csv> leftX rightX bottomY topY")
+    print("Usage: python interpolation.py <original.csv> <extracted.csv> leftX rightX bottomY topY")
     sys.exit(1)
 
 # Loads API key from .env file

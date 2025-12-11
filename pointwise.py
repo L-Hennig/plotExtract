@@ -241,7 +241,7 @@ def plot_curve_comparison(ax, curve_label, df_extracted, df_original,
         label='original'
     )
 
-    # leftover_extracted => "missing from original"
+    # leftover_extracted => extra extracted points that didn't match any original
     if leftover_extracted:
         x_ex_left = [pt[0] for pt in leftover_extracted]
         y_ex_left = [pt[1] for pt in leftover_extracted]
@@ -249,11 +249,11 @@ def plot_curve_comparison(ax, curve_label, df_extracted, df_original,
             x_ex_left, y_ex_left,
             marker='X', s=60, color='blue',
             edgecolors='black', linewidth=1.0,
-            label=f'missing from orig ({len(leftover_extracted)})',
+            label=f'extra extr ({len(leftover_extracted)})',
             zorder=5
         )
 
-    # leftover_original => "missing from extracted"
+    # leftover_original => original points not found in extracted
     if leftover_original:
         x_or_left = [pt[0] for pt in leftover_original]
         y_or_left = [pt[1] for pt in leftover_original]
@@ -261,7 +261,7 @@ def plot_curve_comparison(ax, curve_label, df_extracted, df_original,
             x_or_left, y_or_left,
             marker='X', s=60, color='red',
             edgecolors='black', linewidth=1.0,
-            label=f'missing from extr ({len(leftover_original)})',
+            label=f'missed orig ({len(leftover_original)})',
             zorder=5
         )
 
@@ -306,7 +306,7 @@ def plot_curve_comparison(ax, curve_label, df_extracted, df_original,
 
 def main():
     if len(sys.argv) < 7:
-        print("Usage: python pointwise_multi.py <extracted.csv> <original.csv> leftX rightX bottomY topY")
+        print("Usage: python pointwise.py <extracted.csv> <original.csv> leftX rightX bottomY topY")
         sys.exit(1)
 
     file_extracted = sys.argv[1]
@@ -474,8 +474,8 @@ def main():
             f.write(f"  Precision: {result['precision']:.4f}\n")
             f.write(f"  Recall: {result['recall']:.4f}\n")
             f.write(f"  MatchedPairs: {result['num_matched']}\n")
-            f.write(f"  Missing from original: {result['num_missing_orig']}\n")
-            f.write(f"  Missing from extracted: {result['num_missing_extr']}\n")
+            f.write(f"  Extra extracted (unmatched): {result['num_missing_orig']}\n")
+            f.write(f"  Missed original (not found): {result['num_missing_extr']}\n")
         
         f.write(f"\n# Summary\n")
         f.write(f"Number of curves: {num_curves}\n")
