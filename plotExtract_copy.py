@@ -21,7 +21,7 @@ if len(sys.argv) < 3:
 api_key = os.getenv("API_KEY_1")
 
 input_plot = sys.argv[1]
-replot_plot = input_plot.replace(".png", "-replot.png").replace(".jpg", "-replot.jpg")
+input_dir = os.path.dirname(input_plot)
 
 # The code below loads the prompts from a separate file
 prompt_file = sys.argv[2]
@@ -34,7 +34,7 @@ prompts = prompts_module.prompts
 # Changed from anthropic.Anthropic to Mistral
 client = Mistral(api_key=api_key)
 
-def stack_images_vertically(image1_path, image2_path, border_color, border_size=30):
+def stack_images_vertically(image1_path, image2_path, border_color, output_dir, prompt_name, border_size=30):
     img1 = cv2.imread(image1_path)
     img2 = cv2.imread(image2_path)
 
@@ -71,8 +71,9 @@ def stack_images_vertically(image1_path, image2_path, border_color, border_size=
         value=color
     )
 
-    # Create the output filename
-    output_filename = "comparison_" + os.path.basename(image1_path)
+    # Create the output filename in the same folder as the input image
+    base_name = os.path.splitext(os.path.basename(image1_path))[0]
+    output_filename = os.path.join(output_dir, f"comparison_{base_name}.{prompt_name}.png")
 
     # Save the combined image with border
     cv2.imwrite(output_filename, combined_image_with_border)
@@ -144,8 +145,15 @@ pngjpg = os.path.splitext(input_plot)[-1].lstrip('.')
 if pngjpg == 'jpg':
   pngjpg = 'jpeg'
 base64_image = encode_image(input_plot)
-output_out = input_plot+'.mistral.out'
+# Include prompt file name (shortened) in output filenames
+prompt_name = os.path.splitext(os.path.basename(prompt_file))[0].replace('prompt_', 'p')
+output_out = input_plot + f'.{prompt_name}.mistral.out'
+# Create replot filename with prompt name
+base_name = os.path.splitext(input_plot)[0]
+ext = os.path.splitext(input_plot)[1]
+replot_plot = f"{base_name}-replot.{prompt_name}{ext}"
 print(f"Input plot: {input_plot}")
+print(f"Using prompt: {prompt_name}")
 
 
 QQ = create_Q_1p([[base64_image, prompts['extract']]])
@@ -157,6 +165,7 @@ with open(output_out+'_data', 'w') as file:
   file.write(data)
 print(f"FINISHED")
 
+# Loads code prompt from prompt file
 code_prompt = prompts['code_plot'].format(replot_plot=replot_plot, data=data)
 
 if 'none' in data.lower():
@@ -210,7 +219,7 @@ with open(output_out+'_conversation', 'a') as file:
   QQ.append({"role": "assistant", "content": code.replace("\n", "\\n")})
   json.dump(QQ, file)
 
-stacked = stack_images_vertically(input_plot, replot_plot, "yes", 0)
+stacked = stack_images_vertically(input_plot, replot_plot, "yes", input_dir, prompt_name, 0)
 
 print("Comparing source and replot... ", end = '', flush=True)
 wrong = False
@@ -269,6 +278,6 @@ if wrong:
 print(f"\nFINISHED (result: {validate})")
 
 print("Stacking original and replotted images for comparison... ", end = '', flush=True)
-stack_images_vertically(input_plot, replot_plot, validate)
+stack_images_vertically(input_plot, replot_plot, validate, input_dir, prompt_name)
 print(f"FINISHED")
 print("\n\n")

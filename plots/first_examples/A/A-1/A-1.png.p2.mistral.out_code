@@ -1,0 +1,76 @@
+import matplotlib.pyplot as plt
+import os
+
+data = {
+    "Blank": [
+        (0, 6.2), (2, 9.5), (4, 10.0), (6, 10.0), (8, 10.0),
+        (10, 10.0), (12, 9.5), (24, 9.0), (26, 9.0)
+    ],
+    "COL 0.125µg/mL": [
+        (0, 6.2), (2, 7.0), (4, 8.5), (6, 9.0), (8, 10.0),
+        (10, 10.0), (12, 10.0), (24, 10.0), (26, 10.0)
+    ],
+    "MINO 1µg/mL": [
+        (0, 6.2), (2, 8.0), (4, 8.5), (6, 9.0), (8, 9.5),
+        (10, 9.5), (12, 9.0), (24, 8.5), (26, 8.0)
+    ],
+    "COL 0.125µg/mL + MEM 4µg/mL": [
+        (0, 6.2), (2, 0.0), (4, 0.0), (6, 0.0), (8, 0.0),
+        (10, 0.0), (12, 0.0), (24, 0.0), (26, 0.0)
+    ],
+    "COL 0.125µg/mL + MINO 1µg/mL": [
+        (0, 6.2), (2, 8.0), (4, 8.5), (6, 9.0), (8, 9.0),
+        (10, 9.0), (12, 8.5), (24, 8.0), (26, 7.5)
+    ],
+    "MEM 4µg/mL": [
+        (0, 6.2), (2, 0.0), (4, 0.5), (6, 1.0), (8, 1.5),
+        (10, 1.5), (12, 1.0), (24, 0.0), (26, 0.0)
+    ],
+    "RFP 0.06µg/mL": [
+        (0, 6.2), (2, 0.0), (4, 1.0), (6, 1.5), (8, 2.0),
+        (10, 2.0), (12, 1.5), (24, 0.0), (26, 0.0)
+    ],
+    "COL 0.125µg/mL + RFP 0.06µg/mL": [
+        (0, 6.2), (2, 0.0), (4, 0.0), (6, 0.0), (8, 0.5),
+        (10, 1.0), (12, 0.0), (24, 0.0), (26, 0.0)
+    ]
+}
+
+markers = {
+    "Blank": ('x', 'gray'),
+    "COL 0.125µg/mL": ('s', 'black'),
+    "MINO 1µg/mL": ('^', 'black'),
+    "COL 0.125µg/mL + MEM 4µg/mL": ('o', 'black'),
+    "COL 0.125µg/mL + MINO 1µg/mL": ('^', 'black'),
+    "MEM 4µg/mL": ('o', 'black'),
+    "RFP 0.06µg/mL": ('v', 'black'),
+    "COL 0.125µg/mL + RFP 0.06µg/mL": ('v', 'black')
+}
+
+linestyles = {
+    "Blank": '-',
+    "COL 0.125µg/mL": '--',
+    "MINO 1µg/mL": '-.',
+    "COL 0.125µg/mL + MEM 4µg/mL": ':',
+    "COL 0.125µg/mL + MINO 1µg/mL": '--',
+    "MEM 4µg/mL": ':',
+    "RFP 0.06µg/mL": ':',
+    "COL 0.125µg/mL + RFP 0.06µg/mL": ':'
+}
+
+plt.figure()
+for label, points in data.items():
+    x_vals, y_vals = zip(*points)
+    marker, color = markers[label]
+    linestyle = linestyles[label]
+    plt.plot(x_vals, y_vals, label=label, marker=marker, color=color, linestyle=linestyle)
+
+plt.xlabel('Time (h)')
+plt.ylabel('Log cfu/mL')
+plt.ylim(0, 16)
+plt.xlim(0, 26)
+plt.legend()
+
+os.makedirs("plots/first_examples/A/A-1", exist_ok=True)
+plt.savefig("plots/first_examples/A/A-1/A-1-replot.p2.png")
+plt.close()
