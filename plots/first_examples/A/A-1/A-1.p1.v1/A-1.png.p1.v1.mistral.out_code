@@ -1,0 +1,63 @@
+```python
+import matplotlib.pyplot as plt
+import os
+
+data = {
+    "Blank": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24, 26],
+        "y": [6.2, 9.5, 9.8, 10.0, 10.0, 10.0, 9.8, 10.0, 9.5]
+    },
+    "COL 0.125µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24, 26],
+        "y": [6.2, 0.0, 0.0, 8.0, 9.5, 10.0, 10.0, 10.0, 10.0]
+    },
+    "MINO 1µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24, 26],
+        "y": [6.2, 8.0, 8.5, 9.0, 9.5, 9.5, 9.5, 9.0, 8.5]
+    },
+    "COL 0.125µg/mL + MEM 4µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24, 26],
+        "y": [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    },
+    "COL 0.125µg/mL + MINO 1µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.2, 0.0, 0.0, 7.5, 8.0, 8.5, 8.0, 0.0]
+    },
+    "MEM 4µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24, 26],
+        "y": [6.2, 9.0, 9.2, 9.5, 9.8, 10.0, 10.0, 10.0, 9.5]
+    },
+    "RFP 0.06µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24, 26],
+        "y": [6.2, 7.0, 2.0, 2.5, 2.0, 1.0, 0.0, 0.0, 0.0]
+    },
+    "COL 0.125µg/mL + RFP 0.06µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.2, 0.0, 0.0, 0.0, 1.0, 2.0, 2.5, 0.0]
+    }
+}
+
+plt.figure(figsize=(10, 6))
+markers = ['x', 's', '^', 'o', 'D', 'v', '>', '<']
+linestyles = ['-', '--', '-.', ':', (0, (3, 1, 1, 1, 1, 1)), '--', '-.', ':']
+colors = ['black'] * 8
+
+for idx, (label, values) in enumerate(data.items()):
+    plt.plot(values["x"], values["y"],
+             label=label,
+             marker=markers[idx],
+             linestyle=linestyles[idx],
+             color=colors[idx])
+
+plt.xlabel('Time (h)')
+plt.ylabel('Log cfu/mL')
+plt.title('A')
+plt.ylim(0, 16)
+plt.xlim(0, 26)
+plt.legend()
+
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\first_examples\A\A-1\A-1.p1.v1"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "A-1-replot.p1.v1.png"))
+plt.close()
+```

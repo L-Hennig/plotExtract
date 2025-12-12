@@ -1,0 +1,49 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time = np.array([0, 2, 4, 6, 8, 10, 12, 24])
+
+data = {
+    'Blank': np.array([6.2, 8.5, 9.5, 10.0, 10.0, 10.0, 9.5, 10.0]),
+    'COL 0.125µg/mL': np.array([6.2, 7.0, 8.5, 9.0, 9.5, 10.0, 10.0, 10.0]),
+    'MINO 1µg/mL': np.array([6.2, 8.0, 9.0, 9.5, 10.0, 10.0, 10.0, 9.0]),
+    'COL 0.125µg/mL + MEM 4µg/mL': np.array([6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
+    'COL 0.125µg/mL + MINO 1µg/mL': np.array([6.2, 7.5, 8.0, 8.5, 9.0, 9.5, 9.0, 8.0]),
+    'MEM 4µg/mL': np.array([6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
+    'RFP 0.06µg/mL': np.array([6.2, 0.0, 1.0, 1.5, 2.0, 2.0, 1.0, 0.0]),
+    'COL 0.125µg/mL + RFP 0.06µg/mL': np.array([6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+}
+
+# Plot settings
+plt.figure(figsize=(8, 6))
+markers = ['x', 's', '^', 'o', '^', 'o', 'v', 'v']
+linestyles = ['-', '-', '-', '--', '--', ':', '-.', '-.']
+colors = ['k', 'k', 'k', 'k', 'k', 'k', 'k', 'k']
+
+# Plot each curve
+for i, (label, y_values) in enumerate(data.items()):
+    plt.plot(time, y_values,
+             label=label,
+             marker=markers[i],
+             linestyle=linestyles[i],
+             color=colors[i])
+
+# Axis labels and title
+plt.xlabel('Time (h)')
+plt.ylabel('Log cfu/mL')
+plt.ylim(0, 16)
+plt.xlim(0, 26)
+
+# Legend
+plt.legend()
+
+# Grid
+plt.grid(False)
+
+# Save the plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\first_examples\A\A-1\A-1.p3.v7"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "A-1-replot.p3.v7.png"), dpi=300, bbox_inches='tight')
+plt.close()
