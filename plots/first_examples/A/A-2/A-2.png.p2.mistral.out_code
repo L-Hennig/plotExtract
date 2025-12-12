@@ -1,0 +1,59 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+
+data = {
+    "Time_Blank": [0, 2, 4, 6, 8, 10, 12, 22],
+    "Log_cfu_Blank": [6.2, 10.5, 12.5, 13.5, 14.0, 14.5, None, None],
+    "Time_COL": [0, 2, 4, 6, 8, 10, 12, 24, 26],
+    "Log_cfu_COL": [6.2, 4.5, 4.0, 4.2, 4.5, 5.0, None, 8.0, None],
+    "Time_MEM": [0, 2, 4, 6, 8, 10, 12, 22, 24],
+    "Log_cfu_MEM": [6.2, 1.0, 0.0, 0.0, 0.0, 0.0, None, None, None],
+    "Time_MINO": [0, 2, 4, 6, 8, 10, 12, 22, 26],
+    "Log_cfu_MINO": [6.2, 9.0, 11.0, 13.0, 13.5, 14.0, 14.5, 15.0, None],
+    "Time_RFP": [0, 2, 4, 6, 8, 10, 12, 22, 24],
+    "Log_cfu_RFP": [6.2, 10.0, 11.0, 12.0, 13.0, 14.0, 14.5, 15.0, None],
+    "Time_COL_MEM": [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+    "Log_cfu_COL_MEM": [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 7.0],
+    "Time_COL_MINO": [0, 2, 4, 6, 8, 10, 12, 22, 24],
+    "Log_cfu_COL_MINO": [6.2, 0.0, 0.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0],
+    "Time_COL_RFP": [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+    "Log_cfu_COL_RFP": [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.0, None, 5.0]
+}
+
+plt.figure(figsize=(8, 6))
+
+# Plot Blank
+plt.plot(data["Time_Blank"], data["Log_cfu_Blank"], linestyle=':', marker='x', color='black', label='Blank')
+
+# Plot COL 0.25µg/mL
+plt.plot(data["Time_COL"], data["Log_cfu_COL"], linestyle='-', marker='s', color='black', label='COL 0.25µg/mL')
+
+# Plot MEM 8µg/mL
+plt.plot(data["Time_MEM"], data["Log_cfu_MEM"], linestyle='-', marker='o', color='black', mfc='white', label='MEM 8µg/mL')
+
+# Plot MINO 1µg/mL
+plt.plot(data["Time_MINO"], data["Log_cfu_MINO"], linestyle='--', marker='^', color='black', label='MINO 1µg/mL')
+
+# Plot RFP 0.06µg/mL
+plt.plot(data["Time_RFP"], data["Log_cfu_RFP"], linestyle='-.', marker='v', color='black', label='RFP 0.06µg/mL')
+
+# Plot COL 0.25µg/mL + MEM 8µg/mL
+plt.plot(data["Time_COL_MEM"], data["Log_cfu_COL_MEM"], linestyle='--', marker='o', color='black', mfc='white', label='COL 0.25µg/mL + MEM 8µg/mL')
+
+# Plot COL 0.25µg/mL + MINO 1µg/mL
+plt.plot(data["Time_COL_MINO"], data["Log_cfu_COL_MINO"], linestyle='--', marker='^', color='black', mfc='white', label='COL 0.25µg/mL + MINO 1µg/mL')
+
+# Plot COL 0.25µg/mL + RFP 0.06µg/mL
+plt.plot(data["Time_COL_RFP"], data["Log_cfu_COL_RFP"], linestyle=':', marker='v', color='black', mfc='white', label='COL 0.25µg/mL + RFP 0.06µg/mL')
+
+plt.xlabel('Time (h)')
+plt.ylabel('Log cfu/mL')
+plt.ylim(0, 16)
+plt.xlim(0, 26)
+plt.legend()
+
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\first_examples\A\A-2"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "A-2-replot.p2.png"))
+plt.close()

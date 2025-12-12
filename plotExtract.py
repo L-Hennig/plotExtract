@@ -147,13 +147,33 @@ if pngjpg == 'jpg':
 base64_image = encode_image(input_plot)
 # Include prompt file name (shortened) in output filenames
 prompt_name = os.path.splitext(os.path.basename(prompt_file))[0].replace('prompt_', 'p')
-output_out = input_plot + f'.{prompt_name}.mistral.out'
-# Create replot filename with prompt name
-base_name = os.path.splitext(input_plot)[0]
-ext = os.path.splitext(input_plot)[1]
-replot_plot = f"{base_name}-replot.{prompt_name}{ext}"
+
+# Get base name and directory info
+image_filename = os.path.basename(input_plot)
+base_name = os.path.splitext(image_filename)[0]  # e.g., 'A-1'
+ext = os.path.splitext(image_filename)[1]  # e.g., '.png'
+
+# Find next version number
+def get_next_version(parent_dir, base_name, prompt_name):
+    """Find the next available version number for this image+prompt combination."""
+    version = 1
+    while True:
+        folder_name = f"{base_name}.{prompt_name}.v{version}"
+        folder_path = os.path.join(parent_dir, folder_name)
+        if not os.path.exists(folder_path):
+            return version, folder_path
+        version += 1
+
+version_num, version_dir = get_next_version(input_dir, base_name, prompt_name)
+os.makedirs(version_dir, exist_ok=True)
+
+# Set output paths inside the version folder
+output_out = os.path.join(version_dir, f"{image_filename}.{prompt_name}.mistral.out")
+replot_plot = os.path.join(version_dir, f"{base_name}-replot.{prompt_name}{ext}")
+
 print(f"Input plot: {input_plot}")
 print(f"Using prompt: {prompt_name}")
+print(f"Output folder: {version_dir} (version {version_num})")
 
 
 QQ = create_Q_1p([[base64_image, prompts['extract']]])
@@ -219,7 +239,7 @@ with open(output_out+'_conversation', 'a') as file:
   QQ.append({"role": "assistant", "content": code.replace("\n", "\\n")})
   json.dump(QQ, file)
 
-stacked = stack_images_vertically(input_plot, replot_plot, "yes", input_dir, prompt_name, 0)
+stacked = stack_images_vertically(input_plot, replot_plot, "yes", version_dir, prompt_name, 0)
 
 print("Comparing source and replot... ", end = '', flush=True)
 wrong = False
@@ -278,6 +298,9 @@ if wrong:
 print(f"\nFINISHED (result: {validate})")
 
 print("Stacking original and replotted images for comparison... ", end = '', flush=True)
-stack_images_vertically(input_plot, replot_plot, validate, input_dir, prompt_name)
+stack_images_vertically(input_plot, replot_plot, validate, version_dir, prompt_name)
 print(f"FINISHED")
+
+# Print the version directory for use by calling scripts
+print(f"VERSION_DIR:{version_dir}")
 print("\n\n")

@@ -1,3 +1,4 @@
+# Copy of prompt 1
 # Added "Do NOT use triple backticks anywhere."
 prompts = {'extract': """The image depicts a figure from a research paper. Please carefully analyze the figure and extract the horizontal ("x") and vertical ("y") coordinates of each individual data point from each curve. Pay extremely close attention to the axes:
 - Identify the tick marks and labels on both axes, and use them to determine the numeric values for every point.

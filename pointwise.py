@@ -306,7 +306,7 @@ def plot_curve_comparison(ax, curve_label, df_extracted, df_original,
 
 def main():
     if len(sys.argv) < 7:
-        print("Usage: python pointwise.py <extracted.csv> <original.csv> leftX rightX bottomY topY")
+        print("Usage: python pointwise.py <extracted.csv> <original.csv> leftX rightX bottomY topY [output_dir]")
         sys.exit(1)
 
     file_extracted = sys.argv[1]
@@ -316,6 +316,12 @@ def main():
     rightX  = float(sys.argv[4])
     bottomY = float(sys.argv[5])
     topY    = float(sys.argv[6])
+    
+    # Optional output directory (if provided, outputs go there instead of extracted file's directory)
+    if len(sys.argv) > 7:
+        output_dir = sys.argv[7]
+    else:
+        output_dir = os.path.dirname(file_extracted)
 
     # 1. Load both CSV files
     print(f"Loading extracted CSV: {file_extracted}")
@@ -452,7 +458,6 @@ def main():
     plt.tight_layout(rect=[0, 0, 1, 0.95])
 
     # 6. Save outputs
-    output_dir = os.path.dirname(file_extracted)
     f1 = os.path.basename(file_extracted)
     f2 = os.path.basename(file_original)
     base_ex = os.path.splitext(f1)[0]

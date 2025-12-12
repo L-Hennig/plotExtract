@@ -1,0 +1,49 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time = np.array([0, 2, 4, 6, 8, 10, 12, 24, 26])
+
+data = {
+    'Blank': np.array([6.2, 8.5, 9.5, 10.0, 10.0, 10.0, 9.5, 9.0, 9.0]),
+    'COL 0.125µg/mL': np.array([6.2, 7.0, 8.5, 9.0, 9.5, 10.0, 10.0, 10.0, 10.0]),
+    'MINO 1µg/mL': np.array([6.2, 8.0, 8.5, 9.0, 9.5, 9.5, 9.5, 9.0, 9.0]),
+    'COL 0.125µg/mL + MEM 4µg/mL': np.array([6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
+    'COL 0.125µg/mL + MINO 1µg/mL': np.array([6.2, 7.5, 8.0, 8.5, 9.0, 9.0, 8.5, 8.0, 0.0]),
+    'MEM 4µg/mL': np.array([6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
+    'RFP 0.06µg/mL': np.array([6.2, 1.0, 1.5, 2.0, 2.0, 2.0, 1.0, 0.0, 0.0]),
+    'COL 0.125µg/mL + RFP 0.06µg/mL': np.array([6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+}
+
+# Line and marker styles
+styles = {
+    'Blank': {'color': 'k', 'linestyle': '--', 'marker': 'x', 'markersize': 6},
+    'COL 0.125µg/mL': {'color': 'k', 'linestyle': '-', 'marker': 's', 'markersize': 6},
+    'MINO 1µg/mL': {'color': 'k', 'linestyle': '-.', 'marker': '^', 'markersize': 6},
+    'COL 0.125µg/mL + MEM 4µg/mL': {'color': 'k', 'linestyle': ':', 'marker': 'o', 'markersize': 6},
+    'COL 0.125µg/mL + MINO 1µg/mL': {'color': 'k', 'linestyle': '--', 'marker': 'D', 'markersize': 6},
+    'MEM 4µg/mL': {'color': 'k', 'linestyle': ':', 'marker': 'v', 'markersize': 6},
+    'RFP 0.06µg/mL': {'color': 'k', 'linestyle': '--', 'marker': '>', 'markersize': 6},
+    'COL 0.125µg/mL + RFP 0.06µg/mL': {'color': 'k', 'linestyle': ':', 'marker': '<', 'markersize': 6}
+}
+
+# Create plot
+plt.figure(figsize=(8, 6))
+for label, values in data.items():
+    plt.plot(time, values, label=label, **styles[label])
+
+# Axis labels and limits
+plt.xlabel('Time (h)')
+plt.ylabel('Log cfu/mL')
+plt.ylim(0, 16)
+plt.xlim(0, 26)
+
+# Legend
+plt.legend(loc='upper right')
+
+# Save plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\first_examples\A\A-1\A-1.p3.v1"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "A-1-replot.p3.png"), dpi=300, bbox_inches='tight')
+plt.close()

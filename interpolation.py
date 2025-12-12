@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 if len(sys.argv) < 7:
-    print("Usage: python interpolation.py <original.csv> <extracted.csv> leftX rightX bottomY topY")
+    print("Usage: python interpolation.py <original.csv> <extracted.csv> leftX rightX bottomY topY [output_dir]")
     sys.exit(1)
 
 # Loads API key from .env file
@@ -183,6 +183,12 @@ rightX = float(sys.argv[4])
 bottomY = float(sys.argv[5])
 topY = float(sys.argv[6])
 
+# Optional output directory (if provided, outputs go there instead of original file's directory)
+if len(sys.argv) > 7:
+    output_dir = sys.argv[7]
+else:
+    output_dir = os.path.dirname(original_file)
+
 xrange_arg = rightX - leftX
 yrange_arg = topY - bottomY
 
@@ -283,7 +289,6 @@ plt.suptitle('Interpolation Comparison: Original vs Extracted Data', fontsize=14
 plt.tight_layout()
 
 # Save outputs
-output_dir = os.path.dirname(original_file)
 f1 = os.path.basename(original_file)
 f2 = os.path.basename(extracted_file)
 output_base = os.path.join(output_dir, f"interpolated_{f1}_VS_{f2}")

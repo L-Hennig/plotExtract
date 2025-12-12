@@ -1,3 +1,5 @@
+# Copy of prompt 2
+# Fixed spelling mistakes "monotonius to monotonous" and "pointis to points"
 prompts = {'extract': """The image depicts a figure from a research paper. Please carefully analyze the figure and extract the horizontal ("x") and vertical ("y") coordinates of each individual data point from each curve. Pay extremely close attention to the axes:
 - Identify the tick marks and labels on both axes, and use them to determine the numeric values for every point.
 - Read the labels of both axes (the text or symbols denoting what each axis represents).
@@ -10,7 +12,7 @@ Data Reporting Requirements:
    - Exactly one row per data point in each curve.
    - For multiple curves, produce additional pairs of columns (two columns per curve: one for x-values, one for y-values).
 4. If, for any reason, you are unable to extract the data, respond with only the word "None".
-5. Make sure that both axis are labeled and there are individual values assigned to each tickmark, and that they increase in a logical monotonius fashion. If they are not it may be impossible to extract the data. In that case respond with only the word "None".
+5. Make sure that both axis are labeled and there are individual values assigned to each tickmark, and that they increase in a logical monotonous fashion. If they are not it may be impossible to extract the data. In that case respond with only the word "None".
 
 Key Instructions:
 - Look at each point individually; do not assume a pattern or formula. Each data point must be read precisely from its plotted location.
@@ -25,11 +27,11 @@ x-axis label,y-axis label (Curve 1),x-axis label,y-axis label (Curve 2)
 
 (Or "None" if you cannot extract the data.)
 
-Remember: The sole output should be either the CSV table (with all columns for the curves) or "None". Nothing else.
+Remember: The sole output should be either the CSV table (with all columns for the curves) or "None". Nothing else. Do NOT use triple backticks anywhere.
 """,
 'code_fix': f'The text above is an error produced by your code, please fix the code so that this error does not appear. Repeat the whole code and only the code so that your whole response can be directly copied and executed. Do not explain and do not say anything else, respond with just the code.',
 'compare_x': 'You are provided with two images of research plots extracted from academic papers. Do these two plots have the same x-axis (horizontal)? Do they have the same ranges, labels, etc.? Answer with a single word, "yes" or "no" only."',
 'compare_y': 'You are provided with two images of research plots extracted from academic papers. Do these two plots have the same y-axis (vertical)? Do they have the same ranges, labels, etc.? Answer with a single word, "yes" or "no" only."',
-'compare_number': 'You are provided with two images of research plots extracted from academic papers. Do these two plots have the same number of points (for point plots)? Do the curves look like they connect the same amount of pointis (for line plots)?. Answer with a single word, "yes" or "no" only."',
+'compare_number': 'You are provided with two images of research plots extracted from academic papers. Do these two plots have the same number of points (for point plots)? Do the curves look like they connect the same amount of points (for line plots)?. Answer with a single word, "yes" or "no" only."',
 'compare_trend': 'You are provided with two images of research plots extracted from academic papers. Do these sets of points or curves on these two plots represent the same trends? Do they follow the same patterns? Are points distributed in the same way? Answer with a single word, "yes" or "no" only."',
-'code_plot': 'Please analyze the figure and create a python code that will reproduce the plot exactly, including colors, line types, point shapes, axis labels, axis ranges, etc. Save the plot as a file "{replot_plot}" only and do not show it. Respond with the code only so that it can be directly copied and executed.\n\nUse the following data on the plot: {data}'}
+'code_plot': 'Please analyze the figure and create a python code that will reproduce the plot exactly, including colors, line types, point shapes, axis labels, axis ranges, etc. Save the plot as a file "{replot_plot}" only and do not show it. Respond with the code only so that it can be directly copied and executed. Do NOT use triple backticks anywhere. \n\nUse the following data on the plot: {data}'}
