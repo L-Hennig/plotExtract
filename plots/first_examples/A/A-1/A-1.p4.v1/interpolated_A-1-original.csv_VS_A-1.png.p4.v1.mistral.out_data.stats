@@ -1,0 +1,37 @@
+# Curve-by-curve statistics
+Curve 'blank' -> 'Log cfu/mL (Blank)':
+  MAE: 0.026904
+  LeftMissed: 0.000000
+  RightMissed: -0.083333
+Curve 'COL 0.125Âµg/mL' -> 'Log cfu/mL (COL 0.125µg/mL)':
+  MAE: 0.021274
+  LeftMissed: 0.000000
+  RightMissed: -0.083333
+Curve 'MINO 1Âµg/mL' -> 'Log cfu/mL (MINO 1µg/mL)':
+  MAE: 0.056796
+  LeftMissed: 0.000000
+  RightMissed: -0.083333
+Curve 'COL 0.125Âµg/mL + MEM 4Âµg/mL' -> 'Log cfu/mL (COL 0.125µg/mL + MEM 4µg/mL)':
+  MAE: 0.057984
+  LeftMissed: 0.000000
+  RightMissed: -0.083333
+Curve 'MEM 4Âµg/mL' -> 'Log cfu/mL (MEM 4µg/mL)':
+  MAE: 0.537640
+  LeftMissed: 0.000000
+  RightMissed: -0.083333
+Curve 'RFP 0.06Âµg/mL' -> 'Log cfu/mL (RFP 0.06µg/mL)':
+  MAE: 0.043894
+  LeftMissed: 0.000000
+  RightMissed: -0.083333
+Curve 'COL 0.125Âµg/mL + MINO 1Âµg/mL' -> 'Log cfu/mL (COL 0.125µg/mL + MINO 1µg/mL)':
+  MAE: 0.061611
+  LeftMissed: 0.000000
+  RightMissed: -0.083333
+Curve 'COL 0.125Âµg/mL + RFP 0.06Âµg/mL' -> 'Log cfu/mL (COL 0.125µg/mL + RFP 0.06µg/mL)':
+  MAE: 0.098385
+  LeftMissed: 0.000000
+  RightMissed: -0.083333
+
+# Summary
+Number of curves: 8
+Mean MAE: 0.113061

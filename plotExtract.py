@@ -34,7 +34,7 @@ prompts = prompts_module.prompts
 # Changed from anthropic.Anthropic to Mistral
 client = Mistral(api_key=api_key)
 
-def stack_images_vertically(image1_path, image2_path, border_color, output_dir, prompt_name, border_size=30):
+def stack_images_vertically(image1_path, image2_path, border_color, output_dir, prompt_name, version_num, border_size=30):
     img1 = cv2.imread(image1_path)
     img2 = cv2.imread(image2_path)
 
@@ -71,9 +71,9 @@ def stack_images_vertically(image1_path, image2_path, border_color, output_dir, 
         value=color
     )
 
-    # Create the output filename in the same folder as the input image
+    # Create the output filename in the same folder as the input image (with version)
     base_name = os.path.splitext(os.path.basename(image1_path))[0]
-    output_filename = os.path.join(output_dir, f"comparison_{base_name}.{prompt_name}.png")
+    output_filename = os.path.join(output_dir, f"comparison_{base_name}.{prompt_name}.v{version_num}.png")
 
     # Save the combined image with border
     cv2.imwrite(output_filename, combined_image_with_border)
@@ -167,9 +167,9 @@ def get_next_version(parent_dir, base_name, prompt_name):
 version_num, version_dir = get_next_version(input_dir, base_name, prompt_name)
 os.makedirs(version_dir, exist_ok=True)
 
-# Set output paths inside the version folder
-output_out = os.path.join(version_dir, f"{image_filename}.{prompt_name}.mistral.out")
-replot_plot = os.path.join(version_dir, f"{base_name}-replot.{prompt_name}{ext}")
+# Set output paths inside the version folder - include version in filenames
+output_out = os.path.join(version_dir, f"{image_filename}.{prompt_name}.v{version_num}.mistral.out")
+replot_plot = os.path.join(version_dir, f"{base_name}-replot.{prompt_name}.v{version_num}{ext}")
 
 print(f"Input plot: {input_plot}")
 print(f"Using prompt: {prompt_name}")
@@ -239,7 +239,7 @@ with open(output_out+'_conversation', 'a') as file:
   QQ.append({"role": "assistant", "content": code.replace("\n", "\\n")})
   json.dump(QQ, file)
 
-stacked = stack_images_vertically(input_plot, replot_plot, "yes", version_dir, prompt_name, 0)
+stacked = stack_images_vertically(input_plot, replot_plot, "yes", version_dir, prompt_name, version_num)
 
 print("Comparing source and replot... ", end = '', flush=True)
 wrong = False
@@ -298,7 +298,7 @@ if wrong:
 print(f"\nFINISHED (result: {validate})")
 
 print("Stacking original and replotted images for comparison... ", end = '', flush=True)
-stack_images_vertically(input_plot, replot_plot, validate, version_dir, prompt_name)
+stack_images_vertically(input_plot, replot_plot, validate, version_dir, prompt_name, version_num)
 print(f"FINISHED")
 
 # Print the version directory for use by calling scripts

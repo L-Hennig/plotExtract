@@ -1,0 +1,81 @@
+# Per-curve statistics
+
+Curve 'blank' -> 'y-axis label (Blank)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 4.31
+  Precision: 0.8889
+  Recall: 1.0000
+  MatchedPairs: 8
+  Extra extracted (unmatched): 1
+  Missed original (not found): 0
+
+Curve 'COL 0.125Âµg/mL' -> 'y-axis label (COL 0.125µg/mL)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 1.22
+  Precision: 0.1111
+  Recall: 0.1250
+  MatchedPairs: 1
+  Extra extracted (unmatched): 8
+  Missed original (not found): 7
+
+Curve 'MINO 1Âµg/mL' -> 'y-axis label (MINO 1µg/mL)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 6.38
+  Precision: 0.8889
+  Recall: 1.0000
+  MatchedPairs: 8
+  Extra extracted (unmatched): 1
+  Missed original (not found): 0
+
+Curve 'COL 0.125Âµg/mL + MEM 4Âµg/mL' -> 'y-axis label (COL 0.125µg/mL + MEM 4µg/mL)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 5.77
+  Precision: 0.8889
+  Recall: 1.0000
+  MatchedPairs: 8
+  Extra extracted (unmatched): 1
+  Missed original (not found): 0
+
+Curve 'MEM 4Âµg/mL' -> 'y-axis label (MEM 4µg/mL)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 5.80
+  Precision: 0.8889
+  Recall: 1.0000
+  MatchedPairs: 8
+  Extra extracted (unmatched): 1
+  Missed original (not found): 0
+
+Curve 'RFP 0.06Âµg/mL' -> 'y-axis label (RFP 0.06µg/mL)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 9.13
+  Precision: 0.5556
+  Recall: 0.6250
+  MatchedPairs: 5
+  Extra extracted (unmatched): 4
+  Missed original (not found): 3
+
+Curve 'COL 0.125Âµg/mL + MINO 1Âµg/mL' -> 'y-axis label (COL 0.125µg/mL + MINO 1µg/mL)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 1.22
+  Precision: 0.1111
+  Recall: 0.1250
+  MatchedPairs: 1
+  Extra extracted (unmatched): 8
+  Missed original (not found): 7
+
+Curve 'COL 0.125Âµg/mL + RFP 0.06Âµg/mL' -> 'y-axis label (COL 0.125µg/mL + RFP 0.06µg/mL)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 6.37
+  Precision: 0.8889
+  Recall: 1.0000
+  MatchedPairs: 8
+  Extra extracted (unmatched): 1
+  Missed original (not found): 0
+
+# Summary
+Number of curves: 8
+Mean MAE X (percent): 0.00
+Mean MAE Y (percent): 5.03
+Mean Precision: 0.6528
+Mean Recall: 0.7344
+Threshold (MAX_NORM_DIST): 0.2

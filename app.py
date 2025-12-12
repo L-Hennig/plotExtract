@@ -36,7 +36,7 @@ def get_input_images(directory):
             
             # Skip if filename contains any exclude pattern
             if not any(pattern in filename for pattern in exclude_patterns):
-                images.append(os.path.relpath(img_path, PLOTS_DIR))
+                images.append(os.path.relpath(img_path, PLOTS_DIR).replace('\\', '/'))
     
     return sorted(images)
 
@@ -67,7 +67,8 @@ def get_csv_paths(image_path):
 
 def find_extracted_csv(image_path, prompt_file):
     """Find the actual extracted data file for a given image and prompt.
-    Now searches inside version folders and returns the latest version."""
+    Now searches inside version folders and returns the latest version.
+    Files have version in filename: {image}.{prompt}.v{n}.mistral.out_data"""
     import re
     
     image_dir = os.path.dirname(os.path.join(PLOTS_DIR, image_path))
@@ -89,14 +90,15 @@ def find_extracted_csv(image_path, prompt_file):
             if match:
                 version_num = int(match.group(1))
                 version_dir = os.path.join(image_dir, item)
-                extracted_file = os.path.join(version_dir, f"{image_name}.{prompt_name}.mistral.out_data")
+                # Filename now includes version: {image}.{prompt}.v{n}.mistral.out_data
+                extracted_file = os.path.join(version_dir, f"{image_name}.{prompt_name}.v{version_num}.mistral.out_data")
                 
                 if os.path.exists(extracted_file) and version_num > latest_version:
                     latest_version = version_num
                     latest_file = extracted_file
     
     if latest_file:
-        return os.path.relpath(latest_file, PLOTS_DIR)
+        return os.path.relpath(latest_file, PLOTS_DIR).replace('\\', '/')
     return None
 
 def get_output_files(image_path, prompt_file=None, version_dir=None):
@@ -109,7 +111,8 @@ def get_output_files(image_path, prompt_file=None, version_dir=None):
         'images': [],
         'stats': [],
         'data': [],
-        'other': []
+        'other': [],
+        'summary': {}
     }
     
     if not os.path.exists(image_dir):
@@ -119,7 +122,7 @@ def get_output_files(image_path, prompt_file=None, version_dir=None):
     original_path = os.path.join(image_dir, image_name)
     if os.path.exists(original_path):
         outputs['images'].append({
-            'path': os.path.relpath(original_path, PLOTS_DIR),
+            'path': os.path.relpath(original_path, PLOTS_DIR).replace('\\', '/'),
             'label': 'Original Input',
             'filename': image_name
         })
@@ -128,7 +131,7 @@ def get_output_files(image_path, prompt_file=None, version_dir=None):
     original_csv = os.path.join(image_dir, f"{base_name}-original.csv")
     if os.path.exists(original_csv):
         outputs['data'].append({
-            'path': os.path.relpath(original_csv, PLOTS_DIR),
+            'path': os.path.relpath(original_csv, PLOTS_DIR).replace('\\', '/'),
             'label': 'Original Data',
             'filename': f"{base_name}-original.csv"
         })
@@ -137,6 +140,7 @@ def get_output_files(image_path, prompt_file=None, version_dir=None):
     if version_dir and os.path.exists(version_dir):
         version_label = os.path.basename(version_dir)
         _scan_version_folder(version_dir, version_label, outputs, PLOTS_DIR)
+        outputs['summary'] = _parse_summary_stats(version_dir)
     else:
         # Scan for all version folders matching pattern: {base_name}.p*.v*
         import re
@@ -147,6 +151,8 @@ def get_output_files(image_path, prompt_file=None, version_dir=None):
             if os.path.isdir(item_path) and version_pattern.match(item):
                 version_label = item
                 _scan_version_folder(item_path, version_label, outputs, PLOTS_DIR)
+                # Use summary from the last scanned folder
+                outputs['summary'] = _parse_summary_stats(item_path)
     
     return outputs
 
@@ -154,7 +160,7 @@ def _scan_version_folder(folder_path, version_label, outputs, plots_dir):
     """Helper to scan a version folder and add files to outputs."""
     for f in os.listdir(folder_path):
         full_path = os.path.join(folder_path, f)
-        rel_path = os.path.relpath(full_path, plots_dir)
+        rel_path = os.path.relpath(full_path, plots_dir).replace('\\', '/')
         
         label = None
         
@@ -186,6 +192,91 @@ def _scan_version_folder(folder_path, version_label, outputs, plots_dir):
             
         elif f.endswith('_code') or f.endswith('_conversation') or f.endswith('_validate') or f.endswith('_validate_why'):
             outputs['other'].append({'path': rel_path, 'filename': f, 'version': version_label})
+
+def _parse_validation_why(code):
+    """Convert validation code like 'X; N; T' to human-readable reasons."""
+    reasons_map = {
+        'X': 'X-axis',
+        'Y': 'Y-axis', 
+        'N': 'Number of points',
+        'T': 'Trends'
+    }
+    if not code:
+        return 'N/A'
+    parts = [p.strip() for p in code.replace(';', ',').split(',') if p.strip()]
+    reasons = [reasons_map.get(p, p) for p in parts]
+    return ', '.join(reasons) if reasons else 'N/A'
+
+def _parse_summary_stats(folder_path):
+    """Parse validation and comparison stats from a version folder."""
+    summary = {
+        'validation_result': None,
+        'validation_reason': None,
+        'interpolation_mae': None,
+        'pointwise_mae_x': None,
+        'pointwise_mae_y': None,
+        'precision': None,
+        'recall': None
+    }
+    
+    if not folder_path or not os.path.exists(folder_path):
+        return summary
+    
+    # Find and parse validation files
+    for f in os.listdir(folder_path):
+        full_path = os.path.join(folder_path, f)
+        
+        if f.endswith('_validate') and not f.endswith('_validate_why'):
+            try:
+                with open(full_path, 'r') as file:
+                    content = file.read().strip().lower()
+                    summary['validation_result'] = 'Yes' if 'yes' in content else 'No'
+            except:
+                pass
+                
+        elif f.endswith('_validate_why'):
+            try:
+                with open(full_path, 'r') as file:
+                    content = file.read().strip()
+                    summary['validation_reason'] = _parse_validation_why(content)
+            except:
+                pass
+                
+        elif f.endswith('.stats') and 'interpolated_' in f:
+            try:
+                with open(full_path, 'r', encoding='latin1') as file:
+                    for line in file:
+                        if 'Mean MAE:' in line:
+                            val = line.split(':')[1].strip()
+                            summary['interpolation_mae'] = float(val)
+                            break
+            except:
+                pass
+                
+        elif f.endswith('.stats') and 'pointwise_' in f:
+            try:
+                with open(full_path, 'r', encoding='latin1') as file:
+                    for line in file:
+                        if 'Mean MAE X (percent):' in line:
+                            val = line.split(':')[1].strip()
+                            summary['pointwise_mae_x'] = f"{float(val):.2f}%"
+                        elif 'Mean MAE Y (percent):' in line:
+                            val = line.split(':')[1].strip()
+                            summary['pointwise_mae_y'] = f"{float(val):.2f}%"
+                        elif 'Mean Precision:' in line:
+                            val = line.split(':')[1].strip()
+                            summary['precision'] = f"{float(val) * 100:.1f}%"
+                        elif 'Mean Recall:' in line:
+                            val = line.split(':')[1].strip()
+                            summary['recall'] = f"{float(val) * 100:.1f}%"
+            except:
+                pass
+    
+    # If validation was Yes, set reason to N/A
+    if summary['validation_result'] == 'Yes':
+        summary['validation_reason'] = 'N/A'
+    
+    return summary
 
 def check_csv_exists(image_path, prompt_file=None):
     """Check if original and extracted CSVs exist."""
@@ -275,6 +366,8 @@ def get_outputs():
 def read_file_route():
     """Read contents of a text file."""
     file_path = request.json.get('file_path')
+    # Convert forward slashes to OS-appropriate separators
+    file_path = file_path.replace('/', os.sep)
     full_path = os.path.join(PLOTS_DIR, file_path)
     try:
         with open(full_path, 'r', encoding='latin1') as f:
@@ -358,11 +451,17 @@ def run_all():
         console_output.append(f"[ERROR] {str(e)}")
     
     # Determine extracted CSV path (inside version folder)
+    # Extract version number from version_dir name (e.g., A-1.p2.v3 -> 3)
+    version_num = 1
     if version_dir:
-        extracted_csv = os.path.join(version_dir, f"{image_name}.{prompt_name}.mistral.out_data")
+        import re
+        version_match = re.search(r'\.v(\d+)$', os.path.basename(version_dir))
+        if version_match:
+            version_num = int(version_match.group(1))
+        extracted_csv = os.path.join(version_dir, f"{image_name}.{prompt_name}.v{version_num}.mistral.out_data")
     else:
         # Fallback if VERSION_DIR not found
-        extracted_csv = os.path.join(image_dir, f"{image_name}.{prompt_name}.mistral.out_data")
+        extracted_csv = os.path.join(image_dir, f"{image_name}.{prompt_name}.v{version_num}.mistral.out_data")
     
     # Step 2: Run interpolation if requested
     if run_interpolation and success:

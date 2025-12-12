@@ -1,0 +1,16 @@
+import matplotlib.pyplot as plt
+
+x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+y = [5, 2, 12, 7, 1, 10, 3, 13, 5, 7]
+
+plt.figure(figsize=(6, 4))
+plt.plot(x, y, color='#1f77b4', linestyle='-', linewidth=1.5, marker='o', markersize=4, markerfacecolor='#1f77b4', markeredgecolor='#1f77b4')
+plt.xlim(0, 9)
+plt.ylim(0, 14)
+plt.xticks(range(0, 10))
+plt.yticks(range(0, 15, 2))
+plt.grid(True, linestyle='--', alpha=0.7)
+plt.gca().set_axisbelow(True)
+
+plt.savefig(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\quick_test\example0-0.p3.v1\example0-0-replot.p3.v1.png", dpi=300, bbox_inches='tight')
+plt.close()

@@ -93,16 +93,57 @@
             opacity: 0.5;
             pointer-events: none;
         }
+        .summary-stats {
+            background: #f0f7ff;
+            border: 1px solid #b3d4fc;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .summary-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .summary-row:last-child {
+            margin-bottom: 0;
+        }
+        .summary-label {
+            font-weight: bold;
+            color: #333;
+            margin-right: 8px;
+            min-width: 140px;
+        }
+        .summary-value {
+            color: #0066cc;
+            font-weight: 500;
+        }
+        .summary-value.yes {
+            color: #28a745;
+        }
+        .summary-value.no {
+            color: #dc3545;
+        }
         .output-section { margin-top: 20px; }
-        .output-images { display: flex; flex-wrap: wrap; gap: 20px; }
+        .output-images { 
+            display: flex; 
+            flex-wrap: nowrap; 
+            gap: 15px; 
+            justify-content: center;
+            align-items: flex-start;
+        }
         .image-card {
             display: flex;
             flex-direction: column;
             align-items: center;
+            flex: 1;
+            min-width: 0;
         }
         .image-card img {
-            max-width: 650px;
-            max-height: 500px;
+            width: 100%;
+            max-height: 600px;
+            object-fit: contain;
             border: 1px solid #ddd;
             border-radius: 4px;
             cursor: pointer;
@@ -267,7 +308,7 @@
                     </div>
                     <div class="form-group">
                         <label for="rightX">Right X:</label>
-                        <input type="number" id="rightX" value="100" step="any">
+                        <input type="number" id="rightX" value="24" step="any">
                     </div>
                     <div class="form-group">
                         <label for="bottomY">Bottom Y:</label>
@@ -275,7 +316,7 @@
                     </div>
                     <div class="form-group">
                         <label for="topY">Top Y:</label>
-                        <input type="number" id="topY" value="100" step="any">
+                        <input type="number" id="topY" value="16" step="any">
                     </div>
                 </div>
             </div>
@@ -305,6 +346,36 @@
             </div>
             
             <div id="tab-images" class="tab-content">
+                <!-- Summary Stats Display -->
+                <div id="summaryStats" class="summary-stats" style="display: none;">
+                    <div class="summary-row">
+                        <span class="summary-label">Validation Result:</span>
+                        <span id="summaryValidation" class="summary-value">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Validation Reason:</span>
+                        <span id="summaryValidationReason" class="summary-value">-</span>
+                    </div>
+                    <div id="interpolationStats" class="summary-row" style="display: none;">
+                        <span class="summary-label">Interpolation MAE:</span>
+                        <span id="summaryInterpolationMAE" class="summary-value">-</span>
+                    </div>
+                    <div id="pointwiseStats" style="display: none;">
+                        <div class="summary-row">
+                            <span class="summary-label">MAE X:</span>
+                            <span id="summaryMAEX" class="summary-value">-</span>
+                            <span class="summary-label" style="margin-left: 20px;">MAE Y:</span>
+                            <span id="summaryMAEY" class="summary-value">-</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Precision:</span>
+                            <span id="summaryPrecision" class="summary-value">-</span>
+                            <span class="summary-label" style="margin-left: 20px;">Recall:</span>
+                            <span id="summaryRecall" class="summary-value">-</span>
+                        </div>
+                    </div>
+                </div>
+                
                 <div id="outputImages" class="output-images">
                     <p style="color: #666;">Select an image and run extraction to see results.</p>
                 </div>
@@ -418,17 +489,67 @@
         }
         
         function updateOutputDisplay(outputs) {
-            // Update images with labels
+            // Update images with labels - only show comparison, interpolation, pointwise
             const imagesDiv = document.getElementById('outputImages');
             if (outputs.images && outputs.images.length > 0) {
-                imagesDiv.innerHTML = outputs.images.map(img => 
-                    `<div class="image-card">
-                        <img src="/plots/${img.path}" onclick="openModal('/plots/${img.path}')" title="${img.filename}">
-                        <div class="image-label">${img.label}</div>
-                    </div>`
-                ).join('');
+                // Filter to only show comparison, interpolation, and pointwise images
+                const filteredImages = outputs.images.filter(img => 
+                    img.filename.startsWith('comparison_') || 
+                    img.filename.startsWith('interpolated_') || 
+                    img.filename.startsWith('pointwise_')
+                );
+                
+                if (filteredImages.length > 0) {
+                    imagesDiv.innerHTML = filteredImages.map(img => 
+                        `<div class="image-card">
+                            <img src="/plots/${img.path}" onclick="openModal('/plots/${img.path}')" title="${img.filename}">
+                            <div class="image-label">${img.label}</div>
+                        </div>`
+                    ).join('');
+                } else {
+                    imagesDiv.innerHTML = '<p style="color: #666;">No comparison images yet. Run extraction first.</p>';
+                }
             } else {
                 imagesDiv.innerHTML = '<p style="color: #666;">No output images yet.</p>';
+            }
+            
+            // Update summary statistics display
+            const summaryDiv = document.getElementById('summaryStats');
+            const summary = outputs.summary || {};
+            
+            if (summary.validation_result) {
+                summaryDiv.style.display = 'block';
+                
+                // Validation result with color
+                const valResult = document.getElementById('summaryValidation');
+                valResult.textContent = summary.validation_result;
+                valResult.className = 'summary-value ' + (summary.validation_result === 'Yes' ? 'yes' : 'no');
+                
+                // Validation reason
+                document.getElementById('summaryValidationReason').textContent = summary.validation_reason || 'N/A';
+                
+                // Interpolation stats
+                const interpStats = document.getElementById('interpolationStats');
+                if (summary.interpolation_mae !== null && summary.interpolation_mae !== undefined) {
+                    interpStats.style.display = 'flex';
+                    document.getElementById('summaryInterpolationMAE').textContent = summary.interpolation_mae.toFixed(4);
+                } else {
+                    interpStats.style.display = 'none';
+                }
+                
+                // Pointwise stats
+                const pointwiseStats = document.getElementById('pointwiseStats');
+                if (summary.precision !== null && summary.precision !== undefined) {
+                    pointwiseStats.style.display = 'block';
+                    document.getElementById('summaryMAEX').textContent = summary.pointwise_mae_x || '-';
+                    document.getElementById('summaryMAEY').textContent = summary.pointwise_mae_y || '-';
+                    document.getElementById('summaryPrecision').textContent = summary.precision || '-';
+                    document.getElementById('summaryRecall').textContent = summary.recall || '-';
+                } else {
+                    pointwiseStats.style.display = 'none';
+                }
+            } else {
+                summaryDiv.style.display = 'none';
             }
             
             // Update stats with labels

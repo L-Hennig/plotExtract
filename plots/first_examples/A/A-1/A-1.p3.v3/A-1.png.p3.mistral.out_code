@@ -1,0 +1,49 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+data = {
+    'Blank': [6.1, 9.5, 9.8, 10.0, 10.2, 10.3, 10.0, 9.5],
+    'COL 0.125µg/mL': [6.1, 7.2, 8.5, 9.0, 9.5, 10.0, 10.0, 10.0],
+    'MINO 1µg/mL': [6.1, 8.2, 9.0, 9.5, 10.0, 10.0, 9.8, 9.0],
+    'COL 0.125µg/mL + MEM 4µg/mL': [6.1, 0.5, 0, 0, 0, 0, 0, 0],
+    'COL 0.125µg/mL + MINO 1µg/mL': [6.1, 0.5, 0, 0, 0, 0, 0, 0],
+    'MEM 4µg/mL': [6.1, 0.5, 0.5, 1.0, 1.5, 1.5, 1.0, 0],
+    'RFP 0.06µg/mL': [6.1, 0.5, 1.0, 1.5, 2.0, 2.0, 1.5, 0],
+    'COL 0.125µg/mL + RFP 0.06µg/mL': [6.1, 0.5, 0, 0.5, 1.0, 1.5, 1.0, 0]
+}
+
+x = [0, 2, 4, 6, 8, 10, 12, 24]
+
+# Plot settings
+plt.figure(figsize=(8, 6))
+line_styles = {
+    'Blank': {'color': 'k', 'linestyle': '--', 'marker': 'x', 'markersize': 8},
+    'COL 0.125µg/mL': {'color': 'k', 'linestyle': '-', 'marker': 's', 'markersize': 8},
+    'MINO 1µg/mL': {'color': 'k', 'linestyle': '--', 'marker': '^', 'markersize': 8},
+    'COL 0.125µg/mL + MEM 4µg/mL': {'color': 'k', 'linestyle': '-.', 'marker': 'o', 'markersize': 8, 'fillstyle': 'none'},
+    'COL 0.125µg/mL + MINO 1µg/mL': {'color': 'k', 'linestyle': ':', 'marker': 'D', 'markersize': 8},
+    'MEM 4µg/mL': {'color': 'k', 'linestyle': ':', 'marker': 'v', 'markersize': 8, 'fillstyle': 'none'},
+    'RFP 0.06µg/mL': {'color': 'k', 'linestyle': '--', 'marker': '>', 'markersize': 8, 'fillstyle': 'none'},
+    'COL 0.125µg/mL + RFP 0.06µg/mL': {'color': 'k', 'linestyle': ':', 'marker': '<', 'markersize': 8}
+}
+
+# Plot each curve
+for label, y_values in data.items():
+    plt.plot(x, y_values, label=label, **line_styles[label])
+
+# Axis labels and title
+plt.xlabel('Time (h)')
+plt.ylabel('Log cfu/mL')
+plt.ylim(0, 16)
+plt.xlim(0, 26)
+
+# Legend
+plt.legend(loc='upper right')
+
+# Save plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\first_examples\A\A-1\A-1.p3.v3"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "A-1-replot.p3.png"), dpi=300, bbox_inches='tight')
+plt.close()

@@ -1,0 +1,54 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time = [0, 2, 4, 6, 8, 10, 12, 22, 24, 26]
+data = {
+    'Blank': [6.2, 9.5, 9.8, 10.0, 10.0, 10.0, 10.0, 9.5, 9.0, 9.0],
+    'COL 0.125µg/mL': [6.2, 7.0, 8.0, 8.5, 9.0, 9.5, 10.0, 10.0, 10.0, 10.0],
+    'MINO 1µg/mL': [6.2, 8.0, 8.5, 9.0, 9.5, 10.0, 10.0, 9.0, 8.5, 8.0],
+    'MEM 4µg/mL': [6.2, 6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'RFP 0.06µg/mL': [6.2, 9.5, 10.0, 10.0, 10.0, 10.0, 10.0, 9.0, 8.0, 7.0],
+    'COL 0.125µg/mL + MEM 4µg/mL': [6.2, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'COL 0.125µg/mL + MINO 1µg/mL': [6.2, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 2.0],
+    'COL 0.125µg/mL + RFP 0.06µg/mL': [6.2, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+}
+
+# Plot settings
+plt.figure(figsize=(8, 6))
+markers = ['x', 's', '^', 'o', 'v', 'D', '>', '<']
+linestyles = ['-', '-', '--', ':', '-.', '--', '-.', '--']
+colors = ['k', 'k', 'k', 'k', 'k', 'k', 'k', 'k']
+
+# Plot each curve
+for i, (label, y_values) in enumerate(data.items()):
+    plt.plot(time, y_values, label=label, marker=markers[i], linestyle=linestyles[i], color=colors[i])
+
+# Axis settings
+plt.xlabel('Time (h)')
+plt.ylabel('Log cfu/mL')
+plt.ylim(0, 16)
+plt.xlim(0, 26)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 22, 24, 26])
+plt.yticks([0, 2, 4, 6, 8, 10, 12, 14, 16])
+
+# Axis break
+plt.gca().set_xlim(0, 26)
+plt.gca().spines['right'].set_visible(False)
+plt.gca().spines['top'].set_visible(False)
+
+# Add axis break visual
+plt.gca().plot((12, 12.5), (0, 0), 'k', lw=1.5)
+plt.gca().plot((12, 12.5), (16, 16), 'k', lw=1.5)
+plt.gca().add_patch(plt.Polygon([[12, 0], [12.5, 0], [12.25, -0.5]], color='white', ec='k'))
+plt.gca().add_patch(plt.Polygon([[12, 16], [12.5, 16], [12.25, 16.5]], color='white', ec='k'))
+
+# Legend
+plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+# Save plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\first_examples\A\A-1\A-1.p4.v1"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "A-1-replot.p4.v1.png"), bbox_inches='tight', dpi=300)
+plt.close()

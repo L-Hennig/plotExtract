@@ -1,0 +1,49 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+data = {
+    "Blank": [6.2, 9.5, 9.8, 10.0, 10.0, 10.0, 9.8, 9.5, 9.0, 9.0],
+    "COL 0.125µg/mL": [6.2, 7.0, 8.5, 9.0, 9.5, 10.0, 10.0, 10.0, 10.0, 10.0],
+    "MINO 1µg/mL": [6.2, 8.0, 8.5, 9.0, 9.5, 9.5, 9.0, 8.5, 8.0, 8.0],
+    "COL 0.125µg/mL + MEM 4µg/mL": [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "COL 0.125µg/mL + MINO 1µg/mL": [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.0, 2.0],
+    "MEM 4µg/mL": [6.2, 0.0, 0.5, 1.0, 1.5, 1.5, 1.5, 1.0, 0.5, 0.0],
+    "RFP 0.06µg/mL": [6.2, 8.5, 9.0, 9.5, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0],
+    "COL 0.125µg/mL + RFP 0.06µg/mL": [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.5, 2.5]
+}
+
+x = [0, 2, 4, 6, 8, 10, 12, 22, 24, 26]
+
+# Plot settings
+plt.figure(figsize=(8, 6))
+line_styles = {
+    "Blank": {'color': 'k', 'marker': 'x', 'linestyle': '--'},
+    "COL 0.125µg/mL": {'color': 'k', 'marker': 's', 'linestyle': '-'},
+    "MINO 1µg/mL": {'color': 'k', 'marker': '^', 'linestyle': '--'},
+    "COL 0.125µg/mL + MEM 4µg/mL": {'color': 'k', 'marker': 'o', 'linestyle': ':'},
+    "COL 0.125µg/mL + MINO 1µg/mL": {'color': 'k', 'marker': 'D', 'linestyle': '--'},
+    "MEM 4µg/mL": {'color': 'k', 'marker': 'v', 'linestyle': '-.'},
+    "RFP 0.06µg/mL": {'color': 'k', 'marker': '>', 'linestyle': ':'},
+    "COL 0.125µg/mL + RFP 0.06µg/mL": {'color': 'k', 'marker': '<', 'linestyle': '--'}
+}
+
+# Plotting each curve
+for label, y_values in data.items():
+    plt.plot(x, y_values, label=label, **line_styles[label])
+
+# Axis labels and limits
+plt.xlabel('Time (h)')
+plt.ylabel('Log cfu/mL')
+plt.ylim(0, 16)
+plt.xlim(0, 26)
+
+# Legend
+plt.legend()
+
+# Save the plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\first_examples\A\A-1\A-1.p3.v4"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "A-1-replot.p3.v4.png"), dpi=300, bbox_inches='tight')
+plt.close()

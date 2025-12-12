@@ -1,0 +1,53 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time = [0, 2, 4, 6, 8, 10, 12, 24]
+
+data = {
+    "Blank": [6.1, 9.5, 10.0, 9.8, 10.0, 10.0, 9.8, 10.0],
+    "COL 0.125µg/mL": [6.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "MINO 1µg/mL": [6.1, 8.0, 8.5, 9.0, 9.5, 9.5, 9.0, 8.5],
+    "MEM 4µg/mL": [6.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "RFP 0.06µg/mL": [6.1, 8.0, 9.0, 9.5, 10.0, 10.0, 9.5, 10.0],
+    "COL 0.125µg/mL + MEM 4µg/mL": [6.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "COL 0.125µg/mL + MINO 1µg/mL": [6.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "COL 0.125µg/mL + RFP 0.06µg/mL": [6.1, 0.0, 0.0, 1.0, 1.5, 2.0, 0.0, 0.0]
+}
+
+# Plot styles
+styles = {
+    "Blank": {"color": "black", "linestyle": "--", "marker": "x", "markersize": 6},
+    "COL 0.125µg/mL": {"color": "black", "linestyle": "-", "marker": "s", "markersize": 6},
+    "MINO 1µg/mL": {"color": "black", "linestyle": "-.", "marker": "^", "markersize": 6},
+    "MEM 4µg/mL": {"color": "black", "linestyle": ":", "marker": "o", "markersize": 6},
+    "RFP 0.06µg/mL": {"color": "black", "linestyle": "--", "marker": "v", "markersize": 6},
+    "COL 0.125µg/mL + MEM 4µg/mL": {"color": "black", "linestyle": ":", "marker": "o", "fillstyle": "none", "markersize": 6},
+    "COL 0.125µg/mL + MINO 1µg/mL": {"color": "black", "linestyle": "-.", "marker": "^", "fillstyle": "none", "markersize": 6},
+    "COL 0.125µg/mL + RFP 0.06µg/mL": {"color": "black", "linestyle": "--", "marker": "v", "fillstyle": "none", "markersize": 6}
+}
+
+# Create plot
+plt.figure(figsize=(8, 6))
+for label, values in data.items():
+    plt.plot(time, values, label=label, **styles[label])
+
+# Axis labels and limits
+plt.xlabel("Time (h)")
+plt.ylabel("Log cfu/mL")
+plt.ylim(0, 16)
+plt.xlim(0, 26)
+
+# Customize x-axis ticks
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 22, 24])
+
+# Add legend
+plt.legend(loc="upper right")
+
+# Ensure directory exists
+os.makedirs(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\first_examples\A\A-1\A-1.p4.v2", exist_ok=True)
+
+# Save plot
+plt.savefig(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\first_examples\A\A-1\A-1.p4.v2\A-1-replot.p4.v2.png", dpi=300, bbox_inches="tight")
+plt.close()
