@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synthetic Time-Kill Plot Generator</title>
+    <style>
+        /* =================================================================
+           Base Styles
+           ================================================================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        h3 {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        /* =================================================================
+           Layout - Three Column Design
+           ================================================================= */
+        .container {
+            display: grid;
+            grid-template-columns: 350px 1fr 300px;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .panel-left { grid-column: 1; }
+        .panel-center { grid-column: 2; }
+        .panel-right { grid-column: 3; }
+
+        /* =================================================================
+           Form Elements
+           ================================================================= */
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 3px rgba(52,152,219,0.3);
+        }
+        input[type="color"] {
+            width: 50px;
+            height: 30px;
+            padding: 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .checkbox-row label {
+            margin-bottom: 0;
+            font-weight: normal;
+        }
+
+        /* Inline form groups */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        /* =================================================================
+           Buttons
+           ================================================================= */
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #219a52;
+        }
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #d68910;
+        }
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* =================================================================
+           Curves Section
+           ================================================================= */
+        .curves-container {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .curve-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+        .curve-card.collapsed .curve-body {
+            display: none;
+        }
+        .curve-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding-bottom: 10px;
+        }
+        .curve-header h4 {
+            margin: 0;
+            font-size: 14px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .curve-color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .curve-toggle {
+            font-size: 12px;
+            color: #666;
+        }
+        .curve-body {
+            border-top: 1px solid #ddd;
+            padding-top: 12px;
+        }
+
+        /* =================================================================
+           Preview Section
+           ================================================================= */
+        .preview-container {
+            text-align: center;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .preview-container img {
+            max-width: 100%;
+            max-height: 500px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .preview-placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* =================================================================
+           Status & Messages
+           ================================================================= */
+        .status-bar {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 10px 15px;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+        .status-bar.success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .status-bar.error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .status-bar.info {
+            background: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+
+        /* =================================================================
+           Section Dividers
+           ================================================================= */
+        .section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        /* =================================================================
+           Tooltips
+           ================================================================= */
+        .tooltip-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background: #3498db;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 16px;
+            font-size: 11px;
+            cursor: help;
+            margin-left: 5px;
+        }
+
+        /* =================================================================
+           Responsive Design
+           ================================================================= */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .panel-left, .panel-center, .panel-right {
+                grid-column: 1;
+            }
+        }
+
+        /* =================================================================
+           File Info Display
+           ================================================================= */
+        .file-info {
+            background: #e8f4f8;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+        .file-info strong {
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧫 Synthetic Time-Kill Plot Generator</h1>
+    
+    <div class="container">
+        <!-- =================================================================
+             Left Panel - Global Settings
+             ================================================================= -->
+        <div class="panel panel-left">
+            <h2>📊 Plot Settings</h2>
+            
+            <!-- Data Settings -->
+            <div class="section">
+                <h3>Data Configuration</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Number of Curves</label>
+                        <input type="number" id="numCurves" min="1" max="15" value="3" onchange="updateCurveCount()">
+                    </div>
+                    <div class="form-group">
+                        <label>Points per Curve</label>
+                        <input type="number" id="numPoints" min="2" max="50" value="8">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>X-Values Mode</label>
+                    <select id="xValuesMode" onchange="toggleXValuesMode()">
+                        <option value="auto">Auto (evenly spaced)</option>
+                        <option value="manual">Manual (specify values)</option>
+                    </select>
+                </div>
+                
+                <div id="xAutoSettings">
+                    <div class="form-group">
+                        <label>X-Axis Spacing</label>
+                        <input type="number" id="xSpacing" min="0.1" step="0.5" value="3">
+                    </div>
+                </div>
+                
+                <div id="xManualSettings" style="display: none;">
+                    <div class="form-group">
+                        <label>X-Values (comma separated)</label>
+                        <input type="text" id="xValuesManual" value="0, 2, 4, 6, 8, 12, 18, 24" placeholder="0, 2, 4, 6, 8, 12, 18, 24">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Axis Settings -->
+            <div class="section">
+                <h3>Axis Labels & Scale</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>X-Axis Label</label>
+                        <input type="text" id="xLabel" value="Time">
+                    </div>
+                    <div class="form-group">
+                        <label>X-Axis Unit</label>
+                        <input type="text" id="xUnit" value="hours">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Y-Axis Label</label>
+                        <input type="text" id="yLabel" value="Bacterial Count">
+                    </div>
+                    <div class="form-group">
+                        <label>Y-Axis Unit</label>
+                        <input type="text" id="yUnit" value="CFU/mL">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Y-Axis Scale</label>
+                    <select id="yScale">
+                        <option value="log">Logarithmic (log₁₀)</option>
+                        <option value="linear">Linear</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Axis Limits -->
+            <div class="section">
+                <h3>Axis Limits (optional)</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>X Min</label>
+                        <input type="number" id="xMin" step="any" placeholder="Auto">
+                    </div>
+                    <div class="form-group">
+                        <label>X Max</label>
+                        <input type="number" id="xMax" step="any" placeholder="Auto">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Y Min (log₁₀)</label>
+                        <input type="number" id="yMin" step="any" value="0" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Y Max (log₁₀)</label>
+                        <input type="number" id="yMax" step="any" placeholder="Auto">
+                    </div>
+                </div>
+                <p style="font-size: 11px; color: #666; margin-top: -8px;">
+                    Y-axis shows log₁₀ values (e.g., 6 = 10⁶ CFU/mL)
+                </p>
+            </div>
+            
+            <!-- Appearance -->
+            <div class="section">
+                <h3>Appearance</h3>
+                <div class="form-group">
+                    <label>Plot Title</label>
+                    <input type="text" id="plotTitle" placeholder="Optional title">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Width (inches)</label>
+                        <input type="number" id="figWidth" min="4" max="20" step="0.5" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label>Height (inches)</label>
+                        <input type="number" id="figHeight" min="3" max="15" step="0.5" value="6">
+                    </div>
+                </div>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="showLegend" checked>
+                    <label for="showLegend">Show Legend</label>
+                </div>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="showGrid" checked>
+                    <label for="showGrid">Show Grid</label>
+                </div>
+            </div>
+            
+            <!-- Output Options -->
+            <div class="section">
+                <h3>Output Options</h3>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="saveSvg">
+                    <label for="saveSvg">Also save as SVG</label>
+                </div>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                    Files saved to: <code>plots/synthetic/</code>
+                </p>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="button-row">
+                <button class="btn-danger" onclick="resetSettings()">🔄 Reset</button>
+            </div>
+        </div>
+        
+        <!-- =================================================================
+             Center Panel - Preview
+             ================================================================= -->
+        <div class="panel panel-center">
+            <h2>👁️ Preview</h2>
+            
+            <div class="preview-container" id="previewContainer">
+                <p class="preview-placeholder">Click "Preview" to generate a plot</p>
+            </div>
+            
+            <div class="button-row" style="justify-content: center;">
+                <button class="btn-primary" onclick="generatePreview()">👁️ Preview</button>
+                <button class="btn-warning" onclick="regenerateData()">🎲 Regenerate</button>
+                <button class="btn-success" onclick="savePlot()">💾 Save</button>
+            </div>
+            
+            <div id="statusBar" class="status-bar" style="display: none;"></div>
+        </div>
+        
+        <!-- =================================================================
+             Right Panel - Curve Configuration
+             ================================================================= -->
+        <div class="panel panel-right">
+            <h2>📈 Curve Settings</h2>
+            <p style="font-size: 12px; color: #666; margin-bottom: 15px;">
+                Click on a curve header to expand/collapse settings
+            </p>
+            
+            <div class="curves-container" id="curvesContainer">
+                <!-- Curve cards will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- =================================================================
+         JavaScript
+         ================================================================= -->
+    <script>
+        // =================================================================
+        // Global State
+        // =================================================================
+        let currentCurves = [];
+        let currentPreviewData = null;
+        
+        // =================================================================
+        // Initialization
+        // =================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+        });
+        
+        function loadSettings() {
+            fetch('/get_settings')
+                .then(res => res.json())
+                .then(settings => {
+                    applySettings(settings);
+                });
+        }
+        
+        function applySettings(settings) {
+            // Global settings
+            document.getElementById('numCurves').value = settings.num_curves || 3;
+            document.getElementById('numPoints').value = settings.num_points || 8;
+            document.getElementById('xValuesMode').value = settings.x_values_mode || 'auto';
+            document.getElementById('xValuesManual').value = settings.x_values_manual || '0, 2, 4, 6, 8, 12, 18, 24';
+            document.getElementById('xSpacing').value = settings.x_spacing || 3;
+            
+            document.getElementById('xLabel').value = settings.x_label || 'Time';
+            document.getElementById('xUnit').value = settings.x_unit || 'hours';
+            document.getElementById('yLabel').value = settings.y_label || 'Bacterial Count';
+            document.getElementById('yUnit').value = settings.y_unit || 'CFU/mL';
+            document.getElementById('yScale').value = settings.y_scale || 'log';
+            
+            document.getElementById('xMin').value = settings.x_min || '';
+            document.getElementById('xMax').value = settings.x_max || '';
+            document.getElementById('yMin').value = settings.y_min || '';
+            document.getElementById('yMax').value = settings.y_max || '';
+            
+            document.getElementById('plotTitle').value = settings.title || '';
+            document.getElementById('figWidth').value = settings.figure_width || 10;
+            document.getElementById('figHeight').value = settings.figure_height || 6;
+            document.getElementById('showLegend').checked = settings.show_legend !== false;
+            document.getElementById('showGrid').checked = settings.show_grid !== false;
+            document.getElementById('saveSvg').checked = settings.save_svg || false;
+            
+            // Curves
+            currentCurves = settings.curves || [];
+            renderCurveCards();
+            toggleXValuesMode();
+        }
+        
+        // =================================================================
+        // Gather Settings from Form
+        // =================================================================
+        function gatherSettings() {
+            // Update curves from form
+            updateCurvesFromForm();
+            
+            return {
+                num_curves: parseInt(document.getElementById('numCurves').value),
+                num_points: parseInt(document.getElementById('numPoints').value),
+                x_values_mode: document.getElementById('xValuesMode').value,
+                x_values_manual: document.getElementById('xValuesManual').value,
+                x_spacing: parseFloat(document.getElementById('xSpacing').value),
+                
+                x_label: document.getElementById('xLabel').value,
+                x_unit: document.getElementById('xUnit').value,
+                y_label: document.getElementById('yLabel').value,
+                y_unit: document.getElementById('yUnit').value,
+                y_scale: document.getElementById('yScale').value,
+                
+                x_min: document.getElementById('xMin').value,
+                x_max: document.getElementById('xMax').value,
+                y_min: document.getElementById('yMin').value,
+                y_max: document.getElementById('yMax').value,
+                
+                title: document.getElementById('plotTitle').value,
+                figure_width: parseFloat(document.getElementById('figWidth').value),
+                figure_height: parseFloat(document.getElementById('figHeight').value),
+                show_legend: document.getElementById('showLegend').checked,
+                show_grid: document.getElementById('showGrid').checked,
+                save_svg: document.getElementById('saveSvg').checked,
+                
+                curves: currentCurves
+            };
+        }
+        
+        // =================================================================
+        // Curve Management
+        // =================================================================
+        function updateCurveCount() {
+            const numCurves = parseInt(document.getElementById('numCurves').value);
+            
+            fetch('/update_curves', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ num_curves: numCurves })
+            })
+            .then(res => res.json())
+            .then(data => {
+                currentCurves = data.curves;
+                renderCurveCards();
+            });
+        }
+        
+        function updateCurvesFromForm() {
+            // Read all curve settings from the form
+            currentCurves.forEach((curve, index) => {
+                const prefix = `curve_${index}_`;
+                
+                const nameEl = document.getElementById(prefix + 'name');
+                const initialYEl = document.getElementById(prefix + 'initialY');
+                const trendEl = document.getElementById(prefix + 'trend');
+                const magnitudeEl = document.getElementById(prefix + 'magnitude');
+                const noiseEl = document.getElementById(prefix + 'noise');
+                const colorEl = document.getElementById(prefix + 'color');
+                const markerEl = document.getElementById(prefix + 'marker');
+                const lineStyleEl = document.getElementById(prefix + 'lineStyle');
+                const showLineEl = document.getElementById(prefix + 'showLine');
+                const lineWidthEl = document.getElementById(prefix + 'lineWidth');
+                const markerSizeEl = document.getElementById(prefix + 'markerSize');
+                
+                if (nameEl) curve.name = nameEl.value;
+                if (initialYEl) curve.initial_y = parseFloat(initialYEl.value);
+                if (trendEl) curve.trend = trendEl.value;
+                if (magnitudeEl) curve.trend_magnitude = parseFloat(magnitudeEl.value);
+                if (noiseEl) curve.noise_level = parseFloat(noiseEl.value);
+                if (colorEl) curve.color = colorEl.value;
+                if (markerEl) curve.marker = markerEl.value;
+                if (lineStyleEl) curve.line_style = lineStyleEl.value;
+                if (showLineEl) curve.show_line = showLineEl.checked;
+                if (lineWidthEl) curve.line_width = parseFloat(lineWidthEl.value);
+                if (markerSizeEl) curve.marker_size = parseFloat(markerSizeEl.value);
+            });
+        }
+        
+        function renderCurveCards() {
+            const container = document.getElementById('curvesContainer');
+            container.innerHTML = '';
+            
+            currentCurves.forEach((curve, index) => {
+                const card = createCurveCard(curve, index);
+                container.appendChild(card);
+            });
+        }
+        
+        function createCurveCard(curve, index) {
+            const div = document.createElement('div');
+            div.className = 'curve-card collapsed';
+            div.id = `curveCard_${index}`;
+            
+            const prefix = `curve_${index}_`;
+            
+            div.innerHTML = `
+                <div class="curve-header" onclick="toggleCurveCard(${index})">
+                    <h4>
+                        <span class="curve-color-dot" style="background: ${curve.color}"></span>
+                        <span id="${prefix}headerName">${curve.name}</span>
+                    </h4>
+                    <span class="curve-toggle">▼</span>
+                </div>
+                <div class="curve-body">
+                    <div class="form-group">
+                        <label>Curve Name</label>
+                        <input type="text" id="${prefix}name" value="${curve.name}" 
+                               onchange="updateCurveHeader(${index})">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Initial Y (log₁₀)</label>
+                            <input type="number" id="${prefix}initialY" value="${curve.initial_y}" 
+                                   step="0.1" min="0" max="12">
+                        </div>
+                        <div class="form-group">
+                            <label>Noise Level</label>
+                            <input type="number" id="${prefix}noise" value="${curve.noise_level}" 
+                                   step="0.05" min="0" max="1">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Trend Pattern</label>
+                        <select id="${prefix}trend">
+                            <option value="stable" ${curve.trend === 'stable' ? 'selected' : ''}>Stable (flat)</option>
+                            <option value="up" ${curve.trend === 'up' ? 'selected' : ''}>Growth (increasing)</option>
+                            <option value="down" ${curve.trend === 'down' ? 'selected' : ''}>Kill (decreasing)</option>
+                            <option value="kill_regrowth" ${curve.trend === 'kill_regrowth' ? 'selected' : ''}>Kill + Regrowth</option>
+                            <option value="mixed" ${curve.trend === 'mixed' ? 'selected' : ''}>Mixed (up then down)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Trend Magnitude (0-3)</label>
+                        <input type="number" id="${prefix}magnitude" value="${curve.trend_magnitude}" 
+                               step="0.1" min="0" max="3">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Color</label>
+                            <input type="color" id="${prefix}color" value="${curve.color}"
+                                   onchange="updateCurveColorDot(${index})">
+                        </div>
+                        <div class="form-group">
+                            <label>Marker</label>
+                            <select id="${prefix}marker">
+                                <option value="o" ${curve.marker === 'o' ? 'selected' : ''}>● Circle</option>
+                                <option value="s" ${curve.marker === 's' ? 'selected' : ''}>■ Square</option>
+                                <option value="^" ${curve.marker === '^' ? 'selected' : ''}>▲ Triangle Up</option>
+                                <option value="v" ${curve.marker === 'v' ? 'selected' : ''}>▼ Triangle Down</option>
+                                <option value="D" ${curve.marker === 'D' ? 'selected' : ''}>◆ Diamond</option>
+                                <option value="p" ${curve.marker === 'p' ? 'selected' : ''}>⬠ Pentagon</option>
+                                <option value="*" ${curve.marker === '*' ? 'selected' : ''}>★ Star</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Line Style</label>
+                            <select id="${prefix}lineStyle">
+                                <option value="-" ${curve.line_style === '-' ? 'selected' : ''}>─ Solid</option>
+                                <option value="--" ${curve.line_style === '--' ? 'selected' : ''}>╌ Dashed</option>
+                                <option value=":" ${curve.line_style === ':' ? 'selected' : ''}>┄ Dotted</option>
+                                <option value="-." ${curve.line_style === '-.' ? 'selected' : ''}>─┄ Dash-dot</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Line Width</label>
+                            <input type="number" id="${prefix}lineWidth" value="${curve.line_width}" 
+                                   step="0.5" min="0.5" max="5">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Marker Size</label>
+                            <input type="number" id="${prefix}markerSize" value="${curve.marker_size}" 
+                                   step="1" min="2" max="15">
+                        </div>
+                        <div class="checkbox-row" style="align-items: flex-end; padding-bottom: 12px;">
+                            <input type="checkbox" id="${prefix}showLine" ${curve.show_line ? 'checked' : ''}>
+                            <label for="${prefix}showLine">Show Line</label>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return div;
+        }
+        
+        function toggleCurveCard(index) {
+            const card = document.getElementById(`curveCard_${index}`);
+            card.classList.toggle('collapsed');
+            const toggle = card.querySelector('.curve-toggle');
+            toggle.textContent = card.classList.contains('collapsed') ? '▼' : '▲';
+        }
+        
+        function updateCurveHeader(index) {
+            const nameInput = document.getElementById(`curve_${index}_name`);
+            const headerName = document.getElementById(`curve_${index}_headerName`);
+            headerName.textContent = nameInput.value;
+            currentCurves[index].name = nameInput.value;
+        }
+        
+        function updateCurveColorDot(index) {
+            const colorInput = document.getElementById(`curve_${index}_color`);
+            const card = document.getElementById(`curveCard_${index}`);
+            const dot = card.querySelector('.curve-color-dot');
+            dot.style.background = colorInput.value;
+            currentCurves[index].color = colorInput.value;
+        }
+        
+        // =================================================================
+        // X-Values Mode Toggle
+        // =================================================================
+        function toggleXValuesMode() {
+            const mode = document.getElementById('xValuesMode').value;
+            document.getElementById('xAutoSettings').style.display = mode === 'auto' ? 'block' : 'none';
+            document.getElementById('xManualSettings').style.display = mode === 'manual' ? 'block' : 'none';
+        }
+        
+        // =================================================================
+        // Preview & Generation
+        // =================================================================
+        function generatePreview() {
+            showStatus('Generating preview...', 'info');
+            
+            const settings = gatherSettings();
+            
+            fetch('/preview', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(settings)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    currentPreviewData = data;
+                    displayPreview(data.image);
+                    showStatus('Preview generated successfully!', 'success');
+                } else {
+                    showStatus('Error generating preview', 'error');
+                }
+            })
+            .catch(err => {
+                showStatus('Error: ' + err, 'error');
+            });
+        }
+        
+        function regenerateData() {
+            showStatus('Regenerating with new random values...', 'info');
+            
+            const settings = gatherSettings();
+            
+            fetch('/regenerate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(settings)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    currentPreviewData = data;
+                    displayPreview(data.image);
+                    showStatus('Data regenerated with new random values!', 'success');
+                } else {
+                    showStatus('Error regenerating data', 'error');
+                }
+            })
+            .catch(err => {
+                showStatus('Error: ' + err, 'error');
+            });
+        }
+        
+        function displayPreview(imageBase64) {
+            const container = document.getElementById('previewContainer');
+            container.innerHTML = `<img src="data:image/png;base64,${imageBase64}" alt="Preview">`;
+        }
+        
+        // =================================================================
+        // Save
+        // =================================================================
+        function savePlot() {
+            showStatus('Saving plot and data...', 'info');
+            
+            const settings = gatherSettings();
+            
+            fetch('/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(settings)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    let msg = `Saved successfully!<br>`;
+                    msg += `<div class="file-info">`;
+                    msg += `<strong>PNG:</strong> ${data.files.filename}.png<br>`;
+                    if (data.files.svg) {
+                        msg += `<strong>SVG:</strong> ${data.files.filename}.svg<br>`;
+                    }
+                    msg += `<strong>CSV:</strong> ${data.files.filename}.csv`;
+                    msg += `</div>`;
+                    showStatus(msg, 'success');
+                } else {
+                    showStatus('Error saving files', 'error');
+                }
+            })
+            .catch(err => {
+                showStatus('Error: ' + err, 'error');
+            });
+        }
+        
+        // =================================================================
+        // Reset
+        // =================================================================
+        function resetSettings() {
+            if (!confirm('Reset all settings to defaults?')) return;
+            
+            fetch('/reset', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(settings => {
+                applySettings(settings);
+                document.getElementById('previewContainer').innerHTML = 
+                    '<p class="preview-placeholder">Click "Preview" to generate a plot</p>';
+                showStatus('Settings reset to defaults', 'info');
+            });
+        }
+        
+        // =================================================================
+        // Status Display
+        // =================================================================
+        function showStatus(message, type) {
+            const bar = document.getElementById('statusBar');
+            bar.innerHTML = message;
+            bar.className = 'status-bar ' + type;
+            bar.style.display = 'block';
+            
+            // Auto-hide after 5 seconds for non-error messages
+            if (type !== 'error') {
+                setTimeout(() => {
+                    bar.style.display = 'none';
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
