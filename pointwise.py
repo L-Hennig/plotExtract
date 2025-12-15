@@ -294,9 +294,13 @@ def plot_curve_comparison(ax, curve_label, df_extracted, df_original,
         bbox=dict(boxstyle='round', facecolor='white', alpha=0.7)
     )
 
-    # Set plot limits
-    ax.set_xlim(leftX, rightX)
-    ax.set_ylim(bottomY, topY)
+    # Set plot limits - ensure axes start at origin (0,0)
+    ax.set_xlim(max(0, leftX), rightX)
+    ax.set_ylim(max(0, bottomY), topY)
+    
+    # Make axes meet at origin
+    ax.spines['left'].set_position(('data', max(0, leftX)))
+    ax.spines['bottom'].set_position(('data', max(0, bottomY)))
 
     ax.set_title(curve_label, fontsize=10)
     ax.set_xlabel("X", fontsize=8)
@@ -393,7 +397,7 @@ def main():
 
     # 4. Determine subplot layout
     if num_curves <= 8:
-        ncols = 2
+        ncols = min(2, num_curves)  # Don't create more columns than curves
     else:
         ncols = 3
     nrows = (num_curves + ncols - 1) // ncols
@@ -401,13 +405,10 @@ def main():
     # Dynamic figure size
     fig_width = 6 * ncols
     fig_height = 5 * nrows
-    fig, axes = plt.subplots(nrows, ncols, figsize=(fig_width, fig_height))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(fig_width, fig_height), squeeze=False)
 
     # Flatten axes for easy iteration
-    if num_curves == 1:
-        axes = [axes]
-    else:
-        axes = axes.flatten()
+    axes = axes.flatten()
 
     # 5. Plot each curve comparison
     all_mae_x = []
@@ -447,15 +448,24 @@ def main():
     mean_precision = np.mean(all_precision)
     mean_recall = np.mean(all_recall)
 
-    # Add overall title with mean MAE
-    fig.suptitle(
-        f'Pointwise Comparison: Original vs Extracted\n'
-        f'Mean MAE X: {mean_mae_x:.2f}%  |  Mean MAE Y: {mean_mae_y:.2f}%  |  '
-        f'Mean Prec: {mean_precision:.2f}  |  Mean Rec: {mean_recall:.2f}  |  Threshold: {MAX_NORM_DIST}',
-        fontsize=14
-    )
-    
-    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    # Add overall title with mean MAE - use multiple lines for narrow figures
+    if num_curves == 1:
+        # For single curve, split stats across multiple lines
+        fig.suptitle(
+            f'Pointwise Comparison: Original vs Extracted\n'
+            f'MAE X: {mean_mae_x:.2f}%  |  MAE Y: {mean_mae_y:.2f}%\n'
+            f'Prec: {mean_precision:.2f}  |  Rec: {mean_recall:.2f}  |  Threshold: {MAX_NORM_DIST}',
+            fontsize=12
+        )
+        plt.tight_layout(rect=[0, 0, 1, 0.90])
+    else:
+        fig.suptitle(
+            f'Pointwise Comparison: Original vs Extracted\n'
+            f'Mean MAE X: {mean_mae_x:.2f}%  |  Mean MAE Y: {mean_mae_y:.2f}%  |  '
+            f'Mean Prec: {mean_precision:.2f}  |  Mean Rec: {mean_recall:.2f}  |  Threshold: {MAX_NORM_DIST}',
+            fontsize=14
+        )
+        plt.tight_layout(rect=[0, 0, 1, 0.95])
 
     # 6. Save outputs
     f1 = os.path.basename(file_extracted)

@@ -330,6 +330,69 @@
         .file-info strong {
             color: #2980b9;
         }
+
+        /* =================================================================
+           Plot Editor Section
+           ================================================================= */
+        .editor-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 3px solid #3498db;
+        }
+        .editor-section h1 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        .editor-container {
+            display: grid;
+            grid-template-columns: 350px 1fr 300px;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .editor-curve-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+        .editor-curve-card h4 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .data-preview {
+            background: #f0f0f0;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 11px;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .data-preview table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .data-preview th, .data-preview td {
+            padding: 3px 6px;
+            text-align: right;
+            border-bottom: 1px solid #ddd;
+        }
+        .data-preview th {
+            background: #e0e0e0;
+            font-weight: 600;
+        }
+        @media (max-width: 1200px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -514,6 +577,131 @@
             
             <div class="curves-container" id="curvesContainer">
                 <!-- Curve cards will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- =================================================================
+         Plot Editor Section
+         ================================================================= -->
+    <div class="editor-section">
+        <h1>✏️ Plot Editor</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 20px;">
+            Edit visual properties of existing synthetic plots (data points remain unchanged)
+        </p>
+        
+        <div class="editor-container">
+            <!-- Left Panel - Plot Selection & Settings -->
+            <div class="panel">
+                <h2>📂 Select Plot to Edit</h2>
+                
+                <div class="section">
+                    <div class="form-group">
+                        <label>Select Existing Plot</label>
+                        <select id="editorPlotSelect" onchange="loadPlotForEdit()">
+                            <option value="">-- Select a plot --</option>
+                        </select>
+                    </div>
+                    <button class="btn-secondary" onclick="refreshPlotList()" style="width: 100%;">
+                        🔄 Refresh List
+                    </button>
+                </div>
+                
+                <div class="section" id="editorGlobalSettings" style="display: none;">
+                    <h3>Plot Appearance</h3>
+                    <div class="form-group">
+                        <label>Plot Title</label>
+                        <input type="text" id="editorPlotTitle" placeholder="Optional title">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Width (inches)</label>
+                            <input type="number" id="editorFigWidth" min="4" max="20" step="0.5" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label>Height (inches)</label>
+                            <input type="number" id="editorFigHeight" min="3" max="15" step="0.5" value="6">
+                        </div>
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="editorShowLegend" checked>
+                        <label for="editorShowLegend">Show Legend</label>
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="editorShowGrid" checked>
+                        <label for="editorShowGrid">Show Grid</label>
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="editorSaveSvg">
+                        <label for="editorSaveSvg">Also save as SVG</label>
+                    </div>
+                </div>
+                
+                <div class="section" id="editorAxisSettings" style="display: none;">
+                    <h3>Axis Labels</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>X-Axis Label</label>
+                            <input type="text" id="editorXLabel" value="Time">
+                        </div>
+                        <div class="form-group">
+                            <label>X-Axis Unit</label>
+                            <input type="text" id="editorXUnit" value="hours">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Y-Axis Label</label>
+                            <input type="text" id="editorYLabel" value="Bacterial Count">
+                        </div>
+                        <div class="form-group">
+                            <label>Y-Axis Unit</label>
+                            <input type="text" id="editorYUnit" value="CFU/mL">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Y Min</label>
+                            <input type="number" id="editorYMin" step="any" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Y Max</label>
+                            <input type="number" id="editorYMax" step="any" placeholder="Auto">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Center Panel - Preview -->
+            <div class="panel">
+                <h2>👁️ Editor Preview</h2>
+                
+                <div class="preview-container" id="editorPreviewContainer">
+                    <p class="preview-placeholder">Select a plot to edit</p>
+                </div>
+                
+                <div class="button-row" style="justify-content: center;">
+                    <button class="btn-primary" onclick="previewEdit()" id="editorPreviewBtn" disabled>
+                        👁️ Preview Changes
+                    </button>
+                    <button class="btn-success" onclick="saveEditedPlot()" id="editorSaveBtn" disabled>
+                        💾 Save as Copy
+                    </button>
+                </div>
+                
+                <div id="editorStatusBar" class="status-bar" style="display: none;"></div>
+            </div>
+            
+            <!-- Right Panel - Curve Visual Settings -->
+            <div class="panel">
+                <h2>🎨 Visual Settings</h2>
+                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">
+                    Adjust colors, markers, and line styles (data points unchanged)
+                </p>
+                
+                <div id="editorCurvesContainer">
+                    <p style="color: #999; font-style: italic;">Select a plot to see curve settings</p>
+                </div>
             </div>
         </div>
     </div>
@@ -883,12 +1071,14 @@
                 if (data.success) {
                     let msg = `Saved successfully!<br>`;
                     msg += `<div class="file-info">`;
+                    msg += `<strong>Folder:</strong> synthetic/${data.files.filename}/<br>`;
                     msg += `<strong>PNG:</strong> ${data.files.filename}.png<br>`;
                     if (data.files.svg) {
                         msg += `<strong>SVG:</strong> ${data.files.filename}.svg<br>`;
                     }
-                    msg += `<strong>CSV:</strong> ${data.files.filename}.csv`;
+                    msg += `<strong>CSV:</strong> ${data.files.filename}-original.csv`;
                     msg += `</div>`;
+                    msg += `<p style="margin-top:8px;font-size:12px;color:#155724;">Ready for PlotExtract app.py!</p>`;
                     showStatus(msg, 'success');
                 } else {
                     showStatus('Error saving files', 'error');
@@ -928,6 +1118,285 @@
             bar.style.display = 'block';
             
             // Auto-hide after 5 seconds for non-error messages
+            if (type !== 'error') {
+                setTimeout(() => {
+                    bar.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // =================================================================
+        // Plot Editor Functions
+        // =================================================================
+        let editorCurvesData = [];
+        let editorXValues = [];
+        let editorPlotName = '';
+        
+        // Initialize editor on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshPlotList();
+        });
+        
+        function refreshPlotList() {
+            fetch('/get_existing_plots')
+                .then(res => res.json())
+                .then(plots => {
+                    const select = document.getElementById('editorPlotSelect');
+                    const currentValue = select.value;
+                    
+                    // Clear and rebuild options
+                    select.innerHTML = '<option value="">-- Select a plot --</option>';
+                    plots.forEach(plot => {
+                        const option = document.createElement('option');
+                        option.value = plot.name;
+                        option.textContent = plot.name + (plot.has_csv ? '' : ' (no CSV)');
+                        if (!plot.has_csv) option.disabled = true;
+                        select.appendChild(option);
+                    });
+                    
+                    // Restore selection if still valid
+                    if (currentValue) {
+                        select.value = currentValue;
+                    }
+                });
+        }
+        
+        function loadPlotForEdit() {
+            const plotName = document.getElementById('editorPlotSelect').value;
+            
+            if (!plotName) {
+                // Reset editor
+                document.getElementById('editorGlobalSettings').style.display = 'none';
+                document.getElementById('editorAxisSettings').style.display = 'none';
+                document.getElementById('editorPreviewBtn').disabled = true;
+                document.getElementById('editorSaveBtn').disabled = true;
+                document.getElementById('editorPreviewContainer').innerHTML = 
+                    '<p class="preview-placeholder">Select a plot to edit</p>';
+                document.getElementById('editorCurvesContainer').innerHTML = 
+                    '<p style="color: #999; font-style: italic;">Select a plot to see curve settings</p>';
+                return;
+            }
+            
+            showEditorStatus('Loading plot data...', 'info');
+            
+            fetch(`/load_plot_for_edit/${plotName}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        editorPlotName = data.plot_name;
+                        editorCurvesData = data.curves_data;
+                        editorXValues = data.x_values;
+                        
+                        // Show settings panels
+                        document.getElementById('editorGlobalSettings').style.display = 'block';
+                        document.getElementById('editorAxisSettings').style.display = 'block';
+                        document.getElementById('editorPreviewBtn').disabled = false;
+                        document.getElementById('editorSaveBtn').disabled = false;
+                        
+                        // Show original image
+                        if (data.image) {
+                            document.getElementById('editorPreviewContainer').innerHTML = 
+                                `<img src="data:image/png;base64,${data.image}" alt="Original">`;
+                        }
+                        
+                        // Render curve settings
+                        renderEditorCurveCards();
+                        
+                        showEditorStatus(`Loaded ${plotName} - ${editorCurvesData.length} curves`, 'success');
+                    } else {
+                        showEditorStatus('Error: ' + data.error, 'error');
+                    }
+                })
+                .catch(err => {
+                    showEditorStatus('Error loading plot: ' + err, 'error');
+                });
+        }
+        
+        function renderEditorCurveCards() {
+            const container = document.getElementById('editorCurvesContainer');
+            container.innerHTML = '';
+            
+            editorCurvesData.forEach((curve, index) => {
+                const config = curve.config;
+                const div = document.createElement('div');
+                div.className = 'editor-curve-card';
+                
+                div.innerHTML = `
+                    <h4>
+                        <span class="curve-color-dot" id="editorDot_${index}" style="background: ${config.color}"></span>
+                        ${config.name}
+                    </h4>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Color</label>
+                            <input type="color" id="editor_${index}_color" value="${config.color}"
+                                   onchange="updateEditorColorDot(${index})">
+                        </div>
+                        <div class="form-group">
+                            <label>Marker</label>
+                            <select id="editor_${index}_marker">
+                                <option value="o" ${config.marker === 'o' ? 'selected' : ''}>● Circle</option>
+                                <option value="s" ${config.marker === 's' ? 'selected' : ''}>■ Square</option>
+                                <option value="^" ${config.marker === '^' ? 'selected' : ''}>▲ Triangle Up</option>
+                                <option value="v" ${config.marker === 'v' ? 'selected' : ''}>▼ Triangle Down</option>
+                                <option value="D" ${config.marker === 'D' ? 'selected' : ''}>◆ Diamond</option>
+                                <option value="p" ${config.marker === 'p' ? 'selected' : ''}>⬠ Pentagon</option>
+                                <option value="*" ${config.marker === '*' ? 'selected' : ''}>★ Star</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Line Style</label>
+                            <select id="editor_${index}_lineStyle">
+                                <option value="-" ${config.line_style === '-' ? 'selected' : ''}>─ Solid</option>
+                                <option value="--" ${config.line_style === '--' ? 'selected' : ''}>╌ Dashed</option>
+                                <option value=":" ${config.line_style === ':' ? 'selected' : ''}>┄ Dotted</option>
+                                <option value="-." ${config.line_style === '-.' ? 'selected' : ''}>─┄ Dash-dot</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Line Width</label>
+                            <input type="number" id="editor_${index}_lineWidth" value="${config.line_width}" 
+                                   step="0.5" min="0.5" max="5">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Marker Size</label>
+                            <input type="number" id="editor_${index}_markerSize" value="${config.marker_size}" 
+                                   step="1" min="2" max="15">
+                        </div>
+                        <div class="checkbox-row" style="align-items: flex-end; padding-bottom: 12px;">
+                            <input type="checkbox" id="editor_${index}_showLine" ${config.show_line ? 'checked' : ''}>
+                            <label for="editor_${index}_showLine">Show Line</label>
+                        </div>
+                    </div>
+                    
+                    <div class="data-preview">
+                        <strong>Data Points (${curve.x.length} points, read-only):</strong>
+                        <table>
+                            <tr><th>X</th><th>Y (log₁₀)</th></tr>
+                            ${curve.x.slice(0, 5).map((x, i) => 
+                                `<tr><td>${x}</td><td>${curve.y[i].toFixed(3)}</td></tr>`
+                            ).join('')}
+                            ${curve.x.length > 5 ? `<tr><td colspan="2" style="text-align:center;">... ${curve.x.length - 5} more points</td></tr>` : ''}
+                        </table>
+                    </div>
+                `;
+                
+                container.appendChild(div);
+            });
+        }
+        
+        function updateEditorColorDot(index) {
+            const colorInput = document.getElementById(`editor_${index}_color`);
+            const dot = document.getElementById(`editorDot_${index}`);
+            dot.style.background = colorInput.value;
+        }
+        
+        function gatherEditorSettings() {
+            // Update curves_data with form values
+            editorCurvesData.forEach((curve, index) => {
+                curve.config.color = document.getElementById(`editor_${index}_color`).value;
+                curve.config.marker = document.getElementById(`editor_${index}_marker`).value;
+                curve.config.line_style = document.getElementById(`editor_${index}_lineStyle`).value;
+                curve.config.line_width = parseFloat(document.getElementById(`editor_${index}_lineWidth`).value);
+                curve.config.marker_size = parseFloat(document.getElementById(`editor_${index}_markerSize`).value);
+                curve.config.show_line = document.getElementById(`editor_${index}_showLine`).checked;
+            });
+            
+            return {
+                title: document.getElementById('editorPlotTitle').value,
+                figure_width: parseFloat(document.getElementById('editorFigWidth').value),
+                figure_height: parseFloat(document.getElementById('editorFigHeight').value),
+                show_legend: document.getElementById('editorShowLegend').checked,
+                show_grid: document.getElementById('editorShowGrid').checked,
+                save_svg: document.getElementById('editorSaveSvg').checked,
+                x_label: document.getElementById('editorXLabel').value,
+                x_unit: document.getElementById('editorXUnit').value,
+                y_label: document.getElementById('editorYLabel').value,
+                y_unit: document.getElementById('editorYUnit').value,
+                y_scale: 'log',
+                y_min: document.getElementById('editorYMin').value,
+                y_max: document.getElementById('editorYMax').value
+            };
+        }
+        
+        function previewEdit() {
+            showEditorStatus('Generating preview...', 'info');
+            
+            const settings = gatherEditorSettings();
+            
+            fetch('/preview_edit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    curves_data: editorCurvesData,
+                    settings: settings,
+                    x_values: editorXValues
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('editorPreviewContainer').innerHTML = 
+                        `<img src="data:image/png;base64,${data.image}" alt="Preview">`;
+                    showEditorStatus('Preview generated!', 'success');
+                } else {
+                    showEditorStatus('Error generating preview', 'error');
+                }
+            })
+            .catch(err => {
+                showEditorStatus('Error: ' + err, 'error');
+            });
+        }
+        
+        function saveEditedPlot() {
+            showEditorStatus('Saving as copy...', 'info');
+            
+            const settings = gatherEditorSettings();
+            
+            fetch('/save_edit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    original_name: editorPlotName,
+                    curves_data: editorCurvesData,
+                    settings: settings,
+                    x_values: editorXValues
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    let msg = `Saved successfully!<br>`;
+                    msg += `<div class="file-info">`;
+                    msg += `<strong>PNG:</strong> ${data.files.filename}.png<br>`;
+                    if (data.files.svg) {
+                        msg += `<strong>SVG:</strong> ${data.files.filename}.svg<br>`;
+                    }
+                    msg += `<strong>CSV:</strong> ${data.files.filename}-original.csv`;
+                    msg += `</div>`;
+                    showEditorStatus(msg, 'success');
+                } else {
+                    showEditorStatus('Error: ' + data.error, 'error');
+                }
+            })
+            .catch(err => {
+                showEditorStatus('Error: ' + err, 'error');
+            });
+        }
+        
+        function showEditorStatus(message, type) {
+            const bar = document.getElementById('editorStatusBar');
+            bar.innerHTML = message;
+            bar.className = 'status-bar ' + type;
+            bar.style.display = 'block';
+            
             if (type !== 'error') {
                 setTimeout(() => {
                     bar.style.display = 'none';

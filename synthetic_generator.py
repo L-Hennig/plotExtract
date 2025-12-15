@@ -313,12 +313,29 @@ def create_plot(settings, curves_data, x_values):
         y_label += f" ({settings['y_unit']})"
     ax.set_ylabel(y_label, fontsize=11)
     
-    # Set axis limits
-    if settings['x_min'] != '' and settings['x_max'] != '':
+    # Set axis limits - x starts at 0 by default
+    x_min = 0
+    if settings['x_min'] != '':
         try:
-            ax.set_xlim(float(settings['x_min']), float(settings['x_max']))
+            x_min = max(0, float(settings['x_min']))
         except:
-            pass
+            x_min = 0
+    
+    # Calculate x_max from data if not specified
+    if settings['x_max'] != '':
+        try:
+            x_max = float(settings['x_max'])
+        except:
+            all_x = [val for curve in curves_data for val in curve['x']]
+            x_max = max(all_x) if all_x else 24
+    else:
+        all_x = [val for curve in curves_data for val in curve['x']]
+        x_max = max(all_x) if all_x else 24
+    
+    ax.set_xlim(x_min, x_max)
+    
+    # Make axes meet at origin
+    ax.spines['left'].set_position(('data', x_min))
     
     # For log scale: use linear axis but with log10 values, starting at 0
     if settings['y_scale'] == 'log':
@@ -357,13 +374,20 @@ def create_plot(settings, curves_data, x_values):
         y_ticks = np.arange(int(y_min), int(y_max) + 1, tick_spacing)
         ax.set_yticks(y_ticks)
         ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%d'))
+        
+        # Make axes meet at origin
+        ax.spines['bottom'].set_position(('data', y_min))
     else:
         # Linear scale
+        y_min = 0
         if settings['y_min'] != '' and settings['y_max'] != '':
             try:
-                ax.set_ylim(float(settings['y_min']), float(settings['y_max']))
+                y_min = float(settings['y_min'])
+                ax.set_ylim(y_min, float(settings['y_max']))
             except:
                 pass
+        # Make axes meet at origin
+        ax.spines['bottom'].set_position(('data', y_min))
     
     # Title
     if settings['title']:
@@ -393,48 +417,83 @@ def fig_to_base64(fig):
 # File Output Functions
 # =============================================================================
 
+def get_next_synthetic_name():
+    """
+    Generate the next available name for a synthetic plot.
+    Names follow pattern: AA, AB, AC, ... AZ, BA, BB, ... ZZ
+    Scans existing folders in SYNTHETIC_DIR to find the next available name.
+    """
+    import string
+    
+    # Get existing folder names
+    existing = set()
+    if os.path.exists(SYNTHETIC_DIR):
+        for item in os.listdir(SYNTHETIC_DIR):
+            if os.path.isdir(os.path.join(SYNTHETIC_DIR, item)):
+                # Extract the name part (could be just "AA" or with other suffixes)
+                existing.add(item.upper())
+    
+    # Generate names: AA, AB, ... AZ, BA, BB, ... ZZ
+    for first in string.ascii_uppercase:
+        for second in string.ascii_uppercase:
+            name = f"{first}{second}"
+            if name not in existing:
+                return name
+    
+    # If all 676 combinations used, fall back to timestamp
+    from datetime import datetime
+    return f"ZZ_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
 def save_plot_and_data(settings, curves_data, x_values):
     """
     Save the plot as PNG (and optionally SVG) and the data as CSV.
+    Creates a subfolder for each plot to match the first_examples structure:
+    plots/synthetic/{name}/{name}.png
+    plots/synthetic/{name}/{name}-original.csv
     
     Returns:
     --------
     dict : Paths to saved files
     """
-    # Generate timestamp for filename
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    base_filename = f'timekill_{timestamp}'
+    # Generate auto-incrementing name (AA, AB, AC, etc.)
+    base_filename = get_next_synthetic_name()
+    
+    # Create subfolder for this plot (like first_examples/A/A-1/)
+    plot_folder = os.path.join(SYNTHETIC_DIR, base_filename)
+    os.makedirs(plot_folder, exist_ok=True)
     
     # Create the figure
     fig = create_plot(settings, curves_data, x_values)
     
-    # Save PNG
-    png_path = os.path.join(SYNTHETIC_DIR, f'{base_filename}.png')
+    # Save PNG inside the subfolder
+    png_path = os.path.join(plot_folder, f'{base_filename}.png')
     fig.savefig(png_path, dpi=150, bbox_inches='tight')
     
     # Save SVG if requested
     svg_path = None
     if settings['save_svg']:
-        svg_path = os.path.join(SYNTHETIC_DIR, f'{base_filename}.svg')
+        svg_path = os.path.join(plot_folder, f'{base_filename}.svg')
         fig.savefig(svg_path, format='svg', bbox_inches='tight')
     
     plt.close(fig)
     
-    # Save CSV
-    csv_path = os.path.join(SYNTHETIC_DIR, f'{base_filename}.csv')
+    # Save CSV with -original suffix (required by app.py)
+    csv_path = os.path.join(plot_folder, f'{base_filename}-original.csv')
     save_csv(curves_data, x_values, settings, csv_path)
     
     return {
         'png': png_path,
         'svg': svg_path,
         'csv': csv_path,
-        'filename': base_filename
+        'filename': base_filename,
+        'folder': plot_folder
     }
 
 def save_csv(curves_data, x_values, settings, filepath):
     """
     Save curve data to CSV file in the same format as extracted data.
     Format: x1, y1, x2, y2, ... (paired columns for each curve)
+    Y-values are saved in log10 scale (e.g., 3 for 10^3 = 1000)
     """
     with open(filepath, 'w', encoding='utf-8') as f:
         # Header row
@@ -446,17 +505,16 @@ def save_csv(curves_data, x_values, settings, filepath):
             headers.extend([x_col, y_col])
         f.write(','.join(headers) + '\n')
         
-        # Data rows
+        # Data rows - Y values saved in log10 scale
         n_points = len(x_values)
         for i in range(n_points):
             row = []
             for curve_data in curves_data:
                 x_val = curve_data['x'][i]
                 y_val = curve_data['y'][i]
-                # For log scale, convert back to actual values
-                if settings['y_scale'] == 'log':
-                    y_val = 10 ** y_val
-                row.extend([str(x_val), str(y_val)])
+                # Y values are already in log10 scale, keep them as-is
+                # Round to reasonable precision
+                row.extend([str(x_val), f'{y_val:.4f}'])
             f.write(','.join(row) + '\n')
 
 # =============================================================================
@@ -577,6 +635,251 @@ def regenerate():
         'x_values': x_values,
         'curves_data': curves_data
     })
+
+# =============================================================================
+# Plot Editor Routes
+# =============================================================================
+
+@app.route('/get_existing_plots')
+def get_existing_plots():
+    """Get list of existing synthetic plots that can be edited."""
+    plots = []
+    
+    if os.path.exists(SYNTHETIC_DIR):
+        for item in sorted(os.listdir(SYNTHETIC_DIR)):
+            item_path = os.path.join(SYNTHETIC_DIR, item)
+            if os.path.isdir(item_path):
+                # Check for PNG and CSV files
+                png_file = os.path.join(item_path, f'{item}.png')
+                csv_file = os.path.join(item_path, f'{item}-original.csv')
+                
+                # Also check for copy files
+                if not os.path.exists(png_file):
+                    # Look for any PNG in the folder
+                    for f in os.listdir(item_path):
+                        if f.endswith('.png'):
+                            png_file = os.path.join(item_path, f)
+                            break
+                
+                if os.path.exists(png_file):
+                    plots.append({
+                        'name': item,
+                        'folder': item_path,
+                        'has_csv': os.path.exists(csv_file)
+                    })
+    
+    return jsonify(plots)
+
+@app.route('/load_plot_for_edit/<plot_name>')
+def load_plot_for_edit(plot_name):
+    """Load an existing plot's data and settings for editing."""
+    plot_folder = os.path.join(SYNTHETIC_DIR, plot_name)
+    
+    if not os.path.exists(plot_folder):
+        return jsonify({'success': False, 'error': 'Plot folder not found'})
+    
+    # Find the CSV file
+    csv_file = os.path.join(plot_folder, f'{plot_name}-original.csv')
+    if not os.path.exists(csv_file):
+        # Try to find any -original.csv
+        for f in os.listdir(plot_folder):
+            if f.endswith('-original.csv'):
+                csv_file = os.path.join(plot_folder, f)
+                break
+    
+    if not os.path.exists(csv_file):
+        return jsonify({'success': False, 'error': 'CSV file not found'})
+    
+    # Parse the CSV file
+    curves_data = []
+    try:
+        with open(csv_file, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+        
+        # Parse header to get curve names
+        header = lines[0].strip().split(',')
+        num_curves = len(header) // 2
+        
+        curve_names = []
+        for i in range(num_curves):
+            y_col_name = header[i * 2 + 1].strip()
+            curve_names.append(y_col_name)
+        
+        # Parse data rows
+        x_values = []
+        y_values_per_curve = [[] for _ in range(num_curves)]
+        
+        for line in lines[1:]:
+            if not line.strip():
+                continue
+            values = line.strip().split(',')
+            for i in range(num_curves):
+                x_val = float(values[i * 2])
+                y_val = float(values[i * 2 + 1])
+                if i == 0:
+                    x_values.append(x_val)
+                y_values_per_curve[i].append(y_val)
+        
+        # Build curves_data with default visual settings
+        for i in range(num_curves):
+            curves_data.append({
+                'x': x_values,
+                'y': y_values_per_curve[i],
+                'config': {
+                    'name': curve_names[i],
+                    'color': COLOR_PALETTE[i % len(COLOR_PALETTE)],
+                    'marker': 'o',
+                    'line_style': '-',
+                    'show_line': True,
+                    'line_width': 1.5,
+                    'marker_size': 6,
+                    'noise_level': 0.1
+                }
+            })
+        
+        # Find the PNG file for preview
+        png_file = os.path.join(plot_folder, f'{plot_name}.png')
+        if not os.path.exists(png_file):
+            for f in os.listdir(plot_folder):
+                if f.endswith('.png') and not '_copy' in f:
+                    png_file = os.path.join(plot_folder, f)
+                    break
+        
+        # Read PNG as base64
+        img_base64 = None
+        if os.path.exists(png_file):
+            with open(png_file, 'rb') as f:
+                img_base64 = base64.b64encode(f.read()).decode('utf-8')
+        
+        return jsonify({
+            'success': True,
+            'plot_name': plot_name,
+            'x_values': x_values,
+            'curves_data': curves_data,
+            'image': img_base64
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/preview_edit', methods=['POST'])
+def preview_edit():
+    """Generate a preview of the edited plot with visual changes only."""
+    try:
+        data = request.json
+        curves_data = data['curves_data']
+        settings = data['settings']
+        x_values = data['x_values']
+        
+        # Ensure settings has all required keys with defaults
+        settings.setdefault('x_min', '')
+        settings.setdefault('x_max', '')
+        settings.setdefault('x_label', 'Time')
+        settings.setdefault('x_unit', 'hours')
+        settings.setdefault('y_label', 'Bacterial Count')
+        settings.setdefault('y_unit', 'CFU/mL')
+        settings.setdefault('y_scale', 'log')
+        settings.setdefault('y_min', '0')
+        settings.setdefault('y_max', '')
+        settings.setdefault('title', '')
+        settings.setdefault('figure_width', 10)
+        settings.setdefault('figure_height', 6)
+        settings.setdefault('show_legend', True)
+        settings.setdefault('show_grid', True)
+        
+        # Create plot with the modified visual settings
+        fig = create_plot(settings, curves_data, x_values)
+        img_base64 = fig_to_base64(fig)
+        
+        return jsonify({
+            'success': True,
+            'image': img_base64
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        })
+
+@app.route('/save_edit', methods=['POST'])
+def save_edit():
+    """Save the edited plot as a copy."""
+    try:
+        data = request.json
+        original_name = data['original_name']
+        curves_data = data['curves_data']
+        settings = data['settings']
+        x_values = data['x_values']
+        
+        # Ensure settings has all required keys with defaults
+        settings.setdefault('x_min', '')
+        settings.setdefault('x_max', '')
+        settings.setdefault('x_label', 'Time')
+        settings.setdefault('x_unit', 'hours')
+        settings.setdefault('y_label', 'Bacterial Count')
+        settings.setdefault('y_unit', 'CFU/mL')
+        settings.setdefault('y_scale', 'log')
+        settings.setdefault('y_min', '0')
+        settings.setdefault('y_max', '')
+        settings.setdefault('title', '')
+        settings.setdefault('figure_width', 10)
+        settings.setdefault('figure_height', 6)
+        settings.setdefault('show_legend', True)
+        settings.setdefault('show_grid', True)
+        
+        plot_folder = os.path.join(SYNTHETIC_DIR, original_name)
+        
+        if not os.path.exists(plot_folder):
+            return jsonify({'success': False, 'error': 'Plot folder not found'})
+        
+        # Find the next copy number
+        copy_num = 1
+        while True:
+            copy_name = f'{original_name}_copy{copy_num}'
+            png_path = os.path.join(plot_folder, f'{copy_name}.png')
+            if not os.path.exists(png_path):
+                break
+            copy_num += 1
+        
+        # Create the figure
+        fig = create_plot(settings, curves_data, x_values)
+    
+        # Save PNG
+        png_path = os.path.join(plot_folder, f'{copy_name}.png')
+        fig.savefig(png_path, dpi=150, bbox_inches='tight')
+        
+        # Save SVG if requested
+        svg_path = None
+        if settings.get('save_svg', False):
+            svg_path = os.path.join(plot_folder, f'{copy_name}.svg')
+            fig.savefig(svg_path, format='svg', bbox_inches='tight')
+        
+        plt.close(fig)
+        
+        # Save CSV
+        csv_path = os.path.join(plot_folder, f'{copy_name}-original.csv')
+        save_csv(curves_data, x_values, settings, csv_path)
+        
+        return jsonify({
+            'success': True,
+            'files': {
+                'png': png_path,
+                'svg': svg_path,
+                'csv': csv_path,
+                'filename': copy_name,
+                'folder': plot_folder
+            },
+            'message': f'Saved as {copy_name}'
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        })
 
 # =============================================================================
 # Main Entry Point

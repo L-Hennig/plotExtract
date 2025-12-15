@@ -30,7 +30,7 @@
       "name": "Condition 1",
       "noise_level": 1,
       "show_line": true,
-      "trend": "stable",
+      "trend": "up",
       "trend_magnitude": 3
     }
   ]

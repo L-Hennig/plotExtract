@@ -233,7 +233,7 @@ if num_curves == 0:
 
 # Determine subplot layout
 if num_curves <= 8:
-    ncols = 2
+    ncols = min(2, num_curves)  # Don't create more columns than curves
 else:
     ncols = 3
 nrows = (num_curves + ncols - 1) // ncols  # Ceiling division
@@ -241,13 +241,10 @@ nrows = (num_curves + ncols - 1) // ncols  # Ceiling division
 # Dynamic figure size
 fig_width = 6 * ncols
 fig_height = 4 * nrows
-fig, axes = plt.subplots(nrows, ncols, figsize=(fig_width, fig_height))
+fig, axes = plt.subplots(nrows, ncols, figsize=(fig_width, fig_height), squeeze=False)
 
-# Flatten axes for easy iteration (handle single subplot case)
-if num_curves == 1:
-    axes = [axes]
-else:
-    axes = axes.flatten()
+# Flatten axes for easy iteration
+axes = axes.flatten()
 
 # Plot each curve comparison
 colors = plt.cm.tab10.colors
@@ -263,9 +260,8 @@ for idx, (orig_label, result) in enumerate(results.items()):
     ax.plot(orig_data['x'], orig_data['y'], label='original', linestyle='-', color=colors[0])
     ax.plot(extr_data['x'], extr_data['y'], label='llm', linestyle='-', color=colors[1])
     
-    # Fill area for differences
-    bottom_y = min(orig_data['y'].min(), extr_data['y'].min())
-    ax.fill_between(common_x, np.abs(differences) + bottom_y, bottom_y, 
+    # Fill area for differences - starting from y=0
+    ax.fill_between(common_x, np.abs(differences), 0, 
                     color='gray', alpha=0.5, label=f'MAE={result["mae"]:.4f}')
     
     # Add miss info to legend
@@ -277,9 +273,15 @@ for idx, (orig_label, result) in enumerate(results.items()):
     ax.legend(fontsize='small')
     ax.grid(True)
     
-    # Set axis limits
-    ax.set_xlim(min(leftX, ax.get_xlim()[0]), max(rightX, ax.get_xlim()[1]))
-    ax.set_ylim(min(bottomY, ax.get_ylim()[0]), max(topY, ax.get_ylim()[1]))
+    # Set axis limits - ensure axes start at origin (0,0)
+    x_min = max(0, min(leftX, ax.get_xlim()[0]))
+    y_min = max(0, min(bottomY, ax.get_ylim()[0]))
+    ax.set_xlim(x_min, max(rightX, ax.get_xlim()[1]))
+    ax.set_ylim(y_min, max(topY, ax.get_ylim()[1]))
+    
+    # Make axes meet at origin
+    ax.spines['left'].set_position(('data', x_min))
+    ax.spines['bottom'].set_position(('data', y_min))
 
 # Hide unused subplots
 for idx in range(num_curves, len(axes)):

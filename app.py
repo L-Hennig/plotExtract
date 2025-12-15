@@ -15,8 +15,9 @@ def get_input_images(directory):
     Recursively find only original input .png files in the plots directory.
     Excludes output files like replot, comparison, interpolated, pointwise images.
     Also excludes files inside version folders (e.g., A-1.p2.v1/)
+    Returns a dict grouped by top-level folder for easier selection.
     """
-    images = []
+    images_set = set()  # Use set to avoid duplicates on case-insensitive filesystems
     exclude_patterns = [
         '-replot', 'comparison_', 'interpolated_', 'pointwise_',
         '.mistral.out', '.claude.out', '_VS_'
@@ -36,9 +37,22 @@ def get_input_images(directory):
             
             # Skip if filename contains any exclude pattern
             if not any(pattern in filename for pattern in exclude_patterns):
-                images.append(os.path.relpath(img_path, PLOTS_DIR).replace('\\', '/'))
+                images_set.add(os.path.relpath(img_path, PLOTS_DIR).replace('\\', '/'))
     
-    return sorted(images)
+    # Group images by top-level folder
+    grouped = {}
+    for img_path in sorted(images_set):
+        parts = img_path.split('/')
+        if len(parts) > 1:
+            folder = parts[0]
+        else:
+            folder = '(root)'
+        
+        if folder not in grouped:
+            grouped[folder] = []
+        grouped[folder].append(img_path)
+    
+    return grouped
 
 def get_prompts():
     """Get all prompt files from the prompts directory."""
@@ -309,9 +323,9 @@ def check_csv_exists(image_path, prompt_file=None):
 
 @app.route('/')
 def index():
-    images = get_input_images(PLOTS_DIR)
+    images_grouped = get_input_images(PLOTS_DIR)
     prompts = get_prompts()
-    return render_template('index.html', images=images, prompts=prompts)
+    return render_template('index.html', images_grouped=images_grouped, prompts=prompts)
 
 @app.route('/plots/<path:filename>')
 def serve_plot(filename):

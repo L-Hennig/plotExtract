@@ -31,6 +31,17 @@
             border-radius: 4px;
             font-size: 14px;
         }
+        select optgroup {
+            font-weight: bold;
+            color: #2c3e50;
+            background: #f0f0f0;
+            padding: 5px 0;
+        }
+        select option {
+            font-weight: normal;
+            color: #333;
+            padding: 5px 10px;
+        }
         .csv-label {
             padding: 10px;
             background: #f8f9fa;
@@ -247,8 +258,12 @@
                         <label for="imageSelect">Select Image:</label>
                         <select id="imageSelect" onchange="onImageSelect()">
                             <option value="">-- Choose an image --</option>
-                            {% for image in images %}
-                            <option value="{{ image }}">{{ image }}</option>
+                            {% for folder, images in images_grouped.items() %}
+                            <optgroup label="📁 {{ folder }}">
+                                {% for image in images %}
+                                <option value="{{ image }}">{{ image.split('/')[-1] }}</option>
+                                {% endfor %}
+                            </optgroup>
                             {% endfor %}
                         </select>
                     </div>
@@ -403,6 +418,31 @@
     </div>
     
     <script>
+        // Load saved values from localStorage on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedLeftX = localStorage.getItem('axisLeftX');
+            const savedRightX = localStorage.getItem('axisRightX');
+            const savedBottomY = localStorage.getItem('axisBottomY');
+            const savedTopY = localStorage.getItem('axisTopY');
+            const savedPrompt = localStorage.getItem('lastPrompt');
+            
+            if (savedLeftX !== null) document.getElementById('leftX').value = savedLeftX;
+            if (savedRightX !== null) document.getElementById('rightX').value = savedRightX;
+            if (savedBottomY !== null) document.getElementById('bottomY').value = savedBottomY;
+            if (savedTopY !== null) document.getElementById('topY').value = savedTopY;
+            
+            // Restore last used prompt if it exists in the dropdown
+            if (savedPrompt !== null) {
+                const promptSelect = document.getElementById('promptSelect');
+                for (let option of promptSelect.options) {
+                    if (option.value === savedPrompt) {
+                        promptSelect.value = savedPrompt;
+                        break;
+                    }
+                }
+            }
+        });
+        
         function onImageSelect() {
             const imagePath = document.getElementById('imageSelect').value;
             const preview = document.getElementById('imagePreview');
@@ -616,6 +656,19 @@
             const consoleOutput = document.getElementById('consoleOutput');
             consoleOutput.textContent = 'Starting tasks...\n';
             
+            // Get axis values and save them for next time
+            const leftX = parseFloat(document.getElementById('leftX').value) || 0;
+            const rightX = parseFloat(document.getElementById('rightX').value) || 100;
+            const bottomY = parseFloat(document.getElementById('bottomY').value) || 0;
+            const topY = parseFloat(document.getElementById('topY').value) || 100;
+            
+            // Save to localStorage for persistence
+            localStorage.setItem('axisLeftX', leftX);
+            localStorage.setItem('axisRightX', rightX);
+            localStorage.setItem('axisBottomY', bottomY);
+            localStorage.setItem('axisTopY', topY);
+            localStorage.setItem('lastPrompt', promptFile);
+            
             fetch('/run_all', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -624,10 +677,10 @@
                     prompt: promptFile,
                     runInterpolation: document.getElementById('runInterpolation').checked,
                     runPointwise: document.getElementById('runPointwise').checked,
-                    leftX: parseFloat(document.getElementById('leftX').value) || 0,
-                    rightX: parseFloat(document.getElementById('rightX').value) || 100,
-                    bottomY: parseFloat(document.getElementById('bottomY').value) || 0,
-                    topY: parseFloat(document.getElementById('topY').value) || 100
+                    leftX: leftX,
+                    rightX: rightX,
+                    bottomY: bottomY,
+                    topY: topY
                 })
             })
             .then(res => res.json())
