@@ -1,0 +1,27 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+
+data = {
+    "Time (hours)": [0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26],
+    "Bacteria Count (CFU/mL) (Condition 1)": [6, 8.5, 9.5, 11, 11.5, 11.5, 10.5, 9, 11, 12, 13.5, 13.5, 12.5, 13, 12.5, 10, 11]
+}
+
+df = pd.DataFrame(data)
+
+plt.figure(figsize=(8, 6))
+plt.plot(df["Time (hours)"], df["Bacteria Count (CFU/mL) (Condition 1)"], color='#1f77b4', marker='s', linestyle='-', linewidth=2, markersize=7)
+
+plt.xlabel("Time (hours)", fontsize=12)
+plt.ylabel("Bacteria Count (CFU/mL)", fontsize=12)
+plt.xticks(range(0, 31, 2), fontsize=10)
+plt.yticks(range(0, 15, 2), fontsize=10)
+plt.xlim(0, 30)
+plt.ylim(0, 14.5)
+plt.grid(True, linestyle='--', alpha=0.6)
+
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\AF\AF_copy1.p4.v1"
+os.makedirs(output_dir, exist_ok=True)
+output_path = os.path.join(output_dir, "AF_copy1-replot.p4.v1.png")
+plt.savefig(output_path, bbox_inches='tight', dpi=300)
+plt.close()

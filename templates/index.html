@@ -9,8 +9,68 @@
         body { 
             font-family: Arial, sans-serif; 
             margin: 0; 
-            padding: 20px; 
+            padding: 0; 
             background: #f5f5f5; 
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            padding: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        .navbar-brand {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .navbar-brand:hover {
+            color: #ecf0f1;
+        }
+        .navbar-nav {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: 5px;
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        .nav-link.active {
+            color: white;
+            border-bottom-color: #f39c12;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .main-content {
+            padding: 20px;
         }
         h1 { color: #333; }
         .container { max-width: 1400px; margin: 0 auto; }
@@ -243,65 +303,464 @@
         }
         .status-indicator.exists { background: #28a745; }
         .status-indicator.missing { background: #dc3545; }
+        
+        /* =================================================================
+           Mode Toggle
+           ================================================================= */
+        .mode-toggle {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #007bff;
+            width: fit-content;
+        }
+        .mode-btn {
+            padding: 12px 24px;
+            border: none;
+            background: white;
+            color: #007bff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mode-btn:hover:not(.active) {
+            background: #e7f1ff;
+        }
+        .mode-btn.active {
+            background: #007bff;
+            color: white;
+        }
+        .mode-btn:first-child {
+            border-right: 1px solid #007bff;
+        }
+        
+        /* =================================================================
+           Batch Mode Styles
+           ================================================================= */
+        .batch-section {
+            display: none;
+        }
+        .batch-section.active {
+            display: block;
+        }
+        .single-section {
+            display: block;
+        }
+        .single-section.hidden {
+            display: none;
+        }
+        
+        /* Batch Image Multi-Select */
+        #batchImageSelect {
+            width: 100%;
+            min-height: 200px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        #batchImageSelect option {
+            padding: 6px 10px;
+        }
+        #batchImageSelect option:checked {
+            background: linear-gradient(0deg, #007bff 0%, #007bff 100%);
+            color: white;
+        }
+        .batch-file-count {
+            background: #e8f4f8;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Batch Queue Status */
+        .batch-queue {
+            margin-top: 15px;
+        }
+        .queue-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .queue-item.pending { border-left: 4px solid #6c757d; }
+        .queue-item.processing { border-left: 4px solid #007bff; background: #e7f1ff; }
+        .queue-item.completed { border-left: 4px solid #28a745; }
+        .queue-item.failed { border-left: 4px solid #dc3545; background: #fff5f5; }
+        .queue-item-status {
+            width: 24px;
+            text-align: center;
+            margin-right: 10px;
+        }
+        .queue-item-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .queue-item-time {
+            color: #666;
+            font-size: 11px;
+            margin-left: 10px;
+        }
+        
+        /* Batch Results */
+        .batch-results {
+            margin-top: 20px;
+        }
+        .batch-summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+        .batch-summary-table th,
+        .batch-summary-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .batch-summary-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        .batch-summary-table tr:hover {
+            background: #f8f9fa;
+        }
+        .batch-summary-table .status-success { color: #28a745; }
+        .batch-summary-table .status-failed { color: #dc3545; }
+        
+        /* Per-image result cards */
+        .result-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .result-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+        }
+        .result-card-header:hover {
+            background: #e9ecef;
+        }
+        .result-card-header h4 {
+            margin: 0;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .result-card-header .status-badge {
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .status-badge.success { background: #d4edda; color: #155724; }
+        .status-badge.failed { background: #f8d7da; color: #721c24; }
+        .result-card-toggle {
+            font-size: 18px;
+            color: #666;
+            transition: transform 0.2s;
+        }
+        .result-card.collapsed .result-card-toggle {
+            transform: rotate(-90deg);
+        }
+        .result-card-body {
+            padding: 15px;
+        }
+        .result-card.collapsed .result-card-body {
+            display: none;
+        }
+        .result-card-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .result-stat {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .result-stat-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+        .result-stat-value {
+            font-weight: 600;
+            color: #333;
+        }
+        .result-images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .result-error {
+            background: #fff5f5;
+            border: 1px solid #f8d7da;
+            border-radius: 4px;
+            padding: 15px;
+            color: #721c24;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        
+        /* Validation reason section */
+        .validation-reason-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        .validation-reason-label {
+            font-size: 11px;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .validation-reason-text {
+            font-size: 13px;
+            color: #333;
+            line-height: 1.4;
+        }
+        
+        /* Batch console output */
+        .batch-console-section {
+            margin-top: 15px;
+            border-top: 1px solid #dee2e6;
+            padding-top: 15px;
+        }
+        .batch-console-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 11px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-top: 10px;
+        }
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        /* Validation tooltip in table */
+        .validation-tooltip {
+            cursor: help;
+            position: relative;
+        }
+        .validation-tooltip:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: normal;
+            max-width: 300px;
+            min-width: 200px;
+            z-index: 1000;
+            text-align: left;
+            line-height: 1.4;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .validation-tooltip:hover::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #333;
+            margin-bottom: -12px;
+            z-index: 1001;
+        }
+        
+        /* Batch progress bar */
+        .batch-progress {
+            margin-bottom: 15px;
+        }
+        .batch-progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .batch-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007bff, #28a745);
+            transition: width 0.3s;
+        }
+        .batch-progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">📊 PlotExtract</a>
+            <ul class="navbar-nav">
+                <li><a href="/" class="nav-link active">🔬 Extraction</a></li>
+                <li><a href="/synthetic" class="nav-link">🧫 Synthetic Generator</a></li>
+                <li><a href="/synthetic/editor" class="nav-link">✏️ Synthetic Editor</a></li>
+                <li><a href="/results" class="nav-link">📈 Results Comparison</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="main-content">
     <div class="container">
         <h1>🔬 PlotExtract Interface</h1>
+        
+        <!-- Mode Toggle -->
+        <div class="mode-toggle">
+            <button class="mode-btn active" onclick="setMode('single')" id="btnSingleMode">📄 Single Image</button>
+            <button class="mode-btn" onclick="setMode('batch')" id="btnBatchMode">📚 Batch Mode</button>
+        </div>
         
         <!-- Selection Panel -->
         <div class="panel">
             <h2>1. Select Input & Configure</h2>
-            <div class="row">
-                <div class="col">
-                    <div class="form-group">
-                        <label for="imageSelect">Select Image:</label>
-                        <select id="imageSelect" onchange="onImageSelect()">
-                            <option value="">-- Choose an image --</option>
-                            {% for folder, images in images_grouped.items() %}
-                            <optgroup label="📁 {{ folder }}">
-                                {% for image in images %}
-                                <option value="{{ image }}">{{ image.split('/')[-1] }}</option>
+            
+            <!-- Single Mode Section -->
+            <div class="single-section" id="singleSection">
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="imageSelect">Select Image:</label>
+                            <select id="imageSelect" onchange="onImageSelect()">
+                                <option value="">-- Choose an image --</option>
+                                {% for folder, images in images_grouped.items() %}
+                                <optgroup label="📁 {{ folder }}">
+                                    {% for image in images %}
+                                    <option value="{{ image }}">{{ image.split('/')[-1] }}</option>
+                                    {% endfor %}
+                                </optgroup>
                                 {% endfor %}
-                            </optgroup>
-                            {% endfor %}
-                        </select>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="promptSelect">Select Prompt:</label>
+                            <select id="promptSelect" onchange="onPromptSelect()">
+                                {% for prompt in prompts %}
+                                <option value="{{ prompt }}">{{ prompt }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="promptSelect">Select Prompt:</label>
-                        <select id="promptSelect" onchange="onPromptSelect()">
-                            {% for prompt in prompts %}
-                            <option value="{{ prompt }}">{{ prompt }}</option>
-                            {% endfor %}
-                        </select>
+                    <div class="col">
+                        <!-- Preview selected image -->
+                        <div id="imagePreview" style="display: none;">
+                            <label><strong>Preview:</strong></label>
+                            <img id="previewImg" src="" style="max-width: 400px; max-height: 250px; display: block; margin-top: 10px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;" onclick="openModal(this.src)">
+                        </div>
                     </div>
                 </div>
-                <div class="col">
-                    <!-- Preview selected image -->
-                    <div id="imagePreview" style="display: none;">
-                        <label><strong>Preview:</strong></label>
-                        <img id="previewImg" src="" style="max-width: 400px; max-height: 250px; display: block; margin-top: 10px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;" onclick="openModal(this.src)">
+                
+                <!-- CSV Info -->
+                <div class="row" style="margin-top: 15px;">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Original CSV (auto-detected):</label>
+                            <div id="originalCsvLabel" class="csv-label">Select an image first</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Extracted Data (after extraction):</label>
+                            <div id="extractedCsvLabel" class="csv-label">Will be created after extraction</div>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <!-- CSV Info -->
-            <div class="row" style="margin-top: 15px;">
-                <div class="col">
-                    <div class="form-group">
-                        <label>Original CSV (auto-detected):</label>
-                        <div id="originalCsvLabel" class="csv-label">Select an image first</div>
+            <!-- Batch Mode Section -->
+            <div class="batch-section" id="batchSection">
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="batchImageSelect">Select Images (hold Ctrl/Cmd to select multiple):</label>
+                            <select id="batchImageSelect" multiple size="10" onchange="updateBatchSelection()">
+                                {% for folder, images in images_grouped.items() %}
+                                <optgroup label="📁 {{ folder }}">
+                                    {% for image in images %}
+                                    <option value="{{ image }}">{{ image.split('/')[-1] }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="batchPromptSelect">Select Prompt (applies to all images):</label>
+                            <select id="batchPromptSelect">
+                                {% for prompt in prompts %}
+                                <option value="{{ prompt }}">{{ prompt }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Selected Images Info -->
+                        <div id="batchFileInfo" style="display: none;">
+                            <div class="batch-file-count">
+                                <span><strong id="batchFileCountText">0 images</strong> selected</span>
+                                <button class="btn" style="padding: 5px 10px; font-size: 12px;" onclick="clearBatchSelection()">Clear Selection</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col">
-                    <div class="form-group">
-                        <label>Extracted Data (after extraction):</label>
-                        <div id="extractedCsvLabel" class="csv-label">Will be created after extraction</div>
+                    <div class="col">
+                        <!-- Batch Queue Status -->
+                        <div id="batchQueuePanel" style="display: none;">
+                            <label><strong>Processing Queue:</strong></label>
+                            <div class="batch-progress" id="batchProgress">
+                                <div class="batch-progress-bar">
+                                    <div class="batch-progress-fill" id="batchProgressFill" style="width: 0%"></div>
+                                </div>
+                                <div class="batch-progress-text">
+                                    <span id="batchProgressText">0 / 0 completed</span>
+                                    <span id="batchElapsedTime">0s elapsed</span>
+                                </div>
+                            </div>
+                            <div class="batch-queue" id="batchQueue"></div>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Options -->
+            <!-- Options (shared between modes) -->
             <div class="checkbox-group">
                 <label>
                     <input type="checkbox" id="runInterpolation" onchange="toggleAxisInputs()">
@@ -310,6 +769,14 @@
                 <label>
                     <input type="checkbox" id="runPointwise" onchange="toggleAxisInputs()">
                     Run Pointwise Comparison
+                </label>
+            </div>
+            
+            <!-- Batch-only: Auto-detect axis ranges -->
+            <div id="autoDetectAxisSection" class="checkbox-group batch-section" style="display: none;">
+                <label>
+                    <input type="checkbox" id="autoDetectAxis" checked onchange="toggleAxisInputs()">
+                    Auto-detect axis ranges from original CSV (recommended for batch)
                 </label>
             </div>
             
@@ -340,74 +807,122 @@
         <!-- Processing Panel -->
         <div class="panel">
             <h2>2. Processing</h2>
-            <div style="text-align: center; margin-bottom: 15px;">
-                <button class="btn btn-primary btn-large" onclick="runAll()" id="btnRunAll">
-                    🚀 Run Plot Extraction (and Comparison)
-                </button>
-                <p style="color: #666; margin-top: 10px;">
-                    This will extract data from the image. If checkboxes are enabled, it will also run comparisons.
-                </p>
+            
+            <!-- Single Mode Processing -->
+            <div class="single-section" id="singleProcessing">
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <button class="btn btn-primary btn-large" onclick="runAll()" id="btnRunAll">
+                        🚀 Run Plot Extraction (and Comparison)
+                    </button>
+                    <p style="color: #666; margin-top: 10px;">
+                        This will extract data from the image. If checkboxes are enabled, it will also run comparisons.
+                    </p>
+                </div>
+                <div id="consoleOutput" class="console">Ready. Select an image and click "Run Plot Extraction" to begin.</div>
             </div>
-            <div id="consoleOutput" class="console">Ready. Select an image and click "Run Plot Extraction" to begin.</div>
+            
+            <!-- Batch Mode Processing -->
+            <div class="batch-section" id="batchProcessing">
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <button class="btn btn-primary btn-large" onclick="runBatch()" id="btnRunBatch">
+                        🚀 Run Batch Extraction
+                    </button>
+                    <button class="btn" onclick="cancelBatch()" id="btnCancelBatch" style="display: none;">
+                        ⏹️ Cancel
+                    </button>
+                    <p style="color: #666; margin-top: 10px;">
+                        Process all selected images sequentially. Failed images won't stop the batch.
+                    </p>
+                </div>
+                <div id="batchConsoleOutput" class="console">Ready. Select images and click "Run Batch Extraction" to begin.</div>
+            </div>
         </div>
         
         <!-- Results Panel -->
         <div class="panel">
             <h2>3. Results</h2>
-            <div class="tabs">
-                <button class="tab active" onclick="showTab('images')">Images</button>
-                <button class="tab" onclick="showTab('stats')">Statistics</button>
-                <button class="tab" onclick="showTab('data')">Data Files</button>
-            </div>
             
-            <div id="tab-images" class="tab-content">
-                <!-- Summary Stats Display -->
-                <div id="summaryStats" class="summary-stats" style="display: none;">
-                    <div class="summary-row">
-                        <span class="summary-label">Validation Result:</span>
-                        <span id="summaryValidation" class="summary-value">-</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Validation Reason:</span>
-                        <span id="summaryValidationReason" class="summary-value">-</span>
-                    </div>
-                    <div id="interpolationStats" class="summary-row" style="display: none;">
-                        <span class="summary-label">Interpolation MAE:</span>
-                        <span id="summaryInterpolationMAE" class="summary-value">-</span>
-                    </div>
-                    <div id="pointwiseStats" style="display: none;">
+            <!-- Single Mode Results -->
+            <div class="single-section" id="singleResults">
+                <div class="tabs">
+                    <button class="tab active" onclick="showTab('images')">Images</button>
+                    <button class="tab" onclick="showTab('stats')">Statistics</button>
+                    <button class="tab" onclick="showTab('data')">Data Files</button>
+                </div>
+                
+                <div id="tab-images" class="tab-content">
+                    <!-- Summary Stats Display -->
+                    <div id="summaryStats" class="summary-stats" style="display: none;">
                         <div class="summary-row">
-                            <span class="summary-label">MAE X:</span>
-                            <span id="summaryMAEX" class="summary-value">-</span>
-                            <span class="summary-label" style="margin-left: 20px;">MAE Y:</span>
-                            <span id="summaryMAEY" class="summary-value">-</span>
+                            <span class="summary-label">Validation Result:</span>
+                            <span id="summaryValidation" class="summary-value">-</span>
                         </div>
                         <div class="summary-row">
-                            <span class="summary-label">Precision:</span>
-                            <span id="summaryPrecision" class="summary-value">-</span>
-                            <span class="summary-label" style="margin-left: 20px;">Recall:</span>
-                            <span id="summaryRecall" class="summary-value">-</span>
+                            <span class="summary-label">Validation Reason:</span>
+                            <span id="summaryValidationReason" class="summary-value">-</span>
                         </div>
+                        <div id="interpolationStats" class="summary-row" style="display: none;">
+                            <span class="summary-label">Interpolation MAE:</span>
+                            <span id="summaryInterpolationMAE" class="summary-value">-</span>
+                        </div>
+                        <div id="pointwiseStats" style="display: none;">
+                            <div class="summary-row">
+                                <span class="summary-label">MAE X:</span>
+                                <span id="summaryMAEX" class="summary-value">-</span>
+                                <span class="summary-label" style="margin-left: 20px;">MAE Y:</span>
+                                <span id="summaryMAEY" class="summary-value">-</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">Precision:</span>
+                                <span id="summaryPrecision" class="summary-value">-</span>
+                                <span class="summary-label" style="margin-left: 20px;">Recall:</span>
+                                <span id="summaryRecall" class="summary-value">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="outputImages" class="output-images">
+                        <p style="color: #666;">Select an image and run extraction to see results.</p>
                     </div>
                 </div>
                 
-                <div id="outputImages" class="output-images">
-                    <p style="color: #666;">Select an image and run extraction to see results.</p>
+                <div id="tab-stats" class="tab-content" style="display: none;">
+                    <ul id="outputStats" class="file-list">
+                        <li style="color: #666;">No statistics files yet.</li>
+                    </ul>
+                    <div id="statsContent" class="file-content" style="display: none; margin-top: 15px;"></div>
+                </div>
+                
+                <div id="tab-data" class="tab-content" style="display: none;">
+                    <ul id="outputData" class="file-list">
+                        <li style="color: #666;">No data files yet.</li>
+                    </ul>
+                    <div id="dataContent" class="file-content" style="display: none; margin-top: 15px;"></div>
                 </div>
             </div>
             
-            <div id="tab-stats" class="tab-content" style="display: none;">
-                <ul id="outputStats" class="file-list">
-                    <li style="color: #666;">No statistics files yet.</li>
-                </ul>
-                <div id="statsContent" class="file-content" style="display: none; margin-top: 15px;"></div>
-            </div>
-            
-            <div id="tab-data" class="tab-content" style="display: none;">
-                <ul id="outputData" class="file-list">
-                    <li style="color: #666;">No data files yet.</li>
-                </ul>
-                <div id="dataContent" class="file-content" style="display: none; margin-top: 15px;"></div>
+            <!-- Batch Mode Results -->
+            <div class="batch-section" id="batchResults">
+                <div class="tabs">
+                    <button class="tab active" onclick="showBatchTab('summary')">📊 Summary</button>
+                    <button class="tab" onclick="showBatchTab('details')">📋 Details</button>
+                </div>
+                
+                <div id="batch-tab-summary" class="tab-content">
+                    <div id="batchSummaryTable" style="max-height: 300px; overflow-y: auto;">
+                        <p style="color: #666;">Run batch extraction to see summary.</p>
+                    </div>
+                </div>
+                
+                <div id="batch-tab-details" class="tab-content" style="display: none;">
+                    <div style="margin-bottom: 10px;">
+                        <button class="btn" onclick="expandAllCards()" style="font-size: 12px; padding: 5px 10px;">Expand All</button>
+                        <button class="btn" onclick="collapseAllCards()" style="font-size: 12px; padding: 5px 10px;">Collapse All</button>
+                    </div>
+                    <div id="batchResultCards">
+                        <p style="color: #666;">Run batch extraction to see detailed results.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -441,6 +956,9 @@
                     }
                 }
             }
+            
+            // Check for running task or load last results
+            checkTaskOnLoad();
         });
         
         function onImageSelect() {
@@ -503,11 +1021,27 @@
             const interpolation = document.getElementById('runInterpolation').checked;
             const pointwise = document.getElementById('runPointwise').checked;
             const axisInputs = document.getElementById('axisInputs');
+            const autoDetectCheckbox = document.getElementById('autoDetectAxis');
+            const isBatchMode = currentMode === 'batch';
             
-            if (interpolation || pointwise) {
-                axisInputs.classList.remove('disabled');
+            // Show/hide auto-detect section based on mode and comparison options
+            const autoDetectSection = document.getElementById('autoDetectAxisSection');
+            if (isBatchMode && (interpolation || pointwise)) {
+                autoDetectSection.style.display = 'block';
             } else {
+                autoDetectSection.style.display = 'none';
+            }
+            
+            // Enable/disable axis inputs:
+            // - Disabled if no comparison selected
+            // - Disabled in batch mode if auto-detect is checked
+            const shouldDisableAxis = !(interpolation || pointwise) || 
+                                      (isBatchMode && autoDetectCheckbox && autoDetectCheckbox.checked);
+            
+            if (shouldDisableAxis) {
                 axisInputs.classList.add('disabled');
+            } else {
+                axisInputs.classList.remove('disabled');
             }
         }
         
@@ -639,6 +1173,10 @@
             });
         }
         
+        // Current task ID for polling
+        let currentTaskId = null;
+        let pollInterval = null;
+        
         function runAll() {
             const imagePath = document.getElementById('imageSelect').value;
             const promptFile = document.getElementById('promptSelect').value;
@@ -650,9 +1188,9 @@
             
             const btn = document.getElementById('btnRunAll');
             btn.disabled = true;
-            btn.textContent = '⏳ Running...';
+            btn.textContent = '⏳ Starting...';
             
-            // Clear console
+            // Clear console and results (new run starting)
             const consoleOutput = document.getElementById('consoleOutput');
             consoleOutput.textContent = 'Starting tasks...\n';
             
@@ -685,24 +1223,11 @@
             })
             .then(res => res.json())
             .then(data => {
-                btn.disabled = false;
-                btn.textContent = '🚀 Run Plot Extraction (and Comparison)';
-                
-                // Update console
-                consoleOutput.textContent = data.console;
-                consoleOutput.scrollTop = consoleOutput.scrollHeight;
-                
-                // Update outputs
-                if (data.outputs) {
-                    updateOutputDisplay(data.outputs);
-                }
-                
-                // Update CSV info
-                updateCsvInfo();
-                
-                // Show images tab if successful
-                if (data.success) {
-                    showTab('images');
+                if (data.task_id) {
+                    currentTaskId = data.task_id;
+                    localStorage.setItem('currentTaskId', currentTaskId);
+                    consoleOutput.textContent = 'Task started. Processing in background...\n';
+                    startPolling();
                 }
             })
             .catch(err => {
@@ -710,6 +1235,124 @@
                 btn.textContent = '🚀 Run Plot Extraction (and Comparison)';
                 consoleOutput.textContent += '\n\n[ERROR] ' + err;
             });
+        }
+        
+        function startPolling() {
+            // Clear any existing interval
+            if (pollInterval) clearInterval(pollInterval);
+            
+            const btn = document.getElementById('btnRunAll');
+            const consoleOutput = document.getElementById('consoleOutput');
+            let startTime = Date.now();
+            
+            pollInterval = setInterval(() => {
+                if (!currentTaskId) {
+                    clearInterval(pollInterval);
+                    return;
+                }
+                
+                fetch(`/task_status/${currentTaskId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+                        
+                        if (data.status === 'running') {
+                            btn.textContent = `⏳ ${data.progress} (${elapsed}s)`;
+                            consoleOutput.textContent = `Task running...\nProgress: ${data.progress}\nElapsed: ${elapsed}s`;
+                        } else if (data.status === 'completed') {
+                            clearInterval(pollInterval);
+                            pollInterval = null;
+                            currentTaskId = null;
+                            localStorage.removeItem('currentTaskId');
+                            
+                            btn.disabled = false;
+                            btn.textContent = '🚀 Run Plot Extraction (and Comparison)';
+                            
+                            // Display results
+                            displayResults(data.result);
+                        } else if (data.status === 'not_found') {
+                            clearInterval(pollInterval);
+                            pollInterval = null;
+                            currentTaskId = null;
+                            localStorage.removeItem('currentTaskId');
+                            
+                            btn.disabled = false;
+                            btn.textContent = '🚀 Run Plot Extraction (and Comparison)';
+                            consoleOutput.textContent += '\n[WARNING] Task not found. It may have completed while you were away.';
+                            
+                            // Try to load the last result
+                            loadLastResult();
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Polling error:', err);
+                    });
+            }, 1000);
+        }
+        
+        function displayResults(result) {
+            const consoleOutput = document.getElementById('consoleOutput');
+            
+            // Update console
+            consoleOutput.textContent = result.console;
+            
+            // Add timing summary at the end
+            if (result.timings) {
+                let timingSummary = '\n\n📊 TIMING SUMMARY:\n';
+                if (result.timings.extraction) timingSummary += `  • Extraction: ${result.timings.extraction.toFixed(2)}s\n`;
+                if (result.timings.interpolation) timingSummary += `  • Interpolation: ${result.timings.interpolation.toFixed(2)}s\n`;
+                if (result.timings.pointwise) timingSummary += `  • Pointwise: ${result.timings.pointwise.toFixed(2)}s\n`;
+                if (result.timings.total) timingSummary += `  • Total: ${result.timings.total.toFixed(2)}s\n`;
+                consoleOutput.textContent += timingSummary;
+            }
+            
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            
+            // Update outputs
+            if (result.outputs) {
+                updateOutputDisplay(result.outputs);
+            }
+            
+            // Update CSV info
+            updateCsvInfo();
+            
+            // Show images tab if successful
+            if (result.success) {
+                showTab('images');
+            }
+        }
+        
+        function loadLastResult() {
+            fetch('/last_extraction_result')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.exists && data.result) {
+                        displayResults(data.result);
+                        
+                        // Update the info about which image/prompt was used
+                        const consoleOutput = document.getElementById('consoleOutput');
+                        const completedAt = data.result.completed_at ? 
+                            new Date(data.result.completed_at * 1000).toLocaleString() : 'Unknown';
+                        consoleOutput.textContent = `📁 Restored results from: ${completedAt}\n` +
+                            `Image: ${data.result.image_path}\n` +
+                            `Prompt: ${data.result.prompt_file}\n\n` +
+                            consoleOutput.textContent;
+                    }
+                });
+        }
+        
+        // Check for running task or last result on page load
+        function checkTaskOnLoad() {
+            const savedTaskId = localStorage.getItem('currentTaskId');
+            if (savedTaskId) {
+                currentTaskId = savedTaskId;
+                document.getElementById('btnRunAll').disabled = true;
+                document.getElementById('btnRunAll').textContent = '⏳ Checking task...';
+                startPolling();
+            } else {
+                // No running task, try to load last result
+                loadLastResult();
+            }
         }
         
         function showTab(tabName) {
@@ -740,6 +1383,597 @@
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape') closeModal();
         });
+        
+        // =================================================================
+        // Mode Toggle
+        // =================================================================
+        let currentMode = 'single';
+        
+        function setMode(mode) {
+            currentMode = mode;
+            
+            // Update toggle buttons
+            document.getElementById('btnSingleMode').classList.toggle('active', mode === 'single');
+            document.getElementById('btnBatchMode').classList.toggle('active', mode === 'batch');
+            
+            // Show/hide sections
+            document.querySelectorAll('.single-section').forEach(el => {
+                el.classList.toggle('hidden', mode !== 'single');
+            });
+            document.querySelectorAll('.batch-section').forEach(el => {
+                el.classList.toggle('active', mode === 'batch');
+            });
+            
+            // Update axis inputs visibility based on mode
+            toggleAxisInputs();
+        }
+        
+        // =================================================================
+        // Batch Mode - State Management
+        // =================================================================
+        let batchImages = [];          // Array of {id, path, name} objects (selected from dropdown)
+        let batchQueue = [];           // Processing queue with status
+        let batchResults = [];         // Results for each processed image
+        let batchTaskId = null;        // Current batch task ID
+        let batchPollInterval = null;  // Polling interval
+        let batchCancelled = false;    // Cancel flag
+        let batchStartTime = null;     // For elapsed time tracking
+        
+        // =================================================================
+        // Batch Mode - Image Selection (from multi-select dropdown)
+        // =================================================================
+        function updateBatchSelection() {
+            const select = document.getElementById('batchImageSelect');
+            const selectedOptions = Array.from(select.selectedOptions);
+            
+            batchImages = selectedOptions.map(opt => ({
+                id: 'batch_' + opt.value.replace(/[^a-zA-Z0-9]/g, '_'),
+                path: opt.value,
+                name: opt.value.split('/').pop()
+            }));
+            
+            updateBatchSelectionDisplay();
+        }
+        
+        function clearBatchSelection() {
+            const select = document.getElementById('batchImageSelect');
+            select.selectedIndex = -1;
+            batchImages = [];
+            updateBatchSelectionDisplay();
+        }
+        
+        function updateBatchSelectionDisplay() {
+            const fileInfo = document.getElementById('batchFileInfo');
+            const fileCount = document.getElementById('batchFileCountText');
+            
+            if (batchImages.length === 0) {
+                fileInfo.style.display = 'none';
+                return;
+            }
+            
+            fileInfo.style.display = 'block';
+            fileCount.textContent = batchImages.length + ' image' + (batchImages.length !== 1 ? 's' : '');
+        }
+        
+        // =================================================================
+        // Batch Mode - Processing
+        // =================================================================
+        async function runBatch() {
+            if (batchImages.length === 0) {
+                alert('Please select at least one image');
+                return;
+            }
+            
+            const promptFile = document.getElementById('batchPromptSelect').value;
+            const runInterpolation = document.getElementById('runInterpolation').checked;
+            const runPointwise = document.getElementById('runPointwise').checked;
+            const autoDetectAxis = document.getElementById('autoDetectAxis').checked;
+            const leftX = parseFloat(document.getElementById('leftX').value) || 0;
+            const rightX = parseFloat(document.getElementById('rightX').value) || 100;
+            const bottomY = parseFloat(document.getElementById('bottomY').value) || 0;
+            const topY = parseFloat(document.getElementById('topY').value) || 100;
+            
+            // Save axis values
+            localStorage.setItem('axisLeftX', leftX);
+            localStorage.setItem('axisRightX', rightX);
+            localStorage.setItem('axisBottomY', bottomY);
+            localStorage.setItem('axisTopY', topY);
+            
+            // Initialize batch state
+            batchQueue = batchImages.map(img => ({
+                id: img.id,
+                name: img.name,
+                path: img.path,
+                status: 'pending',
+                result: null,
+                error: null,
+                time: null
+            }));
+            batchResults = [];
+            batchCancelled = false;
+            batchStartTime = Date.now();
+            
+            // Update UI
+            const btnRun = document.getElementById('btnRunBatch');
+            const btnCancel = document.getElementById('btnCancelBatch');
+            btnRun.disabled = true;
+            btnRun.textContent = '⏳ Processing...';
+            btnCancel.style.display = 'inline-block';
+            
+            document.getElementById('batchQueuePanel').style.display = 'block';
+            updateBatchQueueDisplay();
+            updateBatchProgress();
+            
+            const consoleOutput = document.getElementById('batchConsoleOutput');
+            consoleOutput.textContent = `Starting batch extraction of ${batchQueue.length} images...\n`;
+            
+            // Start elapsed time updater
+            const elapsedInterval = setInterval(() => {
+                if (batchStartTime) {
+                    const elapsed = ((Date.now() - batchStartTime) / 1000).toFixed(0);
+                    document.getElementById('batchElapsedTime').textContent = elapsed + 's elapsed';
+                }
+            }, 1000);
+            
+            // Process images sequentially
+            for (let i = 0; i < batchQueue.length; i++) {
+                if (batchCancelled) {
+                    consoleOutput.textContent += '\n⏹️ Batch cancelled by user.\n';
+                    break;
+                }
+                
+                const item = batchQueue[i];
+                item.status = 'processing';
+                updateBatchQueueDisplay();
+                updateBatchProgress();
+                
+                consoleOutput.textContent += `\n[${i + 1}/${batchQueue.length}] Processing: ${item.name}...\n`;
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                
+                const startTime = Date.now();
+                
+                try {
+                    // Run extraction using the same endpoint as single mode
+                    const result = await processBatchImage(item.path, promptFile, runInterpolation, runPointwise, leftX, rightX, bottomY, topY, autoDetectAxis);
+                    
+                    item.status = 'completed';
+                    item.result = result;
+                    item.time = ((Date.now() - startTime) / 1000).toFixed(1);
+                    
+                    consoleOutput.textContent += `  ✅ Completed in ${item.time}s\n`;
+                    
+                    batchResults.push({
+                        id: item.id,
+                        name: item.name,
+                        path: item.path,
+                        status: 'success',
+                        result: result,
+                        time: item.time
+                    });
+                } catch (error) {
+                    item.status = 'failed';
+                    item.error = error.message || 'Unknown error';
+                    item.time = ((Date.now() - startTime) / 1000).toFixed(1);
+                    
+                    consoleOutput.textContent += `  ❌ Failed: ${item.error}\n`;
+                    
+                    batchResults.push({
+                        id: item.id,
+                        name: item.name,
+                        path: item.path,
+                        status: 'failed',
+                        error: item.error,
+                        time: item.time
+                    });
+                }
+                
+                updateBatchQueueDisplay();
+                updateBatchProgress();
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            }
+            
+            // Cleanup
+            clearInterval(elapsedInterval);
+            btnRun.disabled = false;
+            btnRun.textContent = '🚀 Run Batch Extraction';
+            btnCancel.style.display = 'none';
+            
+            const completed = batchResults.filter(r => r.status === 'success').length;
+            const failed = batchResults.filter(r => r.status === 'failed').length;
+            const totalTime = ((Date.now() - batchStartTime) / 1000).toFixed(1);
+            
+            consoleOutput.textContent += `\n${'='.repeat(50)}\n`;
+            consoleOutput.textContent += `BATCH COMPLETE: ${completed} succeeded, ${failed} failed (${totalTime}s total)\n`;
+            consoleOutput.textContent += `${'='.repeat(50)}\n`;
+            
+            // Update results display
+            renderBatchResults();
+        }
+        
+        async function processBatchImage(imagePath, promptFile, runInterpolation, runPointwise, leftX, rightX, bottomY, topY, autoDetectAxis) {
+            // If auto-detect is enabled, fetch axis ranges from original CSV
+            if (autoDetectAxis && (runInterpolation || runPointwise)) {
+                try {
+                    const axisResponse = await fetch('/get_axis_ranges', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ image_path: imagePath })
+                    });
+                    const axisData = await axisResponse.json();
+                    
+                    if (axisData.success) {
+                        leftX = axisData.leftX;
+                        rightX = axisData.rightX;
+                        bottomY = axisData.bottomY;
+                        topY = axisData.topY;
+                        console.log(`Auto-detected axis ranges for ${imagePath}:`, leftX, rightX, bottomY, topY);
+                    } else {
+                        console.warn(`Could not auto-detect axis for ${imagePath}: ${axisData.error}`);
+                        // Fall back to provided values
+                    }
+                } catch (e) {
+                    console.warn(`Failed to auto-detect axis for ${imagePath}:`, e);
+                    // Fall back to provided values
+                }
+            }
+            
+            // Use the same /run_all endpoint as single mode, but wait for completion synchronously
+            const response = await fetch('/run_all', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    image: imagePath,
+                    prompt: promptFile,
+                    runInterpolation: runInterpolation,
+                    runPointwise: runPointwise,
+                    leftX: leftX,
+                    rightX: rightX,
+                    bottomY: bottomY,
+                    topY: topY
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (!data.task_id) {
+                throw new Error('Failed to start extraction task');
+            }
+            
+            // Poll for completion
+            return await waitForTaskCompletion(data.task_id);
+        }
+        
+        async function waitForTaskCompletion(taskId) {
+            const maxWaitTime = 5 * 60 * 1000; // 5 minutes
+            const pollInterval = 1000; // 1 second
+            const startTime = Date.now();
+            
+            while (Date.now() - startTime < maxWaitTime) {
+                const response = await fetch(`/task_status/${taskId}`);
+                const data = await response.json();
+                
+                if (data.status === 'completed') {
+                    if (data.result && data.result.success) {
+                        return data.result;
+                    } else {
+                        throw new Error(data.result?.error || 'Extraction failed');
+                    }
+                } else if (data.status === 'not_found') {
+                    throw new Error('Task not found');
+                }
+                
+                // Wait before next poll
+                await new Promise(resolve => setTimeout(resolve, pollInterval));
+            }
+            
+            throw new Error('Task timed out');
+        }
+        
+        function cancelBatch() {
+            if (confirm('Cancel the batch extraction? Images already processed will be kept.')) {
+                batchCancelled = true;
+            }
+        }
+        
+        function updateBatchQueueDisplay() {
+            const queueDiv = document.getElementById('batchQueue');
+            
+            const statusIcons = {
+                pending: '⏳',
+                processing: '🔄',
+                completed: '✅',
+                failed: '❌'
+            };
+            
+            queueDiv.innerHTML = batchQueue.map(item => `
+                <div class="queue-item ${item.status}">
+                    <span class="queue-item-status">${statusIcons[item.status]}</span>
+                    <span class="queue-item-name">${item.name}</span>
+                    ${item.time ? `<span class="queue-item-time">${item.time}s</span>` : ''}
+                </div>
+            `).join('');
+        }
+        
+        function updateBatchProgress() {
+            const completed = batchQueue.filter(q => q.status === 'completed' || q.status === 'failed').length;
+            const total = batchQueue.length;
+            const percent = total > 0 ? (completed / total * 100) : 0;
+            
+            document.getElementById('batchProgressFill').style.width = percent + '%';
+            document.getElementById('batchProgressText').textContent = `${completed} / ${total} completed`;
+        }
+        
+        // =================================================================
+        // Batch Mode - Results Rendering
+        // =================================================================
+        function renderBatchResults() {
+            renderBatchSummaryTable();
+            renderBatchResultCards();
+        }
+        
+        function renderBatchSummaryTable() {
+            const container = document.getElementById('batchSummaryTable');
+            
+            if (batchResults.length === 0) {
+                container.innerHTML = '<p style="color: #666;">No results yet.</p>';
+                return;
+            }
+            
+            let html = `
+                <table class="batch-summary-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Image</th>
+                            <th>Status</th>
+                            <th>Validation</th>
+                            <th>Interp. MAE</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            batchResults.forEach((result, idx) => {
+                const summary = result.result?.outputs?.summary || {};
+                const validation = summary.validation_result || '-';
+                const validationReason = summary.validation_reason || '';
+                const interpMAE = summary.interpolation_mae != null ? summary.interpolation_mae.toFixed(4) : '-';
+                const precision = summary.precision || '-';
+                const recall = summary.recall || '-';
+                
+                // Create validation cell with tooltip if reason exists
+                const validationCell = validationReason 
+                    ? `<span class="validation-tooltip" title="${escapeHtml(validationReason)}">${validation} ℹ️</span>`
+                    : validation;
+                
+                html += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${result.name}</td>
+                        <td class="${result.status === 'success' ? 'status-success' : 'status-failed'}">
+                            ${result.status === 'success' ? '✅' : '❌'}
+                        </td>
+                        <td>${validationCell}</td>
+                        <td>${interpMAE}</td>
+                        <td>${precision}</td>
+                        <td>${recall}</td>
+                        <td>${result.time}s</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        function renderBatchResultCards() {
+            const container = document.getElementById('batchResultCards');
+            
+            if (batchResults.length === 0) {
+                container.innerHTML = '<p style="color: #666;">No results yet.</p>';
+                return;
+            }
+            
+            container.innerHTML = batchResults.map((result, idx) => {
+                if (result.status === 'failed') {
+                    return `
+                        <div class="result-card" id="card-${result.id}">
+                            <div class="result-card-header" onclick="toggleCard('${result.id}')">
+                                <h4>
+                                    <span>#${idx + 1}</span>
+                                    <span>${result.name}</span>
+                                    <span class="status-badge failed">Failed</span>
+                                </h4>
+                                <span class="result-card-toggle">▼</span>
+                            </div>
+                            <div class="result-card-body">
+                                <div class="result-error">${result.error}</div>
+                                ${result.result?.console ? `
+                                    <div class="batch-console-section">
+                                        <button class="btn btn-small" onclick="event.stopPropagation(); toggleBatchConsole('${result.id}')">
+                                            📋 Show Console Output
+                                        </button>
+                                        <pre class="batch-console-output" id="console-${result.id}" style="display: none;">${escapeHtml(result.result.console)}</pre>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                const outputs = result.result?.outputs || {};
+                const summary = outputs.summary || {};
+                const consoleText = result.result?.console || '';
+                
+                // Build stats display
+                let statsHtml = '<div class="result-card-stats">';
+                
+                if (summary.validation_result) {
+                    statsHtml += `
+                        <div class="result-stat">
+                            <div class="result-stat-label">Validation</div>
+                            <div class="result-stat-value" style="color: ${summary.validation_result === 'Yes' ? '#28a745' : '#dc3545'}">
+                                ${summary.validation_result}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (summary.interpolation_mae != null) {
+                    statsHtml += `
+                        <div class="result-stat">
+                            <div class="result-stat-label">Interp. MAE</div>
+                            <div class="result-stat-value">${summary.interpolation_mae.toFixed(4)}</div>
+                        </div>
+                    `;
+                }
+                
+                if (summary.precision) {
+                    statsHtml += `
+                        <div class="result-stat">
+                            <div class="result-stat-label">Precision</div>
+                            <div class="result-stat-value">${summary.precision}</div>
+                        </div>
+                        <div class="result-stat">
+                            <div class="result-stat-label">Recall</div>
+                            <div class="result-stat-value">${summary.recall}</div>
+                        </div>
+                    `;
+                }
+                
+                if (summary.pointwise_mae_x) {
+                    statsHtml += `
+                        <div class="result-stat">
+                            <div class="result-stat-label">MAE X</div>
+                            <div class="result-stat-value">${summary.pointwise_mae_x}</div>
+                        </div>
+                        <div class="result-stat">
+                            <div class="result-stat-label">MAE Y</div>
+                            <div class="result-stat-value">${summary.pointwise_mae_y}</div>
+                        </div>
+                    `;
+                }
+                
+                statsHtml += '</div>';
+                
+                // Build validation reason display
+                let validationReasonHtml = '';
+                if (summary.validation_reason) {
+                    validationReasonHtml = `
+                        <div class="validation-reason-section">
+                            <div class="validation-reason-label">Validation Reason:</div>
+                            <div class="validation-reason-text">${escapeHtml(summary.validation_reason)}</div>
+                        </div>
+                    `;
+                }
+                
+                // Build images display
+                let imagesHtml = '';
+                const images = outputs.images || [];
+                const filteredImages = images.filter(img => 
+                    img.filename.startsWith('comparison_') || 
+                    img.filename.startsWith('interpolated_') || 
+                    img.filename.startsWith('pointwise_')
+                );
+                
+                if (filteredImages.length > 0) {
+                    imagesHtml = '<div class="result-images-grid">' + filteredImages.map(img => `
+                        <div class="image-card">
+                            <img src="/plots/${img.path}" onclick="openModal('/plots/${img.path}')" title="${img.filename}" style="max-height: 200px;">
+                            <div class="image-label">${img.label}</div>
+                        </div>
+                    `).join('') + '</div>';
+                }
+                
+                // Build console section
+                let consoleHtml = '';
+                if (consoleText) {
+                    consoleHtml = `
+                        <div class="batch-console-section">
+                            <button class="btn btn-small" onclick="event.stopPropagation(); toggleBatchConsole('${result.id}')">
+                                📋 Show Console Output
+                            </button>
+                            <pre class="batch-console-output" id="console-${result.id}" style="display: none;">${escapeHtml(consoleText)}</pre>
+                        </div>
+                    `;
+                }
+                
+                return `
+                    <div class="result-card" id="card-${result.id}">
+                        <div class="result-card-header" onclick="toggleCard('${result.id}')">
+                            <h4>
+                                <span>#${idx + 1}</span>
+                                <span>${result.name}</span>
+                                <span class="status-badge success">Success</span>
+                                <span style="color: #666; font-weight: normal;">(${result.time}s)</span>
+                            </h4>
+                            <span class="result-card-toggle">▼</span>
+                        </div>
+                        <div class="result-card-body">
+                            ${statsHtml}
+                            ${validationReasonHtml}
+                            ${imagesHtml}
+                            ${consoleHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function toggleBatchConsole(id) {
+            const consoleEl = document.getElementById('console-' + id);
+            const btn = consoleEl.previousElementSibling;
+            if (consoleEl.style.display === 'none') {
+                consoleEl.style.display = 'block';
+                btn.textContent = '📋 Hide Console Output';
+            } else {
+                consoleEl.style.display = 'none';
+                btn.textContent = '📋 Show Console Output';
+            }
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function toggleCard(id) {
+            const card = document.getElementById('card-' + id);
+            card.classList.toggle('collapsed');
+        }
+        
+        function expandAllCards() {
+            document.querySelectorAll('.result-card').forEach(card => card.classList.remove('collapsed'));
+        }
+        
+        function collapseAllCards() {
+            document.querySelectorAll('.result-card').forEach(card => card.classList.add('collapsed'));
+        }
+        
+        function showBatchTab(tabName) {
+            // Hide all batch tabs
+            document.querySelectorAll('#batchResults .tab-content').forEach(t => t.style.display = 'none');
+            document.querySelectorAll('#batchResults .tab').forEach(t => t.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById('batch-tab-' + tabName).style.display = 'block';
+            // Activate correct button
+            document.querySelectorAll('#batchResults .tab').forEach(t => {
+                if (t.textContent.toLowerCase().includes(tabName.substring(0, 4))) {
+                    t.classList.add('active');
+                }
+            });
+        }
     </script>
+    </div> <!-- End main-content -->
 </body>
 </html>

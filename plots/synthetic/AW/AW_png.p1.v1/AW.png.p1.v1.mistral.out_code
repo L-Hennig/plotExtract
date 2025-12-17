@@ -1,0 +1,28 @@
+import matplotlib.pyplot as plt
+import os
+
+# Data
+time = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+bacteria_count = [4.8, 8.5, 11.2, 10.2, 10.0, 11.2, 11.5, 11.8, 11.5, 11.8, 12.0, 11.8, 12.0, 12.2, 12.0, 12.5, 12.8, 13.0, 12.8, 13.0, 12.8]
+
+# Create plot
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.plot(time, bacteria_count, marker='o', color='#1f77b4', linestyle='-', linewidth=1.5, markersize=6, label='Condition 1')
+
+# Axis configuration
+ax.set_xlabel('Time (hours)')
+ax.set_ylabel('Bacteria Count (CFU/mL)')
+ax.set_xlim(0, 20)
+ax.set_ylim(0, 14)
+ax.set_xticks(range(0, 21, 2))
+ax.set_yticks(range(0, 15, 2))
+
+# Legend
+ax.legend()
+
+# Save plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\AW\AW_png.p1.v1"
+os.makedirs(output_dir, exist_ok=True)
+output_path = os.path.join(output_dir, "AW_png-replot.p1.v1.png")
+plt.savefig(output_path, bbox_inches='tight', dpi=300)
+plt.close()

@@ -1,0 +1,24 @@
+import matplotlib.pyplot as plt
+import os
+
+data = {
+    "Time (hours)": [0, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33],
+    "Bacterial Count (CFU/mL) (Condition 1)": [5.8, 8.9, 11.6, 11.7, 9.1, 11.5, 13.9, 11.3, 13.2, 13.0, 10.1, 11.2]
+}
+
+plt.figure(figsize=(6, 4))
+plt.plot(data["Time (hours)"], data["Bacterial Count (CFU/mL) (Condition 1)"], marker='s', color='#1f77b4', linestyle='-', linewidth=1.5, markersize=6, label='Condition 1')
+
+plt.xlabel('Time (hours)', fontsize=12)
+plt.ylabel('Bacterial Count (CFU/mL)', fontsize=12)
+plt.ylim(0, 14)
+plt.xlim(0, 33)
+plt.xticks(range(0, 34, 3))
+plt.yticks(range(0, 15, 2))
+plt.grid(True, linestyle='--', alpha=0.6)
+
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\AF\AF_copy1_svg.p4.v2"
+os.makedirs(output_dir, exist_ok=True)
+output_path = os.path.join(output_dir, "AF_copy1_svg-replot.p4.v2.png")
+plt.savefig(output_path, dpi=300, bbox_inches='tight')
+plt.close()

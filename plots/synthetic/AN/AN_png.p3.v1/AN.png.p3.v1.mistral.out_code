@@ -1,0 +1,24 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+
+data = {
+    "Time (hours)": [0, 2, 4, 6, 8, 10, 12, 14, 16, 18],
+    "Bacteria Count (CFU/mL) (Condition 1)": [7, 7.5, 10.5, 11.2, 11.5, 11.8, 13.8, 12.2, 11.2, 11.3]
+}
+
+df = pd.DataFrame(data)
+
+plt.figure(figsize=(6, 4))
+plt.plot(df["Time (hours)"], df["Bacteria Count (CFU/mL) (Condition 1)"], marker='o', linestyle='-', color='#1f77b4', label='Condition 1')
+
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacteria Count (CFU/mL)')
+plt.xlim(0, 18)
+plt.ylim(0, 15)
+plt.xticks(range(0, 19, 2))
+plt.yticks(range(0, 16, 2))
+plt.grid(False)
+plt.legend()
+
+plt.savefig(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\AN\AN_png.p3.v1\AN_png-replot.p3.v1.png", bbox_inches='tight', dpi=300)
+plt.close()

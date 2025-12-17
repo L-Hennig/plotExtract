@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synthetic Plot Editor</title>
+    <style>
+        /* =================================================================
+           Base Styles
+           ================================================================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 0;
+            color: #333;
+        }
+        
+        /* =================================================================
+           Navbar Styles
+           ================================================================= */
+        .navbar {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            padding: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        .navbar-brand {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .navbar-brand:hover {
+            color: #ecf0f1;
+        }
+        .navbar-nav {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: 5px;
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        .nav-link.active {
+            color: white;
+            border-bottom-color: #f39c12;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .main-content {
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        h3 {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        /* =================================================================
+           Layout - Three Column Design
+           ================================================================= */
+        .editor-container {
+            display: grid;
+            grid-template-columns: 350px 1fr 300px;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* =================================================================
+           Form Elements
+           ================================================================= */
+        .section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .checkbox-row input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+        .checkbox-row label {
+            font-size: 13px;
+            color: #555;
+        }
+
+        /* =================================================================
+           Buttons
+           ================================================================= */
+        .btn-primary {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: #2980b9;
+        }
+        .btn-primary:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        .btn-success {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-success:hover:not(:disabled) {
+            background: #219a52;
+        }
+        .btn-success:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* =================================================================
+           Preview Area
+           ================================================================= */
+        .preview-container {
+            background: #fafafa;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        .preview-container img {
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 4px;
+        }
+        .preview-placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* =================================================================
+           Status Bar
+           ================================================================= */
+        .status-bar {
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+        .status-bar.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status-bar.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status-bar.info {
+            background: #cce5ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+        .file-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 4px;
+            font-size: 12px;
+            word-break: break-all;
+        }
+        .file-info strong {
+            color: #2980b9;
+        }
+
+        /* =================================================================
+           Curve Cards
+           ================================================================= */
+        .editor-curve-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+        .editor-curve-card h4 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .curve-color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 1px solid rgba(0,0,0,0.2);
+        }
+        .data-preview {
+            background: #f0f0f0;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 11px;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .data-preview table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .data-preview th, .data-preview td {
+            padding: 3px 6px;
+            text-align: right;
+            border-bottom: 1px solid #ddd;
+        }
+        .data-preview th {
+            background: #e0e0e0;
+            font-weight: 600;
+        }
+
+        /* Color Preset Styles */
+        .color-picker-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            align-items: center;
+        }
+        .color-preset {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .color-preset:hover {
+            transform: scale(1.1);
+        }
+        .color-preset.selected {
+            border-color: #333;
+            box-shadow: 0 0 4px rgba(0,0,0,0.3);
+        }
+        .color-add-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 2px dashed #999;
+            background: #f5f5f5;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.2s;
+        }
+        .color-add-btn:hover {
+            border-color: #3498db;
+            color: #3498db;
+        }
+
+        /* Save History Styles */
+        .save-history {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .save-history h4 {
+            margin: 0 0 10px 0;
+            font-size: 13px;
+            color: #666;
+        }
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .history-item:hover {
+            background: #e9ecef;
+        }
+        .history-item img {
+            width: 40px;
+            height: 30px;
+            object-fit: cover;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+        .history-item-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #333;
+        }
+        .history-item-time {
+            color: #999;
+            font-size: 11px;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">📊 PlotExtract</a>
+            <ul class="navbar-nav">
+                <li><a href="/" class="nav-link">🔬 Extraction</a></li>
+                <li><a href="/synthetic" class="nav-link">🧫 Synthetic Generator</a></li>
+                <li><a href="/synthetic/editor" class="nav-link active">✏️ Synthetic Editor</a></li>
+                <li><a href="/results" class="nav-link">📈 Results Comparison</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <h1>✏️ Synthetic Plot Editor</h1>
+        <p class="page-subtitle">
+            Edit visual properties of existing synthetic plots (data points remain unchanged)
+        </p>
+        
+        <div class="editor-container">
+            <!-- Left Panel - Plot Selection & Settings -->
+            <div class="panel">
+                <h2>📂 Select Plot to Edit</h2>
+                
+                <div class="section">
+                    <div class="form-group">
+                        <label>Select Existing Plot</label>
+                        <select id="editorPlotSelect" onchange="loadPlotForEdit()">
+                            <option value="">-- Select a plot --</option>
+                        </select>
+                    </div>
+                    <button class="btn-secondary" onclick="refreshPlotList()" style="width: 100%;">
+                        🔄 Refresh List
+                    </button>
+                </div>
+                
+                <div class="section" id="editorGlobalSettings" style="display: none;">
+                    <h3>Plot Appearance</h3>
+                    <div class="form-group">
+                        <label>Plot Title</label>
+                        <input type="text" id="editorPlotTitle" placeholder="Optional title">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Width (pixels)</label>
+                            <input type="number" id="editorFigWidth" min="400" max="3000" step="50" value="1500">
+                        </div>
+                        <div class="form-group">
+                            <label>Height (pixels)</label>
+                            <input type="number" id="editorFigHeight" min="300" max="2000" step="50" value="900">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>DPI (resolution)</label>
+                        <input type="number" id="editorFigDpi" min="72" max="600" step="1" value="150">
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="editorShowLegend" checked>
+                        <label for="editorShowLegend">Show Legend</label>
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="editorShowGrid" checked>
+                        <label for="editorShowGrid">Show Grid</label>
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="editorSaveSvg">
+                        <label for="editorSaveSvg">Also save as SVG</label>
+                    </div>
+                </div>
+                
+                <div class="section" id="editorAxisSettings" style="display: none;">
+                    <h3>Axis Labels</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>X-Axis Label</label>
+                            <input type="text" id="editorXLabel" value="Time">
+                        </div>
+                        <div class="form-group">
+                            <label>X-Axis Unit</label>
+                            <input type="text" id="editorXUnit" value="hours">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Y-Axis Label</label>
+                            <input type="text" id="editorYLabel" value="Bacterial Count">
+                        </div>
+                        <div class="form-group">
+                            <label>Y-Axis Unit</label>
+                            <input type="text" id="editorYUnit" value="CFU/mL">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Y Min</label>
+                            <input type="number" id="editorYMin" step="any" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Y Max</label>
+                            <input type="number" id="editorYMax" step="any" placeholder="Auto">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Center Panel - Preview -->
+            <div class="panel">
+                <h2>👁️ Editor Preview</h2>
+                
+                <div class="preview-container" id="editorPreviewContainer">
+                    <p class="preview-placeholder">Select a plot to edit</p>
+                </div>
+                
+                <div class="button-row" style="justify-content: center;">
+                    <button class="btn-primary" onclick="previewEdit()" id="editorPreviewBtn" disabled>
+                        👁️ Preview Changes
+                    </button>
+                    <button class="btn-success" onclick="saveEditedPlot()" id="editorSaveBtn" disabled>
+                        💾 Save as Copy
+                    </button>
+                </div>
+                
+                <div id="editorStatusBar" class="status-bar" style="display: none;"></div>
+                
+                <!-- Save History -->
+                <div id="saveHistorySection" style="margin-top: 20px;">
+                    <h3 style="font-size: 14px; margin-bottom: 10px;">📜 Recent Saves</h3>
+                    <div id="saveHistoryContainer">
+                        <p style="color: #999; font-style: italic; font-size: 12px;">No recent saves</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Panel - Curve Visual Settings -->
+            <div class="panel">
+                <h2>🎨 Visual Settings</h2>
+                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">
+                    Adjust colors, markers, and line styles (data points unchanged)
+                </p>
+                
+                <div id="editorCurvesContainer">
+                    <p style="color: #999; font-style: italic;">Select a plot to see curve settings</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =================================================================
+        // Global State
+        // =================================================================
+        let editorCurvesData = [];
+        let editorXValues = [];
+        let editorPlotName = '';
+        const SAVE_HISTORY_KEY = 'plotExtractSaveHistory';
+        const MAX_HISTORY_ITEMS = 5;
+        
+        // =================================================================
+        // Initialization
+        // =================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshPlotList();
+            renderSaveHistory();
+        });
+        
+        // =================================================================
+        // Save History Functions
+        // =================================================================
+        function getSaveHistory() {
+            try {
+                const history = localStorage.getItem(SAVE_HISTORY_KEY);
+                return history ? JSON.parse(history) : [];
+            } catch (e) {
+                console.error('Error loading save history:', e);
+                return [];
+            }
+        }
+        
+        function addToSaveHistory(item) {
+            let history = getSaveHistory();
+            // Add new item at the beginning
+            history.unshift({
+                name: item.name,
+                timestamp: new Date().toISOString(),
+                displayTime: new Date().toLocaleString()
+            });
+            // Keep only the last 5 items
+            history = history.slice(0, MAX_HISTORY_ITEMS);
+            localStorage.setItem(SAVE_HISTORY_KEY, JSON.stringify(history));
+            renderSaveHistory();
+        }
+        
+        function renderSaveHistory() {
+            const container = document.getElementById('saveHistoryContainer');
+            const history = getSaveHistory();
+            
+            if (history.length === 0) {
+                container.innerHTML = '<p style="color: #999; font-style: italic; font-size: 12px;">No recent saves</p>';
+                return;
+            }
+            
+            container.innerHTML = history.map((item, idx) => `
+                <div class="save-history-item" onclick="loadHistoryPlot('${item.name.replace(/'/g, "\\'")}')">
+                    <span class="history-name">${item.name}</span>
+                    <span class="history-time">${item.displayTime}</span>
+                </div>
+            `).join('');
+        }
+        
+        function loadHistoryPlot(plotName) {
+            // Set the select value and load the plot
+            const select = document.getElementById('editorPlotSelect');
+            select.value = plotName;
+            loadPlotForEditing();
+        }
+        
+        function clearSaveHistory() {
+            localStorage.removeItem(SAVE_HISTORY_KEY);
+            renderSaveHistory();
+        }
+        
+        // =================================================================
+        // Plot List Functions
+        // =================================================================
+        function refreshPlotList() {
+            fetch('/synthetic/get_existing_plots')
+                .then(res => res.json())
+                .then(plots => {
+                    const select = document.getElementById('editorPlotSelect');
+                    const currentValue = select.value;
+                    
+                    // Clear and rebuild options
+                    select.innerHTML = '<option value="">-- Select a plot --</option>';
+                    plots.forEach(plot => {
+                        const option = document.createElement('option');
+                        option.value = plot.name;
+                        option.textContent = plot.name + (plot.has_csv ? '' : ' (no CSV)');
+                        if (!plot.has_csv) option.disabled = true;
+                        select.appendChild(option);
+                    });
+                    
+                    // Restore selection if still valid
+                    if (currentValue) {
+                        select.value = currentValue;
+                    }
+                });
+        }
+        
+        function loadPlotForEdit() {
+            const plotName = document.getElementById('editorPlotSelect').value;
+            
+            if (!plotName) {
+                // Reset editor
+                document.getElementById('editorGlobalSettings').style.display = 'none';
+                document.getElementById('editorAxisSettings').style.display = 'none';
+                document.getElementById('editorPreviewBtn').disabled = true;
+                document.getElementById('editorSaveBtn').disabled = true;
+                document.getElementById('editorPreviewContainer').innerHTML = 
+                    '<p class="preview-placeholder">Select a plot to edit</p>';
+                document.getElementById('editorCurvesContainer').innerHTML = 
+                    '<p style="color: #999; font-style: italic;">Select a plot to see curve settings</p>';
+                return;
+            }
+            
+            showEditorStatus('Loading plot data...', 'info');
+            
+            fetch(`/synthetic/load_plot_for_edit/${plotName}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        editorPlotName = data.plot_name;
+                        editorCurvesData = data.curves_data;
+                        editorXValues = data.x_values;
+                        
+                        // Show settings panels
+                        document.getElementById('editorGlobalSettings').style.display = 'block';
+                        document.getElementById('editorAxisSettings').style.display = 'block';
+                        document.getElementById('editorPreviewBtn').disabled = false;
+                        document.getElementById('editorSaveBtn').disabled = false;
+                        
+                        // Show original image
+                        if (data.image) {
+                            document.getElementById('editorPreviewContainer').innerHTML = 
+                                `<img src="data:image/png;base64,${data.image}" alt="Original">`;
+                        }
+                        
+                        // Render curve settings
+                        renderEditorCurveCards();
+                        
+                        showEditorStatus(`Loaded ${plotName} - ${editorCurvesData.length} curves`, 'success');
+                    } else {
+                        showEditorStatus('Error: ' + data.error, 'error');
+                    }
+                })
+                .catch(err => {
+                    showEditorStatus('Error loading plot: ' + err, 'error');
+                });
+        }
+        
+        // =================================================================
+        // Curve Card Rendering
+        // =================================================================
+        function renderEditorCurveCards() {
+            const container = document.getElementById('editorCurvesContainer');
+            container.innerHTML = '';
+            
+            editorCurvesData.forEach((curve, index) => {
+                const config = curve.config;
+                const div = document.createElement('div');
+                div.className = 'editor-curve-card';
+                
+                div.innerHTML = `
+                    <h4>
+                        <span class="curve-color-dot" id="editorDot_${index}" style="background: ${config.color}"></span>
+                        ${config.name}
+                    </h4>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Color</label>
+                            <div class="color-picker-container" id="editorColorPicker_${index}">
+                                <div class="color-preset ${config.color === '#1f77b4' ? 'selected' : ''}" 
+                                     style="background: #1f77b4" onclick="selectEditorPresetColor(${index}, '#1f77b4')"></div>
+                                <div class="color-preset ${config.color === '#ff7f0e' ? 'selected' : ''}" 
+                                     style="background: #ff7f0e" onclick="selectEditorPresetColor(${index}, '#ff7f0e')"></div>
+                                <div class="color-preset ${config.color === '#2ca02c' ? 'selected' : ''}" 
+                                     style="background: #2ca02c" onclick="selectEditorPresetColor(${index}, '#2ca02c')"></div>
+                                <div class="color-preset ${config.color === '#d62728' ? 'selected' : ''}" 
+                                     style="background: #d62728" onclick="selectEditorPresetColor(${index}, '#d62728')"></div>
+                                <div class="color-preset ${config.color === '#9467bd' ? 'selected' : ''}" 
+                                     style="background: #9467bd" onclick="selectEditorPresetColor(${index}, '#9467bd')"></div>
+                                <div class="color-preset ${config.color === '#8c564b' ? 'selected' : ''}" 
+                                     style="background: #8c564b" onclick="selectEditorPresetColor(${index}, '#8c564b')"></div>
+                                <div class="color-preset ${config.color === '#e377c2' ? 'selected' : ''}" 
+                                     style="background: #e377c2" onclick="selectEditorPresetColor(${index}, '#e377c2')"></div>
+                                <div class="color-preset ${config.color === '#17becf' ? 'selected' : ''}" 
+                                     style="background: #17becf" onclick="selectEditorPresetColor(${index}, '#17becf')"></div>
+                                <div class="color-preset ${config.color === '#000000' ? 'selected' : ''}" 
+                                     style="background: #000000" onclick="selectEditorPresetColor(${index}, '#000000')"></div>
+                                <label class="color-add-btn" title="Custom color" onclick="openEditorColorPicker(${index})">
+                                    +
+                                    <input type="color" id="editor_${index}_color" value="${config.color}" 
+                                           style="display:none" onchange="selectEditorCustomColor(${index})">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Marker</label>
+                            <select id="editor_${index}_marker">
+                                <option value="o" ${config.marker === 'o' ? 'selected' : ''}>● Circle</option>
+                                <option value="s" ${config.marker === 's' ? 'selected' : ''}>■ Square</option>
+                                <option value="^" ${config.marker === '^' ? 'selected' : ''}>▲ Triangle Up</option>
+                                <option value="v" ${config.marker === 'v' ? 'selected' : ''}>▼ Triangle Down</option>
+                                <option value="D" ${config.marker === 'D' ? 'selected' : ''}>◆ Diamond</option>
+                                <option value="p" ${config.marker === 'p' ? 'selected' : ''}>⬠ Pentagon</option>
+                                <option value="*" ${config.marker === '*' ? 'selected' : ''}>★ Star</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Line Style</label>
+                            <select id="editor_${index}_lineStyle">
+                                <option value="-" ${config.line_style === '-' ? 'selected' : ''}>─ Solid</option>
+                                <option value="--" ${config.line_style === '--' ? 'selected' : ''}>╌ Dashed</option>
+                                <option value=":" ${config.line_style === ':' ? 'selected' : ''}>┄ Dotted</option>
+                                <option value="-." ${config.line_style === '-.' ? 'selected' : ''}>─┄ Dash-dot</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Line Width</label>
+                            <input type="number" id="editor_${index}_lineWidth" value="${config.line_width}" 
+                                   step="0.5" min="0.5" max="5">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Marker Size</label>
+                            <input type="number" id="editor_${index}_markerSize" value="${config.marker_size}" 
+                                   step="1" min="2" max="15">
+                        </div>
+                        <div class="checkbox-row" style="align-items: flex-end; padding-bottom: 12px;">
+                            <input type="checkbox" id="editor_${index}_showLine" ${config.show_line ? 'checked' : ''}>
+                            <label for="editor_${index}_showLine">Show Line</label>
+                        </div>
+                    </div>
+                    
+                    <div class="data-preview">
+                        <strong>Data Points (${curve.x.length} points, read-only):</strong>
+                        <table>
+                            <tr><th>X</th><th>Y (log₁₀)</th></tr>
+                            ${curve.x.slice(0, 5).map((x, i) => 
+                                `<tr><td>${x}</td><td>${curve.y[i].toFixed(3)}</td></tr>`
+                            ).join('')}
+                            ${curve.x.length > 5 ? `<tr><td colspan="2" style="text-align:center;">... ${curve.x.length - 5} more points</td></tr>` : ''}
+                        </table>
+                    </div>
+                `;
+                
+                container.appendChild(div);
+            });
+        }
+        
+        function updateEditorColorDot(index) {
+            const colorInput = document.getElementById(`editor_${index}_color`);
+            const dot = document.getElementById(`editorDot_${index}`);
+            dot.style.background = colorInput.value;
+        }
+        
+        function selectEditorPresetColor(index, color) {
+            // Update hidden color input
+            document.getElementById(`editor_${index}_color`).value = color;
+            // Update visual selection
+            const picker = document.getElementById(`editorColorPicker_${index}`);
+            picker.querySelectorAll('.color-preset').forEach(el => el.classList.remove('selected'));
+            picker.querySelectorAll('.color-preset').forEach(el => {
+                if (el.style.background === color || rgbToHex(el.style.background) === color.toLowerCase()) {
+                    el.classList.add('selected');
+                }
+            });
+            // Update curve dot
+            updateEditorColorDot(index);
+        }
+        
+        function selectEditorCustomColor(index) {
+            const picker = document.getElementById(`editorColorPicker_${index}`);
+            // Deselect all presets
+            picker.querySelectorAll('.color-preset').forEach(el => el.classList.remove('selected'));
+            // Update curve dot
+            updateEditorColorDot(index);
+        }
+        
+        function openEditorColorPicker(index) {
+            const colorInput = document.getElementById(`editor_${index}_color`);
+            colorInput.click();
+        }
+        
+        function rgbToHex(rgb) {
+            if (!rgb || rgb.startsWith('#')) return rgb;
+            const match = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+            if (!match) return rgb;
+            return '#' + [match[1], match[2], match[3]].map(x => {
+                const hex = parseInt(x).toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('');
+        }
+        
+        // =================================================================
+        // Settings Gathering
+        // =================================================================
+        function gatherEditorSettings() {
+            // Update curves_data with form values
+            editorCurvesData.forEach((curve, index) => {
+                curve.config.color = document.getElementById(`editor_${index}_color`).value;
+                curve.config.marker = document.getElementById(`editor_${index}_marker`).value;
+                curve.config.line_style = document.getElementById(`editor_${index}_lineStyle`).value;
+                curve.config.line_width = parseFloat(document.getElementById(`editor_${index}_lineWidth`).value);
+                curve.config.marker_size = parseFloat(document.getElementById(`editor_${index}_markerSize`).value);
+                curve.config.show_line = document.getElementById(`editor_${index}_showLine`).checked;
+            });
+            
+            return {
+                title: document.getElementById('editorPlotTitle').value,
+                figure_width: parseFloat(document.getElementById('editorFigWidth').value) / 150,  // Convert pixels to inches
+                figure_height: parseFloat(document.getElementById('editorFigHeight').value) / 150,  // Convert pixels to inches
+                dpi: parseInt(document.getElementById('editorFigDpi').value),
+                show_legend: document.getElementById('editorShowLegend').checked,
+                show_grid: document.getElementById('editorShowGrid').checked,
+                save_svg: document.getElementById('editorSaveSvg').checked,
+                x_label: document.getElementById('editorXLabel').value,
+                x_unit: document.getElementById('editorXUnit').value,
+                y_label: document.getElementById('editorYLabel').value,
+                y_unit: document.getElementById('editorYUnit').value,
+                y_scale: 'log',
+                y_min: document.getElementById('editorYMin').value,
+                y_max: document.getElementById('editorYMax').value
+            };
+        }
+        
+        // =================================================================
+        // Preview & Save
+        // =================================================================
+        function previewEdit() {
+            showEditorStatus('Generating preview...', 'info');
+            
+            const settings = gatherEditorSettings();
+            
+            fetch('/synthetic/preview_edit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    curves_data: editorCurvesData,
+                    settings: settings,
+                    x_values: editorXValues
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('editorPreviewContainer').innerHTML = 
+                        `<img src="data:image/png;base64,${data.image}" alt="Preview">`;
+                    const timeMsg = data.time_seconds ? ` (${data.time_seconds}s)` : '';
+                    showEditorStatus('Preview generated!' + timeMsg, 'success');
+                } else {
+                    showEditorStatus('Error generating preview', 'error');
+                }
+            })
+            .catch(err => {
+                showEditorStatus('Error: ' + err, 'error');
+            });
+        }
+        
+        function saveEditedPlot() {
+            showEditorStatus('Saving as copy...', 'info');
+            
+            const settings = gatherEditorSettings();
+            
+            fetch('/synthetic/save_edit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    original_name: editorPlotName,
+                    curves_data: editorCurvesData,
+                    settings: settings,
+                    x_values: editorXValues
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const timeMsg = data.time_seconds ? ` in ${data.time_seconds}s` : '';
+                    let msg = `Saved successfully${timeMsg}!<br>`;
+                    msg += `<div class="file-info">`;
+                    msg += `<strong>PNG:</strong> ${data.files.filename}.png<br>`;
+                    if (data.files.svg) {
+                        msg += `<strong>SVG:</strong> ${data.files.filename}.svg<br>`;
+                    }
+                    msg += `<strong>CSV:</strong> ${data.files.filename}-original.csv`;
+                    msg += `</div>`;
+                    showEditorStatus(msg, 'success');
+                    
+                    // Add to save history
+                    addToSaveHistory({ name: data.files.filename });
+                    
+                    // Refresh the plot list
+                    refreshPlotList();
+                } else {
+                    showEditorStatus('Error: ' + data.error, 'error');
+                }
+            })
+            .catch(err => {
+                showEditorStatus('Error: ' + err, 'error');
+            });
+        }
+        
+        // =================================================================
+        // Status Display
+        // =================================================================
+        function showEditorStatus(message, type) {
+            const bar = document.getElementById('editorStatusBar');
+            bar.innerHTML = message;
+            bar.className = 'status-bar ' + type;
+            bar.style.display = 'block';
+            
+            if (type !== 'error') {
+                setTimeout(() => {
+                    bar.style.display = 'none';
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>

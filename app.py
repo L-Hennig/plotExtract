@@ -1,6 +1,21 @@
 import os
 import subprocess
 import glob
+import json
+import numpy as np
+
+# Set matplotlib backend to Agg (non-interactive) BEFORE importing pyplot
+# This prevents threading issues with Tkinter when using Flask
+import matplotlib
+matplotlib.use('Agg')
+
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+import io
+import base64
+import threading
+import time
+import uuid
 from flask import Flask, render_template, request, jsonify, send_from_directory
 
 app = Flask(__name__)
@@ -9,10 +24,408 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PLOTS_DIR = os.path.join(BASE_DIR, 'plots')
 PROMPTS_DIR = os.path.join(BASE_DIR, 'prompts')
+SYNTHETIC_DIR = os.path.join(PLOTS_DIR, 'synthetic')
+
+# Create synthetic folder if it doesn't exist
+os.makedirs(SYNTHETIC_DIR, exist_ok=True)
+
+# Settings file for synthetic generator
+SETTINGS_FILE = os.path.join(BASE_DIR, 'synthetic_settings.json')
+
+# File to persist extraction results
+EXTRACTION_STATE_FILE = os.path.join(BASE_DIR, 'extraction_state.json')
+
+# =============================================================================
+# Background Task Management
+# =============================================================================
+
+# In-memory task storage (for running tasks)
+extraction_tasks = {}
+extraction_tasks_lock = threading.Lock()
+
+def load_extraction_state():
+    """Load the last extraction result from file."""
+    if os.path.exists(EXTRACTION_STATE_FILE):
+        try:
+            with open(EXTRACTION_STATE_FILE, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Error loading extraction state: {e}")
+    return None
+
+def save_extraction_state(state):
+    """Save extraction result to file for persistence."""
+    try:
+        with open(EXTRACTION_STATE_FILE, 'w') as f:
+            json.dump(state, f, indent=2)
+    except Exception as e:
+        print(f"Error saving extraction state: {e}")
+
+# =============================================================================
+# Synthetic Generator Configuration
+# =============================================================================
+
+DEFAULT_SETTINGS = {
+    'num_curves': 3,
+    'num_points': 8,
+    'x_values_mode': 'auto',
+    'x_values_manual': '0, 2, 4, 6, 8, 12, 18, 24',
+    'x_spacing': 3,
+    'x_label': 'Time',
+    'x_unit': 'hours',
+    'y_label': 'Bacterial Count',
+    'y_unit': 'CFU/mL',
+    'y_scale': 'log',
+    'x_min': '',
+    'x_max': '',
+    'y_min': '',
+    'y_max': '',
+    'title': '',
+    'show_legend': True,
+    'show_grid': True,
+    'figure_width': 10,
+    'figure_height': 6,
+    'dpi': 150,
+    'save_svg': False,
+    'curves': []
+}
+
+DEFAULT_CURVE = {
+    'name': 'Condition',
+    'initial_y': 6.0,
+    'trend': 'stable',
+    'trend_magnitude': 1.0,
+    'noise_level': 0.1,
+    'color': '#1f77b4',
+    'marker': 'o',
+    'line_style': '-',
+    'show_line': True,
+    'line_width': 1.5,
+    'marker_size': 6
+}
+
+COLOR_PALETTE = [
+    '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
+    '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
+    '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5'
+]
+
+# =============================================================================
+# Synthetic Generator Helper Functions
+# =============================================================================
+
+def load_synthetic_settings():
+    """Load settings from file, or return defaults if file doesn't exist."""
+    if os.path.exists(SETTINGS_FILE):
+        try:
+            with open(SETTINGS_FILE, 'r') as f:
+                saved = json.load(f)
+                settings = DEFAULT_SETTINGS.copy()
+                settings.update(saved)
+                return settings
+        except Exception as e:
+            print(f"Error loading settings: {e}")
+    return DEFAULT_SETTINGS.copy()
+
+def save_synthetic_settings(settings):
+    """Save settings to file for persistence."""
+    try:
+        with open(SETTINGS_FILE, 'w') as f:
+            json.dump(settings, f, indent=2)
+    except Exception as e:
+        print(f"Error saving settings: {e}")
+
+def get_default_curves(num_curves):
+    """Generate default curve configurations."""
+    curves = []
+    for i in range(num_curves):
+        curve = DEFAULT_CURVE.copy()
+        curve['name'] = f'Condition {i + 1}'
+        curve['color'] = COLOR_PALETTE[i % len(COLOR_PALETTE)]
+        trends = ['stable', 'down', 'up', 'kill_regrowth', 'mixed']
+        curve['trend'] = trends[i % len(trends)]
+        curves.append(curve)
+    return curves
+
+def generate_x_values(settings):
+    """Generate X-axis values based on settings."""
+    if settings['x_values_mode'] == 'manual':
+        try:
+            x_vals = [float(x.strip()) for x in settings['x_values_manual'].split(',')]
+            return np.array(x_vals)
+        except:
+            pass
+    num_points = settings['num_points']
+    spacing = settings['x_spacing']
+    return np.arange(0, num_points * spacing, spacing)
+
+def generate_curve_data(x_values, curve_config, y_scale='log'):
+    """Generate Y-values for a single curve based on its configuration."""
+    n_points = len(x_values)
+    initial_y = curve_config['initial_y']
+    trend = curve_config['trend']
+    magnitude = curve_config['trend_magnitude']
+    noise = curve_config['noise_level']
+    
+    x_norm = (x_values - x_values.min()) / (x_values.max() - x_values.min() + 1e-10)
+    
+    if trend == 'stable':
+        base = np.zeros(n_points)
+        for i in range(1, n_points):
+            base[i] = base[i-1] + np.random.normal(0, 0.05 * magnitude)
+    elif trend == 'down':
+        decay_rate = 0.5 + magnitude * 0.5
+        base = -decay_rate * x_norm * (2 + magnitude)
+        base = base * (1 + 0.3 * np.sin(x_norm * np.pi))
+    elif trend == 'up':
+        growth_rate = 0.3 + magnitude * 0.3
+        base = magnitude * (1 - np.exp(-growth_rate * x_norm * 5)) * 2
+    elif trend == 'mixed':
+        peak_pos = np.random.uniform(0.3, 0.7)
+        base = np.zeros(n_points)
+        for i, xn in enumerate(x_norm):
+            if xn < peak_pos:
+                base[i] = magnitude * (xn / peak_pos)
+            else:
+                base[i] = magnitude * (1 - (xn - peak_pos) / (1 - peak_pos))
+    elif trend == 'kill_regrowth':
+        nadir_pos = np.random.uniform(0.3, 0.5)
+        nadir_depth = 1.5 + magnitude
+        base = np.zeros(n_points)
+        for i, xn in enumerate(x_norm):
+            if xn < nadir_pos:
+                base[i] = -nadir_depth * (xn / nadir_pos) ** 0.8
+            else:
+                regrowth_x = (xn - nadir_pos) / (1 - nadir_pos)
+                regrowth_amount = (magnitude * 0.5) * regrowth_x ** 1.5
+                base[i] = -nadir_depth + regrowth_amount
+    else:
+        base = np.zeros(n_points)
+    
+    noise_vals = np.random.normal(0, noise, n_points)
+    
+    if y_scale == 'log':
+        y_values = initial_y + base + noise_vals
+        y_values = np.maximum(y_values, 0.1)
+    else:
+        y_values = (10 ** initial_y) * (10 ** (base + noise_vals))
+        y_values = np.maximum(y_values, 0)
+    
+    return y_values
+
+def generate_all_curves(settings):
+    """Generate data for all curves based on settings."""
+    x_values = generate_x_values(settings)
+    curves_data = []
+    
+    for curve_config in settings['curves']:
+        y_values = generate_curve_data(x_values, curve_config, settings['y_scale'])
+        curves_data.append({
+            'x': x_values.tolist(),
+            'y': y_values.tolist(),
+            'config': curve_config
+        })
+    
+    return x_values.tolist(), curves_data
+
+def create_synthetic_plot(settings, curves_data, x_values):
+    """Create the matplotlib figure based on settings and data."""
+    fig, ax = plt.subplots(figsize=(settings['figure_width'], settings['figure_height']))
+    
+    for curve_data in curves_data:
+        config = curve_data['config']
+        x = curve_data['x']
+        y = curve_data['y']
+        
+        if settings['y_scale'] == 'log':
+            y_plot = y
+        else:
+            y_plot = y
+        
+        if config['show_line']:
+            ax.plot(x, y_plot,
+                   linestyle=config['line_style'],
+                   color=config['color'],
+                   linewidth=config['line_width'],
+                   label=config['name'])
+        
+        # Always draw markers with no line (line was drawn above if show_line is True)
+        ax.plot(x, y_plot,
+               marker=config['marker'],
+               linestyle='none',
+               color=config['color'],
+               markersize=config['marker_size'],
+               label=config['name'] if not config['show_line'] else None)
+    
+    x_label = settings['x_label']
+    if settings['x_unit']:
+        x_label += f" ({settings['x_unit']})"
+    ax.set_xlabel(x_label, fontsize=11)
+    
+    y_label = settings['y_label']
+    if settings['y_unit']:
+        y_label += f" ({settings['y_unit']})"
+    ax.set_ylabel(y_label, fontsize=11)
+    
+    # Set axis limits - x starts at 0 by default
+    x_min = 0
+    if settings['x_min'] != '':
+        try:
+            x_min = max(0, float(settings['x_min']))
+        except:
+            x_min = 0
+    
+    if settings['x_max'] != '':
+        try:
+            x_max = float(settings['x_max'])
+        except:
+            all_x = [val for curve in curves_data for val in curve['x']]
+            x_max = max(all_x) if all_x else 24
+    else:
+        all_x = [val for curve in curves_data for val in curve['x']]
+        x_max = max(all_x) if all_x else 24
+    
+    ax.set_xlim(x_min, x_max)
+    ax.spines['left'].set_position(('data', x_min))
+    
+    if settings['y_scale'] == 'log':
+        if settings['y_min'] != '':
+            try:
+                y_min = float(settings['y_min'])
+            except:
+                y_min = 0
+        else:
+            y_min = 0
+        
+        if settings['y_max'] != '':
+            try:
+                y_max = float(settings['y_max'])
+            except:
+                all_y = [val for curve in curves_data for val in curve['y']]
+                y_max = max(all_y) + 1
+        else:
+            all_y = [val for curve in curves_data for val in curve['y']]
+            y_max = max(all_y) + 1
+        
+        ax.set_ylim(y_min, y_max)
+        
+        y_range = y_max - y_min
+        if y_range <= 6:
+            tick_spacing = 1
+        elif y_range <= 12:
+            tick_spacing = 2
+        else:
+            tick_spacing = max(1, int(y_range / 6))
+        
+        y_ticks = np.arange(int(y_min), int(y_max) + 1, tick_spacing)
+        ax.set_yticks(y_ticks)
+        ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%d'))
+        ax.spines['bottom'].set_position(('data', y_min))
+    else:
+        y_min = 0
+        if settings['y_min'] != '' and settings['y_max'] != '':
+            try:
+                y_min = float(settings['y_min'])
+                ax.set_ylim(y_min, float(settings['y_max']))
+            except:
+                pass
+        ax.spines['bottom'].set_position(('data', y_min))
+    
+    if settings['title']:
+        ax.set_title(settings['title'], fontsize=12, fontweight='bold')
+    
+    if settings['show_legend']:
+        ax.legend(loc='best', framealpha=0.9)
+    
+    if settings['show_grid']:
+        ax.grid(True, alpha=0.3, linestyle='--')
+    
+    plt.tight_layout()
+    return fig
+
+def fig_to_base64(fig):
+    """Convert matplotlib figure to base64 string for web display."""
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png', dpi=100, bbox_inches='tight')
+    buf.seek(0)
+    img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    plt.close(fig)
+    return img_base64
+
+def get_next_synthetic_name():
+    """Generate the next available name for a synthetic plot (AA, AB, AC, ...)."""
+    import string
+    existing = set()
+    if os.path.exists(SYNTHETIC_DIR):
+        for item in os.listdir(SYNTHETIC_DIR):
+            if os.path.isdir(os.path.join(SYNTHETIC_DIR, item)):
+                existing.add(item.upper())
+    
+    for first in string.ascii_uppercase:
+        for second in string.ascii_uppercase:
+            name = f"{first}{second}"
+            if name not in existing:
+                return name
+    
+    from datetime import datetime
+    return f"ZZ_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+def save_synthetic_plot_and_data(settings, curves_data, x_values):
+    """Save the plot as PNG and the data as CSV."""
+    base_filename = get_next_synthetic_name()
+    plot_folder = os.path.join(SYNTHETIC_DIR, base_filename)
+    os.makedirs(plot_folder, exist_ok=True)
+    
+    fig = create_synthetic_plot(settings, curves_data, x_values)
+    
+    png_path = os.path.join(plot_folder, f'{base_filename}.png')
+    fig.savefig(png_path, dpi=150, bbox_inches='tight')
+    
+    svg_path = None
+    if settings.get('save_svg', False):
+        svg_path = os.path.join(plot_folder, f'{base_filename}.svg')
+        fig.savefig(svg_path, format='svg', bbox_inches='tight')
+    
+    plt.close(fig)
+    
+    csv_path = os.path.join(plot_folder, f'{base_filename}-original.csv')
+    save_synthetic_csv(curves_data, x_values, settings, csv_path)
+    
+    return {
+        'png': png_path,
+        'svg': svg_path,
+        'csv': csv_path,
+        'filename': base_filename,
+        'folder': plot_folder
+    }
+
+def save_synthetic_csv(curves_data, x_values, settings, filepath):
+    """Save curve data to CSV file."""
+    with open(filepath, 'w', encoding='utf-8') as f:
+        headers = []
+        for curve_data in curves_data:
+            config = curve_data['config']
+            x_col = settings['x_label'] if settings['x_label'] else 'x'
+            y_col = config['name']
+            headers.extend([x_col, y_col])
+        f.write(','.join(headers) + '\n')
+        
+        n_points = len(x_values)
+        for i in range(n_points):
+            row = []
+            for curve_data in curves_data:
+                x_val = curve_data['x'][i]
+                y_val = curve_data['y'][i]
+                row.extend([str(x_val), f'{y_val:.4f}'])
+            f.write(','.join(row) + '\n')
+
+# =============================================================================
+# Plot Extraction Helper Functions
+# =============================================================================
 
 def get_input_images(directory):
     """
-    Recursively find only original input .png files in the plots directory.
+    Recursively find only original input image files (.png, .svg) in the plots directory.
     Excludes output files like replot, comparison, interpolated, pointwise images.
     Also excludes files inside version folders (e.g., A-1.p2.v1/)
     Returns a dict grouped by top-level folder for easier selection.
@@ -26,7 +439,7 @@ def get_input_images(directory):
     import re
     version_folder_pattern = re.compile(r'\.p\d+\.v\d+[\\/]')
     
-    for ext in ['*.png', '*.PNG']:
+    for ext in ['*.png', '*.PNG', '*.svg', '*.SVG']:
         for img_path in glob.glob(os.path.join(directory, '**', ext), recursive=True):
             rel_path = os.path.relpath(img_path, directory)
             filename = os.path.basename(img_path)
@@ -82,29 +495,41 @@ def get_csv_paths(image_path):
 def find_extracted_csv(image_path, prompt_file):
     """Find the actual extracted data file for a given image and prompt.
     Now searches inside version folders and returns the latest version.
-    Files have version in filename: {image}.{prompt}.v{n}.mistral.out_data"""
+    Files have version in filename: {image}.{prompt}.v{n}.mistral.out_data
+    Folder names use underscores instead of dots for the extension: A-1_png.p2.v1/"""
     import re
     
     image_dir = os.path.dirname(os.path.join(PLOTS_DIR, image_path))
     image_name = os.path.basename(image_path)
     base_name = os.path.splitext(image_name)[0]
+    # Folder naming uses underscore: A-1.png -> A-1_png
+    name_for_folder = image_name.replace('.', '_')
     
     # Get prompt short name (e.g., prompt_1.py -> p1)
     prompt_name = os.path.splitext(prompt_file)[0].replace('prompt_', 'p')
     
-    # Look for version folders matching this image+prompt
-    version_pattern = re.compile(rf'^{re.escape(base_name)}\.{re.escape(prompt_name)}\.v(\d+)$')
+    # Look for version folders matching this image+prompt (new format with extension underscore)
+    # Also check old format (without extension) for backwards compatibility
+    version_pattern_new = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(prompt_name)}\.v(\d+)$')
+    version_pattern_old = re.compile(rf'^{re.escape(base_name)}\.{re.escape(prompt_name)}\.v(\d+)$')
     
     latest_version = 0
     latest_file = None
     
     if os.path.exists(image_dir):
         for item in os.listdir(image_dir):
-            match = version_pattern.match(item)
+            # Try new format first
+            match = version_pattern_new.match(item)
+            is_new_format = True
+            if not match:
+                # Fall back to old format
+                match = version_pattern_old.match(item)
+                is_new_format = False
+            
             if match:
                 version_num = int(match.group(1))
                 version_dir = os.path.join(image_dir, item)
-                # Filename now includes version: {image}.{prompt}.v{n}.mistral.out_data
+                # Filename still includes version: {image}.{prompt}.v{n}.mistral.out_data
                 extracted_file = os.path.join(version_dir, f"{image_name}.{prompt_name}.v{version_num}.mistral.out_data")
                 
                 if os.path.exists(extracted_file) and version_num > latest_version:
@@ -156,13 +581,16 @@ def get_output_files(image_path, prompt_file=None, version_dir=None):
         _scan_version_folder(version_dir, version_label, outputs, PLOTS_DIR)
         outputs['summary'] = _parse_summary_stats(version_dir)
     else:
-        # Scan for all version folders matching pattern: {base_name}.p*.v*
+        # Scan for all version folders matching pattern: {base_name}.p*.v* or {name_for_folder}.p*.v*
+        # name_for_folder uses underscore instead of dot for extension (A-1_png)
         import re
-        version_pattern = re.compile(rf'^{re.escape(base_name)}\.p\d+\.v\d+$')
+        name_for_folder = image_name.replace('.', '_')
+        version_pattern_new = re.compile(rf'^{re.escape(name_for_folder)}\.p\d+\.v\d+$')
+        version_pattern_old = re.compile(rf'^{re.escape(base_name)}\.p\d+\.v\d+$')
         
         for item in os.listdir(image_dir):
             item_path = os.path.join(image_dir, item)
-            if os.path.isdir(item_path) and version_pattern.match(item):
+            if os.path.isdir(item_path) and (version_pattern_new.match(item) or version_pattern_old.match(item)):
                 version_label = item
                 _scan_version_folder(item_path, version_label, outputs, PLOTS_DIR)
                 # Use summary from the last scanned folder
@@ -178,7 +606,7 @@ def _scan_version_folder(folder_path, version_label, outputs, plots_dir):
         
         label = None
         
-        if f.endswith('.png') or f.endswith('.jpg'):
+        if f.endswith('.png') or f.endswith('.jpg') or f.endswith('.svg'):
             if '-replot' in f:
                 label = f'Extracted Replot ({version_label})'
             elif f.startswith('comparison_'):
@@ -341,6 +769,59 @@ def check_csv():
     result = check_csv_exists(image_path, prompt_file)
     return jsonify(result)
 
+@app.route('/get_axis_ranges', methods=['POST'])
+def get_axis_ranges():
+    """Get axis ranges from the original CSV file for an image."""
+    import pandas as pd
+    
+    image_path = request.json.get('image_path')
+    
+    # Get the original CSV path
+    csv_paths = get_csv_paths(os.path.join(PLOTS_DIR, image_path))
+    original_csv_path = os.path.join(PLOTS_DIR, csv_paths['original'])
+    
+    if not os.path.exists(original_csv_path):
+        return jsonify({
+            'success': False, 
+            'error': f'Original CSV not found: {csv_paths["original"]}',
+            'has_original': False
+        })
+    
+    try:
+        # Read CSV and auto-detect axis ranges
+        df = pd.read_csv(original_csv_path)
+        
+        # First column is X values
+        x_col = df.columns[0]
+        x_values = df[x_col].dropna()
+        
+        # Find Y columns (all except first)
+        y_cols = df.columns[1:]
+        y_values = df[y_cols].values.flatten()
+        y_values = y_values[~pd.isna(y_values)]
+        
+        # Get min/max with some padding for better visualization
+        left_x = float(x_values.min())
+        right_x = float(x_values.max())
+        bottom_y = float(y_values.min())
+        top_y = float(y_values.max())
+        
+        return jsonify({
+            'success': True,
+            'has_original': True,
+            'leftX': left_x,
+            'rightX': right_x,
+            'bottomY': bottom_y,
+            'topY': top_y,
+            'csv_path': csv_paths['original']
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'has_original': True
+        })
+
 @app.route('/get_outputs', methods=['POST'])
 def get_outputs():
     """Get output files for a selected image. Shows latest version by default."""
@@ -355,16 +836,18 @@ def get_outputs():
         image_dir = os.path.dirname(os.path.join(PLOTS_DIR, image_path))
         image_name = os.path.basename(image_path)
         base_name = os.path.splitext(image_name)[0]
+        name_for_folder = image_name.replace('.', '_')  # New format with extension underscore
         prompt_name = os.path.splitext(prompt_file)[0].replace('prompt_', 'p')
         
-        # Find latest version folder
-        version_pattern = re.compile(rf'^{re.escape(base_name)}\.{re.escape(prompt_name)}\.v(\d+)$')
+        # Find latest version folder (check both new and old formats)
+        version_pattern_new = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(prompt_name)}\.v(\d+)$')
+        version_pattern_old = re.compile(rf'^{re.escape(base_name)}\.{re.escape(prompt_name)}\.v(\d+)$')
         latest_version = 0
         latest_dir = None
         
         if os.path.exists(image_dir):
             for item in os.listdir(image_dir):
-                match = version_pattern.match(item)
+                match = version_pattern_new.match(item) or version_pattern_old.match(item)
                 if match:
                     version_num = int(match.group(1))
                     if version_num > latest_version:
@@ -393,8 +876,8 @@ def read_file_route():
 @app.route('/run_all', methods=['POST'])
 def run_all():
     """
-    Run extraction and optionally interpolation/pointwise comparison.
-    Returns results after all tasks complete.
+    Start extraction in background and return task ID immediately.
+    Client will poll /task_status/<task_id> for updates.
     """
     import re
     
@@ -408,12 +891,53 @@ def run_all():
     bottom_y = str(data.get('bottomY', 0))
     top_y = str(data.get('topY', 100))
     
+    # Generate unique task ID
+    task_id = str(uuid.uuid4())[:8]
+    
+    # Initialize task state
+    with extraction_tasks_lock:
+        extraction_tasks[task_id] = {
+            'status': 'running',
+            'progress': 'Starting...',
+            'console': [],
+            'started_at': time.time(),
+            'image_path': image_path,
+            'prompt_file': prompt_file
+        }
+    
+    # Start background thread
+    thread = threading.Thread(
+        target=run_extraction_task,
+        args=(task_id, image_path, prompt_file, run_interpolation, run_pointwise, 
+              left_x, right_x, bottom_y, top_y)
+    )
+    thread.daemon = True
+    thread.start()
+    
+    return jsonify({'task_id': task_id, 'status': 'started'})
+
+def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run_pointwise,
+                        left_x, right_x, bottom_y, top_y):
+    """Background task that runs the extraction pipeline."""
+    import re
+    
+    def update_task(progress=None, console_line=None):
+        with extraction_tasks_lock:
+            if task_id in extraction_tasks:
+                if progress:
+                    extraction_tasks[task_id]['progress'] = progress
+                if console_line:
+                    extraction_tasks[task_id]['console'].append(console_line)
+    
+    total_start_time = time.time()
+    
     full_image_path = os.path.join(PLOTS_DIR, image_path)
     full_prompt_path = os.path.join(PROMPTS_DIR, prompt_file)
     
     console_output = []
     success = True
-    version_dir = None  # Will be set after extraction
+    version_dir = None
+    timings = {}
     
     # Get CSV info
     csv_info = check_csv_exists(image_path, prompt_file)
@@ -425,6 +949,7 @@ def run_all():
     image_name = os.path.basename(image_path)
     
     # Step 1: Run extraction
+    update_task(progress='Running extraction...')
     console_output.append("=" * 60)
     console_output.append("STEP 1: Running Plot Extraction")
     console_output.append("=" * 60)
@@ -432,6 +957,7 @@ def run_all():
     console_output.append(f"Prompt: {prompt_file}")
     console_output.append("")
     
+    step1_start = time.time()
     try:
         result = subprocess.run(
             ['python', 'plotExtract.py', full_image_path, full_prompt_path],
@@ -464,21 +990,25 @@ def run_all():
         success = False
         console_output.append(f"[ERROR] {str(e)}")
     
-    # Determine extracted CSV path (inside version folder)
-    # Extract version number from version_dir name (e.g., A-1.p2.v3 -> 3)
+    step1_time = time.time() - step1_start
+    timings['extraction'] = step1_time
+    console_output.append(f"[TIME] Extraction took {step1_time:.2f} seconds")
+    
+    # Determine extracted CSV path
     version_num = 1
     if version_dir:
-        import re
         version_match = re.search(r'\.v(\d+)$', os.path.basename(version_dir))
         if version_match:
             version_num = int(version_match.group(1))
         extracted_csv = os.path.join(version_dir, f"{image_name}.{prompt_name}.v{version_num}.mistral.out_data")
     else:
-        # Fallback if VERSION_DIR not found
-        extracted_csv = os.path.join(image_dir, f"{image_name}.{prompt_name}.v{version_num}.mistral.out_data")
+        name_for_folder = image_name.replace('.', '_')
+        fallback_dir = os.path.join(image_dir, f"{name_for_folder}.{prompt_name}.v{version_num}")
+        extracted_csv = os.path.join(fallback_dir, f"{image_name}.{prompt_name}.v{version_num}.mistral.out_data")
     
     # Step 2: Run interpolation if requested
     if run_interpolation and success:
+        update_task(progress='Running interpolation...')
         console_output.append("")
         console_output.append("=" * 60)
         console_output.append("STEP 2: Running Interpolation")
@@ -497,8 +1027,8 @@ def run_all():
             console_output.append(f"Axis range: X=[{left_x}, {right_x}], Y=[{bottom_y}, {top_y}]")
             console_output.append("")
             
+            step2_start = time.time()
             try:
-                # Pass version_dir as output directory
                 cmd = ['python', 'interpolation.py', original_csv, extracted_csv,
                        left_x, right_x, bottom_y, top_y]
                 if version_dir:
@@ -526,9 +1056,14 @@ def run_all():
                 console_output.append("[ERROR] Interpolation timed out after 5 minutes")
             except Exception as e:
                 console_output.append(f"[ERROR] {str(e)}")
+            
+            step2_time = time.time() - step2_start
+            timings['interpolation'] = step2_time
+            console_output.append(f"[TIME] Interpolation took {step2_time:.2f} seconds")
     
     # Step 3: Run pointwise if requested
     if run_pointwise and success:
+        update_task(progress='Running pointwise comparison...')
         console_output.append("")
         console_output.append("=" * 60)
         console_output.append("STEP 3: Running Pointwise Comparison")
@@ -547,8 +1082,8 @@ def run_all():
             console_output.append(f"Axis range: X=[{left_x}, {right_x}], Y=[{bottom_y}, {top_y}]")
             console_output.append("")
             
+            step3_start = time.time()
             try:
-                # Pass version_dir as output directory
                 cmd = ['python', 'pointwise.py', extracted_csv, original_csv,
                        left_x, right_x, bottom_y, top_y]
                 if version_dir:
@@ -576,23 +1111,985 @@ def run_all():
                 console_output.append("[ERROR] Pointwise comparison timed out after 5 minutes")
             except Exception as e:
                 console_output.append(f"[ERROR] {str(e)}")
+            
+            step3_time = time.time() - step3_start
+            timings['pointwise'] = step3_time
+            console_output.append(f"[TIME] Pointwise took {step3_time:.2f} seconds")
+    
+    total_time = time.time() - total_start_time
+    timings['total'] = total_time
     
     console_output.append("")
     console_output.append("=" * 60)
     console_output.append("ALL TASKS COMPLETED")
+    console_output.append(f"Total time: {total_time:.2f} seconds")
     console_output.append("=" * 60)
     
-    # Get updated outputs - only for the current version
+    # Get updated outputs
     outputs = get_output_files(image_path, prompt_file, version_dir)
     csv_status = check_csv_exists(image_path, prompt_file)
     
-    return jsonify({
+    # Build final result
+    final_result = {
         'success': success,
         'console': '\n'.join(console_output),
         'outputs': outputs,
         'csv_status': csv_status,
-        'version_dir': version_dir
+        'version_dir': version_dir,
+        'timings': timings,
+        'completed_at': time.time(),
+        'image_path': image_path,
+        'prompt_file': prompt_file
+    }
+    
+    # Update task state
+    with extraction_tasks_lock:
+        if task_id in extraction_tasks:
+            extraction_tasks[task_id]['status'] = 'completed'
+            extraction_tasks[task_id]['result'] = final_result
+    
+    # Save to file for persistence
+    save_extraction_state(final_result)
+
+@app.route('/task_status/<task_id>')
+def task_status(task_id):
+    """Get the status of a running task."""
+    with extraction_tasks_lock:
+        if task_id in extraction_tasks:
+            task = extraction_tasks[task_id]
+            return jsonify({
+                'status': task['status'],
+                'progress': task.get('progress', ''),
+                'elapsed': time.time() - task['started_at'],
+                'result': task.get('result')
+            })
+    return jsonify({'status': 'not_found'})
+
+@app.route('/last_extraction_result')
+def last_extraction_result():
+    """Get the last completed extraction result (persisted to file)."""
+    state = load_extraction_state()
+    if state:
+        return jsonify({'exists': True, 'result': state})
+    return jsonify({'exists': False})
+
+# =============================================================================
+# Batch Extraction Routes
+# =============================================================================
+
+# Directory for batch uploads
+BATCH_DIR = os.path.join(PLOTS_DIR, 'batch_uploads')
+os.makedirs(BATCH_DIR, exist_ok=True)
+
+@app.route('/run_batch_single', methods=['POST'])
+def run_batch_single():
+    """
+    Process a single image for batch extraction.
+    Accepts file upload, saves to batch_uploads folder, runs extraction, returns results.
+    """
+    import re
+    from datetime import datetime
+    
+    try:
+        # Get the uploaded file
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'error': 'No file uploaded'})
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'No file selected'})
+        
+        # Get parameters
+        prompt_file = request.form.get('prompt', 'prompt_1.py')
+        run_interpolation = request.form.get('runInterpolation', 'false') == 'true'
+        run_pointwise = request.form.get('runPointwise', 'false') == 'true'
+        left_x = request.form.get('leftX', '0')
+        right_x = request.form.get('rightX', '100')
+        bottom_y = request.form.get('bottomY', '0')
+        top_y = request.form.get('topY', '100')
+        
+        # Create a unique batch subfolder for this image
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        batch_subfolder = f"batch_{timestamp}_{file.filename.replace('.', '_')}"
+        batch_image_dir = os.path.join(BATCH_DIR, batch_subfolder)
+        os.makedirs(batch_image_dir, exist_ok=True)
+        
+        # Save the uploaded file
+        original_filename = file.filename
+        image_path = os.path.join(batch_image_dir, original_filename)
+        file.save(image_path)
+        
+        # Get relative path for the extraction pipeline
+        rel_image_path = os.path.relpath(image_path, PLOTS_DIR).replace('\\', '/')
+        
+        # Build the full paths
+        full_prompt_path = os.path.join(PROMPTS_DIR, prompt_file)
+        
+        console_output = []
+        success = True
+        version_dir = None
+        timings = {}
+        total_start_time = time.time()
+        
+        # Get prompt short name
+        prompt_name = os.path.splitext(prompt_file)[0].replace('prompt_', 'p')
+        
+        # Step 1: Run extraction
+        console_output.append("=" * 60)
+        console_output.append("STEP 1: Running Plot Extraction")
+        console_output.append("=" * 60)
+        console_output.append(f"Image: {original_filename}")
+        console_output.append(f"Prompt: {prompt_file}")
+        console_output.append("")
+        
+        step1_start = time.time()
+        try:
+            result = subprocess.run(
+                ['python', 'plotExtract.py', image_path, full_prompt_path],
+                cwd=BASE_DIR,
+                capture_output=True,
+                text=True,
+                timeout=300
+            )
+            
+            if result.stdout:
+                console_output.append(result.stdout)
+                # Parse VERSION_DIR from output
+                for line in result.stdout.split('\n'):
+                    if line.startswith('VERSION_DIR:'):
+                        version_dir = line.replace('VERSION_DIR:', '').strip()
+                        break
+            if result.stderr:
+                console_output.append(f"[STDERR] {result.stderr}")
+            
+            if result.returncode != 0:
+                success = False
+                console_output.append(f"\n[ERROR] Extraction failed with exit code {result.returncode}")
+            else:
+                console_output.append("\n[SUCCESS] Extraction completed!")
+                
+        except subprocess.TimeoutExpired:
+            success = False
+            console_output.append("[ERROR] Extraction timed out after 5 minutes")
+        except Exception as e:
+            success = False
+            console_output.append(f"[ERROR] {str(e)}")
+        
+        step1_time = time.time() - step1_start
+        timings['extraction'] = step1_time
+        console_output.append(f"[TIME] Extraction took {step1_time:.2f} seconds")
+        
+        # Determine extracted CSV path
+        version_num = 1
+        if version_dir:
+            version_match = re.search(r'\.v(\d+)$', os.path.basename(version_dir))
+            if version_match:
+                version_num = int(version_match.group(1))
+            extracted_csv = os.path.join(version_dir, f"{original_filename}.{prompt_name}.v{version_num}.mistral.out_data")
+        else:
+            name_for_folder = original_filename.replace('.', '_')
+            fallback_dir = os.path.join(batch_image_dir, f"{name_for_folder}.{prompt_name}.v{version_num}")
+            extracted_csv = os.path.join(fallback_dir, f"{original_filename}.{prompt_name}.v{version_num}.mistral.out_data")
+        
+        # Try to find original CSV in batch_image_dir
+        original_csv = None
+        for f in os.listdir(batch_image_dir):
+            if f.endswith('-original.csv'):
+                original_csv = os.path.join(batch_image_dir, f)
+                break
+        
+        # Step 2: Run interpolation if requested
+        if run_interpolation and success and original_csv and os.path.exists(original_csv):
+            console_output.append("")
+            console_output.append("=" * 60)
+            console_output.append("STEP 2: Running Interpolation")
+            console_output.append("=" * 60)
+            
+            if not os.path.exists(extracted_csv):
+                console_output.append(f"[WARNING] Extracted data not found: {extracted_csv}")
+                console_output.append("[SKIPPED] Interpolation skipped - missing extracted data")
+            else:
+                console_output.append(f"Original: {original_csv}")
+                console_output.append(f"Extracted: {extracted_csv}")
+                console_output.append(f"Output dir: {version_dir}")
+                console_output.append("")
+                
+                step2_start = time.time()
+                try:
+                    cmd = ['python', 'interpolation.py', original_csv, extracted_csv,
+                           left_x, right_x, bottom_y, top_y]
+                    if version_dir:
+                        cmd.append(version_dir)
+                    
+                    result = subprocess.run(
+                        cmd,
+                        cwd=BASE_DIR,
+                        capture_output=True,
+                        text=True,
+                        timeout=300
+                    )
+                    
+                    if result.stdout:
+                        console_output.append(result.stdout)
+                    if result.stderr:
+                        console_output.append(f"[STDERR] {result.stderr}")
+                    
+                    if result.returncode != 0:
+                        console_output.append(f"\n[ERROR] Interpolation failed with exit code {result.returncode}")
+                    else:
+                        console_output.append("\n[SUCCESS] Interpolation completed!")
+                        
+                except subprocess.TimeoutExpired:
+                    console_output.append("[ERROR] Interpolation timed out after 5 minutes")
+                except Exception as e:
+                    console_output.append(f"[ERROR] {str(e)}")
+                
+                step2_time = time.time() - step2_start
+                timings['interpolation'] = step2_time
+                console_output.append(f"[TIME] Interpolation took {step2_time:.2f} seconds")
+        elif run_interpolation and success:
+            console_output.append("")
+            console_output.append("[INFO] Interpolation skipped - no original CSV found for comparison")
+        
+        # Step 3: Run pointwise if requested
+        if run_pointwise and success and original_csv and os.path.exists(original_csv):
+            console_output.append("")
+            console_output.append("=" * 60)
+            console_output.append("STEP 3: Running Pointwise Comparison")
+            console_output.append("=" * 60)
+            
+            if not os.path.exists(extracted_csv):
+                console_output.append(f"[WARNING] Extracted data not found: {extracted_csv}")
+                console_output.append("[SKIPPED] Pointwise skipped - missing extracted data")
+            else:
+                console_output.append(f"Extracted: {extracted_csv}")
+                console_output.append(f"Original: {original_csv}")
+                console_output.append(f"Output dir: {version_dir}")
+                console_output.append("")
+                
+                step3_start = time.time()
+                try:
+                    cmd = ['python', 'pointwise.py', extracted_csv, original_csv,
+                           left_x, right_x, bottom_y, top_y]
+                    if version_dir:
+                        cmd.append(version_dir)
+                    
+                    result = subprocess.run(
+                        cmd,
+                        cwd=BASE_DIR,
+                        capture_output=True,
+                        text=True,
+                        timeout=300
+                    )
+                    
+                    if result.stdout:
+                        console_output.append(result.stdout)
+                    if result.stderr:
+                        console_output.append(f"[STDERR] {result.stderr}")
+                    
+                    if result.returncode != 0:
+                        console_output.append(f"\n[ERROR] Pointwise comparison failed with exit code {result.returncode}")
+                    else:
+                        console_output.append("\n[SUCCESS] Pointwise comparison completed!")
+                        
+                except subprocess.TimeoutExpired:
+                    console_output.append("[ERROR] Pointwise comparison timed out after 5 minutes")
+                except Exception as e:
+                    console_output.append(f"[ERROR] {str(e)}")
+                
+                step3_time = time.time() - step3_start
+                timings['pointwise'] = step3_time
+                console_output.append(f"[TIME] Pointwise took {step3_time:.2f} seconds")
+        elif run_pointwise and success:
+            console_output.append("")
+            console_output.append("[INFO] Pointwise comparison skipped - no original CSV found for comparison")
+        
+        total_time = time.time() - total_start_time
+        timings['total'] = total_time
+        
+        # Get outputs relative to PLOTS_DIR for serving
+        outputs = {'images': [], 'stats': [], 'data': [], 'summary': {}}
+        
+        if version_dir and os.path.exists(version_dir):
+            # Get the relative path from PLOTS_DIR
+            try:
+                rel_version_dir = os.path.relpath(version_dir, PLOTS_DIR)
+            except ValueError:
+                rel_version_dir = None
+            
+            if rel_version_dir:
+                # Build outputs from version_dir
+                for f in os.listdir(version_dir):
+                    file_path = os.path.join(rel_version_dir, f).replace('\\', '/')
+                    
+                    if f.endswith('.png'):
+                        label = f
+                        if f.startswith('comparison_'):
+                            label = 'Comparison'
+                        elif f.startswith('interpolated_'):
+                            label = 'Interpolation'
+                        elif f.startswith('pointwise_'):
+                            label = 'Pointwise'
+                        outputs['images'].append({
+                            'filename': f,
+                            'path': file_path,
+                            'label': label
+                        })
+                    elif 'stats' in f.lower() or f.endswith('_stats'):
+                        label = 'Statistics'
+                        if 'interpolation' in f.lower():
+                            label = 'Interpolation Stats'
+                        elif 'pointwise' in f.lower():
+                            label = 'Pointwise Stats'
+                        outputs['stats'].append({
+                            'filename': f,
+                            'path': file_path,
+                            'label': label
+                        })
+                    elif f.endswith('.out_data') or f.endswith('.csv'):
+                        outputs['data'].append({
+                            'filename': f,
+                            'path': file_path,
+                            'label': 'Extracted Data' if 'out_data' in f else 'Data'
+                        })
+                
+                # Parse summary stats
+                outputs['summary'] = _parse_summary_stats(version_dir)
+        
+        return jsonify({
+            'success': success,
+            'console': '\n'.join(console_output),
+            'outputs': outputs,
+            'version_dir': version_dir,
+            'timings': timings,
+            'filename': original_filename
+        })
+            
+    except Exception as e:
+        import traceback
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        })
+
+# =============================================================================
+# Synthetic Generator Routes
+# =============================================================================
+
+@app.route('/synthetic')
+def synthetic():
+    """Render the synthetic generator page."""
+    settings = load_synthetic_settings()
+    if not settings['curves']:
+        settings['curves'] = get_default_curves(settings['num_curves'])
+    return render_template('synthetic.html', settings=settings)
+
+@app.route('/synthetic/editor')
+def synthetic_editor():
+    """Render the synthetic plot editor page."""
+    return render_template('synthetic_editor.html')
+
+@app.route('/synthetic/get_settings')
+def synthetic_get_settings():
+    """Return current synthetic settings as JSON."""
+    settings = load_synthetic_settings()
+    if not settings['curves']:
+        settings['curves'] = get_default_curves(settings['num_curves'])
+    return jsonify(settings)
+
+@app.route('/synthetic/update_curves', methods=['POST'])
+def synthetic_update_curves():
+    """Update the number of curves and return new curve configs."""
+    data = request.json
+    num_curves = int(data.get('num_curves', 3))
+    
+    settings = load_synthetic_settings()
+    current_curves = settings.get('curves', [])
+    
+    if num_curves > len(current_curves):
+        for i in range(len(current_curves), num_curves):
+            curve = DEFAULT_CURVE.copy()
+            curve['name'] = f'Condition {i + 1}'
+            curve['color'] = COLOR_PALETTE[i % len(COLOR_PALETTE)]
+            trends = ['stable', 'down', 'up', 'kill_regrowth', 'mixed']
+            curve['trend'] = trends[i % len(trends)]
+            current_curves.append(curve)
+    elif num_curves < len(current_curves):
+        current_curves = current_curves[:num_curves]
+    
+    settings['curves'] = current_curves
+    settings['num_curves'] = num_curves
+    save_synthetic_settings(settings)
+    
+    return jsonify({'curves': current_curves})
+
+@app.route('/synthetic/preview', methods=['POST'])
+def synthetic_preview():
+    """Generate a preview of the synthetic plot."""
+    start_time = time.time()
+    settings = request.json
+    x_values, curves_data = generate_all_curves(settings)
+    fig = create_synthetic_plot(settings, curves_data, x_values)
+    img_base64 = fig_to_base64(fig)
+    save_synthetic_settings(settings)
+    elapsed = time.time() - start_time
+    
+    return jsonify({
+        'success': True,
+        'image': img_base64,
+        'x_values': x_values,
+        'curves_data': curves_data,
+        'time_seconds': round(elapsed, 2)
     })
 
+@app.route('/synthetic/save', methods=['POST'])
+def synthetic_save():
+    """Save the synthetic plot and data to files."""
+    start_time = time.time()
+    settings = request.json
+    x_values, curves_data = generate_all_curves(settings)
+    saved_files = save_synthetic_plot_and_data(settings, curves_data, x_values)
+    save_synthetic_settings(settings)
+    elapsed = time.time() - start_time
+    
+    return jsonify({
+        'success': True,
+        'files': saved_files,
+        'message': f"Saved to {saved_files['filename']}",
+        'time_seconds': round(elapsed, 2)
+    })
+
+@app.route('/synthetic/reset', methods=['POST'])
+def synthetic_reset():
+    """Reset all synthetic settings to defaults."""
+    settings = DEFAULT_SETTINGS.copy()
+    settings['curves'] = get_default_curves(settings['num_curves'])
+    save_synthetic_settings(settings)
+    return jsonify(settings)
+
+@app.route('/synthetic/regenerate', methods=['POST'])
+def synthetic_regenerate():
+    """Regenerate curve data with same settings (new random values)."""
+    start_time = time.time()
+    settings = request.json
+    x_values, curves_data = generate_all_curves(settings)
+    fig = create_synthetic_plot(settings, curves_data, x_values)
+    img_base64 = fig_to_base64(fig)
+    elapsed = time.time() - start_time
+    
+    return jsonify({
+        'success': True,
+        'image': img_base64,
+        'x_values': x_values,
+        'curves_data': curves_data,
+        'time_seconds': round(elapsed, 2)
+    })
+
+# =============================================================================
+# Plot Editor Routes
+# =============================================================================
+
+@app.route('/synthetic/get_existing_plots')
+def get_existing_plots():
+    """Get list of existing synthetic plots that can be edited."""
+    plots = []
+    
+    if os.path.exists(SYNTHETIC_DIR):
+        for item in sorted(os.listdir(SYNTHETIC_DIR)):
+            item_path = os.path.join(SYNTHETIC_DIR, item)
+            if os.path.isdir(item_path):
+                png_file = os.path.join(item_path, f'{item}.png')
+                csv_file = os.path.join(item_path, f'{item}-original.csv')
+                
+                if not os.path.exists(png_file):
+                    for f in os.listdir(item_path):
+                        if f.endswith('.png'):
+                            png_file = os.path.join(item_path, f)
+                            break
+                
+                if os.path.exists(png_file):
+                    plots.append({
+                        'name': item,
+                        'folder': item_path,
+                        'has_csv': os.path.exists(csv_file)
+                    })
+    
+    return jsonify(plots)
+
+@app.route('/synthetic/load_plot_for_edit/<plot_name>')
+def load_plot_for_edit(plot_name):
+    """Load an existing plot's data and settings for editing."""
+    plot_folder = os.path.join(SYNTHETIC_DIR, plot_name)
+    
+    if not os.path.exists(plot_folder):
+        return jsonify({'success': False, 'error': 'Plot folder not found'})
+    
+    csv_file = os.path.join(plot_folder, f'{plot_name}-original.csv')
+    if not os.path.exists(csv_file):
+        for f in os.listdir(plot_folder):
+            if f.endswith('-original.csv'):
+                csv_file = os.path.join(plot_folder, f)
+                break
+    
+    if not os.path.exists(csv_file):
+        return jsonify({'success': False, 'error': 'CSV file not found'})
+    
+    curves_data = []
+    try:
+        with open(csv_file, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+        
+        header = lines[0].strip().split(',')
+        num_curves = len(header) // 2
+        
+        curve_names = []
+        for i in range(num_curves):
+            y_col_name = header[i * 2 + 1].strip()
+            curve_names.append(y_col_name)
+        
+        x_values = []
+        y_values_per_curve = [[] for _ in range(num_curves)]
+        
+        for line in lines[1:]:
+            if not line.strip():
+                continue
+            values = line.strip().split(',')
+            for i in range(num_curves):
+                x_val = float(values[i * 2])
+                y_val = float(values[i * 2 + 1])
+                if i == 0:
+                    x_values.append(x_val)
+                y_values_per_curve[i].append(y_val)
+        
+        for i in range(num_curves):
+            curves_data.append({
+                'x': x_values,
+                'y': y_values_per_curve[i],
+                'config': {
+                    'name': curve_names[i],
+                    'color': COLOR_PALETTE[i % len(COLOR_PALETTE)],
+                    'marker': 'o',
+                    'line_style': '-',
+                    'show_line': True,
+                    'line_width': 1.5,
+                    'marker_size': 6,
+                    'noise_level': 0.1
+                }
+            })
+        
+        png_file = os.path.join(plot_folder, f'{plot_name}.png')
+        if not os.path.exists(png_file):
+            for f in os.listdir(plot_folder):
+                if f.endswith('.png') and not '_copy' in f:
+                    png_file = os.path.join(plot_folder, f)
+                    break
+        
+        img_base64 = None
+        if os.path.exists(png_file):
+            with open(png_file, 'rb') as f:
+                img_base64 = base64.b64encode(f.read()).decode('utf-8')
+        
+        return jsonify({
+            'success': True,
+            'plot_name': plot_name,
+            'x_values': x_values,
+            'curves_data': curves_data,
+            'image': img_base64
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/synthetic/preview_edit', methods=['POST'])
+def preview_edit():
+    """Generate a preview of the edited plot with visual changes only."""
+    try:
+        start_time = time.time()
+        data = request.json
+        curves_data = data['curves_data']
+        settings = data['settings']
+        x_values = data['x_values']
+        
+        settings.setdefault('x_min', '')
+        settings.setdefault('x_max', '')
+        settings.setdefault('x_label', 'Time')
+        settings.setdefault('x_unit', 'hours')
+        settings.setdefault('y_label', 'Bacterial Count')
+        settings.setdefault('y_unit', 'CFU/mL')
+        settings.setdefault('y_scale', 'log')
+        settings.setdefault('y_min', '0')
+        settings.setdefault('y_max', '')
+        settings.setdefault('title', '')
+        settings.setdefault('figure_width', 10)
+        settings.setdefault('figure_height', 6)
+        settings.setdefault('show_legend', True)
+        settings.setdefault('show_grid', True)
+        
+        fig = create_synthetic_plot(settings, curves_data, x_values)
+        img_base64 = fig_to_base64(fig)
+        elapsed = time.time() - start_time
+        
+        return jsonify({
+            'success': True,
+            'image': img_base64,
+            'time_seconds': round(elapsed, 2)
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        })
+
+@app.route('/synthetic/save_edit', methods=['POST'])
+def save_edit():
+    """Save the edited plot as a copy."""
+    try:
+        start_time = time.time()
+        data = request.json
+        original_name = data['original_name']
+        curves_data = data['curves_data']
+        settings = data['settings']
+        x_values = data['x_values']
+        
+        settings.setdefault('x_min', '')
+        settings.setdefault('x_max', '')
+        settings.setdefault('x_label', 'Time')
+        settings.setdefault('x_unit', 'hours')
+        settings.setdefault('y_label', 'Bacterial Count')
+        settings.setdefault('y_unit', 'CFU/mL')
+        settings.setdefault('y_scale', 'log')
+        settings.setdefault('y_min', '0')
+        settings.setdefault('y_max', '')
+        settings.setdefault('title', '')
+        settings.setdefault('figure_width', 10)
+        settings.setdefault('figure_height', 6)
+        settings.setdefault('show_legend', True)
+        settings.setdefault('show_grid', True)
+        
+        plot_folder = os.path.join(SYNTHETIC_DIR, original_name)
+        
+        if not os.path.exists(plot_folder):
+            return jsonify({'success': False, 'error': 'Plot folder not found'})
+        
+        copy_num = 1
+        while True:
+            copy_name = f'{original_name}_copy{copy_num}'
+            png_path = os.path.join(plot_folder, f'{copy_name}.png')
+            if not os.path.exists(png_path):
+                break
+            copy_num += 1
+        
+        fig = create_synthetic_plot(settings, curves_data, x_values)
+        
+        png_path = os.path.join(plot_folder, f'{copy_name}.png')
+        fig.savefig(png_path, dpi=150, bbox_inches='tight')
+        
+        svg_path = None
+        if settings.get('save_svg', False):
+            svg_path = os.path.join(plot_folder, f'{copy_name}.svg')
+            fig.savefig(svg_path, format='svg', bbox_inches='tight')
+        
+        plt.close(fig)
+        
+        csv_path = os.path.join(plot_folder, f'{copy_name}-original.csv')
+        save_synthetic_csv(curves_data, x_values, settings, csv_path)
+        elapsed = time.time() - start_time
+        
+        return jsonify({
+            'success': True,
+            'files': {
+                'png': png_path,
+                'svg': svg_path,
+                'csv': csv_path,
+                'filename': copy_name,
+                'folder': plot_folder
+            },
+            'message': f'Saved as {copy_name}',
+            'time_seconds': round(elapsed, 2)
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        })
+
+# =============================================================================
+# Results Comparison Page Routes
+# =============================================================================
+
+@app.route('/results')
+def results_page():
+    """Render the results comparison page"""
+    return render_template('results.html')
+
+@app.route('/results/list_replots')
+def list_replots():
+    """List all available replots from synthetic and first_examples folders"""
+    source_filter = request.args.get('source', 'all')
+    replots = []
+    
+    def find_replots_in_folder(folder_path, source_name):
+        """Recursively find all replot images in a folder"""
+        results = []
+        if not os.path.exists(folder_path):
+            return results
+        
+        for root, dirs, files in os.walk(folder_path):
+            # Look for replot images
+            for f in files:
+                if '-replot' in f and f.endswith('.png'):
+                    rel_path = os.path.relpath(os.path.join(root, f), PLOTS_DIR)
+                    
+                    # Extract display name from path
+                    path_parts = rel_path.replace('\\', '/').split('/')
+                    if len(path_parts) >= 2:
+                        display_name = '/'.join(path_parts[-2:])  # Folder/filename
+                    else:
+                        display_name = f
+                    
+                    results.append({
+                        'path': rel_path.replace('\\', '/'),
+                        'display_name': display_name,
+                        'source': source_name,
+                        'folder': os.path.dirname(rel_path).replace('\\', '/')
+                    })
+        return results
+    
+    # Scan synthetic folder
+    if source_filter in ['all', 'synthetic']:
+        replots.extend(find_replots_in_folder(SYNTHETIC_DIR, 'synthetic'))
+    
+    # Scan first_examples folder
+    if source_filter in ['all', 'first_examples']:
+        first_examples_dir = os.path.join(PLOTS_DIR, 'first_examples')
+        replots.extend(find_replots_in_folder(first_examples_dir, 'first_examples'))
+    
+    # Sort by display name
+    replots.sort(key=lambda x: x['display_name'])
+    
+    return jsonify({'replots': replots})
+
+@app.route('/results/get_replot_data', methods=['POST'])
+def get_replot_data():
+    """Get all data for a specific replot including images and stats"""
+    data = request.json
+    replot_path = data.get('replot_path', '')
+    
+    if not replot_path:
+        return jsonify({'success': False, 'error': 'No replot path provided'})
+    
+    full_path = os.path.join(PLOTS_DIR, replot_path.replace('/', os.sep))
+    if not os.path.exists(full_path):
+        return jsonify({'success': False, 'error': 'Replot file not found'})
+    
+    folder = os.path.dirname(full_path)
+    replot_filename = os.path.basename(full_path)
+    
+    result = {
+        'success': True,
+        'replot_name': replot_filename,
+        'replot_image': f'/plots/{replot_path}',
+        'pointwise_image': None,
+        'pointwise_stats': None,
+        'interpolation_image': None,
+        'interpolation_stats': None,
+        'visual_image': None
+    }
+    
+    # Find associated comparison files
+    folder_files = os.listdir(folder)
+    
+    for f in folder_files:
+        full_file_path = os.path.join(folder, f)
+        rel_file_path = os.path.relpath(full_file_path, PLOTS_DIR).replace('\\', '/')
+        
+        # Pointwise comparison image
+        if f.startswith('pointwise_') and f.endswith('.png'):
+            result['pointwise_image'] = f'/plots/{rel_file_path}'
+        
+        # Pointwise stats
+        if f.startswith('pointwise_') and f.endswith('.stats'):
+            result['pointwise_stats'] = parse_pointwise_stats(full_file_path)
+        
+        # Interpolation comparison image
+        if f.startswith('interpolated_') and f.endswith('.png'):
+            result['interpolation_image'] = f'/plots/{rel_file_path}'
+        
+        # Interpolation stats
+        if f.startswith('interpolated_') and f.endswith('.stats'):
+            result['interpolation_stats'] = parse_interpolation_stats(full_file_path)
+        
+        # Visual/side-by-side comparison
+        if f.startswith('comparison_') and f.endswith('.png'):
+            result['visual_image'] = f'/plots/{rel_file_path}'
+    
+    return jsonify(result)
+
+def parse_pointwise_stats(stats_path):
+    """Parse a pointwise stats file and return structured data"""
+    try:
+        with open(stats_path, 'r', encoding='utf-8', errors='replace') as f:
+            content = f.read()
+        
+        curves = []
+        current_curve = None
+        overall = {}
+        
+        for line in content.split('\n'):
+            line = line.strip()
+            
+            # Match curve header: "Curve 'name1' -> 'name2':"
+            if line.startswith("Curve '"):
+                if current_curve:
+                    curves.append(current_curve)
+                
+                # Extract names
+                parts = line.split("' -> '")
+                if len(parts) == 2:
+                    extracted_name = parts[0].replace("Curve '", "")
+                    original_name = parts[1].rstrip("':")
+                else:
+                    extracted_name = line
+                    original_name = ""
+                
+                current_curve = {
+                    'extracted_name': extracted_name,
+                    'original_name': original_name
+                }
+            
+            # Parse stats
+            elif current_curve and ':' in line:
+                key, value = line.split(':', 1)
+                key = key.strip()
+                value = value.strip()
+                
+                try:
+                    if key == 'MAE X (percent)':
+                        current_curve['mae_x_percent'] = float(value)
+                    elif key == 'MAE Y (percent)':
+                        current_curve['mae_y_percent'] = float(value)
+                    elif key == 'Precision':
+                        current_curve['precision'] = float(value)
+                    elif key == 'Recall':
+                        current_curve['recall'] = float(value)
+                    elif key == 'MatchedPairs':
+                        current_curve['matched_pairs'] = int(value)
+                except ValueError:
+                    pass
+            
+            # Overall stats
+            elif line.startswith('Overall') or 'Average' in line or 'Mean' in line:
+                if ':' in line:
+                    key, value = line.split(':', 1)
+                    try:
+                        overall[key.strip().lower().replace(' ', '_')] = float(value.strip().rstrip('%'))
+                    except ValueError:
+                        pass
+        
+        # Add last curve
+        if current_curve:
+            curves.append(current_curve)
+        
+        # Calculate overall if not present
+        if not overall and curves:
+            mae_y_values = [c['mae_y_percent'] for c in curves if 'mae_y_percent' in c]
+            precision_values = [c['precision'] for c in curves if 'precision' in c]
+            recall_values = [c['recall'] for c in curves if 'recall' in c]
+            
+            overall = {
+                'avg_mae_y': sum(mae_y_values) / len(mae_y_values) if mae_y_values else None,
+                'avg_precision': sum(precision_values) / len(precision_values) if precision_values else None,
+                'avg_recall': sum(recall_values) / len(recall_values) if recall_values else None
+            }
+        
+        return {'curves': curves, 'overall': overall}
+    
+    except Exception as e:
+        print(f"Error parsing pointwise stats: {e}")
+        return None
+
+def parse_interpolation_stats(stats_path):
+    """Parse an interpolation stats file and return structured data"""
+    try:
+        with open(stats_path, 'r', encoding='utf-8', errors='replace') as f:
+            content = f.read()
+        
+        curves = []
+        current_curve = None
+        mean_mae = None
+        
+        for line in content.split('\n'):
+            line = line.strip()
+            
+            # Match curve header
+            if line.startswith("Curve '"):
+                if current_curve:
+                    curves.append(current_curve)
+                
+                # Extract names
+                parts = line.split("' -> '")
+                if len(parts) == 2:
+                    extracted_name = parts[0].replace("Curve '", "")
+                    original_name = parts[1].rstrip("':")
+                else:
+                    extracted_name = line
+                    original_name = ""
+                
+                current_curve = {
+                    'extracted_name': extracted_name,
+                    'original_name': original_name
+                }
+            
+            # Parse stats
+            elif current_curve and ':' in line:
+                key, value = line.split(':', 1)
+                key = key.strip()
+                value = value.strip()
+                
+                try:
+                    if key == 'MAE':
+                        current_curve['mae'] = float(value)
+                    elif key == 'LeftMissed':
+                        current_curve['left_missed'] = float(value)
+                    elif key == 'RightMissed':
+                        current_curve['right_missed'] = float(value)
+                except ValueError:
+                    pass
+            
+            # Mean MAE at the end
+            elif 'Mean MAE' in line and ':' in line:
+                try:
+                    mean_mae = float(line.split(':')[1].strip())
+                except ValueError:
+                    pass
+        
+        # Add last curve
+        if current_curve:
+            curves.append(current_curve)
+        
+        # Calculate mean MAE if not present
+        if mean_mae is None and curves:
+            mae_values = [c['mae'] for c in curves if 'mae' in c]
+            if mae_values:
+                mean_mae = sum(mae_values) / len(mae_values)
+        
+        return {'curves': curves, 'mean_mae': mean_mae}
+    
+    except Exception as e:
+        print(f"Error parsing interpolation stats: {e}")
+        return None
+
+# =============================================================================
+# Main Entry Point
+# =============================================================================
+
 if __name__ == '__main__':
+    print(f"Synthetic plots will be saved to: {SYNTHETIC_DIR}")
+    print("Starting PlotExtract Web Application...")
+    print("Open http://127.0.0.1:5000 in your browser")
     app.run(debug=True, port=5000)

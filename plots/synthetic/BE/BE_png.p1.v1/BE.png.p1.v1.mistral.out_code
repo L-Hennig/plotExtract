@@ -1,0 +1,26 @@
+```python
+import matplotlib.pyplot as plt
+import pandas as pd
+
+data = {
+    "Time (hours)": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
+    "Bacteria Count (CFU/mL)": [6.8, 7.1, 8.2, 9.5, 10.5, 10.8, 10.9, 11.0, 10.0, 10.2, 13.5, 13.8, 11.0, 10.5, 13.8, 13.5, 12.5, 12.0, 12.5, 11.0, 10.0, 9.5, 12.0, 11.8, 10.0, 9.0, 12.0, 12.5, 10.0, 9.5, 12.5]
+}
+
+df = pd.DataFrame(data)
+
+plt.figure(figsize=(8, 5))
+plt.plot(df["Time (hours)"], df["Bacteria Count (CFU/mL)"], marker='o', color='#1f77b4', linestyle='-', label='Condition 1')
+
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacteria Count (CFU/mL)')
+plt.xlim(0, 30)
+plt.ylim(0, 14.5)
+plt.yticks(range(0, 15, 2))
+
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.legend(frameon=True, facecolor='white', edgecolor='black')
+
+plt.savefig(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\BE\BE_png.p1.v1\BE_png-replot.p1.v1.png", bbox_inches='tight', dpi=300)
+plt.close()
+```

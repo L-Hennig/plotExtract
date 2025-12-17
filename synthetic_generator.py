@@ -294,10 +294,10 @@ def create_plot(settings, curves_data, x_values):
                    linewidth=config['line_width'],
                    label=config['name'])
         
-        # Plot markers
+        # Plot markers (always with no line - line was drawn above if needed)
         ax.plot(x, y_plot,
                marker=config['marker'],
-               linestyle='none' if config['show_line'] else config['line_style'],
+               linestyle='none',
                color=config['color'],
                markersize=config['marker_size'],
                label=config['name'] if not config['show_line'] else None)
@@ -467,7 +467,8 @@ def save_plot_and_data(settings, curves_data, x_values):
     
     # Save PNG inside the subfolder
     png_path = os.path.join(plot_folder, f'{base_filename}.png')
-    fig.savefig(png_path, dpi=150, bbox_inches='tight')
+    dpi = settings.get('dpi', 150)
+    fig.savefig(png_path, dpi=dpi, bbox_inches='tight')
     
     # Save SVG if requested
     svg_path = None
@@ -848,7 +849,8 @@ def save_edit():
     
         # Save PNG
         png_path = os.path.join(plot_folder, f'{copy_name}.png')
-        fig.savefig(png_path, dpi=150, bbox_inches='tight')
+        dpi = settings.get('dpi', 150)
+        fig.savefig(png_path, dpi=dpi, bbox_inches='tight')
         
         # Save SVG if requested
         svg_path = None

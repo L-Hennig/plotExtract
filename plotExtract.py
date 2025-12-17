@@ -35,12 +35,14 @@ prompts = prompts_module.prompts
 client = Mistral(api_key=api_key)
 
 def stack_images_vertically(image1_path, image2_path, border_color, output_dir, prompt_name, version_num, border_size=30):
+    """Stack original and replot images vertically with labels."""
+    
     img1 = cv2.imread(image1_path)
     img2 = cv2.imread(image2_path)
 
     if img1 is None or img2 is None:
-        print("Error: One or both image paths are invalid.")
-        sys.exit(1)
+        print(f"Error: Cannot read images. img1={image1_path}, img2={image2_path}")
+        return None
 
     # Get the width of both images to determine the new size
     width = max(img1.shape[1], img2.shape[1])
@@ -49,8 +51,22 @@ def stack_images_vertically(image1_path, image2_path, border_color, output_dir, 
     img1_resized = cv2.resize(img1, (width, int(img1.shape[0] * width / img1.shape[1])))
     img2_resized = cv2.resize(img2, (width, int(img2.shape[0] * width / img2.shape[1])))
 
-    # Stack images vertically
-    combined_image = np.vstack((img1_resized, img2_resized))
+    # Add labels to each image - larger font and height
+    label_height = 60
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 1.8
+    font_thickness = 3
+    
+    # Create label bars
+    label1 = np.ones((label_height, width, 3), dtype=np.uint8) * 255  # White background
+    label2 = np.ones((label_height, width, 3), dtype=np.uint8) * 255
+    
+    # Add text to labels (vertically centered)
+    cv2.putText(label1, "Original", (15, 45), font, font_scale, (0, 0, 0), font_thickness)
+    cv2.putText(label2, "Extracted (Re-plotted)", (15, 45), font, font_scale, (0, 0, 0), font_thickness)
+    
+    # Stack: label1 + img1 + label2 + img2
+    combined_image = np.vstack((label1, img1_resized, label2, img2_resized))
 
     # Add a border around the combined image
     if "yes" in border_color.lower():
@@ -59,7 +75,7 @@ def stack_images_vertically(image1_path, image2_path, border_color, output_dir, 
         color = (0, 0, 255)  # Red border
     else:
         print("Invalid border color input. Use 'yes' for green or 'no' for red.")
-        sys.exit(1)
+        return None
 
     combined_image_with_border = cv2.copyMakeBorder(
         combined_image,
@@ -71,12 +87,15 @@ def stack_images_vertically(image1_path, image2_path, border_color, output_dir, 
         value=color
     )
 
-    # Create the output filename in the same folder as the input image (with version)
-    base_name = os.path.splitext(os.path.basename(image1_path))[0]
+    # Create the output filename - use full original filename for uniqueness
+    original_filename = os.path.basename(image1_path)
+    # Remove extension and use underscores
+    base_name = original_filename.rsplit('.', 1)[0] if '.' in original_filename else original_filename
     output_filename = os.path.join(output_dir, f"comparison_{base_name}.{prompt_name}.v{version_num}.png")
 
     # Save the combined image with border
     cv2.imwrite(output_filename, combined_image_with_border)
+    
     return(output_filename)
 
 def encode_image(image_path):
@@ -141,35 +160,101 @@ def create_Q_1p(convo):
       Q.append({'role': role, 'content': c})
   return Q
 
-pngjpg = os.path.splitext(input_plot)[-1].lstrip('.')
+# Get extension and prepare for API
+original_ext = os.path.splitext(input_plot)[-1].lower()  # e.g., '.png', '.svg'
+
+# Set MIME type based on extension
+api_image_path = input_plot
+pngjpg = original_ext.lstrip('.')
 if pngjpg == 'jpg':
-  pngjpg = 'jpeg'
-base64_image = encode_image(input_plot)
+    pngjpg = 'jpeg'
+elif pngjpg == 'svg':
+    # Mistral API doesn't support SVG - convert to PNG using Edge browser
+    import subprocess as sp
+    import tempfile
+    temp_png = tempfile.NamedTemporaryFile(suffix='.png', delete=False).name
+    abs_svg = os.path.abspath(input_plot).replace('\\', '/')
+    
+    # Create HTML wrapper that scales SVG to fill viewport
+    html_content = f'''<!DOCTYPE html>
+<html><head><style>
+html, body {{ margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: white; }}
+img {{ width: 100%; height: 100%; object-fit: contain; }}
+</style></head>
+<body><img src="file:///{abs_svg}"></body></html>'''
+    
+    temp_html = tempfile.NamedTemporaryFile(suffix='.html', delete=False, mode='w', encoding='utf-8')
+    temp_html.write(html_content)
+    temp_html.close()
+    
+    # Browser paths to try
+    browsers = [
+        r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe',
+        r'C:\Program Files\Microsoft\Edge\Application\msedge.exe',
+        'msedge',
+        r'C:\Program Files\Google\Chrome\Application\chrome.exe',
+        r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe',
+        'chrome'
+    ]
+    
+    converted = False
+    for browser in browsers:
+        try:
+            # Screenshot the HTML wrapper which scales SVG to fill viewport
+            sp.run([browser, '--headless', '--disable-gpu', 
+                    f'--screenshot={temp_png}', '--window-size=1600,1200',
+                    '--force-device-scale-factor=2',  # 2x scale for higher resolution
+                    f'file:///{temp_html.name.replace(os.sep, "/")}'], 
+                   capture_output=True, timeout=60)
+            if os.path.exists(temp_png) and os.path.getsize(temp_png) > 0:
+                api_image_path = temp_png
+                pngjpg = 'png'
+                converted = True
+                print(f"Converted SVG to PNG (high resolution)")
+                break
+        except (FileNotFoundError, sp.TimeoutExpired, OSError):
+            continue
+    
+    # Clean up temp HTML
+    try:
+        os.unlink(temp_html.name)
+    except:
+        pass
+    
+    if not converted:
+        print("ERROR: Cannot convert SVG to PNG. Install Edge or Chrome.")
+        sys.exit(1)
+
+base64_image = encode_image(api_image_path)
 # Include prompt file name (shortened) in output filenames
 prompt_name = os.path.splitext(os.path.basename(prompt_file))[0].replace('prompt_', 'p')
 
-# Get base name and directory info
+# Get base name and directory info - include extension in naming for uniqueness
 image_filename = os.path.basename(input_plot)
 base_name = os.path.splitext(image_filename)[0]  # e.g., 'A-1'
-ext = os.path.splitext(image_filename)[1]  # e.g., '.png'
+ext = os.path.splitext(image_filename)[1]  # e.g., '.png' or '.svg'
+# Use full filename (with extension) for folder naming to differentiate .png from .svg
+name_for_folder = image_filename.replace('.', '_')  # e.g., 'A-1_png' or 'A-1_svg'
 
-# Find next version number
-def get_next_version(parent_dir, base_name, prompt_name):
-    """Find the next available version number for this image+prompt combination."""
+# Find next version number - uses name_for_folder to include extension
+def get_next_version(parent_dir, name_for_folder, prompt_name):
+    """Find the next available version number for this image+prompt combination.
+    Uses the full filename (with extension converted to underscore) for uniqueness."""
     version = 1
     while True:
-        folder_name = f"{base_name}.{prompt_name}.v{version}"
+        folder_name = f"{name_for_folder}.{prompt_name}.v{version}"
         folder_path = os.path.join(parent_dir, folder_name)
         if not os.path.exists(folder_path):
             return version, folder_path
         version += 1
 
-version_num, version_dir = get_next_version(input_dir, base_name, prompt_name)
+version_num, version_dir = get_next_version(input_dir, name_for_folder, prompt_name)
 os.makedirs(version_dir, exist_ok=True)
 
 # Set output paths inside the version folder - include version in filenames
 output_out = os.path.join(version_dir, f"{image_filename}.{prompt_name}.v{version_num}.mistral.out")
-replot_plot = os.path.join(version_dir, f"{base_name}-replot.{prompt_name}.v{version_num}{ext}")
+# Replot is always PNG (matplotlib output)
+replot_plot = os.path.join(version_dir, f"{name_for_folder}-replot.{prompt_name}.v{version_num}.png")
 
 print(f"Input plot: {input_plot}")
 print(f"Using prompt: {prompt_name}")
@@ -190,6 +275,8 @@ code_prompt = prompts['code_plot'].format(replot_plot=replot_plot, data=data)
 
 if 'none' in data.lower():
   print(f"NO DATA EXTRACTED")
+  # Still print VERSION_DIR so app.py knows where files are
+  print(f"VERSION_DIR:{version_dir}")
   exit()
 
 print("Generating replot code... ", end = '', flush=True)
@@ -239,67 +326,83 @@ with open(output_out+'_conversation', 'a') as file:
   QQ.append({"role": "assistant", "content": code.replace("\n", "\\n")})
   json.dump(QQ, file)
 
-stacked = stack_images_vertically(input_plot, replot_plot, "yes", version_dir, prompt_name, version_num)
+# For comparison, use the converted PNG if original was SVG (cv2 can't read SVG)
+comparison_original = api_image_path if original_ext == '.svg' else input_plot
+stacked = stack_images_vertically(comparison_original, replot_plot, "yes", version_dir, prompt_name, version_num)
 
-print("Comparing source and replot... ", end = '', flush=True)
-wrong = False
-wrong_why = ""
+# Only run validation comparisons if we have a stacked comparison image
+if stacked:
+    print("Comparing source and replot... ", end = '', flush=True)
+    wrong = False
+    wrong_why = ""
 
-QQ = create_Q_1p([[encode_image(stacked), prompts['compare_x']]])
-QQ, validate = prompt_mistral(QQ)
-print(f"\n\nAxis x (result: {validate})")
-if 'no' in validate.lower().strip()[:10]:
-  wrong = True
-  wrong_why += "X; "
-with open(output_out+'_conversation', 'a') as file:
-  QQ.append({"role": "assistant", "content": validate.replace("\n", "\\n")})
-  json.dump(QQ, file)
+    QQ = create_Q_1p([[encode_image(stacked), prompts['compare_x']]])
+    QQ, validate = prompt_mistral(QQ)
+    print(f"\n\nAxis x (result: {validate})")
+    if 'no' in validate.lower().strip()[:10]:
+      wrong = True
+      wrong_why += "X; "
+    with open(output_out+'_conversation', 'a') as file:
+      QQ.append({"role": "assistant", "content": validate.replace("\n", "\\n")})
+      json.dump(QQ, file)
 
-QQ = create_Q_1p([[encode_image(stacked), prompts['compare_y']]])
-QQ, validate = prompt_mistral(QQ)
-print(f"Axis y (result: {validate})")
-if 'no' in validate.lower().strip()[:10]:
-  wrong = True
-  wrong_why += "Y; "
-with open(output_out+'_conversation', 'a') as file:
-  QQ.append({"role": "assistant", "content": validate.replace("\n", "\\n")})
-  json.dump(QQ, file)
+    QQ = create_Q_1p([[encode_image(stacked), prompts['compare_y']]])
+    QQ, validate = prompt_mistral(QQ)
+    print(f"Axis y (result: {validate})")
+    if 'no' in validate.lower().strip()[:10]:
+      wrong = True
+      wrong_why += "Y; "
+    with open(output_out+'_conversation', 'a') as file:
+      QQ.append({"role": "assistant", "content": validate.replace("\n", "\\n")})
+      json.dump(QQ, file)
 
-QQ = create_Q_1p([[encode_image(stacked), prompts['compare_number']]])
-QQ, validate = prompt_mistral(QQ)
-print(f"Points n (result: {validate})")
-if 'no' in validate.lower().strip()[:10]:
-  wrong = True
-  wrong_why += "N; "
-with open(output_out+'_conversation', 'a') as file:
-  QQ.append({"role": "assistant", "content": validate.replace("\n", "\\n")})
-  json.dump(QQ, file)
+    QQ = create_Q_1p([[encode_image(stacked), prompts['compare_number']]])
+    QQ, validate = prompt_mistral(QQ)
+    print(f"Points n (result: {validate})")
+    if 'no' in validate.lower().strip()[:10]:
+      wrong = True
+      wrong_why += "N; "
+    with open(output_out+'_conversation', 'a') as file:
+      QQ.append({"role": "assistant", "content": validate.replace("\n", "\\n")})
+      json.dump(QQ, file)
 
-QQ = create_Q_1p([[encode_image(stacked), prompts['compare_trend']]])
-QQ, validate = prompt_mistral(QQ)
-print(f"Trends (result: {validate})")
-if 'no' in validate.lower().strip()[:10]:
-  wrong = True
-  wrong_why += "T"
-with open(output_out+'_conversation', 'a') as file:
-  QQ.append({"role": "assistant", "content": validate.replace("\n", "\\n")})
-  json.dump(QQ, file)
+    QQ = create_Q_1p([[encode_image(stacked), prompts['compare_trend']]])
+    QQ, validate = prompt_mistral(QQ)
+    print(f"Trends (result: {validate})")
+    if 'no' in validate.lower().strip()[:10]:
+      wrong = True
+      wrong_why += "T"
+    with open(output_out+'_conversation', 'a') as file:
+      QQ.append({"role": "assistant", "content": validate.replace("\n", "\\n")})
+      json.dump(QQ, file)
 
-with open(output_out+'_validate', 'w') as file:
-  if wrong:
-    validate = 'no'
-    file.write(validate)
-  else:
-    validate = 'yes'
-    file.write(validate)
-if wrong:
-  with open(output_out+'_validate_why', 'w') as file:
-    file.write(wrong_why)
-print(f"\nFINISHED (result: {validate})")
+    with open(output_out+'_validate', 'w') as file:
+      if wrong:
+        validate = 'no'
+        file.write(validate)
+      else:
+        validate = 'yes'
+        file.write(validate)
+    if wrong:
+      with open(output_out+'_validate_why', 'w') as file:
+        file.write(wrong_why)
+    print(f"\nFINISHED (result: {validate})")
 
-print("Stacking original and replotted images for comparison... ", end = '', flush=True)
-stack_images_vertically(input_plot, replot_plot, validate, version_dir, prompt_name, version_num)
-print(f"FINISHED")
+    print("Stacking original and replotted images for comparison... ", end = '', flush=True)
+    stack_images_vertically(comparison_original, replot_plot, validate, version_dir, prompt_name, version_num)
+    print(f"FINISHED")
+else:
+    # Could not create comparison image
+    print("Skipping visual validation (comparison image could not be generated)")
+    with open(output_out+'_validate', 'w') as file:
+      file.write('skipped')
+
+# Cleanup temp PNG from SVG conversion
+if original_ext == '.svg' and api_image_path != input_plot:
+    try:
+        os.unlink(api_image_path)
+    except:
+        pass
 
 # Print the version directory for use by calling scripts
 print(f"VERSION_DIR:{version_dir}")

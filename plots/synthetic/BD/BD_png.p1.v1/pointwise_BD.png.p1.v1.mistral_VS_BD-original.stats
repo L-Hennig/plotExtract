@@ -1,0 +1,18 @@
+# Per-curve statistics
+
+Curve 'Condition 1' -> 'Bacteria Count (CFU/mL) (Condition 1)':
+  MAE X (percent): 2.47
+  MAE Y (percent): 3.56
+  Precision: 0.7368
+  Recall: 1.0000
+  MatchedPairs: 14
+  Extra extracted (unmatched): 5
+  Missed original (not found): 0
+
+# Summary
+Number of curves: 1
+Mean MAE X (percent): 2.47
+Mean MAE Y (percent): 3.56
+Mean Precision: 0.7368
+Mean Recall: 1.0000
+Threshold (MAX_NORM_DIST): 0.2

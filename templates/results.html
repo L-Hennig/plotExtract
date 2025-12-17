@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Results Comparison - PlotExtract</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0; 
+            background: #f5f7fa; 
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            padding: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        .navbar-brand {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .navbar-brand:hover { color: #ecf0f1; }
+        .navbar-nav {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: 5px;
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        .nav-link.active {
+            color: white;
+            border-bottom-color: #f39c12;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .main-content { padding: 20px; }
+        .container { max-width: 1600px; margin: 0 auto; }
+        
+        h1 { color: #333; margin-bottom: 5px; }
+        .page-subtitle { color: #666; margin-bottom: 20px; }
+        
+        /* Control Panel */
+        .control-panel {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 60px;
+            z-index: 100;
+        }
+        .control-panel h3 { margin-top: 0; color: #444; }
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .control-group label { font-weight: 500; color: #555; white-space: nowrap; }
+        .control-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .toggle-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .toggle-btn:hover { background: #e9ecef; }
+        .toggle-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-primary:hover { background: #0056b3; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #1e7e34; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #545b62; }
+
+        /* Comparison Grid */
+        .comparison-grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .comparison-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex: 1 1 400px;
+            min-width: 400px;
+            max-width: 600px;
+        }
+        .comparison-card.expanded {
+            flex: 1 1 800px;
+            max-width: 100%;
+        }
+        .card-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-header h4 { margin: 0; color: #333; }
+        .card-actions { display: flex; gap: 8px; }
+        .card-body { padding: 15px; }
+        
+        /* Replot Selector */
+        .replot-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .replot-selector select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        /* Image Container */
+        .image-container {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+        .image-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* Comparison Toggles */
+        .comparison-toggles {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .comp-toggle {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .comp-toggle:hover { background: #e9ecef; }
+        .comp-toggle.active {
+            background: #17a2b8;
+            color: white;
+            border-color: #17a2b8;
+        }
+        .comp-toggle.pointwise.active { background: #28a745; border-color: #28a745; }
+        .comp-toggle.interpolation.active { background: #6f42c1; border-color: #6f42c1; }
+        .comp-toggle.visual.active { background: #fd7e14; border-color: #fd7e14; }
+        
+        /* Comparison Images */
+        .comparison-images { margin-bottom: 15px; }
+        .comparison-images img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            border: 1px solid #eee;
+            margin-bottom: 10px;
+        }
+        .comparison-image-wrapper {
+            display: none;
+            margin-bottom: 10px;
+        }
+        .comparison-image-wrapper.visible { display: block; }
+        .comparison-image-wrapper h5 {
+            margin: 0 0 8px 0;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        /* Stats Display */
+        .stats-container {
+            background: #f8f9fa;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 12px;
+        }
+        .stats-container h5 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 13px;
+        }
+        .stats-section {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .stats-section:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .stats-section-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 6px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+        }
+        .stat-item {
+            background: white;
+            padding: 6px 10px;
+            border-radius: 3px;
+            border: 1px solid #e9ecef;
+        }
+        .stat-label { color: #6c757d; font-size: 11px; }
+        .stat-value { 
+            font-weight: 600; 
+            color: #212529;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+        .stat-good { color: #28a745; }
+        .stat-medium { color: #ffc107; }
+        .stat-bad { color: #dc3545; }
+        
+        /* No Selection State */
+        .no-selection {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        .no-selection i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+        }
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-top-color: #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Remove Button */
+        .remove-card-btn {
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            font-size: 16px;
+            line-height: 1;
+            border-radius: 50%;
+        }
+        
+        /* Add Card Button */
+        .add-card-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            flex: 1 1 400px;
+            min-width: 400px;
+            max-width: 600px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .add-card-container:hover {
+            border-color: #007bff;
+            background: rgba(0, 123, 255, 0.05);
+        }
+        .add-card-btn {
+            text-align: center;
+            color: #6c757d;
+        }
+        .add-card-btn span {
+            display: block;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        /* Universal Controls */
+        .universal-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            padding: 10px 15px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        .universal-controls label {
+            font-weight: 500;
+            color: #495057;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">📊 PlotExtract</a>
+            <ul class="navbar-nav">
+                <li><a href="/" class="nav-link">🔬 Extraction</a></li>
+                <li><a href="/synthetic" class="nav-link">🧫 Synthetic Generator</a></li>
+                <li><a href="/synthetic/editor" class="nav-link">✏️ Synthetic Editor</a></li>
+                <li><a href="/results" class="nav-link active">📈 Results Comparison</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="main-content">
+        <div class="container">
+            <h1>📈 Results / Replot Comparison</h1>
+            <p class="page-subtitle">Compare re-plotted images side-by-side with pointwise, interpolation, and visual comparisons</p>
+            
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <h3>🎛️ Universal Controls</h3>
+                <div class="control-row">
+                    <div class="control-group">
+                        <label>Source:</label>
+                        <select id="sourceFilter">
+                            <option value="all">All Sources</option>
+                            <option value="synthetic">Synthetic Only</option>
+                            <option value="first_examples">First Examples Only</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Show All:</label>
+                        <button class="toggle-btn" id="toggleAllPointwise" onclick="toggleAllComparisons('pointwise')">📊 Pointwise</button>
+                        <button class="toggle-btn" id="toggleAllInterpolation" onclick="toggleAllComparisons('interpolation')">📈 Interpolation</button>
+                        <button class="toggle-btn" id="toggleAllVisual" onclick="toggleAllComparisons('visual')">🖼️ Visual</button>
+                    </div>
+                    <div class="control-group">
+                        <button class="toggle-btn active" id="toggleAllStats" onclick="toggleAllStats()">📋 Stats</button>
+                    </div>
+                    <div class="control-group" style="margin-left: auto;">
+                        <button class="btn btn-success" onclick="addComparisonCard()">➕ Add Comparison</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Comparison Grid -->
+            <div class="comparison-grid" id="comparisonGrid">
+                <!-- Cards will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ========================================
+        // State Management
+        // ========================================
+        let comparisonCards = [];
+        let cardIdCounter = 0;
+        let availableReplots = [];
+        let globalToggles = {
+            pointwise: false,
+            interpolation: false,
+            visual: false
+        };
+        
+        // ========================================
+        // Initialization
+        // ========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load available replots
+            loadAvailableReplots();
+            
+            // Add initial two cards
+            addComparisonCard();
+            addComparisonCard();
+        });
+        
+        // ========================================
+        // API Functions
+        // ========================================
+        async function loadAvailableReplots() {
+            try {
+                const source = document.getElementById('sourceFilter').value;
+                const response = await fetch(`/results/list_replots?source=${source}`);
+                const data = await response.json();
+                availableReplots = data.replots || [];
+                
+                // Update all selectors
+                comparisonCards.forEach(card => {
+                    updateReplotSelector(card.id);
+                });
+            } catch (error) {
+                console.error('Error loading replots:', error);
+            }
+        }
+        
+        async function loadReplotData(cardId, replotPath) {
+            const card = comparisonCards.find(c => c.id === cardId);
+            if (!card) return;
+            
+            const cardEl = document.getElementById(`card-${cardId}`);
+            const bodyEl = cardEl.querySelector('.card-body');
+            
+            // Store selector HTML before replacing content
+            const selector = document.getElementById(`selector-${cardId}`);
+            card.selectorHtml = selector ? selector.innerHTML : '';
+            
+            bodyEl.innerHTML = '<div class="loading">Loading replot data</div>';
+            
+            try {
+                const response = await fetch('/results/get_replot_data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ replot_path: replotPath })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    card.data = data;
+                    renderCardContent(cardId);
+                } else {
+                    bodyEl.innerHTML = `<div class="no-selection">❌ ${data.error || 'Failed to load data'}</div>`;
+                }
+            } catch (error) {
+                bodyEl.innerHTML = `<div class="no-selection">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        // ========================================
+        // Card Management
+        // ========================================
+        function addComparisonCard() {
+            const cardId = cardIdCounter++;
+            const card = {
+                id: cardId,
+                selectedReplot: null,
+                data: null,
+                showPointwise: globalToggles.pointwise,
+                showInterpolation: globalToggles.interpolation,
+                showVisual: globalToggles.visual,
+                showStats: true
+            };
+            comparisonCards.push(card);
+            
+            const gridEl = document.getElementById('comparisonGrid');
+            const cardHtml = createCardHtml(cardId);
+            
+            // Remove add button if exists, add card, then add button back
+            const addBtn = gridEl.querySelector('.add-card-container');
+            if (addBtn) addBtn.remove();
+            
+            gridEl.insertAdjacentHTML('beforeend', cardHtml);
+            
+            // Add the "add card" button back
+            gridEl.insertAdjacentHTML('beforeend', `
+                <div class="add-card-container" onclick="addComparisonCard()">
+                    <div class="add-card-btn">
+                        <span>➕</span>
+                        <p>Add Comparison</p>
+                    </div>
+                </div>
+            `);
+            
+            updateReplotSelector(cardId);
+        }
+        
+        function removeComparisonCard(cardId) {
+            comparisonCards = comparisonCards.filter(c => c.id !== cardId);
+            const cardEl = document.getElementById(`card-${cardId}`);
+            if (cardEl) cardEl.remove();
+        }
+        
+        function createCardHtml(cardId) {
+            return `
+                <div class="comparison-card" id="card-${cardId}">
+                    <div class="card-header">
+                        <h4>Select a replot...</h4>
+                        <div class="card-actions">
+                            <button class="btn btn-danger remove-card-btn" onclick="removeComparisonCard(${cardId})" title="Remove">×</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="replot-selector">
+                            <select id="selector-${cardId}" onchange="onReplotSelected(${cardId})">
+                                <option value="">-- Select a replot --</option>
+                            </select>
+                        </div>
+                        <div class="no-selection">
+                            📊<br>Select a replot to view comparison
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function updateReplotSelector(cardId) {
+            const selector = document.getElementById(`selector-${cardId}`);
+            if (!selector) return;
+            
+            const card = comparisonCards.find(c => c.id === cardId);
+            const currentValue = card?.selectedReplot || '';
+            
+            let html = '<option value="">-- Select a replot --</option>';
+            
+            // Group by source folder
+            const grouped = {};
+            availableReplots.forEach(replot => {
+                const source = replot.source || 'Other';
+                if (!grouped[source]) grouped[source] = [];
+                grouped[source].push(replot);
+            });
+            
+            Object.keys(grouped).sort().forEach(source => {
+                html += `<optgroup label="${source}">`;
+                grouped[source].forEach(replot => {
+                    const selected = replot.path === currentValue ? 'selected' : '';
+                    html += `<option value="${replot.path}" ${selected}>${replot.display_name}</option>`;
+                });
+                html += '</optgroup>';
+            });
+            
+            selector.innerHTML = html;
+        }
+        
+        function onReplotSelected(cardId) {
+            const selector = document.getElementById(`selector-${cardId}`);
+            const path = selector.value;
+            
+            const card = comparisonCards.find(c => c.id === cardId);
+            if (card) {
+                card.selectedReplot = path;
+                if (path) {
+                    loadReplotData(cardId, path);
+                } else {
+                    const cardEl = document.getElementById(`card-${cardId}`);
+                    const bodyEl = cardEl.querySelector('.card-body');
+                    bodyEl.innerHTML = `
+                        <div class="replot-selector">
+                            <select id="selector-${cardId}" onchange="onReplotSelected(${cardId})">
+                                ${selector.innerHTML}
+                            </select>
+                        </div>
+                        <div class="no-selection">
+                            📊<br>Select a replot to view comparison
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // ========================================
+        // Rendering
+        // ========================================
+        function renderCardContent(cardId) {
+            const card = comparisonCards.find(c => c.id === cardId);
+            if (!card || !card.data) return;
+            
+            const cardEl = document.getElementById(`card-${cardId}`);
+            const bodyEl = cardEl.querySelector('.card-body');
+            const data = card.data;
+            
+            // Update card title with replot name
+            const titleEl = cardEl.querySelector('.card-header h4');
+            if (titleEl && data.replot_name) {
+                // Extract a cleaner name from replot filename
+                const cleanName = data.replot_name.replace('-replot', '').replace('.png', '');
+                titleEl.textContent = cleanName;
+            }
+            
+            let html = `
+                <div class="replot-selector">
+                    <select id="selector-${cardId}" onchange="onReplotSelected(${cardId})">
+                        ${card.selectorHtml || ''}
+                    </select>
+                </div>
+            `;
+            
+            // Main replot image
+            if (data.replot_image) {
+                html += `
+                    <div class="image-container">
+                        <img src="${data.replot_image}" alt="Replot">
+                        <div class="image-label">Replot: ${data.replot_name || 'Unknown'}</div>
+                    </div>
+                `;
+            }
+            
+            // No per-card toggles - using universal controls only
+            
+            // Comparison images
+            html += '<div class="comparison-images">';
+            
+            if (data.pointwise_image) {
+                html += `
+                    <div class="comparison-image-wrapper ${card.showPointwise ? 'visible' : ''}" id="pointwise-${cardId}">
+                        <h5>📊 Pointwise Comparison</h5>
+                        <img src="${data.pointwise_image}" alt="Pointwise Comparison">
+                    </div>
+                `;
+            }
+            
+            if (data.interpolation_image) {
+                html += `
+                    <div class="comparison-image-wrapper ${card.showInterpolation ? 'visible' : ''}" id="interpolation-${cardId}">
+                        <h5>📈 Interpolation Comparison</h5>
+                        <img src="${data.interpolation_image}" alt="Interpolation Comparison">
+                    </div>
+                `;
+            }
+            
+            if (data.visual_image) {
+                html += `
+                    <div class="comparison-image-wrapper ${card.showVisual ? 'visible' : ''}" id="visual-${cardId}">
+                        <h5>🖼️ Visual Comparison</h5>
+                        <img src="${data.visual_image}" alt="Visual Comparison">
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            
+            // Stats
+            if (data.pointwise_stats || data.interpolation_stats) {
+                html += `<div class="stats-container" id="stats-${cardId}">`;
+                html += '<h5>📋 Statistics</h5>';
+                
+                // Pointwise stats
+                if (data.pointwise_stats) {
+                    html += `
+                        <div class="stats-section">
+                            <div class="stats-section-title">📊 Pointwise Stats</div>
+                            ${renderPointwiseStats(data.pointwise_stats)}
+                        </div>
+                    `;
+                }
+                
+                // Interpolation stats
+                if (data.interpolation_stats) {
+                    html += `
+                        <div class="stats-section">
+                            <div class="stats-section-title">📈 Interpolation Stats</div>
+                            ${renderInterpolationStats(data.interpolation_stats)}
+                        </div>
+                    `;
+                }
+                
+                html += '</div>';
+            }
+            
+            bodyEl.innerHTML = html;
+        }
+        
+        function renderPointwiseStats(stats) {
+            if (!stats.curves || stats.curves.length === 0) {
+                return '<p style="color:#6c757d;font-size:12px;">No curve statistics available</p>';
+            }
+            
+            let html = '';
+            stats.curves.forEach(curve => {
+                const maeClass = getStatClass(curve.mae_y_percent, 5, 15);
+                const precisionClass = getStatClass(curve.precision * 100, 80, 60, true);
+                const recallClass = getStatClass(curve.recall * 100, 80, 60, true);
+                
+                html += `
+                    <div style="margin-bottom:8px;padding:8px;background:white;border-radius:3px;border:1px solid #e9ecef;">
+                        <div style="font-weight:500;margin-bottom:4px;font-size:11px;color:#495057;">
+                            ${curve.extracted_name || 'Unknown'} → ${curve.original_name || 'Unknown'}
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-label">MAE X%</div>
+                                <div class="stat-value">${curve.mae_x_percent?.toFixed(2) || 'N/A'}%</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">MAE Y%</div>
+                                <div class="stat-value ${maeClass}">${curve.mae_y_percent?.toFixed(2) || 'N/A'}%</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Precision</div>
+                                <div class="stat-value ${precisionClass}">${(curve.precision * 100)?.toFixed(1) || 'N/A'}%</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Recall</div>
+                                <div class="stat-value ${recallClass}">${(curve.recall * 100)?.toFixed(1) || 'N/A'}%</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            return html;
+        }
+        
+        function renderInterpolationStats(stats) {
+            if (!stats.curves || stats.curves.length === 0) {
+                return '<p style="color:#6c757d;font-size:12px;">No curve statistics available</p>';
+            }
+            
+            let html = '';
+            stats.curves.forEach(curve => {
+                const maeClass = getStatClass(curve.mae, 0.1, 0.5);
+                
+                html += `
+                    <div style="margin-bottom:8px;padding:8px;background:white;border-radius:3px;border:1px solid #e9ecef;">
+                        <div style="font-weight:500;margin-bottom:4px;font-size:11px;color:#495057;">
+                            ${curve.extracted_name || 'Unknown'} → ${curve.original_name || 'Unknown'}
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-label">MAE</div>
+                                <div class="stat-value ${maeClass}">${curve.mae?.toFixed(4) || 'N/A'}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Left Missed</div>
+                                <div class="stat-value">${(curve.left_missed * 100)?.toFixed(1) || '0'}%</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Right Missed</div>
+                                <div class="stat-value">${(curve.right_missed * 100)?.toFixed(1) || '0'}%</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            return html;
+        }
+        
+        function getStatClass(value, goodThreshold, badThreshold, higherIsBetter = false) {
+            if (value === undefined || value === null) return '';
+            if (higherIsBetter) {
+                if (value >= goodThreshold) return 'stat-good';
+                if (value >= badThreshold) return 'stat-medium';
+                return 'stat-bad';
+            } else {
+                if (value <= goodThreshold) return 'stat-good';
+                if (value <= badThreshold) return 'stat-medium';
+                return 'stat-bad';
+            }
+        }
+        
+        // ========================================
+        // Toggle Functions
+        // ========================================
+        function toggleAllComparisons(type) {
+            globalToggles[type] = !globalToggles[type];
+            
+            // Update button state
+            const btn = document.getElementById(`toggleAll${type.charAt(0).toUpperCase() + type.slice(1)}`);
+            if (btn) {
+                btn.classList.toggle('active', globalToggles[type]);
+            }
+            
+            // Apply to all cards
+            comparisonCards.forEach(card => {
+                if (type === 'pointwise') {
+                    card.showPointwise = globalToggles[type];
+                } else if (type === 'interpolation') {
+                    card.showInterpolation = globalToggles[type];
+                } else if (type === 'visual') {
+                    card.showVisual = globalToggles[type];
+                }
+                
+                if (card.data) {
+                    renderCardContent(card.id);
+                }
+            });
+        }
+        
+        let statsVisible = true;
+        
+        function toggleAllStats() {
+            statsVisible = !statsVisible;
+            
+            // Update button state
+            const btn = document.getElementById('toggleAllStats');
+            if (btn) {
+                btn.classList.toggle('active', statsVisible);
+            }
+            
+            // Toggle all stats containers
+            document.querySelectorAll('.stats-container').forEach(el => {
+                el.style.display = statsVisible ? 'block' : 'none';
+            });
+        }
+        
+        // ========================================
+        // Source Filter
+        // ========================================
+        document.getElementById('sourceFilter').addEventListener('change', function() {
+            loadAvailableReplots();
+        });
+    </script>
+</body>
+</html>
