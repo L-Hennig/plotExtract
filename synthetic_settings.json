@@ -1,6 +1,6 @@
 {
   "num_curves": 1,
-  "num_points": 8,
+  "num_points": 18,
   "x_values_mode": "auto",
   "x_values_manual": "0, 2, 4, 6, 8, 12, 18, 24",
   "x_spacing": 2,

@@ -1,105 +1,105 @@
 {
   "success": true,
-  "console": "============================================================\nSTEP 1: Running Plot Extraction\n============================================================\nImage: synthetic/BR/BR.png\nPrompt: prompt_3.py\n\nInput plot: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR/BR.png\nUsing prompt: p3\nOutput folder: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR\\BR_png.p3.v1 (version 1)\nExtracting data... FINISHED\nGenerating replot code... FINISHED\nReplotting with extracted data... FINISHED\nComparing source and replot... \n\nAxis x (result: Yes)\nAxis y (result: Yes)\nPoints n (result: Yes)\nTrends (result: Yes)\n\nFINISHED (result: yes)\nStacking original and replotted images for comparison... FINISHED\nVERSION_DIR:C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR\\BR_png.p3.v1\n\n\n\n\n\n[SUCCESS] Extraction completed!\n[TIME] Extraction took 31.44 seconds\n\n============================================================\nSTEP 2: Running Interpolation\n============================================================\nOriginal: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR\\BR-original.csv\nExtracted: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR\\BR_png.p3.v1\\BR.png.p3.v1.mistral.out_data\nOutput dir: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR\\BR_png.p3.v1\nAxis range: X=[0, 34], Y=[5.0093, 12.799]\n\nLoading original CSV: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR\\BR-original.csv\n  Found 1 curve(s): ['Condition 1']\nLoading extracted CSV: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR\\BR_png.p3.v1\\BR.png.p3.v1.mistral.out_data\n  Found 1 curve(s): ['Bacteria Count (CFU/mL) (Condition 1)']\nMatching curves using LLM... DONE\nCurve mapping: {'Condition 1': 'Bacteria Count (CFU/mL) (Condition 1)'}\nComparing 'Condition 1' vs 'Bacteria Count (CFU/mL) (Condition 1)'... MAE = 0.141157\nSaved figure: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR\\BR_png.p3.v1\\interpolated_BR-original.csv_VS_BR.png.p3.v1.mistral.out_data.png\nSaved statistics: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR\\BR_png.p3.v1\\interpolated_BR-original.csv_VS_BR.png.p3.v1.mistral.out_data.stats\n\nMean MAE across all curves: 0.141157\n\n\n[SUCCESS] Interpolation completed!\n[TIME] Interpolation took 5.55 seconds\n\n============================================================\nSTEP 3: Running Pointwise Comparison\n============================================================\nExtracted: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR\\BR_png.p3.v1\\BR.png.p3.v1.mistral.out_data\nOriginal: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR\\BR-original.csv\nOutput dir: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR\\BR_png.p3.v1\nAxis range: X=[0, 34], Y=[5.0093, 12.799]\n\nLoading extracted CSV: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR\\BR_png.p3.v1\\BR.png.p3.v1.mistral.out_data\n  Found 1 curve(s): ['Bacteria Count (CFU/mL) (Condition 1)']\nLoading original CSV: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR\\BR-original.csv\n  Found 1 curve(s): ['Condition 1']\nMatching curves using LLM... DONE\nCurve mapping: {'Condition 1': 'Bacteria Count (CFU/mL) (Condition 1)'}\nProcessing 'Condition 1' vs 'Bacteria Count (CFU/mL) (Condition 1)'... MAE X=3.31%, MAE Y=4.69%, Prec=0.52, Rec=0.89\nSaved figure: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR\\BR_png.p3.v1\\pointwise_BR.png.p3.v1.mistral_VS_BR-original.png\nSaved statistics: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR\\BR_png.p3.v1\\pointwise_BR.png.p3.v1.mistral_VS_BR-original.stats\n\nMean MAE X: 3.31%\nMean MAE Y: 4.69%\nMean Precision: 0.5161\nMean Recall: 0.8889\n\n\n[SUCCESS] Pointwise comparison completed!\n[TIME] Pointwise took 6.10 seconds\n\n============================================================\nALL TASKS COMPLETED\nTotal time: 43.10 seconds\n============================================================",
+  "console": "============================================================\nSTEP 1: Running Plot Extraction\n============================================================\nImage: synthetic/BX/BX.png\nPrompt: prompt_3.py\n\nInput plot: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX/BX.png\nUsing prompt: p3\nOutput folder: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX\\BX_png.p3.v1 (version 1)\nExtracting data... FINISHED\nGenerating replot code... FINISHED\nReplotting with extracted data... FINISHED\nComparing source and replot... \n\nAxis x (result: Yes)\nAxis y (result: Yes)\nPoints n (result: Yes)\nTrends (result: Yes)\n\nFINISHED (result: yes)\nStacking original and replotted images for comparison... FINISHED\nVERSION_DIR:C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX\\BX_png.p3.v1\n\n\n\n\n\n[SUCCESS] Extraction completed!\n[TIME] Extraction took 34.58 seconds\n\n============================================================\nSTEP 2: Running Interpolation\n============================================================\nOriginal: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX\\BX-original.csv\nExtracted: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX\\BX_png.p3.v1\\BX.png.p3.v1.mistral.out_data\nOutput dir: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX\\BX_png.p3.v1\nAxis range: X=[0, 34], Y=[4.8242, 13.455]\n\nLoading original CSV: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX\\BX-original.csv\n  Found 1 curve(s): ['Condition 1']\nLoading extracted CSV: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX\\BX_png.p3.v1\\BX.png.p3.v1.mistral.out_data\n  Found 1 curve(s): ['Bacteria Count (CFU/mL) (Condition 1)']\nMatching curves using LLM... DONE\nCurve mapping: {'Condition 1': 'Bacteria Count (CFU/mL) (Condition 1)'}\nComparing 'Condition 1' vs 'Bacteria Count (CFU/mL) (Condition 1)'... MAE = 0.115274\nSaved figure: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX\\BX_png.p3.v1\\interpolated_BX-original.csv_VS_BX.png.p3.v1.mistral.out_data.png\nSaved statistics: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX\\BX_png.p3.v1\\interpolated_BX-original.csv_VS_BX.png.p3.v1.mistral.out_data.stats\n\nMean MAE across all curves: 0.115274\n\n\n[SUCCESS] Interpolation completed!\n[TIME] Interpolation took 5.64 seconds\n\n============================================================\nSTEP 3: Running Pointwise Comparison\n============================================================\nExtracted: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX\\BX_png.p3.v1\\BX.png.p3.v1.mistral.out_data\nOriginal: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX\\BX-original.csv\nOutput dir: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX\\BX_png.p3.v1\nAxis range: X=[0, 34], Y=[4.8242, 13.455]\n\nLoading extracted CSV: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX\\BX_png.p3.v1\\BX.png.p3.v1.mistral.out_data\n  Found 1 curve(s): ['Bacteria Count (CFU/mL) (Condition 1)']\nLoading original CSV: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX\\BX-original.csv\n  Found 1 curve(s): ['Condition 1']\nMatching curves using LLM... DONE\nCurve mapping: {'Condition 1': 'Bacteria Count (CFU/mL) (Condition 1)'}\nProcessing 'Condition 1' vs 'Bacteria Count (CFU/mL) (Condition 1)'... MAE X=4.67%, MAE Y=3.17%, Prec=0.55, Rec=0.94\nSaved figure: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX\\BX_png.p3.v1\\pointwise_BX.png.p3.v1.mistral_VS_BX-original.png\nSaved statistics: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX\\BX_png.p3.v1\\pointwise_BX.png.p3.v1.mistral_VS_BX-original.stats\n\nMean MAE X: 4.67%\nMean MAE Y: 3.17%\nMean Precision: 0.5484\nMean Recall: 0.9444\n\n\n[SUCCESS] Pointwise comparison completed!\n[TIME] Pointwise took 5.53 seconds\n\n============================================================\nALL TASKS COMPLETED\nTotal time: 45.75 seconds\n============================================================",
   "outputs": {
     "images": [
       {
-        "path": "synthetic/BR/BR.png",
+        "path": "synthetic/BX/BX.png",
         "label": "Original Input",
-        "filename": "BR.png"
+        "filename": "BX.png"
       },
       {
-        "path": "synthetic/BR/BR_png.p3.v1/BR_png-replot.p3.v1.png",
-        "label": "Extracted Replot (BR_png.p3.v1)",
-        "filename": "BR_png-replot.p3.v1.png"
+        "path": "synthetic/BX/BX_png.p3.v1/BX_png-replot.p3.v1.png",
+        "label": "Extracted Replot (BX_png.p3.v1)",
+        "filename": "BX_png-replot.p3.v1.png"
       },
       {
-        "path": "synthetic/BR/BR_png.p3.v1/comparison_BR.p3.v1.png",
-        "label": "Comparison (BR_png.p3.v1)",
-        "filename": "comparison_BR.p3.v1.png"
+        "path": "synthetic/BX/BX_png.p3.v1/comparison_BX.p3.v1.png",
+        "label": "Comparison (BX_png.p3.v1)",
+        "filename": "comparison_BX.p3.v1.png"
       },
       {
-        "path": "synthetic/BR/BR_png.p3.v1/interpolated_BR-original.csv_VS_BR.png.p3.v1.mistral.out_data.png",
-        "label": "Interpolation (BR_png.p3.v1)",
-        "filename": "interpolated_BR-original.csv_VS_BR.png.p3.v1.mistral.out_data.png"
+        "path": "synthetic/BX/BX_png.p3.v1/interpolated_BX-original.csv_VS_BX.png.p3.v1.mistral.out_data.png",
+        "label": "Interpolation (BX_png.p3.v1)",
+        "filename": "interpolated_BX-original.csv_VS_BX.png.p3.v1.mistral.out_data.png"
       },
       {
-        "path": "synthetic/BR/BR_png.p3.v1/pointwise_BR.png.p3.v1.mistral_VS_BR-original.png",
-        "label": "Pointwise (BR_png.p3.v1)",
-        "filename": "pointwise_BR.png.p3.v1.mistral_VS_BR-original.png"
+        "path": "synthetic/BX/BX_png.p3.v1/pointwise_BX.png.p3.v1.mistral_VS_BX-original.png",
+        "label": "Pointwise (BX_png.p3.v1)",
+        "filename": "pointwise_BX.png.p3.v1.mistral_VS_BX-original.png"
       }
     ],
     "stats": [
       {
-        "path": "synthetic/BR/BR_png.p3.v1/interpolated_BR-original.csv_VS_BR.png.p3.v1.mistral.out_data.stats",
-        "label": "Interpolation Stats (BR_png.p3.v1)",
-        "filename": "interpolated_BR-original.csv_VS_BR.png.p3.v1.mistral.out_data.stats"
+        "path": "synthetic/BX/BX_png.p3.v1/interpolated_BX-original.csv_VS_BX.png.p3.v1.mistral.out_data.stats",
+        "label": "Interpolation Stats (BX_png.p3.v1)",
+        "filename": "interpolated_BX-original.csv_VS_BX.png.p3.v1.mistral.out_data.stats"
       },
       {
-        "path": "synthetic/BR/BR_png.p3.v1/pointwise_BR.png.p3.v1.mistral_VS_BR-original.stats",
-        "label": "Pointwise Stats (BR_png.p3.v1)",
-        "filename": "pointwise_BR.png.p3.v1.mistral_VS_BR-original.stats"
+        "path": "synthetic/BX/BX_png.p3.v1/pointwise_BX.png.p3.v1.mistral_VS_BX-original.stats",
+        "label": "Pointwise Stats (BX_png.p3.v1)",
+        "filename": "pointwise_BX.png.p3.v1.mistral_VS_BX-original.stats"
       }
     ],
     "data": [
       {
-        "path": "synthetic/BR/BR-original.csv",
+        "path": "synthetic/BX/BX-original.csv",
         "label": "Original Data",
-        "filename": "BR-original.csv"
+        "filename": "BX-original.csv"
       },
       {
-        "path": "synthetic/BR/BR_png.p3.v1/BR.png.p3.v1.mistral.out_data",
-        "label": "Extracted Data (BR_png.p3.v1)",
-        "filename": "BR.png.p3.v1.mistral.out_data"
+        "path": "synthetic/BX/BX_png.p3.v1/BX.png.p3.v1.mistral.out_data",
+        "label": "Extracted Data (BX_png.p3.v1)",
+        "filename": "BX.png.p3.v1.mistral.out_data"
       }
     ],
     "other": [
       {
-        "path": "synthetic/BR/BR_png.p3.v1/BR.png.p3.v1.mistral.out_code",
-        "filename": "BR.png.p3.v1.mistral.out_code",
-        "version": "BR_png.p3.v1"
+        "path": "synthetic/BX/BX_png.p3.v1/BX.png.p3.v1.mistral.out_code",
+        "filename": "BX.png.p3.v1.mistral.out_code",
+        "version": "BX_png.p3.v1"
       },
       {
-        "path": "synthetic/BR/BR_png.p3.v1/BR.png.p3.v1.mistral.out_conversation",
-        "filename": "BR.png.p3.v1.mistral.out_conversation",
-        "version": "BR_png.p3.v1"
+        "path": "synthetic/BX/BX_png.p3.v1/BX.png.p3.v1.mistral.out_conversation",
+        "filename": "BX.png.p3.v1.mistral.out_conversation",
+        "version": "BX_png.p3.v1"
       },
       {
-        "path": "synthetic/BR/BR_png.p3.v1/BR.png.p3.v1.mistral.out_validate",
-        "filename": "BR.png.p3.v1.mistral.out_validate",
-        "version": "BR_png.p3.v1"
+        "path": "synthetic/BX/BX_png.p3.v1/BX.png.p3.v1.mistral.out_validate",
+        "filename": "BX.png.p3.v1.mistral.out_validate",
+        "version": "BX_png.p3.v1"
       }
     ],
     "summary": {
       "validation_result": "Yes",
       "validation_reason": "N/A",
-      "interpolation_mae": 0.141157,
-      "pointwise_mae_x": "3.31%",
-      "pointwise_mae_y": "4.69%",
-      "precision": "51.6%",
-      "recall": "88.9%"
+      "interpolation_mae": 0.115274,
+      "pointwise_mae_x": "4.67%",
+      "pointwise_mae_y": "3.17%",
+      "precision": "54.8%",
+      "recall": "94.4%"
     }
   },
   "csv_status": {
     "original": {
-      "path": "synthetic/BR\\BR-original.csv",
+      "path": "synthetic/BX\\BX-original.csv",
       "exists": true
     },
     "extracted": {
-      "path": "synthetic/BR/BR_png.p3.v1/BR.png.p3.v1.mistral.out_data",
+      "path": "synthetic/BX/BX_png.p3.v1/BX.png.p3.v1.mistral.out_data",
       "exists": true
     },
-    "base_name": "BR",
-    "image_dir": "synthetic/BR"
+    "base_name": "BX",
+    "image_dir": "synthetic/BX"
   },
-  "version_dir": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BR\\BR_png.p3.v1",
+  "version_dir": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/BX\\BX_png.p3.v1",
   "timings": {
-    "extraction": 31.440409421920776,
-    "interpolation": 5.552481412887573,
-    "pointwise": 6.100451231002808,
-    "total": 43.09647464752197
+    "extraction": 34.58093452453613,
+    "interpolation": 5.640415191650391,
+    "pointwise": 5.526899814605713,
+    "total": 45.750303506851196
   },
-  "completed_at": 1765937573.6512692,
-  "image_path": "synthetic/BR/BR.png",
+  "completed_at": 1765938607.2869406,
+  "image_path": "synthetic/BX/BX.png",
   "prompt_file": "prompt_3.py"
 }

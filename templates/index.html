@@ -726,7 +726,7 @@
                         </div>
                         <div class="form-group">
                             <label for="batchPromptSelect">Select Prompt (applies to all images):</label>
-                            <select id="batchPromptSelect">
+                            <select id="batchPromptSelect" onchange="onBatchPromptSelect()">
                                 {% for prompt in prompts %}
                                 <option value="{{ prompt }}">{{ prompt }}</option>
                                 {% endfor %}
@@ -948,10 +948,19 @@
             
             // Restore last used prompt if it exists in the dropdown
             if (savedPrompt !== null) {
+                // Single mode prompt select
                 const promptSelect = document.getElementById('promptSelect');
                 for (let option of promptSelect.options) {
                     if (option.value === savedPrompt) {
                         promptSelect.value = savedPrompt;
+                        break;
+                    }
+                }
+                // Batch mode prompt select
+                const batchPromptSelect = document.getElementById('batchPromptSelect');
+                for (let option of batchPromptSelect.options) {
+                    if (option.value === savedPrompt) {
+                        batchPromptSelect.value = savedPrompt;
                         break;
                     }
                 }
@@ -981,7 +990,18 @@
         }
         
         function onPromptSelect() {
+            const promptFile = document.getElementById('promptSelect').value;
+            // Save prompt selection and sync with batch dropdown
+            localStorage.setItem('lastPrompt', promptFile);
+            document.getElementById('batchPromptSelect').value = promptFile;
             updateCsvInfo();
+        }
+        
+        function onBatchPromptSelect() {
+            const promptFile = document.getElementById('batchPromptSelect').value;
+            // Save prompt selection and sync with single mode dropdown
+            localStorage.setItem('lastPrompt', promptFile);
+            document.getElementById('promptSelect').value = promptFile;
         }
         
         function updateCsvInfo() {
@@ -1473,11 +1493,12 @@
             const bottomY = parseFloat(document.getElementById('bottomY').value) || 0;
             const topY = parseFloat(document.getElementById('topY').value) || 100;
             
-            // Save axis values
+            // Save axis values and prompt
             localStorage.setItem('axisLeftX', leftX);
             localStorage.setItem('axisRightX', rightX);
             localStorage.setItem('axisBottomY', bottomY);
             localStorage.setItem('axisTopY', topY);
+            localStorage.setItem('lastPrompt', promptFile);
             
             // Initialize batch state
             batchQueue = batchImages.map(img => ({
