@@ -1,0 +1,31 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+
+data = {
+    "Time (hours)": [0, 3, 6, 9, 12, 15, 21],
+    "Bacteria Count (CFU/mL) (Condition 1)": [4, 5, 6, 5.5, 4.5, 3, 3.2],
+    "Bacteria Count (CFU/mL) (Condition 2)": [6, 6.5, 6, 5, 4, 4, 3],
+    "Bacteria Count (CFU/mL) (Condition 3)": [6.5, 7, 7.5, 7.5, 7.5, 7.8, 8.2]
+}
+
+df = pd.DataFrame(data)
+
+plt.figure(figsize=(8, 6))
+plt.plot(df["Time (hours)"], df["Bacteria Count (CFU/mL) (Condition 1)"], marker='o', color='#1f77b4', label='Condition 1')
+plt.plot(df["Time (hours)"], df["Bacteria Count (CFU/mL) (Condition 2)"], marker='o', color='#ff7f0e', label='Condition 2')
+plt.plot(df["Time (hours)"], df["Bacteria Count (CFU/mL) (Condition 3)"], marker='o', color='#2ca02c', label='Condition 3')
+
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacteria Count (CFU/mL)')
+plt.xlim(0, 22)
+plt.ylim(0, 9)
+plt.xticks([0, 3, 6, 9, 12, 15, 18, 21])
+plt.yticks([0, 2, 4, 6, 8])
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.6)
+
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\CM\CM_png.p3.v1"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "CM_png-replot.p3.v1.png"))
+plt.close()

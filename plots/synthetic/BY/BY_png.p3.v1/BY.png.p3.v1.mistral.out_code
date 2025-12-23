@@ -1,0 +1,29 @@
+import matplotlib.pyplot as plt
+import os
+
+# Data
+time = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+condition1 = [6, 8, 9, 10, 11, 11.5, 12, 12.2, 12, 12.5, 13, 12.5, 12, 13, 13.5, 12.5, 12, 11, 10.5, 11, 12.5]
+condition2 = [5.5, 5.8, 5.6, 5.3, 5, 4.8, 4.5, 4.2, 4, 3.8, 3.6, 3.5, 3.4, 3.3, 3.2, 3.1, 3, 2.9, 2.8, 2.9, 3.2]
+condition3 = [6, 6.5, 6.7, 7, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.8, 7.9, 7.9, 8, 8, 8, 8, 8, 8.1]
+
+# Plot
+plt.figure(figsize=(8, 6))
+plt.plot(time, condition1, marker='o', linestyle='-', color='#1f77b4', label='Condition 1')
+plt.plot(time, condition2, marker='o', linestyle='-', color='#ff7f0e', label='Condition 2')
+plt.plot(time, condition3, marker='o', linestyle='-', color='#2ca02c', label='Condition 3')
+
+# Axis labels and title
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacteria Count (CFU/mL)')
+plt.ylim(0, 14)
+plt.xlim(0, 20)
+
+# Legend
+plt.legend()
+
+# Save plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\BY\BY_png.p3.v1"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "BY_png-replot.p3.v1.png"), dpi=300, bbox_inches='tight')
+plt.close()

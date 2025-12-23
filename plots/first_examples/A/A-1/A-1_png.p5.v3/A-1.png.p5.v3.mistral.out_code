@@ -1,0 +1,73 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
+# Data preparation
+data = {
+    'Time_Blank': [0, 2, 4, 6, 8, 10, 24, 26],
+    'Blank': [6.0, 9.0, 10.0, 9.5, 10.0, 10.0, 9.5, 10.0],
+    'Time_COL': [0, 2, 4, 6, 8, 10, 24],
+    'COL_0.125': [6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'Time_MINO': [0, 2, 4, 6, 8, 10, 24],
+    'MINO_1': [6.0, 8.0, 8.5, 9.0, 9.5, 10.0, 9.0],
+    'Time_COL_MEM': [0, 2, 4, 6, 8, 10, 24],
+    'COL_MEM': [6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'Time_COL_MINO': [0, 2, 4, 6, 8, 10, 24],
+    'COL_MINO': [6.0, 7.0, 8.0, 8.5, 9.0, 9.0, 8.0],
+    'Time_COL_RFP': [0, 2, 4, 6, 8, 10, 12, 24],
+    'COL_RFP': [6.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 0.0],
+    'Time_MEM': [0, 2, 4, 6, 8, 10, 24],
+    'MEM_4': [6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'Time_RFP': [0, 2, 4, 6, 8, 10, 24],
+    'RFP_0.06': [6.0, 2.0, 1.0, 1.5, 2.0, 1.0, 0.0]
+}
+
+# Plot setup
+plt.figure(figsize=(8, 6))
+plt.rcParams['font.family'] = 'Arial'
+plt.rcParams['font.size'] = 12
+
+# Define line styles, markers, and colors
+curve_styles = [
+    {'label': 'Blank', 'color': 'black', 'linestyle': ':', 'marker': 'x', 'markersize': 6},
+    {'label': 'COL 0.125µg/mL', 'color': 'black', 'linestyle': '-', 'marker': 's', 'markersize': 6},
+    {'label': 'MINO 1µg/mL', 'color': 'black', 'linestyle': '--', 'marker': '^', 'markersize': 6},
+    {'label': 'COL 0.125µg/mL + MEM 4µg/mL', 'color': 'black', 'linestyle': '-.', 'marker': 'o', 'markersize': 6},
+    {'label': 'COL 0.125µg/mL + MINO 1µg/mL', 'color': 'black', 'linestyle': '--', 'marker': 'D', 'markersize': 6},
+    {'label': 'COL 0.125µg/mL + RFP 0.06µg/mL', 'color': 'black', 'linestyle': ':', 'marker': 'v', 'markersize': 6},
+    {'label': 'MEM 4µg/mL', 'color': 'black', 'linestyle': '-.', 'marker': 'o', 'fillstyle': 'none', 'markersize': 6},
+    {'label': 'RFP 0.06µg/mL', 'color': 'black', 'linestyle': '--', 'marker': '>', 'markersize': 6}
+]
+
+# Plot each curve
+plt.plot(data['Time_Blank'], data['Blank'], **curve_styles[0])
+plt.plot(data['Time_COL'], data['COL_0.125'], **curve_styles[1])
+plt.plot(data['Time_MINO'], data['MINO_1'], **curve_styles[2])
+plt.plot(data['Time_COL_MEM'], data['COL_MEM'], **{**curve_styles[3], 'markerfacecolor': 'none'})
+plt.plot(data['Time_COL_MINO'], data['COL_MINO'], **curve_styles[4])
+plt.plot(data['Time_COL_RFP'], data['COL_RFP'], **curve_styles[5])
+plt.plot(data['Time_MEM'], data['MEM_4'], **{**curve_styles[6], 'markerfacecolor': 'none'})
+plt.plot(data['Time_RFP'], data['RFP_0.06'], **curve_styles[7])
+
+# Axis setup
+plt.xlim(0, 26)
+plt.ylim(0, 16)
+plt.xlabel('Time (h)')
+plt.ylabel('Log cfu/mL')
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 22, 24, 26])
+plt.yticks([0, 2, 4, 6, 8, 10, 12, 14, 16])
+
+# Add axis break
+plt.axvline(x=11, ymin=0.05, ymax=0.95, color='black', linestyle='-', linewidth=1)
+plt.axvline(x=13, ymin=0.05, ymax=0.95, color='black', linestyle='-', linewidth=1)
+d = 0.015
+kwargs = dict(transform=plt.gca().transAxes, color='k', clip_on=False)
+plt.plot((1-d, 1+d), (0.05-d, 0.05+d), **kwargs)
+plt.plot((1-d, 1+d), (0.95-d, 0.95+d), **kwargs)
+
+# Add legend
+plt.legend(loc='upper left', bbox_to_anchor=(0.0, 1.0), frameon=False)
+
+# Save plot
+plt.savefig(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\first_examples\A\A-1\A-1_png.p5.v3\A-1_png-replot.p5.v3.png", dpi=300, bbox_inches='tight')
+plt.close()

@@ -1,0 +1,46 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+# Data preparation
+data = {
+    'Time_C1': [0, 2, 4, 6, 8, 10],
+    'CFU_C1': [6.0, 5.5, 5.0, 4.8, 4.7, 5.0],
+    'Time_C2': [0, 2, 4, 6, 8, 10, 12, 16, 20],
+    'CFU_C2': [6.0, 5.5, 5.0, 4.8, 4.5, 4.0, 3.8, 3.5, 3.0],
+    'Time_C3': [0, 2, 4, 6, 8, 10, 12, 16, 20],
+    'CFU_C3': [6.5, 6.7, 7.0, 7.2, 7.5, 7.7, 7.8, 8.0, 8.0],
+    'Time_C4': [0, 2, 4, 6, 8, 10, 12, 16, 20, 24],
+    'CFU_C4': [6.0, 5.0, 4.5, 4.0, 3.8, 3.7, 3.8, 3.9, 4.0, 3.8],
+    'Time_C5': [0, 2, 4, 6, 8, 10, 12, 16, 20],
+    'CFU_C5': [6.5, 6.5, 6.5, 6.7, 6.6, 6.5, 6.3, 6.0, 5.5]
+}
+
+# Plot settings
+plt.figure(figsize=(8, 6))
+colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
+markers = ['o', 'o', 'o', 'o', 'o']
+linestyles = ['-', '-', '-', '-', '-']
+labels = ['Condition 1', 'Condition 2', 'Condition 3', 'Condition 4', 'Condition 5']
+
+# Plotting each condition
+for i, (time_key, cfu_key) in enumerate(zip(['Time_C1', 'Time_C2', 'Time_C3', 'Time_C4', 'Time_C5'],
+                                            ['CFU_C1', 'CFU_C2', 'CFU_C3', 'CFU_C4', 'CFU_C5'])):
+    plt.plot(data[time_key], data[cfu_key], color=colors[i], linestyle=linestyles[i],
+             marker=markers[i], markersize=8, label=labels[i], linewidth=2)
+
+# Axis settings
+plt.xlabel('Time (hours)', fontsize=12)
+plt.ylabel('Bacteria Count (CFU/mL)', fontsize=12)
+plt.xticks(np.arange(0, 25, 2), fontsize=10)
+plt.yticks(np.arange(0, 9, 1), fontsize=10)
+plt.xlim(0, 24)
+plt.ylim(0, 8.5)
+plt.grid(True, linestyle='--', alpha=0.6)
+
+# Legend
+plt.legend(loc='upper right', fontsize=10)
+
+# Save the plot
+plt.savefig(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\CI\CI_png.p5.v2\CI_png-replot.p5.v2.png", dpi=300, bbox_inches='tight')
+plt.close()

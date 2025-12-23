@@ -1,0 +1,31 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+
+data = {
+    "Time (hours)": [0, 3, 6, 9, 12, 15, 21],
+    "Bacteria Count (CFU/mL) (Condition 1)": [6, 5.2, 4.5, 4.1, 3.8, 3.5, 2.8],
+    "Bacteria Count (CFU/mL) (Condition 2)": [6, 6.3, 6.1, 6.2, 6, 5.9, 6.1],
+    "Bacteria Count (CFU/mL) (Condition 3)": [6, 7.3, 7.5, 7.6, 7.8, 7.9, 8]
+}
+
+df = pd.DataFrame(data)
+
+plt.figure(figsize=(8, 6))
+plt.plot(df["Time (hours)"], df["Bacteria Count (CFU/mL) (Condition 1)"], marker='o', linestyle='-', color='black', label='Condition 1')
+plt.plot(df["Time (hours)"], df["Bacteria Count (CFU/mL) (Condition 2)"], marker='s', linestyle='-', color='gray', label='Condition 2')
+plt.plot(df["Time (hours)"], df["Bacteria Count (CFU/mL) (Condition 3)"], marker='*', linestyle='-', color='black', markersize=10, label='Condition 3')
+
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacteria Count (CFU/mL)')
+plt.ylim(0, 8.5)
+plt.xlim(0, 22)
+plt.xticks([0, 3, 6, 9, 12, 15, 18, 21])
+plt.yticks([0, 2, 4, 6, 8])
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.legend()
+
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\CP\CP_png.p3.v1"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "CP_png-replot.p3.v1.png"))
+plt.close()

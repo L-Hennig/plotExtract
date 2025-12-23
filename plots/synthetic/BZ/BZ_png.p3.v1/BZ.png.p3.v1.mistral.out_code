@@ -1,0 +1,26 @@
+import matplotlib.pyplot as plt
+
+# Data
+time_hours = [0, 2, 4, 6, 8, 10, 12, 14]
+bacteria_count = [6.0, 5.2, 8.6, 4.8, 5.8, 5.4, 5.6, 6.2]
+
+# Plot settings
+plt.figure(figsize=(6, 4))
+plt.plot(time_hours, bacteria_count, marker='o', linestyle='-', color='#1f77b4', label='Condition 1')
+
+# Axis labels and ranges
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacteria Count (CFU/mL)')
+plt.xlim(0, 14)
+plt.ylim(0, 9)
+
+# Tick marks
+plt.xticks(range(0, 15, 2))
+plt.yticks(range(0, 10, 2))
+
+# Legend
+plt.legend(loc='upper right', frameon=True)
+
+# Save the plot
+plt.savefig(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\BZ\BZ_png.p3.v1\BZ_png-replot.p3.v1.png", bbox_inches='tight', dpi=300)
+plt.close()

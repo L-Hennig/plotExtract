@@ -1,0 +1,31 @@
+import matplotlib.pyplot as plt
+import os
+
+# Data
+time = [0, 2, 4, 6, 8, 12, 16, 20, 24]
+cfu = [6.7, 6.0, 4.6, 4.5, 3.4, 5.6, 5.0, 2.7, 2.3]
+
+# Create plot
+plt.figure(figsize=(6, 4))
+plt.plot(time, cfu, color='black', linestyle='-', marker='o', markerfacecolor='black', markeredgecolor='black', markersize=6)
+
+# Axis labels and limits
+plt.xlabel('Time (hours)', fontsize=12)
+plt.ylabel('Bacteria Count (CFU/mL)', fontsize=12)
+plt.xlim(0, 24)
+plt.ylim(0, 7)
+
+# Tick marks
+plt.xticks([0, 5, 10, 15, 20])
+plt.yticks([0, 2, 4, 6])
+
+# Grid and layout
+plt.grid(False)
+plt.tight_layout()
+
+# Save plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\CE\CE_png.p5.v2"
+os.makedirs(output_dir, exist_ok=True)
+output_path = os.path.join(output_dir, "CE_png-replot.p5.v2.png")
+plt.savefig(output_path, dpi=300, bbox_inches='tight')
+plt.close()

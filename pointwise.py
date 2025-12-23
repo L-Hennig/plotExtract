@@ -6,6 +6,12 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import io
+
+# Configure stdout/stderr to use UTF-8 encoding on Windows
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 # Import Mistral for LLM-based curve matching
 from mistralai import Mistral
@@ -33,7 +39,11 @@ def load_multi_curve_csv(filepath):
     Load a CSV with multiple curves (pairs of x,y columns).
     Returns a dict: {curve_label: {'data': DataFrame, 'x_label': str, 'y_label': str, 'coords': list}}
     """
-    df = pd.read_csv(filepath, encoding='latin1')
+    # Try UTF-8 first (for extracted CSVs), fall back to latin1 if needed
+    try:
+        df = pd.read_csv(filepath, encoding='utf-8')
+    except UnicodeDecodeError:
+        df = pd.read_csv(filepath, encoding='latin1')
     headers = df.columns.tolist()
     
     curves = {}
@@ -480,7 +490,7 @@ def main():
     print(f"Saved figure: {output_base}.png")
 
     # 7. Save statistics
-    with open(f"{output_base}.stats", 'w') as f:
+    with open(f"{output_base}.stats", 'w', encoding='utf-8') as f:
         f.write("# Per-curve statistics\n")
         for orig_label, result in results.items():
             f.write(f"\nCurve '{orig_label}' -> '{result['extr_label']}':\n")

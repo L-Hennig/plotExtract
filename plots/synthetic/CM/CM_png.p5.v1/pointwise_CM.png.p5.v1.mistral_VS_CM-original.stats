@@ -1,0 +1,36 @@
+# Per-curve statistics
+
+Curve 'Condition 1' -> 'log₁₀ CFU/mL (Condition 1)':
+  MAE X (percent): 2.78
+  MAE Y (percent): 2.54
+  Precision: 1.0000
+  Recall: 0.8571
+  MatchedPairs: 6
+  Extra extracted (unmatched): 0
+  Missed original (not found): 1
+
+Curve 'Condition 2' -> 'log₁₀ CFU/mL (Condition 2)':
+  MAE X (percent): 1.39
+  MAE Y (percent): 0.70
+  Precision: 1.0000
+  Recall: 0.8571
+  MatchedPairs: 6
+  Extra extracted (unmatched): 0
+  Missed original (not found): 1
+
+Curve 'Condition 3' -> 'log₁₀ CFU/mL (Condition 3)':
+  MAE X (percent): 1.39
+  MAE Y (percent): 0.90
+  Precision: 1.0000
+  Recall: 0.8571
+  MatchedPairs: 6
+  Extra extracted (unmatched): 0
+  Missed original (not found): 1
+
+# Summary
+Number of curves: 3
+Mean MAE X (percent): 1.85
+Mean MAE Y (percent): 1.38
+Mean Precision: 1.0000
+Mean Recall: 0.8571
+Threshold (MAX_NORM_DIST): 0.2

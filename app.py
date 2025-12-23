@@ -938,6 +938,11 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
     success = True
     version_dir = None
     timings = {}
+    step_status = {
+        'extraction': 'pending',
+        'interpolation': 'skipped',
+        'pointwise': 'skipped'
+    }
     
     # Get CSV info
     csv_info = check_csv_exists(image_path, prompt_file)
@@ -979,15 +984,19 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
         
         if result.returncode != 0:
             success = False
+            step_status['extraction'] = f"failed (exit code {result.returncode})"
             console_output.append(f"\n[ERROR] Extraction failed with exit code {result.returncode}")
         else:
-            console_output.append("\n[SUCCESS] Extraction completed!")
+            step_status['extraction'] = 'success'
+            console_output.append("\n[SUCCESS] Extraction completed.")
             
     except subprocess.TimeoutExpired:
         success = False
+        step_status['extraction'] = 'failed (timeout)'
         console_output.append("[ERROR] Extraction timed out after 5 minutes")
     except Exception as e:
         success = False
+        step_status['extraction'] = 'failed (exception)'
         console_output.append(f"[ERROR] {str(e)}")
     
     step1_time = time.time() - step1_start
@@ -1015,11 +1024,15 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
         console_output.append("=" * 60)
         
         if not os.path.exists(original_csv):
+            success = False
+            step_status['interpolation'] = 'failed (missing original CSV)'
             console_output.append(f"[WARNING] Original CSV not found: {original_csv}")
-            console_output.append("[SKIPPED] Interpolation skipped - missing original CSV")
+            console_output.append("[ERROR] Interpolation skipped - missing original CSV")
         elif not os.path.exists(extracted_csv):
+            success = False
+            step_status['interpolation'] = 'failed (missing extracted data)'
             console_output.append(f"[WARNING] Extracted data not found: {extracted_csv}")
-            console_output.append("[SKIPPED] Interpolation skipped - missing extracted data")
+            console_output.append("[ERROR] Interpolation skipped - missing extracted data")
         else:
             console_output.append(f"Original: {original_csv}")
             console_output.append(f"Extracted: {extracted_csv}")
@@ -1048,18 +1061,27 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
                     console_output.append(f"[STDERR] {result.stderr}")
                 
                 if result.returncode != 0:
+                    success = False
+                    step_status['interpolation'] = f"failed (exit code {result.returncode})"
                     console_output.append(f"\n[ERROR] Interpolation failed with exit code {result.returncode}")
                 else:
-                    console_output.append("\n[SUCCESS] Interpolation completed!")
+                    step_status['interpolation'] = 'success'
+                    console_output.append("\n[SUCCESS] Interpolation completed.")
                     
             except subprocess.TimeoutExpired:
+                success = False
+                step_status['interpolation'] = 'failed (timeout)'
                 console_output.append("[ERROR] Interpolation timed out after 5 minutes")
             except Exception as e:
+                success = False
+                step_status['interpolation'] = 'failed (exception)'
                 console_output.append(f"[ERROR] {str(e)}")
             
             step2_time = time.time() - step2_start
             timings['interpolation'] = step2_time
             console_output.append(f"[TIME] Interpolation took {step2_time:.2f} seconds")
+    elif run_interpolation:
+        step_status['interpolation'] = 'skipped (earlier step failed)'
     
     # Step 3: Run pointwise if requested
     if run_pointwise and success:
@@ -1070,11 +1092,15 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
         console_output.append("=" * 60)
         
         if not os.path.exists(original_csv):
+            success = False
+            step_status['pointwise'] = 'failed (missing original CSV)'
             console_output.append(f"[WARNING] Original CSV not found: {original_csv}")
-            console_output.append("[SKIPPED] Pointwise skipped - missing original CSV")
+            console_output.append("[ERROR] Pointwise skipped - missing original CSV")
         elif not os.path.exists(extracted_csv):
+            success = False
+            step_status['pointwise'] = 'failed (missing extracted data)'
             console_output.append(f"[WARNING] Extracted data not found: {extracted_csv}")
-            console_output.append("[SKIPPED] Pointwise skipped - missing extracted data")
+            console_output.append("[ERROR] Pointwise skipped - missing extracted data")
         else:
             console_output.append(f"Extracted: {extracted_csv}")
             console_output.append(f"Original: {original_csv}")
@@ -1103,25 +1129,40 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
                     console_output.append(f"[STDERR] {result.stderr}")
                 
                 if result.returncode != 0:
+                    success = False
+                    step_status['pointwise'] = f"failed (exit code {result.returncode})"
                     console_output.append(f"\n[ERROR] Pointwise comparison failed with exit code {result.returncode}")
                 else:
-                    console_output.append("\n[SUCCESS] Pointwise comparison completed!")
+                    step_status['pointwise'] = 'success'
+                    console_output.append("\n[SUCCESS] Pointwise comparison completed.")
                     
             except subprocess.TimeoutExpired:
+                success = False
+                step_status['pointwise'] = 'failed (timeout)'
                 console_output.append("[ERROR] Pointwise comparison timed out after 5 minutes")
             except Exception as e:
+                success = False
+                step_status['pointwise'] = 'failed (exception)'
                 console_output.append(f"[ERROR] {str(e)}")
             
             step3_time = time.time() - step3_start
             timings['pointwise'] = step3_time
             console_output.append(f"[TIME] Pointwise took {step3_time:.2f} seconds")
+    elif run_pointwise:
+        step_status['pointwise'] = 'skipped (earlier step failed)'
     
     total_time = time.time() - total_start_time
     timings['total'] = total_time
     
     console_output.append("")
     console_output.append("=" * 60)
-    console_output.append("ALL TASKS COMPLETED")
+    if success:
+        console_output.append("PIPELINE FINISHED SUCCESSFULLY")
+    else:
+        console_output.append("PIPELINE FINISHED WITH ERRORS")
+    console_output.append(f"Extraction: {step_status['extraction']}")
+    console_output.append(f"Interpolation: {step_status['interpolation']}")
+    console_output.append(f"Pointwise: {step_status['pointwise']}")
     console_output.append(f"Total time: {total_time:.2f} seconds")
     console_output.append("=" * 60)
     

@@ -1,0 +1,29 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+
+data = {
+    'Time (hours)': [0, 3, 3, 5, 7, 10, 15, 20],
+    'Bacteria Count (CFU/mL) (Condition 1)': [5.8, 6.5, 4.8, 5.0, 5.2, 6.1, 3.5, 3.6],
+    'Bacteria Count (CFU/mL) (Condition 2)': [5.6, 5.5, 5.7, 5.3, 5.4, 4.9, 4.1, 3.4]
+}
+
+df = pd.DataFrame(data)
+
+plt.figure(figsize=(8, 6))
+plt.scatter(df['Time (hours)'], df['Bacteria Count (CFU/mL) (Condition 1)'], color='#1f77b4', label='Condition 1', zorder=5)
+plt.scatter(df['Time (hours)'], df['Bacteria Count (CFU/mL) (Condition 2)'], color='#ff7f0e', label='Condition 2', zorder=5)
+
+plt.plot(df['Time (hours)'], df['Bacteria Count (CFU/mL) (Condition 1)'], color='#1f77b4', linestyle='-', alpha=0.5)
+plt.plot(df['Time (hours)'], df['Bacteria Count (CFU/mL) (Condition 2)'], color='#ff7f0e', linestyle='-', alpha=0.5)
+
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacteria Count (CFU/mL)')
+plt.xlim(0, 22)
+plt.ylim(0, 7)
+plt.xticks(range(0, 21, 5))
+plt.yticks(range(0, 8, 1))
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.6)
+
+plt.savefig(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\CL\CL_png.p3.v1\CL_png-replot.p3.v1.png", bbox_inches='tight', dpi=300)
+plt.close()

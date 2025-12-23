@@ -1,0 +1,49 @@
+import matplotlib.pyplot as plt
+import os
+
+data = {
+    "Time_Blank": [0, 2, 4, 6, 8, 10, 26],
+    "Blank": [6.0, 8.5, 9.5, 10.0, 10.0, 10.0, 10.0],
+    "Time_COL_0_125": [0, 2, 4, 6, 8, 10, 24],
+    "COL_0_125": [6.0, 0.0, 0.0, 0.0, 9.0, 10.0, 10.0],
+    "Time_MINO_1": [0, 2, 4, 6, 8, 10, 24],
+    "MINO_1": [6.0, 8.0, 8.5, 9.0, 9.5, 9.5, 9.0],
+    "Time_MEM_4": [0, 2, 4, 6, 8, 10, 24],
+    "MEM_4": [6.0, 6.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "Time_RFP_0_06": [0, 2, 4, 6, 8, 10, 24],
+    "RFP_0_06": [6.0, 8.0, 9.0, 9.5, 10.0, 10.0, 10.0],
+    "Time_COL_MEM": [0, 2, 4, 6, 8, 10, 24],
+    "COL_MEM": [6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "Time_COL_MINO": [0, 2, 4, 6, 8, 10, 24],
+    "COL_MINO": [6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "Time_COL_RFP": [0, 2, 4, 6, 8, 10, 24],
+    "COL_RFP": [6.0, 0.0, 0.0, 1.0, 2.0, 1.0, 1.0]
+}
+
+plt.figure(figsize=(8, 6))
+
+plt.plot(data["Time_Blank"], data["Blank"], linestyle=':', marker='x', color='black', label='Blank')
+plt.plot(data["Time_COL_0_125"], data["COL_0_125"], linestyle='-', marker='s', color='black', label='COL 0.125µg/mL')
+plt.plot(data["Time_MINO_1"], data["MINO_1"], linestyle='--', marker='^', color='black', label='MINO 1µg/mL')
+plt.plot(data["Time_MEM_4"], data["MEM_4"], linestyle='-.', marker='o', color='black', mfc='none', label='MEM 4µg/mL')
+plt.plot(data["Time_RFP_0_06"], data["RFP_0_06"], linestyle=':', marker='v', color='black', mfc='none', label='RFP 0.06µg/mL')
+plt.plot(data["Time_COL_MEM"], data["COL_MEM"], linestyle='--', marker='o', color='black', mfc='none', label='COL 0.125µg/mL + MEM 4µg/mL')
+plt.plot(data["Time_COL_MINO"], data["COL_MINO"], linestyle='-.', marker='^', color='black', mfc='none', label='COL 0.125µg/mL + MINO 1µg/mL')
+plt.plot(data["Time_COL_RFP"], data["COL_RFP"], linestyle=':', marker='v', color='black', label='COL 0.125µg/mL + RFP 0.06µg/mL')
+
+plt.xlabel('Time (h)')
+plt.ylabel('Log cfu/mL')
+plt.title('A', loc='left', weight='bold', size=14)
+
+plt.xlim(0, 26)
+plt.ylim(0, 16)
+
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 22, 24, 26])
+plt.yticks([0, 1, 2, 4, 6, 8, 10, 12, 14, 16])
+
+plt.axhline(y=0, color='black', linestyle='-', linewidth=0.5)
+
+os.makedirs(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\first_examples\A\A-1\A-1_png.p5.v4", exist_ok=True)
+
+plt.savefig(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\first_examples\A\A-1\A-1_png.p5.v4\A-1_png-replot.p5.v4.png", dpi=300, bbox_inches='tight')
+plt.close()

@@ -1,0 +1,41 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time_cond1 = [0, 3, 6, 9, 12, 24]
+cfu_cond1 = [6.6, 6.0, 5.5, 4.9, 3.6, 3.0]
+
+time_cond2 = [0, 3, 6, 9, 12, 24]
+cfu_cond2 = [6.5, 5.8, 5.3, 4.8, 4.1, 2.8]
+
+time_cond3 = [0, 3, 6, 9, 12, 24]
+cfu_cond3 = [6.7, 7.2, 7.3, 7.4, 7.5, 8.0]
+
+# Create plot
+plt.figure(figsize=(6, 5))
+plt.plot(time_cond1, cfu_cond1, marker='o', color='#1f77b4', linestyle='-', label='Condition 1')
+plt.plot(time_cond2, cfu_cond2, marker='o', color='#ff7f0e', linestyle='-', label='Condition 2')
+plt.plot(time_cond3, cfu_cond3, marker='o', color='#2ca02c', linestyle='-', label='Condition 3')
+
+# Axis labels and title
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacteria Count (CFU/mL)')
+plt.ylim(0, 8.5)
+plt.xlim(-1, 25)
+
+# Tick marks
+plt.xticks([0, 3, 6, 9, 12, 15, 20, 24])
+plt.yticks([0, 2, 4, 6, 8])
+
+# Grid
+plt.grid(True, linestyle='--', alpha=0.6)
+
+# Legend
+plt.legend(loc='upper right')
+
+# Save plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\CM\CM_png.p5.v1"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "CM_png-replot.p5.v1.png"), dpi=300, bbox_inches='tight')
+plt.close()

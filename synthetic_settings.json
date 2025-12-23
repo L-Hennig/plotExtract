@@ -1,8 +1,8 @@
 {
-  "num_curves": 1,
-  "num_points": 18,
-  "x_values_mode": "auto",
-  "x_values_manual": "0, 2, 4, 6, 8, 12, 18, 24",
+  "num_curves": 4,
+  "num_points": 7,
+  "x_values_mode": "manual",
+  "x_values_manual": "0, 2, 4, 6, 8, 12,  24",
   "x_spacing": 2,
   "x_label": "Time",
   "x_unit": "hours",
@@ -22,17 +22,56 @@
   "save_svg": false,
   "curves": [
     {
-      "color": "#1f77b4",
+      "color": "#000000",
       "initial_y": 6,
       "line_style": "-",
       "line_width": 1.5,
       "marker": "o",
       "marker_size": 6,
       "name": "Condition 1",
-      "noise_level": 1,
+      "noise_level": 0.1,
+      "show_line": true,
+      "trend": "down",
+      "trend_magnitude": 1
+    },
+    {
+      "color": "#000000",
+      "initial_y": 6,
+      "line_style": "-",
+      "line_width": 1.5,
+      "marker": "*",
+      "marker_size": 6,
+      "name": "Condition 2",
+      "noise_level": 0.1,
       "show_line": true,
       "trend": "up",
-      "trend_magnitude": 3
+      "trend_magnitude": 1
+    },
+    {
+      "color": "#000000",
+      "initial_y": 6,
+      "line_style": "-",
+      "line_width": 1.5,
+      "marker": "s",
+      "marker_size": 6,
+      "name": "Condition 3",
+      "noise_level": 0.1,
+      "show_line": true,
+      "trend": "stable",
+      "trend_magnitude": 1
+    },
+    {
+      "color": "#000000",
+      "initial_y": 6,
+      "line_style": "-",
+      "line_width": 1.5,
+      "marker": "v",
+      "marker_size": 6,
+      "name": "Condition 4",
+      "noise_level": 0.1,
+      "show_line": true,
+      "trend": "kill_regrowth",
+      "trend_magnitude": 1
     }
   ]
 }

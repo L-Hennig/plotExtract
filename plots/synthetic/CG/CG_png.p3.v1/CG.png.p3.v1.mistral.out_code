@@ -1,0 +1,32 @@
+import matplotlib.pyplot as plt
+import os
+
+# Data
+time = [0, 3, 6, 9, 12, 15, 21]
+condition1 = [5, 7, 5.5, 4.5, 3.8, 3.7, 4.2]
+condition2 = [6, 5.8, 5.5, 5, 4.2, 3.8, 3.2]
+condition3 = [6.2, 6.8, 7, 7.3, 7.5, 7.8, 8.1]
+
+# Plot
+plt.figure(figsize=(8, 6))
+plt.plot(time, condition1, marker='o', color='#1f77b4', label='Condition 1')
+plt.plot(time, condition2, marker='o', color='#ff7f0e', label='Condition 2')
+plt.plot(time, condition3, marker='o', color='#2ca02c', label='Condition 3')
+
+# Axis labels and title
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacteria Count (CFU/mL)')
+plt.legend()
+
+# Axis range
+plt.xlim(0, 22)
+plt.ylim(0, 9)
+
+# Grid
+plt.grid(True, linestyle='--', alpha=0.7)
+
+# Save the plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\CG\CG_png.p3.v1"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "CG_png-replot.p3.v1.png"), dpi=300, bbox_inches='tight')
+plt.close()

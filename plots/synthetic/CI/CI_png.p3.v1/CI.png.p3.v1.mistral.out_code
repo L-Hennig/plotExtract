@@ -1,0 +1,45 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time = np.array([0, 2, 4, 6, 8, 10, 12, 16, 20, 24])
+condition1 = np.array([5.9, 5.2, 4.8, 4.7, 5.0, 4.6, 4.9, 4.5, 3.9, 3.8])
+condition2 = np.array([6.0, 5.7, 5.5, 5.3, 5.0, 4.8, 4.5, 3.9, 3.2, 2.9])
+condition3 = np.array([6.3, 6.7, 7.0, 7.2, 7.4, 7.6, 7.8, 8.0, 8.1, 8.0])
+condition4 = np.array([5.8, 5.3, 4.9, 4.5, 4.0, 3.8, 3.9, 4.0, 4.1, 4.2])
+condition5 = np.array([6.2, 6.4, 6.5, 6.6, 6.5, 6.4, 6.3, 6.0, 5.7, 5.6])
+
+# Plot settings
+plt.figure(figsize=(8, 6))
+colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
+markers = ['o', 'o', 'o', 'o', 'o']
+linestyles = ['-', '-', '-', '-', '-']
+
+# Plot each condition
+plt.plot(time, condition1, color=colors[0], marker=markers[0], linestyle=linestyles[0], label='Condition 1')
+plt.plot(time, condition2, color=colors[1], marker=markers[1], linestyle=linestyles[1], label='Condition 2')
+plt.plot(time, condition3, color=colors[2], marker=markers[2], linestyle=linestyles[2], label='Condition 3')
+plt.plot(time, condition4, color=colors[3], marker=markers[3], linestyle=linestyles[3], label='Condition 4')
+plt.plot(time, condition5, color=colors[4], marker=markers[4], linestyle=linestyles[4], label='Condition 5')
+
+# Axis labels
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacteria Count (CFU/mL)')
+
+# Axis range
+plt.xlim(0, 24)
+plt.ylim(0, 8.5)
+
+# Legend
+plt.legend()
+
+# Grid
+plt.grid(True, linestyle='--', alpha=0.6)
+
+# Save plot
+output_dir = r'C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\CI\CI_png.p3.v1'
+os.makedirs(output_dir, exist_ok=True)
+output_path = os.path.join(output_dir, 'CI_png-replot.p3.v1.png')
+plt.savefig(output_path, bbox_inches='tight', dpi=300)
+plt.close()

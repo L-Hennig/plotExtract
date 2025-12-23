@@ -266,7 +266,7 @@ QQ = create_Q_1p([[base64_image, prompts['extract']]])
 print("Extracting data... ", end = '', flush=True)
 QQ, data = prompt_mistral(QQ)
 QQ.append({'role': 'assistant', 'content': data})
-with open(output_out+'_data', 'w') as file:
+with open(output_out+'_data', 'w', encoding='utf-8') as file:
   file.write(data)
 print(f"FINISHED")
 
@@ -320,9 +320,9 @@ if error_output:
 
 
 
-with open(output_out+'_code', 'w') as file:
+with open(output_out+'_code', 'w', encoding='utf-8') as file:
   file.write(code)
-with open(output_out+'_conversation', 'a') as file:
+with open(output_out+'_conversation', 'a', encoding='utf-8') as file:
   QQ.append({"role": "assistant", "content": code.replace("\n", "\\n")})
   json.dump(QQ, file)
 
@@ -342,7 +342,7 @@ if stacked:
     if 'no' in validate.lower().strip()[:10]:
       wrong = True
       wrong_why += "X; "
-    with open(output_out+'_conversation', 'a') as file:
+    with open(output_out+'_conversation', 'a', encoding='utf-8') as file:
       QQ.append({"role": "assistant", "content": validate.replace("\n", "\\n")})
       json.dump(QQ, file)
 
@@ -352,7 +352,7 @@ if stacked:
     if 'no' in validate.lower().strip()[:10]:
       wrong = True
       wrong_why += "Y; "
-    with open(output_out+'_conversation', 'a') as file:
+    with open(output_out+'_conversation', 'a', encoding='utf-8') as file:
       QQ.append({"role": "assistant", "content": validate.replace("\n", "\\n")})
       json.dump(QQ, file)
 
@@ -362,7 +362,7 @@ if stacked:
     if 'no' in validate.lower().strip()[:10]:
       wrong = True
       wrong_why += "N; "
-    with open(output_out+'_conversation', 'a') as file:
+    with open(output_out+'_conversation', 'a', encoding='utf-8') as file:
       QQ.append({"role": "assistant", "content": validate.replace("\n", "\\n")})
       json.dump(QQ, file)
 
@@ -372,11 +372,11 @@ if stacked:
     if 'no' in validate.lower().strip()[:10]:
       wrong = True
       wrong_why += "T"
-    with open(output_out+'_conversation', 'a') as file:
+    with open(output_out+'_conversation', 'a', encoding='utf-8') as file:
       QQ.append({"role": "assistant", "content": validate.replace("\n", "\\n")})
       json.dump(QQ, file)
 
-    with open(output_out+'_validate', 'w') as file:
+    with open(output_out+'_validate', 'w', encoding='utf-8') as file:
       if wrong:
         validate = 'no'
         file.write(validate)
@@ -384,7 +384,7 @@ if stacked:
         validate = 'yes'
         file.write(validate)
     if wrong:
-      with open(output_out+'_validate_why', 'w') as file:
+      with open(output_out+'_validate_why', 'w', encoding='utf-8') as file:
         file.write(wrong_why)
     print(f"\nFINISHED (result: {validate})")
 
@@ -394,7 +394,7 @@ if stacked:
 else:
     # Could not create comparison image
     print("Skipping visual validation (comparison image could not be generated)")
-    with open(output_out+'_validate', 'w') as file:
+    with open(output_out+'_validate', 'w', encoding='utf-8') as file:
       file.write('skipped')
 
 # Cleanup temp PNG from SVG conversion

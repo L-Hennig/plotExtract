@@ -1,0 +1,13 @@
+# Curve-by-curve statistics
+Curve 'Condition 1' -> 'log₁₀ CFU/mL (Condition 1)':
+  MAE: 0.037157
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+Curve 'Condition 2' -> 'log₁₀ CFU/mL (Condition 2)':
+  MAE: 0.013700
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+
+# Summary
+Number of curves: 2
+Mean MAE: 0.025428
