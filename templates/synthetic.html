@@ -597,6 +597,53 @@
                 </p>
             </div>
             
+            <!-- X-Axis Tick Marks -->
+            <div class="section">
+                <h3>X-Axis Tick Marks</h3>
+                <p style="font-size: 11px; color: #666; margin-bottom: 10px;">
+                    <strong>Note:</strong> This controls axis labels/tick marks, not data point spacing.
+                    Data point spacing is controlled by "X-Axis Spacing" above.
+                </p>
+                <div class="form-group">
+                    <label>Tick Mark Mode</label>
+                    <select id="xTickMode" onchange="toggleXTickMode()">
+                        <option value="auto">Auto</option>
+                        <option value="custom" selected>Custom Interval</option>
+                    </select>
+                </div>
+                <div id="xTickCustomSettings">
+                    <div class="form-group">
+                        <label>Tick Interval (hours)</label>
+                        <input type="number" id="xTickInterval" min="0.1" step="0.5" value="2" placeholder="2">
+                        <p style="font-size: 11px; color: #666; margin-top: 5px;">
+                            Tick marks every N hours on the axis (e.g., 2 = every 2 hours: 0, 2, 4, 6, 8...)
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Axis Break -->
+            <div class="section">
+                <h3>Axis Break</h3>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="axisBreakEnabled" onchange="toggleAxisBreak()">
+                    <label for="axisBreakEnabled">Enable Axis Break</label>
+                </div>
+                <div id="axisBreakSettings" style="display: none;">
+                    <div class="form-group">
+                        <label>Break Start (x-value)</label>
+                        <input type="number" id="axisBreakStart" step="any" placeholder="e.g., 12">
+                    </div>
+                    <div class="form-group">
+                        <label>Break End (x-value)</label>
+                        <input type="number" id="axisBreakEnd" step="any" placeholder="e.g., 18">
+                    </div>
+                    <p style="font-size: 11px; color: #666; margin-top: -8px;">
+                        Creates a break in the x-axis between these values
+                    </p>
+                </div>
+            </div>
+            
             <!-- Appearance -->
             <div class="section">
                 <h3>Appearance</h3>
@@ -780,6 +827,15 @@
             document.getElementById('yMin').value = settings.y_min || '';
             document.getElementById('yMax').value = settings.y_max || '';
             
+            // X-axis tick settings
+            document.getElementById('xTickMode').value = settings.x_tick_mode || 'custom';
+            document.getElementById('xTickInterval').value = settings.x_tick_interval || 2;
+            
+            // Axis break settings
+            document.getElementById('axisBreakEnabled').checked = settings.axis_break_enabled || false;
+            document.getElementById('axisBreakStart').value = settings.axis_break_start || '';
+            document.getElementById('axisBreakEnd').value = settings.axis_break_end || '';
+            
             document.getElementById('plotTitle').value = settings.title || '';
             // Convert stored inches to pixels for display (settings store inches, UI shows pixels)
             document.getElementById('figWidth').value = Math.round((settings.figure_width || 10) * 150);
@@ -793,6 +849,8 @@
             currentCurves = settings.curves || [];
             renderCurveCards();
             toggleXValuesMode();
+            toggleXTickMode();
+            toggleAxisBreak();
         }
         
         // =================================================================
@@ -819,6 +877,14 @@
                 x_max: document.getElementById('xMax').value,
                 y_min: document.getElementById('yMin').value,
                 y_max: document.getElementById('yMax').value,
+                
+                x_tick_mode: document.getElementById('xTickMode').value,
+                x_tick_interval: parseFloat(document.getElementById('xTickInterval').value) || 0,
+                
+                axis_break_enabled: document.getElementById('axisBreakEnabled').checked,
+                axis_break_type: 'x',
+                axis_break_start: document.getElementById('axisBreakStart').value,
+                axis_break_end: document.getElementById('axisBreakEnd').value,
                 
                 title: document.getElementById('plotTitle').value,
                 figure_width: parseFloat(document.getElementById('figWidth').value) / 150,  // Convert pixels to inches
@@ -1090,6 +1156,16 @@
             document.getElementById('xManualSettings').style.display = mode === 'manual' ? 'block' : 'none';
         }
         
+        function toggleXTickMode() {
+            const mode = document.getElementById('xTickMode').value;
+            document.getElementById('xTickCustomSettings').style.display = mode === 'custom' ? 'block' : 'none';
+        }
+        
+        function toggleAxisBreak() {
+            const enabled = document.getElementById('axisBreakEnabled').checked;
+            document.getElementById('axisBreakSettings').style.display = enabled ? 'block' : 'none';
+        }
+        
         // =================================================================
         // Preview & Generation
         // =================================================================
@@ -1097,6 +1173,15 @@
             showStatus('Generating preview...', 'info');
             
             const settings = gatherSettings();
+            
+            // Debug: Log settings to console
+            console.log('=== SETTINGS BEING SENT ===');
+            console.log('x_tick_mode:', settings.x_tick_mode);
+            console.log('x_tick_interval:', settings.x_tick_interval);
+            console.log('axis_break_enabled:', settings.axis_break_enabled);
+            console.log('axis_break_start:', settings.axis_break_start);
+            console.log('axis_break_end:', settings.axis_break_end);
+            console.log('Full settings:', settings);
             
             fetch('/synthetic/preview', {
                 method: 'POST',

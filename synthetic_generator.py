@@ -13,6 +13,7 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import matplotlib.gridspec as gridspec
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, send_file
 import io
@@ -57,6 +58,14 @@ DEFAULT_SETTINGS = {
     'x_max': '',
     'y_min': '',
     'y_max': '',
+    'x_tick_interval': 2,  # Tick marks every N hours (0 or empty for auto)
+    'x_tick_mode': 'custom',  # 'custom' or 'auto'
+    
+    # Axis break settings
+    'axis_break_enabled': False,
+    'axis_break_type': 'x',  # 'x' or 'y'
+    'axis_break_start': '',
+    'axis_break_end': '',
     
     # Plot appearance
     'title': '',
@@ -295,12 +304,20 @@ def create_plot(settings, curves_data, x_values):
                    label=config['name'])
         
         # Plot markers (always with no line - line was drawn above if needed)
-        ax.plot(x, y_plot,
-               marker=config['marker'],
-               linestyle='none',
-               color=config['color'],
-               markersize=config['marker_size'],
-               label=config['name'] if not config['show_line'] else None)
+        # Fix black border issue: if color is black, don't add edge color
+        marker_kwargs = {
+            'marker': config['marker'],
+            'linestyle': 'none',
+            'color': config['color'],
+            'markersize': config['marker_size'],
+            'label': config['name'] if not config['show_line'] else None
+        }
+        # If color is black (or very dark), set edge color to 'none' to avoid invisible border
+        color_lower = config['color'].lower()
+        if color_lower == '#000000' or color_lower == '#000' or color_lower == 'black':
+            marker_kwargs['markeredgecolor'] = 'none'
+        
+        ax.plot(x, y_plot, **marker_kwargs)
     
     # Set axis labels
     x_label = settings['x_label']
@@ -332,14 +349,8 @@ def create_plot(settings, curves_data, x_values):
         all_x = [val for curve in curves_data for val in curve['x']]
         x_max = max(all_x) if all_x else 24
     
-    ax.set_xlim(x_min, x_max)
-    
-    # Make axes meet at origin
-    ax.spines['left'].set_position(('data', x_min))
-    
-    # For log scale: use linear axis but with log10 values, starting at 0
+    # Calculate y limits first (needed for both regular and broken axis)
     if settings['y_scale'] == 'log':
-        # Set y-axis to start at 0 by default
         if settings['y_min'] != '':
             try:
                 y_min = float(settings['y_min'])
@@ -352,16 +363,246 @@ def create_plot(settings, curves_data, x_values):
             try:
                 y_max = float(settings['y_max'])
             except:
-                # Auto-calculate from data
                 all_y = [val for curve in curves_data for val in curve['y']]
-                y_max = max(all_y) + 1
+                y_max = max(all_y) + 1 if all_y else 8
         else:
-            # Auto-calculate from data
             all_y = [val for curve in curves_data for val in curve['y']]
-            y_max = max(all_y) + 1
-        
-        ax.set_ylim(y_min, y_max)
-        
+            y_max = max(all_y) + 1 if all_y else 8
+    else:
+        y_min = 0
+        if settings['y_min'] != '' and settings['y_max'] != '':
+            try:
+                y_min = float(settings['y_min'])
+                y_max = float(settings['y_max'])
+            except:
+                all_y = [val for curve in curves_data for val in curve['y']]
+                y_max = max(all_y) + 1 if all_y else 1
+        else:
+            all_y = [val for curve in curves_data for val in curve['y']]
+            y_max = max(all_y) + 1 if all_y else 1
+    
+    # Handle axis break if enabled
+    axis_break_enabled = settings.get('axis_break_enabled', False)
+    # Handle both boolean and string 'true'/'false' from JSON
+    if isinstance(axis_break_enabled, str):
+        axis_break_enabled = axis_break_enabled.lower() in ('true', '1', 'yes')
+    axis_break_type = settings.get('axis_break_type', 'x')
+    axis_break_start = settings.get('axis_break_start', '')
+    axis_break_end = settings.get('axis_break_end', '')
+    
+    print(f"CREATE_PLOT - Axis break: enabled={axis_break_enabled} (type: {type(axis_break_enabled)}), start='{axis_break_start}', end='{axis_break_end}'")
+    
+    # Check if axis break should be applied
+    # Handle both string and numeric inputs from JavaScript
+    # JavaScript sends numbers as numbers, not strings
+    axis_break_start_valid = (axis_break_start is not None and 
+                             axis_break_start != '' and 
+                             str(axis_break_start).strip() != '')
+    axis_break_end_valid = (axis_break_end is not None and 
+                           axis_break_end != '' and 
+                           str(axis_break_end).strip() != '')
+    
+    print(f"CREATE_PLOT - After validation: start_valid={axis_break_start_valid}, end_valid={axis_break_end_valid}")
+    
+    if axis_break_enabled and axis_break_type == 'x' and axis_break_start_valid and axis_break_end_valid:
+        print(f"CREATE_PLOT - Axis break condition met, attempting to create break...")
+        try:
+            # Convert to float (handles both string and numeric)
+            break_start = float(axis_break_start)
+            break_end = float(axis_break_end)
+            print(f"CREATE_PLOT - Parsed break: start={break_start}, end={break_end}, x_min={x_min}, x_max={x_max}")
+            
+            if break_start < break_end and x_min < break_start and break_end < x_max:
+                print(f"CREATE_PLOT - Creating axis break!")
+                # Create a broken x-axis using subplots
+                fig.clf()
+                
+                # Use calculated y limits
+                y_plot_min = y_min
+                y_plot_max = y_max
+                
+                # Create two subplots side by side
+                gs = gridspec.GridSpec(1, 2, width_ratios=[break_start - x_min, x_max - break_end], 
+                                     wspace=0.05, left=0.1, right=0.95, top=0.9, bottom=0.1)
+                ax1 = fig.add_subplot(gs[0, 0])
+                ax2 = fig.add_subplot(gs[0, 1], sharey=ax1)
+                
+                # Hide the spines between the axes
+                ax1.spines['right'].set_visible(False)
+                ax2.spines['left'].set_visible(False)
+                ax1.yaxis.tick_left()
+                ax2.yaxis.tick_right()
+                ax2.tick_params(labelleft=False)
+                
+                # Add diagonal lines to indicate break
+                d = 0.015  # Size of diagonal lines
+                kwargs = dict(transform=ax1.transAxes, color='k', clip_on=False, linewidth=1)
+                ax1.plot((1-d, 1+d), (-d, +d), **kwargs)
+                ax1.plot((1-d, 1+d), (1-d, 1+d), **kwargs)
+                kwargs.update(transform=ax2.transAxes)
+                ax2.plot((-d, +d), (-d, +d), **kwargs)
+                ax2.plot((-d, +d), (1-d, 1+d), **kwargs)
+                
+                # Plot curves on both axes
+                for curve_data in curves_data:
+                    config = curve_data['config']
+                    x = np.array(curve_data['x'])
+                    y = np.array(curve_data['y'])
+                    
+                    if settings['y_scale'] == 'log':
+                        y_plot = y
+                    else:
+                        y_plot = y
+                    
+                    # Split data at break
+                    mask_before = x <= break_start
+                    mask_after = x >= break_end
+                    
+                    # Marker kwargs
+                    marker_kwargs = {
+                        'marker': config['marker'],
+                        'linestyle': 'none',
+                        'color': config['color'],
+                        'markersize': config['marker_size']
+                    }
+                    color_lower = config['color'].lower()
+                    if color_lower == '#000000' or color_lower == '#000' or color_lower == 'black':
+                        marker_kwargs['markeredgecolor'] = 'none'
+                    
+                    # Plot on first axis
+                    if np.any(mask_before):
+                        x_before = x[mask_before]
+                        y_before = y_plot[mask_before]
+                        
+                        if config['show_line']:
+                            ax1.plot(x_before, y_before,
+                                   linestyle=config['line_style'],
+                                   color=config['color'],
+                                   linewidth=config['line_width'],
+                                   label=config['name'])
+                        ax1.plot(x_before, y_before, **marker_kwargs)
+                    
+                    # Plot on second axis
+                    if np.any(mask_after):
+                        x_after = x[mask_after]
+                        y_after = y_plot[mask_after]
+                        
+                        if config['show_line']:
+                            ax2.plot(x_after, y_after,
+                                   linestyle=config['line_style'],
+                                   color=config['color'],
+                                   linewidth=config['line_width'],
+                                   label=None)
+                        marker_kwargs_copy = marker_kwargs.copy()
+                        marker_kwargs_copy['label'] = None
+                        ax2.plot(x_after, y_after, **marker_kwargs_copy)
+                
+                # Set axis limits
+                ax1.set_xlim(x_min, break_start)
+                ax2.set_xlim(break_end, x_max)
+                ax1.set_ylim(y_plot_min, y_plot_max)
+                ax2.set_ylim(y_plot_min, y_plot_max)
+                
+                # Set x-axis ticks
+                x_tick_mode_break = settings.get('x_tick_mode', 'auto')
+                x_tick_interval_break = settings.get('x_tick_interval', 0)
+                
+                # Convert to appropriate types if needed
+                if isinstance(x_tick_interval_break, str):
+                    try:
+                        x_tick_interval_break = float(x_tick_interval_break)
+                    except:
+                        x_tick_interval_break = 0
+                
+                if x_tick_mode_break == 'custom' and x_tick_interval_break > 0:
+                    tick_interval = float(x_tick_interval_break)
+                    ticks_before = np.arange(x_min, break_start + tick_interval, tick_interval)
+                    ticks_after = np.arange(break_end, x_max + tick_interval, tick_interval)
+                    # Filter ticks to be within the respective axis ranges
+                    ticks_before = ticks_before[(ticks_before >= x_min) & (ticks_before <= break_start)]
+                    ticks_after = ticks_after[(ticks_after >= break_end) & (ticks_after <= x_max)]
+                    if len(ticks_before) > 0:
+                        ax1.set_xticks(ticks_before)
+                    if len(ticks_after) > 0:
+                        ax2.set_xticks(ticks_after)
+                
+                # Set labels
+                x_label = settings['x_label']
+                if settings['x_unit']:
+                    x_label += f" ({settings['x_unit']})"
+                fig.text(0.5, 0.02, x_label, ha='center', fontsize=11)
+                
+                y_label = settings['y_label']
+                if settings['y_unit']:
+                    y_label += f" ({settings['y_unit']})"
+                ax1.set_ylabel(y_label, fontsize=11)
+                
+                # Title
+                if settings['title']:
+                    fig.suptitle(settings['title'], fontsize=12, fontweight='bold')
+                
+                # Legend
+                if settings['show_legend']:
+                    ax1.legend(loc='best', framealpha=0.9)
+                
+                # Grid
+                if settings['show_grid']:
+                    ax1.grid(True, alpha=0.3, linestyle='--')
+                    ax2.grid(True, alpha=0.3, linestyle='--')
+                
+                plt.tight_layout()
+                return fig
+        except Exception as e:
+            print(f"Warning: Could not create axis break: {e}")
+            import traceback
+            traceback.print_exc()
+            # Fall back to regular plot
+    
+    ax.set_xlim(x_min, x_max)
+    
+    # Set x-axis tick marks (this is independent of data point spacing)
+    x_tick_mode = settings.get('x_tick_mode', 'auto')
+    x_tick_interval = settings.get('x_tick_interval', 0)
+    
+    print(f"CREATE_PLOT - Tick settings: mode={x_tick_mode}, interval={x_tick_interval} (type: {type(x_tick_interval)})")
+    
+    # Convert to appropriate types if needed
+    if isinstance(x_tick_interval, str):
+        try:
+            x_tick_interval = float(x_tick_interval)
+        except:
+            x_tick_interval = 0
+    elif x_tick_interval is None:
+        x_tick_interval = 0
+    
+    # Apply custom tick marks if specified
+    # Note: This controls tick marks on the axis, NOT data point spacing
+    if x_tick_mode == 'custom' and x_tick_interval and x_tick_interval > 0:
+        tick_interval = float(x_tick_interval)
+        # Generate ticks starting from x_min
+        x_ticks = np.arange(x_min, x_max + tick_interval, tick_interval)
+        # Filter ticks to be within the x-axis range
+        x_ticks = x_ticks[(x_ticks >= x_min) & (x_ticks <= x_max)]
+        print(f"CREATE_PLOT - Setting custom ticks: {x_ticks.tolist()}")
+        if len(x_ticks) > 0:
+            ax.set_xticks(x_ticks)
+            # Ensure tick labels are shown
+            ax.tick_params(axis='x', which='major', labelsize=10)
+            print(f"CREATE_PLOT - Ticks set successfully!")
+        else:
+            print(f"CREATE_PLOT - WARNING: No ticks generated (x_min={x_min}, x_max={x_max}, interval={tick_interval})")
+    else:
+        print(f"CREATE_PLOT - Using auto ticks (mode={x_tick_mode}, interval={x_tick_interval})")
+    # Otherwise, use auto ticks (matplotlib default)
+    
+    # Make axes meet at origin
+    ax.spines['left'].set_position(('data', x_min))
+    
+    # Set y-axis limits (already calculated above)
+    ax.set_ylim(y_min, y_max)
+    
+    # For log scale: set integer tick marks
+    if settings['y_scale'] == 'log':
         # Set integer tick marks (0, 1, 2, 3, 4, 5, etc. or 0, 2, 4, 6, 8, 10)
         y_range = y_max - y_min
         if y_range <= 6:
@@ -374,20 +615,9 @@ def create_plot(settings, curves_data, x_values):
         y_ticks = np.arange(int(y_min), int(y_max) + 1, tick_spacing)
         ax.set_yticks(y_ticks)
         ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%d'))
-        
-        # Make axes meet at origin
-        ax.spines['bottom'].set_position(('data', y_min))
-    else:
-        # Linear scale
-        y_min = 0
-        if settings['y_min'] != '' and settings['y_max'] != '':
-            try:
-                y_min = float(settings['y_min'])
-                ax.set_ylim(y_min, float(settings['y_max']))
-            except:
-                pass
-        # Make axes meet at origin
-        ax.spines['bottom'].set_position(('data', y_min))
+    
+    # Make axes meet at origin
+    ax.spines['bottom'].set_position(('data', y_min))
     
     # Title
     if settings['title']:
@@ -573,6 +803,24 @@ def preview():
     """Generate a preview of the plot."""
     settings = request.json
     
+    # Ensure all new settings have default values if missing
+    settings.setdefault('x_tick_mode', 'custom')
+    settings.setdefault('x_tick_interval', 2)
+    settings.setdefault('axis_break_enabled', False)
+    settings.setdefault('axis_break_type', 'x')
+    settings.setdefault('axis_break_start', '')
+    settings.setdefault('axis_break_end', '')
+    
+    # Debug: Print received settings
+    print("=" * 50)
+    print("PREVIEW - Received settings:")
+    print(f"  x_tick_mode: {settings.get('x_tick_mode')}")
+    print(f"  x_tick_interval: {settings.get('x_tick_interval')} (type: {type(settings.get('x_tick_interval'))})")
+    print(f"  axis_break_enabled: {settings.get('axis_break_enabled')} (type: {type(settings.get('axis_break_enabled'))})")
+    print(f"  axis_break_start: '{settings.get('axis_break_start')}'")
+    print(f"  axis_break_end: '{settings.get('axis_break_end')}'")
+    print("=" * 50)
+    
     # Generate data
     x_values, curves_data = generate_all_curves(settings)
     
@@ -594,6 +842,14 @@ def preview():
 def save():
     """Save the plot and data to files."""
     settings = request.json
+    
+    # Ensure all new settings have default values if missing
+    settings.setdefault('x_tick_mode', 'custom')
+    settings.setdefault('x_tick_interval', 2)
+    settings.setdefault('axis_break_enabled', False)
+    settings.setdefault('axis_break_type', 'x')
+    settings.setdefault('axis_break_start', '')
+    settings.setdefault('axis_break_end', '')
     
     # Generate data
     x_values, curves_data = generate_all_curves(settings)
@@ -622,6 +878,14 @@ def reset():
 def regenerate():
     """Regenerate curve data with same settings (new random values)."""
     settings = request.json
+    
+    # Ensure all new settings have default values if missing
+    settings.setdefault('x_tick_mode', 'custom')
+    settings.setdefault('x_tick_interval', 2)
+    settings.setdefault('axis_break_enabled', False)
+    settings.setdefault('axis_break_type', 'x')
+    settings.setdefault('axis_break_start', '')
+    settings.setdefault('axis_break_end', '')
     
     # Generate new data
     x_values, curves_data = generate_all_curves(settings)
