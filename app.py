@@ -230,25 +230,26 @@ def generate_all_curves(settings):
     return x_values.tolist(), curves_data
 
 def create_synthetic_plot(settings, curves_data, x_values):
-                    # Helper: draw a broken line across the axis break
-                    def draw_broken_line(ax1, ax2, x_before, y_before, x_after, y_after, break_start, break_end, color, linestyle, linewidth):
-                        # Find the last point before the break and first after
-                        if len(x_before) == 0 or len(x_after) == 0:
-                            return
-                        x0, y0 = x_before[-1], y_before[-1]
-                        x1, y1 = x_after[0], y_after[0]
-                        # Calculate the gap width in data coordinates
-                        gap_left = break_start
-                        gap_right = break_end
-                        # Draw line from last point to gap_left (on ax1)
-                        if x0 < gap_left:
-                            ax1.plot([x0, gap_left], [y0, np.interp(gap_left, [x0, x1], [y0, y1])],
-                                     color=color, linestyle=linestyle, linewidth=linewidth, alpha=0.7, zorder=10, dashes=(5, 5))
-                        # Draw line from gap_right to first point (on ax2)
-                        if x1 > gap_right:
-                            ax2.plot([gap_right, x1], [np.interp(gap_right, [x0, x1], [y0, y1]), y1],
-                                     color=color, linestyle=linestyle, linewidth=linewidth, alpha=0.7, zorder=10, dashes=(5, 5))
     """Create the matplotlib figure based on settings and data."""
+    # Helper: draw a broken line across the axis break
+    def draw_broken_line(ax1, ax2, x_before, y_before, x_after, y_after, break_start, break_end, color, linestyle, linewidth):
+        # Find the last point before the break and first after
+        if len(x_before) == 0 or len(x_after) == 0:
+            return
+        x0, y0 = x_before[-1], y_before[-1]
+        x1, y1 = x_after[0], y_after[0]
+        # Calculate the gap width in data coordinates
+        gap_left = break_start
+        gap_right = break_end
+        # Draw line from last point to gap_left (on ax1)
+        if x0 < gap_left:
+            ax1.plot([x0, gap_left], [y0, np.interp(gap_left, [x0, x1], [y0, y1])],
+                     color=color, linestyle=linestyle, linewidth=linewidth, alpha=0.7, zorder=10, dashes=(5, 5))
+        # Draw line from gap_right to first point (on ax2)
+        if x1 > gap_right:
+            ax2.plot([gap_right, x1], [np.interp(gap_right, [x0, x1], [y0, y1]), y1],
+                     color=color, linestyle=linestyle, linewidth=linewidth, alpha=0.7, zorder=10, dashes=(5, 5))
+    
     fig, ax = plt.subplots(figsize=(settings['figure_width'], settings['figure_height']))
     
     for curve_data in curves_data:
