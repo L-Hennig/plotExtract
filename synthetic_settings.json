@@ -1,8 +1,8 @@
 {
   "num_curves": 1,
-  "num_points": 7,
+  "num_points": 8,
   "x_values_mode": "manual",
-  "x_values_manual": "0, 2, 4, 6, 8, 12,  24",
+  "x_values_manual": "0, 2, 4, 6, 8, 10, 12,  24",
   "x_spacing": 2,
   "x_label": "Time",
   "x_unit": "hours",
@@ -37,7 +37,7 @@
       "name": "Condition 1",
       "noise_level": 0.1,
       "show_line": true,
-      "trend": "down",
+      "trend": "kill_regrowth",
       "trend_magnitude": 1
     }
   ]

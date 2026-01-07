@@ -151,6 +151,21 @@
             width: 18px;
             height: 18px;
         }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+        }
         .axis-inputs { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
@@ -773,6 +788,15 @@
                 </label>
             </div>
             
+            <!-- Article Information (optional) -->
+            <div class="form-group" style="margin-top: 20px;">
+                <label for="articleInfo"><strong>Article Information (optional):</strong></label>
+                <textarea id="articleInfo" rows="6" placeholder="Paste figure caption, legend text, or brief experimental context from the article here. This will be converted to structured facts before extraction."></textarea>
+                <small style="display: block; margin-top: 5px; color: #666;">
+                    Example: "Figure 3. Bacterial burden over time. Wild-type mice were infected with S. aureus. CFU/mL measured at 0, 6, 12, and 24 hours post-infection."
+                </small>
+            </div>
+            
             <!-- Batch-only: Auto-detect axis ranges -->
             <div id="autoDetectAxisSection" class="checkbox-group batch-section" style="display: none;">
                 <label>
@@ -1228,12 +1252,15 @@
             localStorage.setItem('axisTopY', topY);
             localStorage.setItem('lastPrompt', promptFile);
             
+            const articleInfo = document.getElementById('articleInfo').value.trim();
+            
             fetch('/v2/run_all', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     image: imagePath,
                     prompt: promptFile,
+                    articleInfo: articleInfo,
                     runInterpolation: document.getElementById('runInterpolation').checked,
                     runPointwise: document.getElementById('runPointwise').checked,
                     leftX: leftX,
@@ -1639,6 +1666,8 @@
                 }
             }
             
+            const articleInfo = document.getElementById('articleInfo').value.trim();
+            
             // Use the same /run_all endpoint as single mode, but wait for completion synchronously
             const response = await fetch('/v2/run_all', {
                 method: 'POST',
@@ -1646,6 +1675,7 @@
                 body: JSON.stringify({
                     image: imagePath,
                     prompt: promptFile,
+                    articleInfo: articleInfo,
                     runInterpolation: runInterpolation,
                     runPointwise: runPointwise,
                     leftX: leftX,

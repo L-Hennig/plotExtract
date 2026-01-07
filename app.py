@@ -472,15 +472,39 @@ def create_synthetic_plot(settings, curves_data, x_values):
                         marker_kwargs_copy = marker_kwargs.copy()
                         marker_kwargs_copy['label'] = None
                         ax2.plot(x_after, y_after, **marker_kwargs_copy)
-                    # Draw broken connecting line if line is enabled and both sides exist
+                    # Connect points across the break with a line that has a gap at the break symbol
                     if config['show_line'] and len(x_before) > 0 and len(x_after) > 0:
-                        draw_broken_line(
-                            ax1, ax2,
-                            x_before, y_before,
-                            x_after, y_after,
-                            break_start, break_end,
-                            config['color'], config['line_style'], config['line_width']
-                        )
+                        # Get the last point before the break and first point after
+                        last_before_x = x_before[-1]
+                        last_before_y = y_before[-1]
+                        first_after_x = x_after[0]
+                        first_after_y = y_after[0]
+                        
+                        # Calculate the break width in data coordinates (approximate)
+                        # The break symbol occupies about 3% of each subplot width
+                        break_gap_width = (break_start - x_min) * 0.03
+                        
+                        # Draw line from last point before break to just before the break symbol
+                        connect_x1 = break_start - break_gap_width / 2
+                        # Interpolate y value at this x position
+                        connect_y1 = last_before_y + (first_after_y - last_before_y) * (connect_x1 - last_before_x) / (first_after_x - last_before_x)
+                        
+                        ax1.plot([last_before_x, connect_x1], [last_before_y, connect_y1],
+                               linestyle=config['line_style'],
+                               color=config['color'],
+                               linewidth=config['line_width'],
+                               label=None, clip_on=False)
+                        
+                        # Draw line from just after the break symbol to first point after break
+                        connect_x2 = break_end + break_gap_width / 2
+                        # Interpolate y value at this x position
+                        connect_y2 = last_before_y + (first_after_y - last_before_y) * (connect_x2 - last_before_x) / (first_after_x - last_before_x)
+                        
+                        ax2.plot([connect_x2, first_after_x], [connect_y2, first_after_y],
+                               linestyle=config['line_style'],
+                               color=config['color'],
+                               linewidth=config['line_width'],
+                               label=None, clip_on=False)
                 # Set axis limits
                 ax1.set_xlim(x_min, break_start)
                 ax2.set_xlim(break_end, x_max)
@@ -1349,6 +1373,7 @@ def run_all_v2():
     data = request.json
     image_path = data.get('image')
     prompt_name = data.get('prompt') or data.get('prompt_name')
+    article_info = data.get('articleInfo', '').strip()
     run_interpolation = data.get('runInterpolation', False)
     run_pointwise = data.get('runPointwise', False)
     left_x = str(data.get('leftX', 0))
@@ -1370,7 +1395,7 @@ def run_all_v2():
 
     thread = threading.Thread(
         target=run_extraction_task_v2,
-        args=(task_id, image_path, prompt_name, run_interpolation, run_pointwise,
+        args=(task_id, image_path, prompt_name, article_info, run_interpolation, run_pointwise,
               left_x, right_x, bottom_y, top_y)
     )
     thread.daemon = True
@@ -1654,7 +1679,7 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
     # Save to file for persistence
     save_extraction_state(final_result)
 
-def run_extraction_task_v2(task_id, image_path, prompt_name, run_interpolation, run_pointwise,
+def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, run_interpolation, run_pointwise,
                            left_x, right_x, bottom_y, top_y):
     """Background task for PlotExtractV2 pipeline."""
     import re
@@ -1698,7 +1723,7 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, run_interpolation, 
     step1_start = time.time()
     try:
         result = subprocess.run(
-            ['python', os.path.join('plot_extract_v2', 'runner.py'), full_image_path, prompt_name],
+            ['python', os.path.join('plot_extract_v2', 'runner.py'), full_image_path, prompt_name, article_info],
             cwd=BASE_DIR,
             capture_output=True,
             text=True,

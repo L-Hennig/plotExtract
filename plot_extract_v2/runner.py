@@ -10,16 +10,21 @@ import numpy as np
 from dotenv import load_dotenv
 from mistralai import Mistral
 
+# Import article info schema
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'prompts'))
+from article_info_schema import ARTICLE_INFO_SCHEMA, SCHEMA_CONSTRAINTS
+
 # Load env for API key
 load_dotenv(override=True)
 API_KEY = os.getenv("API_KEY_1")
 
 if len(sys.argv) < 3:
-    print("Usage: python plot_extract_v2/runner.py <path_to_plot_image> <prompt_name>\nError: Missing required argument. Please provide the path to the plot image and the prompt name (e.g., prompt_1).")
+    print("Usage: python plot_extract_v2/runner.py <path_to_plot_image> <prompt_name> [article_info]\nError: Missing required argument. Please provide the path to the plot image and the prompt name (e.g., prompt_1).")
     sys.exit(1)
 
 input_plot = sys.argv[1]
 prompt_name = sys.argv[2]
+article_info_text = sys.argv[3] if len(sys.argv) > 3 else ""
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(BASE_DIR)
@@ -290,10 +295,68 @@ img {{ width: 100%; height: 100%; object-fit: contain; }}
 
 base64_image = encode_image(api_image_path)
 
+# Initialize Mistral client
+client = Mistral(api_key=API_KEY)
+
+# -----------------------------------------------------------------------------
+# Preprocessing: Convert article info to structured JSON (if provided)
+# -----------------------------------------------------------------------------
+ARTICLE_INFO_PROMPT = r"""You are given free-text information copied from a research article that describes a plot (e.g. figure caption, legend text, brief experimental context).
+
+Your task is to convert this text into a structured JSON object called `article_info`, following the schema below.
+
+Rules (non-negotiable):
+- Use ONLY the information explicitly present in the provided text.
+- Do NOT guess, infer, or fill in missing fields.
+- If a field cannot be confidently populated, OMIT it entirely.
+- Do NOT paraphrase figure captions or legend text; copy verbatim where applicable.
+- Output VALID JSON only. No explanations, no commentary, no extra text.
+
+The resulting JSON will be treated as hard facts and passed unchanged to later extraction stages.
+
+JSON schema to follow:
+
+{schema}
+
+{constraints}
+
+Input:
+{article_text}
+
+Output:
+(valid JSON only)"""
+
+article_info_json = ""
+if article_info_text:
+    print("Preprocessing article information...")
+    article_prompt = ARTICLE_INFO_PROMPT.format(
+        schema=ARTICLE_INFO_SCHEMA,
+        constraints=SCHEMA_CONSTRAINTS,
+        article_text=article_info_text
+    )
+    messages = [{"role": "user", "content": article_prompt}]
+    _, article_response = prompt_mistral(client, messages)
+    
+    # Clean response and validate JSON
+    article_response = article_response.strip()
+    if article_response.startswith("```json"):
+        article_response = article_response[len("```json"):].strip()
+    if article_response.startswith("```"):
+        article_response = article_response[3:].strip()
+    if article_response.endswith("```"):
+        article_response = article_response[:-3].strip()
+    
+    try:
+        json.loads(article_response)  # Validate JSON
+        article_info_json = article_response
+        print("Article information structured successfully")
+    except json.JSONDecodeError:
+        print("Warning: Article information could not be parsed as valid JSON, skipping")
+        article_info_json = ""
+
 # -----------------------------------------------------------------------------
 # Output naming
 # -----------------------------------------------------------------------------
-client = Mistral(api_key=API_KEY)
 image_filename = os.path.basename(input_plot)
 base_name = os.path.splitext(image_filename)[0]
 name_for_folder = image_filename.replace(".", "_")
@@ -311,6 +374,10 @@ print(f"Output folder: {version_dir} (version {version_num})")
 stage_context = {}
 conversation_log = []
 
+# If article info was provided, add it as initial context
+if article_info_json:
+    stage_context["article_info"] = article_info_json
+
 # -----------------------------------------------------------------------------
 # Stage 1: extraction (and additional stages)
 # -----------------------------------------------------------------------------
@@ -324,8 +391,12 @@ for stage_index, stage_name in enumerate(EXTRACT_STAGES):
     
     # Build stage-specific prompt, injecting previous outputs when needed
     if "{data_context}" in prompt_payload:
-        # Accumulate all previous stages' outputs
+        # Start with article info if available
         accumulated_context = ""
+        if article_info_json:
+            accumulated_context = f"=== Article Information (structured facts) ===\n{article_info_json}\n\n"
+        
+        # Accumulate all previous stages' outputs
         for prev_stage_name in EXTRACT_STAGES[:stage_index]:
             if prev_stage_name in stage_context:
                 accumulated_context += f"\n=== {prev_stage_name} ===\n{stage_context[prev_stage_name]}\n"
