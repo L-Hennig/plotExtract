@@ -25,6 +25,8 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PLOTS_DIR = os.path.join(BASE_DIR, 'plots')
 PROMPTS_DIR = os.path.join(BASE_DIR, 'prompts')
+PROMPTS_V2_DIR = os.path.join(BASE_DIR, 'plot_extract_v2', 'prompts')
+PROMPTS_V2_CHAINS_DIR = os.path.join(PROMPTS_V2_DIR, 'chains')
 SYNTHETIC_DIR = os.path.join(PLOTS_DIR, 'synthetic')
 
 # Create synthetic folder if it doesn't exist
@@ -707,6 +709,26 @@ def get_prompts():
             prompts.append(f)
     return sorted(prompts)
 
+@app.route('/v2/get_prompts')
+def get_prompts_route_v2():
+    return jsonify({'prompts': get_prompts_v2()})
+
+def get_prompts_v2():
+    """Get all v2 prompt sets (prompt_1, prompt_2, etc.) from the v2 prompts directory."""
+    prompts = []
+    prompts_dir = os.path.join(BASE_DIR, 'plot_extract_v2', 'prompts')
+    if os.path.exists(prompts_dir):
+        for item in os.listdir(prompts_dir):
+            item_path = os.path.join(prompts_dir, item)
+            # Check if it's a directory and has a prompts.py file
+            if os.path.isdir(item_path) and not item.startswith('__'):
+                prompts_file = os.path.join(item_path, 'prompts.py')
+                if os.path.exists(prompts_file):
+                    prompts.append(item)
+    # Sort numerically (prompt_1, prompt_2, etc.)
+    prompts.sort(key=lambda x: int(x.split('_')[1]) if '_' in x and x.split('_')[1].isdigit() else 0)
+    return prompts
+
 def get_csv_paths(image_path):
     """
     Given an image path like 'first_examples/A/A-1/A-1.png',
@@ -771,6 +793,98 @@ def find_extracted_csv(image_path, prompt_file):
     if latest_file:
         return os.path.relpath(latest_file, PLOTS_DIR).replace('\\', '/')
     return None
+
+def _get_prompt_name_v2(chain_file):
+    """Convert chain filename to v2 prompt identifier."""
+    chain_short = os.path.splitext(chain_file)[0]
+    return f"pv2_{chain_short}"
+
+def find_extracted_csv_v2(image_path, prompt_name):
+    """Find extracted data file for v2 prompt set outputs."""
+    import re
+
+    image_dir = os.path.dirname(os.path.join(PLOTS_DIR, image_path))
+    image_name = os.path.basename(image_path)
+    base_name = os.path.splitext(image_name)[0]
+    name_for_folder = image_name.replace('.', '_')
+    full_prompt_name = f"pv2_{prompt_name}"
+
+    version_pattern_new = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(full_prompt_name)}\.v(\d+)$')
+    version_pattern_old = re.compile(rf'^{re.escape(base_name)}\.{re.escape(full_prompt_name)}\.v(\d+)$')
+
+    latest_version = 0
+    latest_file = None
+
+    if os.path.exists(image_dir):
+        for item in os.listdir(image_dir):
+            match = version_pattern_new.match(item) or version_pattern_old.match(item)
+            if match:
+                version_num = int(match.group(1))
+                version_dir = os.path.join(image_dir, item)
+                extracted_file = os.path.join(version_dir, f"{image_name}.{full_prompt_name}.v{version_num}.mistral.out_data")
+                if os.path.exists(extracted_file) and version_num > latest_version:
+                    latest_version = version_num
+                    latest_file = extracted_file
+
+    if latest_file:
+        return os.path.relpath(latest_file, PLOTS_DIR).replace('\\', '/')
+    return None
+
+def get_output_files_v2(image_path, prompt_name=None, version_dir=None):
+    """Get output files for PlotExtractV2 runs."""
+    image_dir = os.path.dirname(os.path.join(PLOTS_DIR, image_path))
+    image_name = os.path.basename(image_path)
+    base_name = os.path.splitext(image_name)[0]
+    full_prompt_name = f"pv2_{prompt_name}" if prompt_name else None
+
+    outputs = {
+        'images': [],
+        'stats': [],
+        'data': [],
+        'other': [],
+        'summary': {}
+    }
+
+    if not os.path.exists(image_dir):
+        return outputs
+
+    original_path = os.path.join(image_dir, image_name)
+    if os.path.exists(original_path):
+        outputs['images'].append({
+            'path': os.path.relpath(original_path, PLOTS_DIR).replace('\\', '/'),
+            'label': 'Original Input',
+            'filename': image_name
+        })
+
+    original_csv = os.path.join(image_dir, f"{base_name}-original.csv")
+    if os.path.exists(original_csv):
+        outputs['data'].append({
+            'path': os.path.relpath(original_csv, PLOTS_DIR).replace('\\', '/'),
+            'label': 'Original Data',
+            'filename': f"{base_name}-original.csv"
+        })
+
+    if version_dir and os.path.exists(version_dir):
+        version_label = os.path.basename(version_dir)
+        _scan_version_folder(version_dir, version_label, outputs, PLOTS_DIR)
+        outputs['summary'] = _parse_summary_stats(version_dir)
+    else:
+        import re
+        name_for_folder = image_name.replace('.', '_')
+        if full_prompt_name:
+            version_pattern_new = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(full_prompt_name)}\.v\d+$')
+            version_pattern_old = re.compile(rf'^{re.escape(base_name)}\.{re.escape(full_prompt_name)}\.v\d+$')
+        else:
+            version_pattern_new = re.compile(r'^$a')
+            version_pattern_old = re.compile(r'^$a')
+
+        for item in os.listdir(image_dir):
+            item_path = os.path.join(image_dir, item)
+            if os.path.isdir(item_path) and (version_pattern_new.match(item) or version_pattern_old.match(item)):
+                version_label = os.path.basename(item_path)
+                _scan_version_folder(item_path, version_label, outputs, PLOTS_DIR)
+
+    return outputs
 
 def get_output_files(image_path, prompt_file=None, version_dir=None):
     """Get output files related to an image. If version_dir is provided, only show that version."""
@@ -981,11 +1095,46 @@ def check_csv_exists(image_path, prompt_file=None):
         'image_dir': csv_info['image_dir']
     }
 
+def check_csv_exists_v2(image_path, prompt_name=None):
+    """Check if original and v2 extracted CSVs exist."""
+    csv_info = get_csv_paths(image_path)
+
+    original_full = os.path.join(PLOTS_DIR, csv_info['original'])
+    original_exists = os.path.exists(original_full)
+
+    extracted_exists = False
+    extracted_path = None
+
+    if prompt_name:
+        extracted_rel = find_extracted_csv_v2(image_path, prompt_name)
+        if extracted_rel:
+            extracted_exists = True
+            extracted_path = extracted_rel
+
+    return {
+        'original': {
+            'path': csv_info['original'],
+            'exists': original_exists
+        },
+        'extracted': {
+            'path': extracted_path,
+            'exists': extracted_exists
+        },
+        'base_name': csv_info['base_name'],
+        'image_dir': csv_info['image_dir']
+    }
+
 @app.route('/')
 def index():
     images_grouped = get_input_images(PLOTS_DIR)
     prompts = get_prompts()
     return render_template('index.html', images_grouped=images_grouped, prompts=prompts)
+
+@app.route('/v2')
+def index_v2():
+    images_grouped = get_input_images(PLOTS_DIR)
+    prompts = get_prompts_v2()
+    return render_template('index_v2.html', images_grouped=images_grouped, prompts=prompts)
 
 @app.route('/plots/<path:filename>')
 def serve_plot(filename):
@@ -999,6 +1148,15 @@ def check_csv():
     prompt_file = request.json.get('prompt_file')
     
     result = check_csv_exists(image_path, prompt_file)
+    return jsonify(result)
+
+@app.route('/v2/check_csv', methods=['POST'])
+def check_csv_v2():
+    """Check CSV existence for PlotExtractV2 outputs."""
+    image_path = request.json.get('image_path')
+    prompt_name = request.json.get('prompt_name') or request.json.get('prompt_file')
+
+    result = check_csv_exists_v2(image_path, prompt_name)
     return jsonify(result)
 
 @app.route('/get_axis_ranges', methods=['POST'])
@@ -1091,6 +1249,41 @@ def get_outputs():
     outputs = get_output_files(image_path, prompt_file, version_dir_param)
     return jsonify({'outputs': outputs, 'version_dir': version_dir_param})
 
+@app.route('/v2/get_outputs', methods=['POST'])
+def get_outputs_v2():
+    """Get output files for PlotExtractV2 using prompt sets."""
+    import re
+
+    image_path = request.json.get('image_path')
+    prompt_name = request.json.get('prompt_name') or request.json.get('prompt_file')
+    version_dir_param = request.json.get('version_dir')
+
+    if not version_dir_param and prompt_name:
+        image_dir = os.path.dirname(os.path.join(PLOTS_DIR, image_path))
+        image_name = os.path.basename(image_path)
+        base_name = os.path.splitext(image_name)[0]
+        name_for_folder = image_name.replace('.', '_')
+        full_prompt_name = f"pv2_{prompt_name}"
+
+        version_pattern_new = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(full_prompt_name)}\.v(\d+)$')
+        version_pattern_old = re.compile(rf'^{re.escape(base_name)}\.{re.escape(full_prompt_name)}\.v(\d+)$')
+        latest_version = 0
+        latest_dir = None
+
+        if os.path.exists(image_dir):
+            for item in os.listdir(image_dir):
+                match = version_pattern_new.match(item) or version_pattern_old.match(item)
+                if match:
+                    version_num = int(match.group(1))
+                    if version_num > latest_version:
+                        latest_version = version_num
+                        latest_dir = os.path.join(image_dir, item)
+
+        version_dir_param = latest_dir
+
+    outputs = get_output_files_v2(image_path, prompt_name, version_dir_param)
+    return jsonify({'outputs': outputs, 'version_dir': version_dir_param})
+
 @app.route('/read_file', methods=['POST'])
 def read_file_route():
     """Read contents of a text file."""
@@ -1146,6 +1339,43 @@ def run_all():
     thread.daemon = True
     thread.start()
     
+    return jsonify({'task_id': task_id, 'status': 'started'})
+
+@app.route('/v2/run_all', methods=['POST'])
+def run_all_v2():
+    """Start v2 extraction pipeline in background."""
+    import re
+
+    data = request.json
+    image_path = data.get('image')
+    prompt_name = data.get('prompt') or data.get('prompt_name')
+    run_interpolation = data.get('runInterpolation', False)
+    run_pointwise = data.get('runPointwise', False)
+    left_x = str(data.get('leftX', 0))
+    right_x = str(data.get('rightX', 100))
+    bottom_y = str(data.get('bottomY', 0))
+    top_y = str(data.get('topY', 100))
+
+    task_id = str(uuid.uuid4())[:8]
+    with extraction_tasks_lock:
+        extraction_tasks[task_id] = {
+            'status': 'running',
+            'progress': 'Starting...',
+            'console': [],
+            'started_at': time.time(),
+            'image_path': image_path,
+            'prompt_name': prompt_name,
+            'pipeline': 'v2'
+        }
+
+    thread = threading.Thread(
+        target=run_extraction_task_v2,
+        args=(task_id, image_path, prompt_name, run_interpolation, run_pointwise,
+              left_x, right_x, bottom_y, top_y)
+    )
+    thread.daemon = True
+    thread.start()
+
     return jsonify({'task_id': task_id, 'status': 'started'})
 
 def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run_pointwise,
@@ -1422,6 +1652,267 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
             extraction_tasks[task_id]['result'] = final_result
     
     # Save to file for persistence
+    save_extraction_state(final_result)
+
+def run_extraction_task_v2(task_id, image_path, prompt_name, run_interpolation, run_pointwise,
+                           left_x, right_x, bottom_y, top_y):
+    """Background task for PlotExtractV2 pipeline."""
+    import re
+
+    def update_task(progress=None, console_line=None):
+        with extraction_tasks_lock:
+            if task_id in extraction_tasks:
+                if progress:
+                    extraction_tasks[task_id]['progress'] = progress
+                if console_line:
+                    extraction_tasks[task_id]['console'].append(console_line)
+
+    total_start_time = time.time()
+
+    full_image_path = os.path.join(PLOTS_DIR, image_path)
+
+    console_output = []
+    success = True
+    version_dir = None
+    timings = {}
+    step_status = {
+        'extraction': 'pending',
+        'interpolation': 'skipped',
+        'pointwise': 'skipped'
+    }
+
+    csv_info = check_csv_exists_v2(image_path, prompt_name)
+    original_csv = os.path.join(PLOTS_DIR, csv_info['original']['path'])
+
+    image_dir = os.path.dirname(full_image_path)
+    image_name = os.path.basename(image_path)
+
+    update_task(progress='Running extraction (v2 pipeline)...')
+    console_output.append("=" * 60)
+    console_output.append("STEP 1: Running PlotExtractV2")
+    console_output.append("=" * 60)
+    console_output.append(f"Image: {image_path}")
+    console_output.append(f"Prompt set: {prompt_name}")
+    console_output.append("")
+
+    step1_start = time.time()
+    try:
+        result = subprocess.run(
+            ['python', os.path.join('plot_extract_v2', 'runner.py'), full_image_path, prompt_name],
+            cwd=BASE_DIR,
+            capture_output=True,
+            text=True,
+            timeout=300
+        )
+
+        if result.stdout:
+            console_output.append(result.stdout)
+            for line in result.stdout.split('\n'):
+                if line.startswith('VERSION_DIR:'):
+                    version_dir = line.replace('VERSION_DIR:', '').strip()
+                    break
+        if result.stderr:
+            console_output.append(f"[STDERR] {result.stderr}")
+
+        if result.returncode != 0:
+            success = False
+            step_status['extraction'] = f"failed (exit code {result.returncode})"
+            console_output.append(f"\n[ERROR] Extraction failed with exit code {result.returncode}")
+        else:
+            step_status['extraction'] = 'success'
+            console_output.append("\n[SUCCESS] Extraction completed.")
+
+    except subprocess.TimeoutExpired:
+        success = False
+        step_status['extraction'] = 'failed (timeout)'
+        console_output.append("[ERROR] Extraction timed out after 5 minutes")
+    except Exception as e:
+        success = False
+        step_status['extraction'] = 'failed (exception)'
+        console_output.append(f"[ERROR] {str(e)}")
+
+    step1_time = time.time() - step1_start
+    timings['extraction'] = step1_time
+    console_output.append(f"[TIME] Extraction took {step1_time:.2f} seconds")
+
+    # Build the expected extracted CSV path using the v2 naming (pv2_<prompt_name>)
+    full_prompt_name = f"pv2_{prompt_name}"
+    version_num = 1
+    if version_dir:
+        version_match = re.search(r'\.v(\d+)$', os.path.basename(version_dir))
+        if version_match:
+            version_num = int(version_match.group(1))
+        extracted_csv = os.path.join(version_dir, f"{image_name}.{full_prompt_name}.v{version_num}.mistral.out_data")
+    else:
+        name_for_folder = image_name.replace('.', '_')
+        fallback_dir = os.path.join(image_dir, f"{name_for_folder}.{full_prompt_name}.v{version_num}")
+        extracted_csv = os.path.join(fallback_dir, f"{image_name}.{full_prompt_name}.v{version_num}.mistral.out_data")
+
+    if run_interpolation and success:
+        update_task(progress='Running interpolation...')
+        console_output.append("")
+        console_output.append("=" * 60)
+        console_output.append("STEP 2: Running Interpolation")
+        console_output.append("=" * 60)
+
+        if not os.path.exists(original_csv):
+            success = False
+            step_status['interpolation'] = 'failed (missing original CSV)'
+            console_output.append(f"[WARNING] Original CSV not found: {original_csv}")
+            console_output.append("[ERROR] Interpolation skipped - missing original CSV")
+        elif not os.path.exists(extracted_csv):
+            success = False
+            step_status['interpolation'] = 'failed (missing extracted data)'
+            console_output.append(f"[WARNING] Extracted data not found: {extracted_csv}")
+            console_output.append("[ERROR] Interpolation skipped - missing extracted data")
+        else:
+            console_output.append(f"Original: {original_csv}")
+            console_output.append(f"Extracted: {extracted_csv}")
+            console_output.append(f"Output dir: {version_dir}")
+            console_output.append(f"Axis range: X=[{left_x}, {right_x}], Y=[{bottom_y}, {top_y}]")
+            console_output.append("")
+
+            step2_start = time.time()
+            try:
+                cmd = ['python', 'interpolation.py', original_csv, extracted_csv, left_x, right_x, bottom_y, top_y]
+                if version_dir:
+                    cmd.append(version_dir)
+
+                result = subprocess.run(
+                    cmd,
+                    cwd=BASE_DIR,
+                    capture_output=True,
+                    text=True,
+                    timeout=300
+                )
+
+                if result.stdout:
+                    console_output.append(result.stdout)
+                if result.stderr:
+                    console_output.append(f"[STDERR] {result.stderr}")
+
+                if result.returncode != 0:
+                    success = False
+                    step_status['interpolation'] = f"failed (exit code {result.returncode})"
+                    console_output.append(f"\n[ERROR] Interpolation failed with exit code {result.returncode}")
+                else:
+                    step_status['interpolation'] = 'success'
+                    console_output.append("\n[SUCCESS] Interpolation completed.")
+
+            except subprocess.TimeoutExpired:
+                success = False
+                step_status['interpolation'] = 'failed (timeout)'
+                console_output.append("[ERROR] Interpolation timed out after 5 minutes")
+            except Exception as e:
+                success = False
+                step_status['interpolation'] = 'failed (exception)'
+                console_output.append(f"[ERROR] {str(e)}")
+
+            step2_time = time.time() - step2_start
+            timings['interpolation'] = step2_time
+            console_output.append(f"[TIME] Interpolation took {step2_time:.2f} seconds")
+    elif run_interpolation:
+        step_status['interpolation'] = 'skipped (earlier step failed)'
+
+    if run_pointwise and success:
+        update_task(progress='Running pointwise comparison...')
+        console_output.append("")
+        console_output.append("=" * 60)
+        console_output.append("STEP 3: Running Pointwise Comparison")
+        console_output.append("=" * 60)
+
+        if not os.path.exists(original_csv):
+            success = False
+            step_status['pointwise'] = 'failed (missing original CSV)'
+            console_output.append(f"[WARNING] Original CSV not found: {original_csv}")
+            console_output.append("[ERROR] Pointwise skipped - missing original CSV")
+        elif not os.path.exists(extracted_csv):
+            success = False
+            step_status['pointwise'] = 'failed (missing extracted data)'
+            console_output.append(f"[WARNING] Extracted data not found: {extracted_csv}")
+            console_output.append("[ERROR] Pointwise skipped - missing extracted data")
+        else:
+            console_output.append(f"Extracted: {extracted_csv}")
+            console_output.append(f"Original: {original_csv}")
+            console_output.append(f"Output dir: {version_dir}")
+            console_output.append(f"Axis range: X=[{left_x}, {right_x}], Y=[{bottom_y}, {top_y}]")
+            console_output.append("")
+
+            step3_start = time.time()
+            try:
+                cmd = ['python', 'pointwise.py', extracted_csv, original_csv, left_x, right_x, bottom_y, top_y]
+                if version_dir:
+                    cmd.append(version_dir)
+
+                result = subprocess.run(
+                    cmd,
+                    cwd=BASE_DIR,
+                    capture_output=True,
+                    text=True,
+                    timeout=300
+                )
+
+                if result.stdout:
+                    console_output.append(result.stdout)
+                if result.stderr:
+                    console_output.append(f"[STDERR] {result.stderr}")
+
+                if result.returncode != 0:
+                    success = False
+                    step_status['pointwise'] = f"failed (exit code {result.returncode})"
+                    console_output.append(f"\n[ERROR] Pointwise comparison failed with exit code {result.returncode}")
+                else:
+                    step_status['pointwise'] = 'success'
+                    console_output.append("\n[SUCCESS] Pointwise comparison completed.")
+
+            except subprocess.TimeoutExpired:
+                success = False
+                step_status['pointwise'] = 'failed (timeout)'
+                console_output.append("[ERROR] Pointwise comparison timed out after 5 minutes")
+            except Exception as e:
+                success = False
+                step_status['pointwise'] = 'failed (exception)'
+                console_output.append(f"[ERROR] {str(e)}")
+
+            step3_time = time.time() - step3_start
+            timings['pointwise'] = step3_time
+            console_output.append(f"[TIME] Pointwise took {step3_time:.2f} seconds")
+    elif run_pointwise:
+        step_status['pointwise'] = 'skipped (earlier step failed)'
+
+    total_time = time.time() - total_start_time
+    timings['total'] = total_time
+
+    console_output.append("")
+    console_output.append("=" * 60)
+    console_output.append("PIPELINE FINISHED SUCCESSFULLY" if success else "PIPELINE FINISHED WITH ERRORS")
+    console_output.append(f"Extraction: {step_status['extraction']}")
+    console_output.append(f"Interpolation: {step_status['interpolation']}")
+    console_output.append(f"Pointwise: {step_status['pointwise']}")
+    console_output.append(f"Total time: {total_time:.2f} seconds")
+    console_output.append("=" * 60)
+
+    outputs = get_output_files_v2(image_path, prompt_name, version_dir)
+    csv_status = check_csv_exists_v2(image_path, prompt_name)
+
+    final_result = {
+        'success': success,
+        'console': '\n'.join(console_output),
+        'outputs': outputs,
+        'csv_status': csv_status,
+        'version_dir': version_dir,
+        'timings': timings,
+        'completed_at': time.time(),
+        'image_path': image_path,
+        'prompt_name': prompt_name,
+        'pipeline': 'v2'
+    }
+
+    with extraction_tasks_lock:
+        if task_id in extraction_tasks:
+            extraction_tasks[task_id]['status'] = 'completed'
+            extraction_tasks[task_id]['result'] = final_result
+
     save_extraction_state(final_result)
 
 @app.route('/task_status/<task_id>')

@@ -1,110 +1,106 @@
 {
   "success": true,
-  "console": "============================================================\nSTEP 1: Running Plot Extraction\n============================================================\nImage: synthetic/CI/CI.png\nPrompt: prompt_5.py\n\nInput plot: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CI/CI.png\nUsing prompt: p5\nOutput folder: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CI\\CI_png.p5.v2 (version 2)\nExtracting data... FINISHED\nGenerating replot code... FINISHED\nReplotting with extracted data... FINISHED\nComparing source and replot... \n\nAxis x (result: No)\nAxis y (result: Yes)\nPoints n (result: No)\nTrends (result: Yes)\n\nFINISHED (result: no)\nStacking original and replotted images for comparison... FINISHED\nVERSION_DIR:C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CI\\CI_png.p5.v2\n\n\n\n\n\n[SUCCESS] Extraction completed.\n[TIME] Extraction took 49.22 seconds\n\n============================================================\nSTEP 2: Running Interpolation\n============================================================\nOriginal: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CI\\CI-original.csv\nExtracted: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CI\\CI_png.p5.v2\\CI.png.p5.v2.mistral.out_data\nOutput dir: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CI\\CI_png.p5.v2\nAxis range: X=[0, 24], Y=[0, 9]\n\n\n[SUCCESS] Interpolation completed.\n[TIME] Interpolation took 7.59 seconds\n\n============================================================\nSTEP 3: Running Pointwise Comparison\n============================================================\nExtracted: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CI\\CI_png.p5.v2\\CI.png.p5.v2.mistral.out_data\nOriginal: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CI\\CI-original.csv\nOutput dir: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CI\\CI_png.p5.v2\nAxis range: X=[0, 24], Y=[0, 9]\n\n\n[SUCCESS] Pointwise comparison completed.\n[TIME] Pointwise took 7.63 seconds\n\n============================================================\nPIPELINE FINISHED SUCCESSFULLY\nExtraction: success\nInterpolation: success\nPointwise: success\nTotal time: 64.45 seconds\n============================================================",
+  "console": "============================================================\nSTEP 1: Running PlotExtractV2\n============================================================\nImage: synthetic/CS/CS.png\nPrompt set: prompt_1\n\nInput plot: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS/CS.png\nUsing prompt set: prompt_1\nOutput folder: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.pv2_prompt_1.v5 (version 5)\nReplotting with extracted data... FINISHED\nComparing source and replot... \n\nAxis x (result: Yes)\nAxis y (result: Yes)\nPoints n (result: Yes)\nTrends (result: Yes)\n\nFINISHED (result: yes)\nStacking original and replotted images for comparison... FINISHED\nVERSION_DIR:C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.pv2_prompt_1.v5\n\n\n\n\n\n[SUCCESS] Extraction completed.\n[TIME] Extraction took 38.12 seconds\n\n============================================================\nSTEP 2: Running Interpolation\n============================================================\nOriginal: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS-original.csv\nExtracted: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.pv2_prompt_1.v5\\CS.png.pv2_prompt_1.v5.mistral.out_data\nOutput dir: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.pv2_prompt_1.v5\nAxis range: X=[0, 24], Y=[0, 8]\n\nLoading original CSV: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS-original.csv\n  Found 1 curve(s): ['Condition 1']\nLoading extracted CSV: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.pv2_prompt_1.v5\\CS.png.pv2_prompt_1.v5.mistral.out_data\n  Found 1 curve(s): ['Bacteria Count (CFU/mL) (Condition 1)']\nMatching curves using LLM... DONE\nCurve mapping: {'Condition 1': 'Bacteria Count (CFU/mL) (Condition 1)'}\nComparing 'Condition 1' vs 'Bacteria Count (CFU/mL) (Condition 1)'... MAE = 0.041454\nSaved figure: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.pv2_prompt_1.v5\\interpolated_CS-original.csv_VS_CS.png.pv2_prompt_1.v5.mistral.out_data.png\nSaved statistics: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.pv2_prompt_1.v5\\interpolated_CS-original.csv_VS_CS.png.pv2_prompt_1.v5.mistral.out_data.stats\n\nMean MAE across all curves: 0.041454\n\n\n[SUCCESS] Interpolation completed.\n[TIME] Interpolation took 7.39 seconds\n\n============================================================\nSTEP 3: Running Pointwise Comparison\n============================================================\nExtracted: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.pv2_prompt_1.v5\\CS.png.pv2_prompt_1.v5.mistral.out_data\nOriginal: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS-original.csv\nOutput dir: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.pv2_prompt_1.v5\nAxis range: X=[0, 24], Y=[0, 8]\n\nLoading extracted CSV: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.pv2_prompt_1.v5\\CS.png.pv2_prompt_1.v5.mistral.out_data\n  Found 1 curve(s): ['Bacteria Count (CFU/mL) (Condition 1)']\nLoading original CSV: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS-original.csv\n  Found 1 curve(s): ['Condition 1']\nMatching curves using LLM... DONE\nCurve mapping: {'Condition 1': 'Bacteria Count (CFU/mL) (Condition 1)'}\nProcessing 'Condition 1' vs 'Bacteria Count (CFU/mL) (Condition 1)'... MAE X=7.64%, MAE Y=2.11%, Prec=1.00, Rec=0.86\nSaved figure: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.pv2_prompt_1.v5\\pointwise_CS.png.pv2_prompt_1.v5.mistral_VS_CS-original.png\nSaved statistics: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.pv2_prompt_1.v5\\pointwise_CS.png.pv2_prompt_1.v5.mistral_VS_CS-original.stats\n\nMean MAE X: 7.64%\nMean MAE Y: 2.11%\nMean Precision: 1.0000\nMean Recall: 0.8571\n\n\n[SUCCESS] Pointwise comparison completed.\n[TIME] Pointwise took 6.83 seconds\n\n============================================================\nPIPELINE FINISHED SUCCESSFULLY\nExtraction: success\nInterpolation: success\nPointwise: success\nTotal time: 52.34 seconds\n============================================================",
   "outputs": {
     "images": [
       {
-        "path": "synthetic/CI/CI.png",
+        "path": "synthetic/CS/CS.png",
         "label": "Original Input",
-        "filename": "CI.png"
+        "filename": "CS.png"
       },
       {
-        "path": "synthetic/CI/CI_png.p5.v2/CI_png-replot.p5.v2.png",
-        "label": "Extracted Replot (CI_png.p5.v2)",
-        "filename": "CI_png-replot.p5.v2.png"
+        "path": "synthetic/CS/CS_png.pv2_prompt_1.v5/comparison_CS.prompt_1.v5.png",
+        "label": "Comparison (CS_png.pv2_prompt_1.v5)",
+        "filename": "comparison_CS.prompt_1.v5.png"
       },
       {
-        "path": "synthetic/CI/CI_png.p5.v2/comparison_CI.p5.v2.png",
-        "label": "Comparison (CI_png.p5.v2)",
-        "filename": "comparison_CI.p5.v2.png"
+        "path": "synthetic/CS/CS_png.pv2_prompt_1.v5/CS_png-replot.pv2_prompt_1.v5.png",
+        "label": "Extracted Replot (CS_png.pv2_prompt_1.v5)",
+        "filename": "CS_png-replot.pv2_prompt_1.v5.png"
       },
       {
-        "path": "synthetic/CI/CI_png.p5.v2/interpolated_CI-original.csv_VS_CI.png.p5.v2.mistral.out_data.png",
-        "label": "Interpolation (CI_png.p5.v2)",
-        "filename": "interpolated_CI-original.csv_VS_CI.png.p5.v2.mistral.out_data.png"
+        "path": "synthetic/CS/CS_png.pv2_prompt_1.v5/interpolated_CS-original.csv_VS_CS.png.pv2_prompt_1.v5.mistral.out_data.png",
+        "label": "Interpolation (CS_png.pv2_prompt_1.v5)",
+        "filename": "interpolated_CS-original.csv_VS_CS.png.pv2_prompt_1.v5.mistral.out_data.png"
       },
       {
-        "path": "synthetic/CI/CI_png.p5.v2/pointwise_CI.png.p5.v2.mistral_VS_CI-original.png",
-        "label": "Pointwise (CI_png.p5.v2)",
-        "filename": "pointwise_CI.png.p5.v2.mistral_VS_CI-original.png"
+        "path": "synthetic/CS/CS_png.pv2_prompt_1.v5/pointwise_CS.png.pv2_prompt_1.v5.mistral_VS_CS-original.png",
+        "label": "Pointwise (CS_png.pv2_prompt_1.v5)",
+        "filename": "pointwise_CS.png.pv2_prompt_1.v5.mistral_VS_CS-original.png"
       }
     ],
     "stats": [
       {
-        "path": "synthetic/CI/CI_png.p5.v2/interpolated_CI-original.csv_VS_CI.png.p5.v2.mistral.out_data.stats",
-        "label": "Interpolation Stats (CI_png.p5.v2)",
-        "filename": "interpolated_CI-original.csv_VS_CI.png.p5.v2.mistral.out_data.stats"
+        "path": "synthetic/CS/CS_png.pv2_prompt_1.v5/interpolated_CS-original.csv_VS_CS.png.pv2_prompt_1.v5.mistral.out_data.stats",
+        "label": "Interpolation Stats (CS_png.pv2_prompt_1.v5)",
+        "filename": "interpolated_CS-original.csv_VS_CS.png.pv2_prompt_1.v5.mistral.out_data.stats"
       },
       {
-        "path": "synthetic/CI/CI_png.p5.v2/pointwise_CI.png.p5.v2.mistral_VS_CI-original.stats",
-        "label": "Pointwise Stats (CI_png.p5.v2)",
-        "filename": "pointwise_CI.png.p5.v2.mistral_VS_CI-original.stats"
+        "path": "synthetic/CS/CS_png.pv2_prompt_1.v5/pointwise_CS.png.pv2_prompt_1.v5.mistral_VS_CS-original.stats",
+        "label": "Pointwise Stats (CS_png.pv2_prompt_1.v5)",
+        "filename": "pointwise_CS.png.pv2_prompt_1.v5.mistral_VS_CS-original.stats"
       }
     ],
     "data": [
       {
-        "path": "synthetic/CI/CI-original.csv",
+        "path": "synthetic/CS/CS-original.csv",
         "label": "Original Data",
-        "filename": "CI-original.csv"
+        "filename": "CS-original.csv"
       },
       {
-        "path": "synthetic/CI/CI_png.p5.v2/CI.png.p5.v2.mistral.out_data",
-        "label": "Extracted Data (CI_png.p5.v2)",
-        "filename": "CI.png.p5.v2.mistral.out_data"
+        "path": "synthetic/CS/CS_png.pv2_prompt_1.v5/CS.png.pv2_prompt_1.v5.mistral.out_data",
+        "label": "Extracted Data (CS_png.pv2_prompt_1.v5)",
+        "filename": "CS.png.pv2_prompt_1.v5.mistral.out_data"
       }
     ],
     "other": [
       {
-        "path": "synthetic/CI/CI_png.p5.v2/CI.png.p5.v2.mistral.out_code",
-        "filename": "CI.png.p5.v2.mistral.out_code",
-        "version": "CI_png.p5.v2"
+        "path": "synthetic/CS/CS_png.pv2_prompt_1.v5/CS.png.pv2_prompt_1.v5.mistral.out_code",
+        "filename": "CS.png.pv2_prompt_1.v5.mistral.out_code",
+        "version": "CS_png.pv2_prompt_1.v5"
       },
       {
-        "path": "synthetic/CI/CI_png.p5.v2/CI.png.p5.v2.mistral.out_conversation",
-        "filename": "CI.png.p5.v2.mistral.out_conversation",
-        "version": "CI_png.p5.v2"
+        "path": "synthetic/CS/CS_png.pv2_prompt_1.v5/CS.png.pv2_prompt_1.v5.mistral.out_conversation",
+        "filename": "CS.png.pv2_prompt_1.v5.mistral.out_conversation",
+        "version": "CS_png.pv2_prompt_1.v5"
       },
       {
-        "path": "synthetic/CI/CI_png.p5.v2/CI.png.p5.v2.mistral.out_validate",
-        "filename": "CI.png.p5.v2.mistral.out_validate",
-        "version": "CI_png.p5.v2"
-      },
-      {
-        "path": "synthetic/CI/CI_png.p5.v2/CI.png.p5.v2.mistral.out_validate_why",
-        "filename": "CI.png.p5.v2.mistral.out_validate_why",
-        "version": "CI_png.p5.v2"
+        "path": "synthetic/CS/CS_png.pv2_prompt_1.v5/CS.png.pv2_prompt_1.v5.mistral.out_validate",
+        "filename": "CS.png.pv2_prompt_1.v5.mistral.out_validate",
+        "version": "CS_png.pv2_prompt_1.v5"
       }
     ],
     "summary": {
-      "validation_result": "No",
-      "validation_reason": "X-axis, Number of points",
-      "interpolation_mae": 0.035718,
-      "pointwise_mae_x": "2.26%",
-      "pointwise_mae_y": "3.76%",
-      "precision": "80.7%",
-      "recall": "97.1%"
+      "validation_result": "Yes",
+      "validation_reason": "N/A",
+      "interpolation_mae": 0.041454,
+      "pointwise_mae_x": "7.64%",
+      "pointwise_mae_y": "2.11%",
+      "precision": "100.0%",
+      "recall": "85.7%"
     }
   },
   "csv_status": {
     "original": {
-      "path": "synthetic/CI\\CI-original.csv",
+      "path": "synthetic/CS\\CS-original.csv",
       "exists": true
     },
     "extracted": {
-      "path": "synthetic/CI/CI_png.p5.v2/CI.png.p5.v2.mistral.out_data",
+      "path": "synthetic/CS/CS_png.pv2_prompt_1.v5/CS.png.pv2_prompt_1.v5.mistral.out_data",
       "exists": true
     },
-    "base_name": "CI",
-    "image_dir": "synthetic/CI"
+    "base_name": "CS",
+    "image_dir": "synthetic/CS"
   },
-  "version_dir": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CI\\CI_png.p5.v2",
+  "version_dir": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.pv2_prompt_1.v5",
   "timings": {
-    "extraction": 49.21956181526184,
-    "interpolation": 7.592352390289307,
-    "pointwise": 7.631232738494873,
-    "total": 64.44615268707275
+    "extraction": 38.11628699302673,
+    "interpolation": 7.387497186660767,
+    "pointwise": 6.830930709838867,
+    "total": 52.341543436050415
   },
-  "completed_at": 1766143589.9060647,
-  "image_path": "synthetic/CI/CI.png",
-  "prompt_file": "prompt_5.py"
+  "completed_at": 1767755263.4654477,
+  "image_path": "synthetic/CS/CS.png",
+  "prompt_name": "prompt_1",
+  "pipeline": "v2"
 }

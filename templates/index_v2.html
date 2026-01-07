@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlotExtract Interface</title>
+    <title>PlotExtract V2 Interface</title>
     <style>
         * { box-sizing: border-box; }
         body { 
@@ -632,10 +632,10 @@
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="navbar-container">
-            <a href="/" class="navbar-brand">📊 PlotExtract</a>
+            <a href="/v2" class="navbar-brand">📊 PlotExtract V2</a>
             <ul class="navbar-nav">
-                <li><a href="/" class="nav-link active">Extraction (v1)</a></li>
-                <li><a href="/v2" class="nav-link">Extraction (v2)</a></li>
+                <li><a href="/" class="nav-link">Extraction (v1)</a></li>
+                <li><a href="/v2" class="nav-link active">Extraction (v2)</a></li>
                 <li><a href="/synthetic" class="nav-link">🧫 Synthetic Generator</a></li>
                 <li><a href="/synthetic/editor" class="nav-link">✏️ Synthetic Editor</a></li>
                 <li><a href="/results" class="nav-link">📈 Results Comparison</a></li>
@@ -645,7 +645,7 @@
     
     <div class="main-content">
     <div class="container">
-        <h1>🔬 PlotExtract Interface</h1>
+        <h1>🔬 PlotExtract V2 Interface</h1>
         
         <!-- Mode Toggle -->
         <div class="mode-toggle">
@@ -675,7 +675,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="promptSelect">Select Prompt:</label>
+                            <label for="promptSelect">Select V2 Chain:</label>
                             <select id="promptSelect" onchange="onPromptSelect()">
                                 {% for prompt in prompts %}
                                 <option value="{{ prompt }}">{{ prompt }}</option>
@@ -726,7 +726,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="batchPromptSelect">Select Prompt (applies to all images):</label>
+                            <label for="batchPromptSelect">Select V2 Chain (applies to all images):</label>
                             <select id="batchPromptSelect" onchange="onBatchPromptSelect()">
                                 {% for prompt in prompts %}
                                 <option value="{{ prompt }}">{{ prompt }}</option>
@@ -1011,7 +1011,7 @@
             
             if (!imagePath) return;
             
-            fetch('/check_csv', {
+            fetch('/v2/check_csv', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ image_path: imagePath, prompt_file: promptFile })
@@ -1072,7 +1072,7 @@
             
             if (!imagePath) return;
             
-            fetch('/get_outputs', {
+            fetch('/v2/get_outputs', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ image_path: imagePath, prompt_file: promptFile })
@@ -1228,7 +1228,7 @@
             localStorage.setItem('axisTopY', topY);
             localStorage.setItem('lastPrompt', promptFile);
             
-            fetch('/run_all', {
+            fetch('/v2/run_all', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1640,7 +1640,7 @@
             }
             
             // Use the same /run_all endpoint as single mode, but wait for completion synchronously
-            const response = await fetch('/run_all', {
+            const response = await fetch('/v2/run_all', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

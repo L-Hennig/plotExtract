@@ -1,0 +1,36 @@
+```csv
+Time (hours),Bacteria Count (CFU/mL) (Condition 1)
+0,6.2
+5,5.6
+7,5.3
+10,4.8
+15,4.1
+20,3.2
+```
+
+```json
+{
+  "axis_facts": {
+    "x_axis": {
+      "quantity": "time",
+      "unit": "hours",
+      "discrete": true,
+      "ticks_verified": [0, 5, 10, 15, 20],
+      "confidence": 1
+    },
+    "y_axis": {
+      "quantity": "bacterial count",
+      "unit": "CFU/mL",
+      "scale": "linear",
+      "ticks_verified": [2, 4, 6],
+      "upper_plausible_limit": 7,
+      "confidence": 0.8
+    }
+  },
+  "marker_facts": {
+    "markers_detected": true,
+    "csv_output": "Time (hours),Bacteria Count (CFU/mL) (Condition 1)\n0,6.2\n5,5.6\n7,5.3\n10,4.8\n15,4.1\n20,3.2",
+    "confidence": 0.95
+  }
+}
+```
