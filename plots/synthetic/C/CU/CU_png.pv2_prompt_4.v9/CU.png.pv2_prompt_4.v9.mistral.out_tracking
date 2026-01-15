@@ -1,0 +1,123 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU/CU.png",
+  "prompt_name": "prompt_4",
+  "overall_status": "completed",
+  "validation_status": "yes",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 437,
+      "execution_time_ms": 3075.4287242889404,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-15T14:38:51.939579",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1433,
+      "execution_time_ms": 7581.993818283081,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-15T14:38:55.016585",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1453,
+      "execution_time_ms": 8844.722986221313,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-15T14:39:02.599823",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 95,
+        "columns": [
+          "Here is the extracted data following the specified rules:"
+        ],
+        "axis_labels": [
+          "Here is the extracted data following the specified rules:"
+        ]
+      },
+      "output_length": 2037,
+      "execution_time_ms": 11826.385498046875,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-15T14:39:11.445763",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 2,
+        "num_rows": 38,
+        "columns": [
+          "Based on the validation steps and the provided data",
+          " here's the output JSON with validation flags:"
+        ],
+        "axis_labels": [
+          "Based on the validation steps and the provided data",
+          " here's the output JSON with validation flags:"
+        ]
+      },
+      "output_length": 1521,
+      "execution_time_ms": 9418.569087982178,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-15T14:39:23.275467",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_4": {
+      "num_columns": 1,
+      "num_rows": 95,
+      "columns": [
+        "Here is the extracted data following the specified rules:"
+      ],
+      "axis_labels": [
+        "Here is the extracted data following the specified rules:"
+      ]
+    },
+    "EXTRACT_STAGE_5": {
+      "num_columns": 2,
+      "num_rows": 38,
+      "columns": [
+        "Based on the validation steps and the provided data",
+        " here's the output JSON with validation flags:"
+      ],
+      "axis_labels": [
+        "Based on the validation steps and the provided data",
+        " here's the output JSON with validation flags:"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 71.171329,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "Yes",
+      "num_points": "Yes",
+      "trend": "Yes"
+    }
+  }
+}

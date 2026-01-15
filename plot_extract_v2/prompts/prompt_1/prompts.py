@@ -5,9 +5,20 @@
 
 # Extract stage 1: X-axis verification
 EXTRACT_STAGE_1 = r"""
+You have access to the complete extraction schema (showing all possible fields).
+You will output ONLY the fields you determine, following this structure.
+
+COMPLETE SCHEMA:
+{complete_schema}
+
+ACCUMULATED FACTS SO FAR:
+{accumulated_facts}
+
+---
+
 Analyze the provided plot image. Determine if the x-axis represents time in hours. Identify discrete tick marks and labels.
 
-Output JSON:
+Output ONLY the populated fields as JSON (do not include empty fields):
 
 {{
   "axis_facts": {{
@@ -16,6 +27,7 @@ Output JSON:
       "unit": "hours",
       "discrete": true/false,
       "ticks_verified": [list of tick marks] or [],
+      "tick_labels": [labels if present],
       "confidence": 0–1
     }}
   }}
@@ -27,21 +39,30 @@ If verification completely fails, output only "None".
 
 # Extract stage 2: Y-axis verification
 EXTRACT_STAGE_2 = r"""
-Use the facts from Step 1: {data_context}
+You have access to the complete extraction schema (showing all possible fields).
+You will output ONLY the fields you determine, building on previous facts.
+
+COMPLETE SCHEMA:
+{complete_schema}
+
+ACCUMULATED FACTS SO FAR:
+{accumulated_facts}
+
+---
 
 Determine if the y-axis represents bacterial burden on a log10 scale. Identify tick marks, labels, and plausible range.
 
-Output JSON (merge previous facts):
+Output ONLY the new/updated fields as JSON (merge with previous facts in the output):
 
 {{
   "axis_facts": {{
-    "x_axis": {{ ...previous x_axis facts... }},
     "y_axis": {{
       "quantity": "bacterial burden",
       "unit": "log10 CFU/mL",
       "scale": "log10",
       "upper_plausible_limit": 9,
       "ticks_verified": [list of tick marks],
+      "tick_labels": [labels if present],
       "confidence": 0–1
     }}
   }}
@@ -53,45 +74,59 @@ If verification completely fails, output only "None".
 
 # Extract stage 3: Marker extraction + CSV output
 EXTRACT_STAGE_3 = r"""
-Use all previous facts: {data_context}
+You have access to the complete extraction schema (showing all possible fields).
+You will output ONLY the fields you determine, building on previous facts.
+
+COMPLETE SCHEMA:
+{complete_schema}
+
+ACCUMULATED FACTS SO FAR:
+{accumulated_facts}
+
+---
 
 Identify explicit markers on the plot (ignore lines connecting points). Extract the x and y coordinates of each marker using the verified axes. Output the data in CSV format.
 
-Output CSV Requirements:
-
-- First row contains axis labels. Include curve label in the y-axis header if available.
-- Subsequent rows present numeric data only, one row per data point.
-- Each curve gets two columns (x and y). Multiple curves produce additional pairs of columns.
-- If extraction fails, output only "None".
-- Both axes must be labelled, tick values must increase logically; otherwise, output "None".
-
-Example CSV format (two curves):
-
-x-axis label,y-axis label (Curve 1),x-axis label,y-axis label (Curve 2)
-0.1,0.5,0.1,0.75
-0.2,0.52,0.2,0.77
-...
-
-After CSV, also output JSON for tracking:
+Output as JSON with marker_facts and CSV:
 
 {{
-  "axis_facts": {{ ...all axis facts from steps 1–2... }},
   "marker_facts": {{
     "markers_detected": true/false,
+    "curves": [
+      {{
+        "curve_label": "string if identifiable",
+        "points": [
+          {{"x": number, "y": number, "confidence": 0-1}}
+        ]
+      }}
+    ],
     "csv_output": "actual CSV content here",
     "confidence": 0–1
   }}
 }}
+
+CSV Requirements:
+- First row contains axis labels. Include curve label in the y-axis header if available.
+- Subsequent rows present numeric data only, one row per data point.
+- Each curve gets two columns (x and y). Multiple curves produce additional pairs of columns.
+- Both axes must be labelled, tick values must increase logically; otherwise, output "None".
+
+If extraction fails, output only "None".
 """
 
 # Code generation stage: Create matplotlib code to replot
 CODE_PLOT = r"""
 You are provided with:
 - The same plot image.
-- Prior extracted CSV data:
-{data_context}
+- Extracted data and facts:
+{accumulated_facts}
 
 Generate Python (matplotlib) code that exactly replots the figure, matching styles, colors, markers, axis labels, limits, ticks, and legend.
+
+CRITICAL REQUIREMENTS:
+- If axis_facts.y_axis.scale is "log10", MUST use plt.yscale('log') to set logarithmic scale
+- If axis_facts.y_axis.scale is "linear", use linear scale (default)
+- Match all axis labels, limits, and legend from the extracted facts
 - Save the plot only to: {replot_path}
 - Do not display the plot.
 - Respond with code only so it can be executed directly.

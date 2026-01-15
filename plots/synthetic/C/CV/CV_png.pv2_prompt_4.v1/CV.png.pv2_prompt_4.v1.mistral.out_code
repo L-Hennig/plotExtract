@@ -1,0 +1,39 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Data points extracted from the image
+time_points = [0, 2, 4, 6, 8, 10, 12, 24]
+bacterial_counts = [6.0, 6.2, 6.4, 7.0, 7.5, 7.8, 7.9, 9.5]  # log10 CFU/mL
+
+# Create the plot
+plt.figure(figsize=(6, 4))
+
+# Plot the curve
+plt.plot(time_points, bacterial_counts,
+         marker='o',
+         color='black',
+         linestyle='-',
+         label='Condition 1')
+
+# Axis labels
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+
+# Axis limits and ticks
+plt.xlim(0, 26)
+plt.ylim(5.984455342171874, 9.63225302445395)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 20, 22, 24, 26])
+plt.yticks([6, 7, 8, 9, 10])
+
+# Add axis break on x-axis between 12 and 24 hours
+plt.axvline(x=14, ymin=0.02, ymax=0.95, color='black', linewidth=1.5)
+plt.axvline(x=18, ymin=0.02, ymax=0.95, color='black', linewidth=1.5)
+plt.plot([14, 18], [plt.ylim()[0]-0.2, plt.ylim()[0]-0.2], color='black', linewidth=1.5)
+plt.plot([14, 18], [plt.ylim()[0]-0.1, plt.ylim()[0]-0.1], color='white', linewidth=4)
+
+# Legend
+plt.legend()
+
+# Save the plot
+plt.savefig(r'C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\C\CV\CV_png.pv2_prompt_4.v1\CV_png-replot.pv2_prompt_4.v1.png', bbox_inches='tight', dpi=300)
+plt.close()

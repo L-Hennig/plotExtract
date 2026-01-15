@@ -1,0 +1,37 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Data points from the image
+time = [0, 2, 4, 6, 8, 10, 12, 20, 24]
+bacterial_count = [6.1, 5.0, 4.3, 3.8, 3.2, 2.8, 2.9, 3.3, 3.6]
+
+# Create the plot
+fig, ax = plt.subplots()
+
+# Plot the data
+ax.plot(time, bacterial_count, marker='o', color='black', label='Condition 1')
+
+# Axis break details
+ax.set_xlim(0, 26)
+ax.set_ylim(0, 7)
+
+# Add axis break
+ax.annotate('', xy=(11.5, 0.5), xycoords='data', xytext=(12.5, 0.5), textcoords='data',
+            arrowprops=dict(arrowstyle='-', linestyle='--', color='black'))
+ax.annotate('', xy=(11.5, 6.5), xycoords='data', xytext=(12.5, 6.5), textcoords='data',
+            arrowprops=dict(arrowstyle='-', linestyle='--', color='black'))
+
+# Set ticks and labels
+ax.set_xticks([0, 2, 4, 6, 8, 10, 12, 20, 22, 24])
+ax.set_yticks([0, 1, 2, 3, 4, 5, 6, 7])
+ax.set_xlabel('Time (hours)')
+ax.set_ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+
+# Add legend
+ax.legend()
+
+# Save the plot
+plt.savefig(r'C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic/C/CX/CX_png.pv2_prompt_4.v2/CX_png-replot.pv2_prompt_4.v2.png', bbox_inches='tight', dpi=300)
+
+# Do not display the plot
+plt.close()

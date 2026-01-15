@@ -1,0 +1,42 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Data points from the provided facts
+time_condition1 = [0, 2, 4, 6, 8, 10, 12, 24]
+bacterial_count_condition1 = [6, 7, 8, 8.2, 8.3, 8.6, 8.8, 9.2]  # log10 CFU/mL
+
+time_condition2 = [0, 2, 4, 6, 8, 10, 12, 24]
+bacterial_count_condition2 = [6, 5.5, 4.5, 3.8, 3.2, 2.8, 2.7, 3.5]  # log10 CFU/mL
+
+# Create the plot
+fig, ax = plt.subplots()
+
+# Plot Condition 1
+ax.plot(time_condition1[:7], bacterial_count_condition1[:7], 'o-', color='black', label='Condition 1', markersize=6)
+ax.plot(time_condition1[7], bacterial_count_condition1[7], 'o', color='black', markersize=6)
+
+# Plot Condition 2
+ax.plot(time_condition2[:7], bacterial_count_condition2[:7], 's-', color='black', label='Condition 2', markersize=6)
+ax.plot(time_condition2[7], bacterial_count_condition2[7], 's', color='black', markersize=6)
+
+# Axis break
+ax.annotate('', xy=(12.5, 0), xycoords=('data', 'axes fraction'), xytext=(13.5, 0),
+            arrowprops=dict(arrowstyle='-', color='black', shrinkA=0, shrinkB=0))
+ax.annotate('', xy=(12.5, 1), xycoords=('data', 'axes fraction'), xytext=(13.5, 1),
+            arrowprops=dict(arrowstyle='-', color='black', shrinkA=0, shrinkB=0))
+
+# Set axis limits and ticks
+ax.set_xlim(0, 26)
+ax.set_ylim(0, 10)
+ax.set_xticks([0, 2, 4, 6, 8, 10, 12, 20, 22, 24])
+ax.set_yticks([0, 2, 4, 6, 8, 10])
+
+# Axis labels
+ax.set_xlabel('Time (hours)')
+ax.set_ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+
+# Legend
+ax.legend(loc='upper left')
+
+# Save the plot
+plt.savefig(r'C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic/D/DA\DA_png.pv2_prompt_4.v2\DA_png-replot.pv2_prompt_4.v2.png', bbox_inches='tight', dpi=300)

@@ -12,6 +12,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import matplotlib.gridspec as gridspec
+from matplotlib.lines import Line2D
 import io
 import base64
 import threading
@@ -81,8 +82,8 @@ DEFAULT_SETTINGS = {
     'y_scale': 'log',
     'x_min': '',
     'x_max': '',
-    'y_min': '',
-    'y_max': '',
+    'y_min': '0.1',
+    'y_max': '6.9',
     'title': '',
     'show_legend': True,
     'show_grid': True,
@@ -163,56 +164,110 @@ def generate_x_values(settings):
     return np.arange(0, num_points * spacing, spacing)
 
 def generate_curve_data(x_values, curve_config, y_scale='log'):
-    """Generate Y-values for a single curve based on its configuration."""
+    """Generate Y-values for a single curve based on its configuration.
+    
+    Implements realistic time-kill curve dynamics:
+    - Stable: Control growth (0.05-0.25 log10 CFU/mL/hr)
+    - Down: Kill curves with realistic slopes (-0.5 to -2 log10 CFU/mL/hr)
+    - Up: Growth without killing
+    - Mixed: Rise and fall within realistic CFU ranges
+    - Kill_regrowth: Kill phase followed by bacterial regrowth
+    """
     n_points = len(x_values)
     initial_y = curve_config['initial_y']
     trend = curve_config['trend']
     magnitude = curve_config['trend_magnitude']
     noise = curve_config['noise_level']
     
+    # Normalize x to [0, 1] for relative positioning
     x_norm = (x_values - x_values.min()) / (x_values.max() - x_values.min() + 1e-10)
+    # Calculate actual time span in hours (for realistic slope calculation)
+    time_span = x_values.max() - x_values.min()
     
     if trend == 'stable':
-        base = np.zeros(n_points)
+        # Control/stable growth: realistic linear growth phase
+        # Slope: 0.05-0.25 log10 CFU/mL per hour (varies with magnitude)
+        # magnitude acts as a multiplier: 0.5->0.075/hr, 1.0->0.15/hr, 2.0->0.30/hr (capped)
+        slope_per_hour = 0.05 + (magnitude * 0.1)
+        slope_per_hour = min(slope_per_hour, 0.25)  # Cap at realistic max
+        base = slope_per_hour * (x_values - x_values.min())
+        # Add small random walk for realism (minor fluctuations)
+        random_walk = np.zeros(n_points)
         for i in range(1, n_points):
-            base[i] = base[i-1] + np.random.normal(0, 0.05 * magnitude)
+            random_walk[i] = random_walk[i-1] + np.random.normal(0, 0.02)
+        base = base + random_walk
+    
     elif trend == 'down':
-        decay_rate = 0.5 + magnitude * 0.5
-        base = -decay_rate * x_norm * (2 + magnitude)
-        base = base * (1 + 0.3 * np.sin(x_norm * np.pi))
+        # Kill curve: realistic decline phase
+        # Slope: -0.5 to -2 log10 CFU/mL per hour
+        # magnitude: 0.5 -> -0.75/hr, 1.0 -> -1.25/hr, 2.0 -> -2.0/hr
+        kill_slope = -(0.5 + magnitude * 0.75)
+        kill_slope = max(kill_slope, -2.0)  # Cap at realistic max killing rate
+        base = kill_slope * (x_values - x_values.min())
+        # Add slight curvature to slow down at very low CFU (realistic antibiotic dynamics)
+        base = base * (1 + 0.15 * np.sin(x_norm * np.pi * 0.5))
+    
     elif trend == 'up':
+        # Growth without killing: exponential-like approach to upper limit
+        # Maximum plausible ~8-10 log10 CFU/mL
+        # Use exponential saturation curve
+        saturation_value = 2.0 + magnitude * 1.0  # Total growth potential
+        saturation_value = min(saturation_value, 3.5)  # Realistic max gain
         growth_rate = 0.3 + magnitude * 0.3
-        base = magnitude * (1 - np.exp(-growth_rate * x_norm * 5)) * 2
+        base = saturation_value * (1 - np.exp(-growth_rate * x_norm * 4))
+    
     elif trend == 'mixed':
+        # Rise and fall within realistic CFU ranges
+        # Peak typically at mid-timeline, max ~12-13 log10 CFU/mL
         peak_pos = np.random.uniform(0.3, 0.7)
+        peak_height = 1.5 + magnitude * 0.8  # Peak relative to initial
+        peak_height = min(peak_height, 4.0)  # Realistic max
         base = np.zeros(n_points)
         for i, xn in enumerate(x_norm):
             if xn < peak_pos:
-                base[i] = magnitude * (xn / peak_pos)
+                # Rise to peak
+                base[i] = peak_height * (xn / peak_pos) ** 0.9
             else:
-                base[i] = magnitude * (1 - (xn - peak_pos) / (1 - peak_pos))
+                # Fall from peak (steeper than rise for realism)
+                base[i] = peak_height * (1 - (xn - peak_pos) / (1 - peak_pos)) ** 0.8
+    
     elif trend == 'kill_regrowth':
-        nadir_pos = np.random.uniform(0.3, 0.5)
-        nadir_depth = 1.5 + magnitude
+        # Kill phase followed by regrowth
+        # Nadir: typically 0-2 log10 CFU/mL (avoid negative)
+        # Regrowth slope: 0.1-0.5 log10 CFU/mL per hour
+        nadir_pos = np.random.uniform(0.25, 0.45)
+        nadir_depth = 2.5 + magnitude * 1.0  # How far down from initial
+        nadir_depth = min(nadir_depth, 4.5)  # Realistic max killing
+        
+        regrowth_rate = 0.15 + magnitude * 0.2  # Regrowth slope multiplier
+        regrowth_rate = min(regrowth_rate, 0.5)
+        
         base = np.zeros(n_points)
         for i, xn in enumerate(x_norm):
             if xn < nadir_pos:
-                base[i] = -nadir_depth * (xn / nadir_pos) ** 0.8
+                # Kill phase: curved decline (slower at low CFU)
+                base[i] = -nadir_depth * (xn / nadir_pos) ** 0.7
             else:
+                # Regrowth phase: exponential regrowth from nadir
                 regrowth_x = (xn - nadir_pos) / (1 - nadir_pos)
-                regrowth_amount = (magnitude * 0.5) * regrowth_x ** 1.5
+                # Realistic regrowth with diminishing slope as CFU increases
+                regrowth_amount = regrowth_rate * nadir_depth * (1 - np.exp(-2.0 * regrowth_x))
                 base[i] = -nadir_depth + regrowth_amount
     else:
         base = np.zeros(n_points)
     
+    # Generate noise: Gaussian, realistic for microbiology assays
     noise_vals = np.random.normal(0, noise, n_points)
     
     if y_scale == 'log':
         y_values = initial_y + base + noise_vals
-        y_values = np.maximum(y_values, 0.1)
+        # Enforce realistic CFU range: 0.1 to ~12-13 log10 CFU/mL
+        y_values = np.maximum(y_values, 0.1)  # Avoid negative/unrealistic low values
+        y_values = np.minimum(y_values, 13.0)  # Cap at extreme but plausible max
     else:
         y_values = (10 ** initial_y) * (10 ** (base + noise_vals))
-        y_values = np.maximum(y_values, 0)
+        y_values = np.maximum(y_values, 0.1)
+        y_values = np.minimum(y_values, 10 ** 13)
     
     return y_values
 
@@ -240,17 +295,34 @@ def create_synthetic_plot(settings, curves_data, x_values):
             return
         x0, y0 = x_before[-1], y_before[-1]
         x1, y1 = x_after[0], y_after[0]
-        # Calculate the gap width in data coordinates
         gap_left = break_start
         gap_right = break_end
-        # Draw line from last point to gap_left (on ax1)
+
+        # Hardcoded virtual gap (e.g., 5 hours)
+        virtual_gap = 5.0
+        # Calculate the virtual slope
+        slope = (y1 - y0) / virtual_gap
+
+        # The total real x-gap between the two points
+        real_gap = x1 - x0
+        # The fraction of the real gap that is before the break
+        left_frac = (gap_left - x0) / real_gap if real_gap != 0 else 0.5
+        # The fraction of the real gap that is after the break
+        right_frac = (x1 - gap_right) / real_gap if real_gap != 0 else 0.5
+
+        # The virtual x for the left and right ends
+        virtual_x_left = x0 + left_frac * virtual_gap
+        virtual_x_right = x0 + (1 - right_frac) * virtual_gap
+
+        # For the left segment: from x0 to gap_left
         if x0 < gap_left:
-            ax1.plot([x0, gap_left], [y0, np.interp(gap_left, [x0, x1], [y0, y1])],
-                     color=color, linestyle=linestyle, linewidth=linewidth, alpha=0.7, zorder=10, dashes=(5, 5))
-        # Draw line from gap_right to first point (on ax2)
+            y_gap_left = y0 + slope * (virtual_x_left - x0)
+            ax1.plot([x0, gap_left], [y0, y_gap_left], color=color, linestyle=linestyle, linewidth=linewidth, alpha=0.7, zorder=10)
+
+        # For the right segment: from gap_right to x1
         if x1 > gap_right:
-            ax2.plot([gap_right, x1], [np.interp(gap_right, [x0, x1], [y0, y1]), y1],
-                     color=color, linestyle=linestyle, linewidth=linewidth, alpha=0.7, zorder=10, dashes=(5, 5))
+            y_gap_right = y0 + slope * (virtual_x_right - x0)
+            ax2.plot([gap_right, x1], [y_gap_right, y1], color=color, linestyle=linestyle, linewidth=linewidth, alpha=0.7, zorder=10)
     
     fig, ax = plt.subplots(figsize=(settings['figure_width'], settings['figure_height']))
     
@@ -295,6 +367,9 @@ def create_synthetic_plot(settings, curves_data, x_values):
     y_label = settings['y_label']
     if settings['y_unit']:
         y_label += f" ({settings['y_unit']})"
+    # Add log10 scale indication if y_scale is log
+    if settings.get('y_scale', '').lower() == 'log':
+        y_label += " (log10 scale)"
     ax.set_ylabel(y_label, fontsize=11)
     
     # Set axis limits - x starts at 0 by default
@@ -321,19 +396,17 @@ def create_synthetic_plot(settings, curves_data, x_values):
             try:
                 y_min = float(settings['y_min'])
             except:
-                y_min = 0
+                y_min = 0.1
         else:
-            y_min = 0
+            y_min = 0.1
         
         if settings['y_max'] != '':
             try:
                 y_max = float(settings['y_max'])
             except:
-                all_y = [val for curve in curves_data for val in curve['y']]
-                y_max = max(all_y) + 1
+                y_max = 6.9
         else:
-            all_y = [val for curve in curves_data for val in curve['y']]
-            y_max = max(all_y) + 1
+            y_max = 6.9
         
         ax.set_ylim(y_min, y_max)
         
@@ -348,6 +421,9 @@ def create_synthetic_plot(settings, curves_data, x_values):
         y_ticks = np.arange(int(y_min), int(y_max) + 1, tick_spacing)
         ax.set_yticks(y_ticks)
         ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%d'))
+        # Add minor ticks at every 1 unit
+        ax.yaxis.set_minor_locator(ticker.MultipleLocator(1))
+        ax.tick_params(axis='y', which='minor', left=True, right=False)
         ax.spines['bottom'].set_position(('data', y_min))
     else:
         y_min = 0
@@ -390,7 +466,9 @@ def create_synthetic_plot(settings, curves_data, x_values):
             break_end = float(axis_break_end)
 
             if break_start < break_end and x_min < break_start and break_end < x_max:
-                # Create a broken x-axis using subplots (y-axis only on left, x-axis break only on bottom)
+                # Create a broken x-axis using three subplots: left | gap | right
+                # The middle axis is invisible and reserves visual space equal to the removed range,
+                # keeping line slopes visually consistent across the break.
                 fig.clf()
                 y_plot_min = y_min
                 y_plot_max = y_max
@@ -418,19 +496,14 @@ def create_synthetic_plot(settings, curves_data, x_values):
                 ax2.xaxis.set_label_position('bottom')
                 ax1.xaxis.set_visible(True)
                 ax2.xaxis.set_visible(True)
-                # Remove any top x-axis
-                ax1.xaxis.set_ticks_position('bottom')
-                ax2.xaxis.set_ticks_position('bottom')
                 # Add diagonal lines to indicate break (bottom only)
                 d = 0.015  # Size of diagonal lines
                 kwargs = dict(transform=ax1.transAxes, color='k', clip_on=False, linewidth=1)
                 # Bottom break (right edge of left axis)
                 ax1.plot((1-d, 1+d), (-d, +d), **kwargs)
-                # No top break
                 kwargs2 = dict(transform=ax2.transAxes, color='k', clip_on=False, linewidth=1)
                 # Bottom break (left edge of right axis)
                 ax2.plot((-d, +d), (-d, +d), **kwargs2)
-                # No top break
                 # Plot curves on both axes
                 for curve_data in curves_data:
                     config = curve_data['config']
@@ -472,44 +545,22 @@ def create_synthetic_plot(settings, curves_data, x_values):
                         marker_kwargs_copy = marker_kwargs.copy()
                         marker_kwargs_copy['label'] = None
                         ax2.plot(x_after, y_after, **marker_kwargs_copy)
-                    # Connect points across the break with a line that has a gap at the break symbol
+                    # Use the helper to draw the broken connecting line in data coordinates
                     if config['show_line'] and len(x_before) > 0 and len(x_after) > 0:
-                        # Get the last point before the break and first point after
-                        last_before_x = x_before[-1]
-                        last_before_y = y_before[-1]
-                        first_after_x = x_after[0]
-                        first_after_y = y_after[0]
-                        
-                        # Calculate the break width in data coordinates (approximate)
-                        # The break symbol occupies about 3% of each subplot width
-                        break_gap_width = (break_start - x_min) * 0.03
-                        
-                        # Draw line from last point before break to just before the break symbol
-                        connect_x1 = break_start - break_gap_width / 2
-                        # Interpolate y value at this x position
-                        connect_y1 = last_before_y + (first_after_y - last_before_y) * (connect_x1 - last_before_x) / (first_after_x - last_before_x)
-                        
-                        ax1.plot([last_before_x, connect_x1], [last_before_y, connect_y1],
-                               linestyle=config['line_style'],
-                               color=config['color'],
-                               linewidth=config['line_width'],
-                               label=None, clip_on=False)
-                        
-                        # Draw line from just after the break symbol to first point after break
-                        connect_x2 = break_end + break_gap_width / 2
-                        # Interpolate y value at this x position
-                        connect_y2 = last_before_y + (first_after_y - last_before_y) * (connect_x2 - last_before_x) / (first_after_x - last_before_x)
-                        
-                        ax2.plot([connect_x2, first_after_x], [connect_y2, first_after_y],
-                               linestyle=config['line_style'],
-                               color=config['color'],
-                               linewidth=config['line_width'],
-                               label=None, clip_on=False)
+                        draw_broken_line(
+                            ax1, ax2,
+                            x_before, y_before, x_after, y_after,
+                            break_start, break_end,
+                            config['color'], config['line_style'], config['line_width']
+                        )
                 # Set axis limits
                 ax1.set_xlim(x_min, break_start)
                 ax2.set_xlim(break_end, x_max)
                 ax1.set_ylim(y_plot_min, y_plot_max)
                 ax2.set_ylim(y_plot_min, y_plot_max)
+                # Add minor ticks at every 1 unit for y-axis
+                ax1.yaxis.set_minor_locator(ticker.MultipleLocator(1))
+                ax1.tick_params(axis='y', which='minor', left=True, right=False)
                 # Set x-axis ticks for broken axis
                 x_tick_mode_break = settings.get('x_tick_mode', 'custom')
                 x_tick_interval_break = settings.get('x_tick_interval', 2)
@@ -534,6 +585,11 @@ def create_synthetic_plot(settings, curves_data, x_values):
                         ax1.set_xticks(ticks_before)
                     if len(ticks_after) > 0:
                         ax2.set_xticks(ticks_after)
+                    # Add minor ticks at every 1 unit for broken axis
+                    ax1.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+                    ax1.tick_params(axis='x', which='minor', bottom=True, top=False)
+                    ax2.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+                    ax2.tick_params(axis='x', which='minor', bottom=True, top=False)
                 # Set labels
                 x_label = settings['x_label']
                 if settings['x_unit']:
@@ -542,13 +598,31 @@ def create_synthetic_plot(settings, curves_data, x_values):
                 y_label = settings['y_label']
                 if settings['y_unit']:
                     y_label += f" ({settings['y_unit']})"
+                if settings.get('y_scale', '').lower() == 'log':
+                    y_label += " (log10 scale)"
                 ax1.set_ylabel(y_label, fontsize=11)
                 # Title
                 if settings['title']:
                     fig.suptitle(settings['title'], fontsize=12, fontweight='bold')
                 # Legend
                 if settings['show_legend']:
-                    ax1.legend(loc='best', framealpha=0.9)
+                    from matplotlib.lines import Line2D
+                    legend_handles = []
+                    for curve_data in curves_data:
+                        config = curve_data['config']
+                        handle = Line2D(
+                            [0], [0],
+                            color=config['color'],
+                            linestyle=config['line_style'] if config['show_line'] else 'none',
+                            linewidth=config['line_width'],
+                            marker=config['marker'],
+                            markersize=config['marker_size'],
+                            markerfacecolor=config['color'],
+                            markeredgecolor='none' if config['color'].lower() in ['#000000', '#000', 'black'] else config['color'],
+                            label=config['name']
+                        )
+                        legend_handles.append(handle)
+                    ax1.legend(handles=legend_handles, loc='best', framealpha=0.9)
                 # Grid (only on left axis)
                 if settings['show_grid']:
                     ax1.grid(True, alpha=0.3, linestyle='--')
@@ -587,6 +661,9 @@ def create_synthetic_plot(settings, curves_data, x_values):
         if len(x_ticks) > 0:
             ax.set_xticks(x_ticks)
             ax.tick_params(axis='x', which='major', labelsize=10)
+            # Add minor ticks at every 1 unit
+            ax.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+            ax.tick_params(axis='x', which='minor', bottom=True, top=False)
     # Otherwise, use auto ticks (matplotlib default)
     
     if settings['title']:
@@ -610,14 +687,165 @@ def fig_to_base64(fig):
     plt.close(fig)
     return img_base64
 
+
+def build_synthetic_context(settings, curves_data, x_values, base_name):
+    """Build structured context metadata for a synthetic time-kill plot."""
+    def map_line_style(style):
+        return {
+            '-': 'solid',
+            '--': 'dashed',
+            '-.': 'dash-dot',
+            ':': 'dotted'
+        }.get(style, 'custom')
+
+    def map_marker(marker):
+        return {
+            'o': 'circle',
+            's': 'square',
+            '^': 'triangle_up',
+            'v': 'triangle_down',
+            'D': 'diamond',
+            'x': 'x',
+            '+': 'plus',
+            None: 'none',
+            '': 'none',
+            'none': 'none',
+            'None': 'none'
+        }.get(marker, marker or 'none')
+
+    def map_trend(trend_key):
+        trend_map = {
+            'stable': 'stable (flat)',
+            'up': 'growth (increasing)',
+            'down': 'kill (decreasing)',
+            'kill_regrowth': 'kill + regrowth',
+            'mixed': 'mixed'
+        }
+        return trend_map.get(trend_key, trend_key or 'unspecified')
+
+    # Axis ranges derived from generator settings/data (not from images)
+    try:
+        x_min_val = max(0, float(settings.get('x_min', 0))) if str(settings.get('x_min', '')).strip() != '' else 0.0
+    except Exception:
+        x_min_val = 0.0
+    try:
+        if str(settings.get('x_max', '')).strip() != '':
+            x_max_val = float(settings['x_max'])
+        else:
+            x_max_val = float(max(x_values)) if len(x_values) > 0 else 24.0
+    except Exception:
+        x_max_val = float(max(x_values)) if len(x_values) > 0 else 24.0
+
+    all_y = [val for curve in curves_data for val in curve.get('y', [])]
+    if str(settings.get('y_scale', '')).lower() == 'log':
+        try:
+            if str(settings.get('y_min', '')).strip() != '':
+                y_min_val = float(settings['y_min'])
+            else:
+                y_min_val = 0.1
+        except Exception:
+            y_min_val = 0.1
+        try:
+            if str(settings.get('y_max', '')).strip() != '':
+                y_max_val = float(settings['y_max'])
+            else:
+                y_max_val = 6.9
+        except Exception:
+            y_max_val = 6.9
+    else:
+        try:
+            if str(settings.get('y_min', '')).strip() != '':
+                y_min_val = float(settings['y_min'])
+            else:
+                y_min_val = float(min(all_y)) if all_y else 0.0
+        except Exception:
+            y_min_val = float(min(all_y)) if all_y else 0.0
+        try:
+            if str(settings.get('y_max', '')).strip() != '':
+                y_max_val = float(settings['y_max'])
+            else:
+                y_max_val = float(max(all_y)) if all_y else 10.0
+        except Exception:
+            y_max_val = float(max(all_y)) if all_y else 10.0
+
+    legend_curves = []
+    trend_entries = []
+    for idx, curve in enumerate(curves_data):
+        config = curve.get('config', {})
+        name = config.get('name') or f"Curve {idx + 1}"
+        color = config.get('color', '')
+        marker = map_marker(config.get('marker'))
+        line_type = map_line_style(config.get('line_style', '-'))
+        trend_key = config.get('trend') or curve.get('trend')
+        legend_curves.append({
+            'id': name,
+            'color': color,
+            'marker': marker,
+            'line_type': line_type
+        })
+        trend_entries.append({
+            'id': name,
+            'trend': trend_key or 'unspecified',
+            'description': map_trend(trend_key)
+        })
+
+    return {
+        'plot_type': 'time-kill plot',
+        'source': 'synthetic_generator',
+        'name': base_name,
+        'legend': {
+            'total_curves': len(curves_data),
+            'curves': legend_curves
+        },
+        'axes': {
+            'x': {
+                'label': settings.get('x_label', ''),
+                'units': settings.get('x_unit', ''),
+                'range': {'min': x_min_val, 'max': x_max_val}
+            },
+            'y': {
+                'label': settings.get('y_label', ''),
+                'units': settings.get('y_unit', ''),
+                'range': {'min': y_min_val, 'max': y_max_val}
+            }
+        },
+        'curves_trends': trend_entries
+    }
+
+def find_synthetic_plot_folder(plot_name):
+    """Find a synthetic plot folder by name, supporting nested letter folders.
+    
+    Looks for plot_name in SYNTHETIC_DIR/[A-Z]/plot_name/ or SYNTHETIC_DIR/plot_name/"""
+    # Try nested structure first
+    if os.path.exists(SYNTHETIC_DIR):
+        first_letter = plot_name[0].upper()
+        letter_folder = os.path.join(SYNTHETIC_DIR, first_letter)
+        nested_path = os.path.join(letter_folder, plot_name)
+        if os.path.isdir(nested_path):
+            return nested_path
+    
+    # Fall back to flat structure for backwards compatibility
+    flat_path = os.path.join(SYNTHETIC_DIR, plot_name)
+    if os.path.isdir(flat_path):
+        return flat_path
+    
+    return None
+
 def get_next_synthetic_name():
-    """Generate the next available name for a synthetic plot (AA, AB, AC, ...)."""
+    """Generate the next available name for a synthetic plot (AA, AB, AC, ...).
+    
+    Looks in nested letter folders (A/, B/, C/, etc.) for existing plots."""
     import string
     existing = set()
     if os.path.exists(SYNTHETIC_DIR):
-        for item in os.listdir(SYNTHETIC_DIR):
-            if os.path.isdir(os.path.join(SYNTHETIC_DIR, item)):
-                existing.add(item.upper())
+        # Look in nested letter folders (A/, B/, C/, D/, ...)
+        for letter_folder in os.listdir(SYNTHETIC_DIR):
+            letter_path = os.path.join(SYNTHETIC_DIR, letter_folder)
+            if os.path.isdir(letter_path) and len(letter_folder) == 1 and letter_folder.isalpha():
+                # This is a letter folder, scan inside it
+                for plot_folder in os.listdir(letter_path):
+                    if os.path.isdir(os.path.join(letter_path, plot_folder)):
+                        existing.add(plot_folder.upper())
     
     for first in string.ascii_uppercase:
         for second in string.ascii_uppercase:
@@ -629,9 +857,11 @@ def get_next_synthetic_name():
     return f"ZZ_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
 def save_synthetic_plot_and_data(settings, curves_data, x_values):
-    """Save the plot as PNG and the data as CSV."""
+    """Save the plot as PNG and the data as CSV into the appropriate letter subfolder."""
     base_filename = get_next_synthetic_name()
-    plot_folder = os.path.join(SYNTHETIC_DIR, base_filename)
+    first_letter = base_filename[0].upper()
+    letter_folder = os.path.join(SYNTHETIC_DIR, first_letter)
+    plot_folder = os.path.join(letter_folder, base_filename)
     os.makedirs(plot_folder, exist_ok=True)
     
     fig = create_synthetic_plot(settings, curves_data, x_values)
@@ -648,11 +878,18 @@ def save_synthetic_plot_and_data(settings, curves_data, x_values):
     
     csv_path = os.path.join(plot_folder, f'{base_filename}-original.csv')
     save_synthetic_csv(curves_data, x_values, settings, csv_path)
+
+    # Save context metadata alongside the image
+    context_path = os.path.join(plot_folder, f'{base_filename}.context.json')
+    context_payload = build_synthetic_context(settings, curves_data, x_values, base_filename)
+    with open(context_path, 'w', encoding='utf-8') as f:
+        json.dump(context_payload, f, indent=2)
     
     return {
         'png': png_path,
         'svg': svg_path,
         'csv': csv_path,
+        'context': context_path,
         'filename': base_filename,
         'folder': plot_folder
     }
@@ -1183,6 +1420,37 @@ def check_csv_v2():
     result = check_csv_exists_v2(image_path, prompt_name)
     return jsonify(result)
 
+
+@app.route('/v2/get_context', methods=['POST'])
+def get_context_v2():
+    """Return synthetic context metadata if available (only for synthetic plots)."""
+    image_path = request.json.get('image_path', '') or ''
+
+    # Only synthetic plots have generator-derived context files
+    if not image_path.lower().startswith('synthetic/'):
+        return jsonify({'found': False, 'reason': 'non_synthetic'})
+
+    full_image_path = os.path.join(PLOTS_DIR, image_path)
+    if not os.path.exists(full_image_path):
+        return jsonify({'found': False, 'reason': 'image_missing'})
+
+    base_name = os.path.splitext(os.path.basename(full_image_path))[0]
+    context_path = os.path.join(os.path.dirname(full_image_path), f"{base_name}.context.json")
+
+    if not os.path.exists(context_path):
+        return jsonify({'found': False, 'reason': 'context_missing', 'context_path': os.path.relpath(context_path, PLOTS_DIR)})
+
+    try:
+        with open(context_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        return jsonify({
+            'found': True,
+            'context_path': os.path.relpath(context_path, PLOTS_DIR),
+            'content': content
+        })
+    except Exception as e:
+        return jsonify({'found': False, 'reason': 'read_error', 'error': str(e)})
+
 @app.route('/get_axis_ranges', methods=['POST'])
 def get_axis_ranges():
     """Get axis ranges from the original CSV file for an image."""
@@ -1402,6 +1670,167 @@ def run_all_v2():
     thread.start()
 
     return jsonify({'task_id': task_id, 'status': 'started'})
+
+
+# =============================================================================
+# V2 Extraction Progress Tracking Routes
+# =============================================================================
+
+@app.route('/v2/extraction_progress/<task_id>')
+def get_extraction_progress(task_id):
+    """Get real-time progress of a running V2 extraction.
+    
+    Returns: current stage, percentage, accumulated facts, and stage timing."""
+    try:
+        progress_files = []
+
+        # Prefer scoping the search to this task's image directory (more accurate, much faster)
+        with extraction_tasks_lock:
+            task = extraction_tasks.get(task_id)
+
+        if task and task.get('pipeline') == 'v2':
+            image_path = task.get('image_path')
+            prompt_name = task.get('prompt_name')
+            if image_path and prompt_name:
+                full_image_path = os.path.join(PLOTS_DIR, image_path)
+                image_dir = os.path.dirname(full_image_path)
+
+                if os.path.isdir(image_dir):
+                    for root, dirs, files in os.walk(image_dir):
+                        # Only consider v2 output dirs for this prompt
+                        if f'pv2_{prompt_name}' not in root:
+                            continue
+                        if '_extraction_progress.json' in files:
+                            progress_path = os.path.join(root, '_extraction_progress.json')
+                            mtime = os.path.getmtime(progress_path)
+                            progress_files.append((mtime, progress_path))
+
+        # Fallback: global search (e.g., if server restarted and task_id not in memory)
+        if not progress_files:
+            plots_dir = os.path.join(BASE_DIR, 'plots')
+            for root, dirs, files in os.walk(plots_dir):
+                if '_extraction_progress.json' in files:
+                    progress_path = os.path.join(root, '_extraction_progress.json')
+                    mtime = os.path.getmtime(progress_path)
+                    progress_files.append((mtime, progress_path))
+
+        if not progress_files:
+            resp = jsonify({'status': 'not_found'})
+            resp.headers['Cache-Control'] = 'no-store'
+            return resp
+
+        progress_files.sort(reverse=True)
+        latest_progress_path = progress_files[0][1]
+        with open(latest_progress_path, 'r', encoding='utf-8') as f:
+            progress_data = json.load(f)
+
+        resp = jsonify(progress_data)
+        resp.headers['Cache-Control'] = 'no-store'
+        return resp
+
+    except Exception as e:
+        resp = jsonify({'error': str(e), 'status': 'error'})
+        resp.headers['Cache-Control'] = 'no-store'
+        return resp, 500
+
+
+@app.route('/v2/extraction_console/<image_name>/<prompt_name>')
+def get_extraction_console(image_name, prompt_name):
+    """Display a standalone console for a completed V2 extraction.
+    
+    This page can be opened in a new tab to show full extraction details."""
+    try:
+        # Parse image_name and find the corresponding version directory
+        # image_name format: "plotname" or with path elements
+        base_name = image_name.replace('.png', '')
+        
+        # Search for the version directory
+        version_dir = None
+        plots_base = os.path.join(BASE_DIR, 'plots')
+        
+        for root, dirs, files in os.walk(plots_base):
+            # Look for directories matching the prompt_name pattern
+            for d in dirs:
+                if f'pv2_{prompt_name}' in d and base_name in root:
+                    version_dir = os.path.join(root, d)
+                    break
+            if version_dir:
+                break
+        
+        if not version_dir or not os.path.isdir(version_dir):
+            return f"<h1>Extraction console not found</h1><p>Image: {image_name}, Prompt: {prompt_name}</p>", 404
+        
+        # Read the progress file and all output files
+        progress_file = os.path.join(version_dir, '_extraction_progress.json')
+        progress_data = {}
+        if os.path.exists(progress_file):
+            with open(progress_file, 'r', encoding='utf-8') as f:
+                progress_data = json.load(f)
+        
+        # Read other output files
+        tracking_file = os.path.join(version_dir, f"{image_name}.pv2_{prompt_name}.*.mistral.out_tracking")
+        tracking_content = ""
+        for f in os.listdir(version_dir):
+            if 'mistral.out_tracking' in f:
+                with open(os.path.join(version_dir, f), 'r', encoding='utf-8') as tf:
+                    tracking_content = tf.read()
+                break
+        
+        # Build HTML page
+        html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Extraction Console - {image_name}</title>
+            <style>
+                body {{ font-family: monospace; background: #1e1e1e; color: #d4d4d4; padding: 20px; }}
+                .header {{ background: #333; padding: 15px; border-radius: 5px; margin-bottom: 20px; }}
+                .header h1 {{ margin: 0; color: #4ec9b0; }}
+                .metadata {{ margin: 10px 0; font-size: 0.9em; color: #858585; }}
+                .console {{ background: #1e1e1e; border: 1px solid #444; padding: 15px; border-radius: 5px; max-height: 70vh; overflow-y: auto; }}
+                .section {{ margin-bottom: 20px; }}
+                .section-title {{ color: #4ec9b0; font-weight: bold; margin-bottom: 10px; }}
+                .progress {{ background: #252526; padding: 10px; border-left: 3px solid #4ec9b0; margin-bottom: 15px; }}
+                code {{ background: #252526; padding: 2px 5px; border-radius: 3px; }}
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>Extraction Console</h1>
+                <div class="metadata">
+                    <strong>Image:</strong> {image_name}<br>
+                    <strong>Prompt:</strong> {prompt_name}
+                </div>
+            </div>
+            
+            <div class="console">
+                <div class="section">
+                    <div class="section-title">📊 Current Progress</div>
+                    <div class="progress">
+                        Stage: <code>{progress_data.get('stage', 'N/A')}</code><br>
+                        Progress: <code>{progress_data.get('percentage', 0)}%</code> ({progress_data.get('stage_index', 0)}/{progress_data.get('total_stages', 5)})<br>
+                        Stage Duration: <code>{progress_data.get('stage_duration_ms', 0):.0f}ms</code>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📋 Accumulated Facts</div>
+                    <pre style="background: #252526; padding: 10px; border-radius: 5px; overflow-x: auto; max-height: 300px;">{json.dumps(progress_data.get('accumulated_facts', {{}}), indent=2)}</pre>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📝 Extraction Report</div>
+                    <pre style="background: #252526; padding: 10px; border-radius: 5px; overflow-x: auto;">{tracking_content or 'No tracking data available yet'}</pre>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        return html
+    
+    except Exception as e:
+        return f"<h1>Error loading console</h1><p>{str(e)}</p>", 500
+
 
 def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run_pointwise,
                         left_x, right_x, bottom_y, top_y):
@@ -1711,6 +2140,7 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, run_i
 
     image_dir = os.path.dirname(full_image_path)
     image_name = os.path.basename(image_path)
+    base_name = os.path.splitext(image_name)[0]
 
     update_task(progress='Running extraction (v2 pipeline)...')
     console_output.append("=" * 60)
@@ -1767,11 +2197,12 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, run_i
         version_match = re.search(r'\.v(\d+)$', os.path.basename(version_dir))
         if version_match:
             version_num = int(version_match.group(1))
-        extracted_csv = os.path.join(version_dir, f"{image_name}.{full_prompt_name}.v{version_num}.mistral.out_data")
+        # V2 runner saves the clean CSV as {base_name}_extracted.csv (Stage 4 backup)
+        extracted_csv = os.path.join(version_dir, f"{base_name}_extracted.csv")
     else:
         name_for_folder = image_name.replace('.', '_')
         fallback_dir = os.path.join(image_dir, f"{name_for_folder}.{full_prompt_name}.v{version_num}")
-        extracted_csv = os.path.join(fallback_dir, f"{image_name}.{full_prompt_name}.v{version_num}.mistral.out_data")
+        extracted_csv = os.path.join(fallback_dir, f"{base_name}_extracted.csv")
 
     if run_interpolation and success:
         update_task(progress='Running interpolation...')
@@ -1990,6 +2421,8 @@ def run_batch_single():
         
         # Get parameters
         prompt_file = request.form.get('prompt', 'prompt_1.py')
+        use_v2 = request.form.get('useV2', 'false') == 'true'
+        article_info = request.form.get('articleInfo', '')
         run_interpolation = request.form.get('runInterpolation', 'false') == 'true'
         run_pointwise = request.form.get('runPointwise', 'false') == 'true'
         left_x = request.form.get('leftX', '0')
@@ -2005,14 +2438,28 @@ def run_batch_single():
         
         # Save the uploaded file
         original_filename = file.filename
+        base_name = os.path.splitext(original_filename)[0]
         image_path = os.path.join(batch_image_dir, original_filename)
         file.save(image_path)
         
         # Get relative path for the extraction pipeline
         rel_image_path = os.path.relpath(image_path, PLOTS_DIR).replace('\\', '/')
         
-        # Build the full paths
-        full_prompt_path = os.path.join(PROMPTS_DIR, prompt_file)
+        # Determine which extraction system to use
+        if use_v2:
+            # Extract prompt name from file (e.g., 'prompt_1.py' -> 'prompt_1')
+            prompt_name_v2 = os.path.splitext(prompt_file)[0]
+            extraction_cmd = ['python', 'plot_extract_v2/runner.py', image_path, prompt_name_v2]
+            if article_info:
+                extraction_cmd.append(article_info)
+            prompt_short = prompt_name_v2.replace('prompt_', 'p')
+            output_pattern = f".pv2_{prompt_name_v2}.v"
+        else:
+            # Use v1 extraction
+            full_prompt_path = os.path.join(PROMPTS_DIR, prompt_file)
+            extraction_cmd = ['python', 'plotExtract.py', image_path, full_prompt_path]
+            prompt_short = os.path.splitext(prompt_file)[0].replace('prompt_', 'p')
+            output_pattern = f".{prompt_short}.v"
         
         console_output = []
         success = True
@@ -2021,7 +2468,7 @@ def run_batch_single():
         total_start_time = time.time()
         
         # Get prompt short name
-        prompt_name = os.path.splitext(prompt_file)[0].replace('prompt_', 'p')
+        prompt_name = prompt_short
         
         # Step 1: Run extraction
         console_output.append("=" * 60)
@@ -2029,12 +2476,15 @@ def run_batch_single():
         console_output.append("=" * 60)
         console_output.append(f"Image: {original_filename}")
         console_output.append(f"Prompt: {prompt_file}")
+        console_output.append(f"Extraction: {'V2' if use_v2 else 'V1'}")
+        if use_v2 and article_info:
+            console_output.append(f"Article Info: {article_info[:100]}..." if len(article_info) > 100 else f"Article Info: {article_info}")
         console_output.append("")
         
         step1_start = time.time()
         try:
             result = subprocess.run(
-                ['python', 'plotExtract.py', image_path, full_prompt_path],
+                extraction_cmd,
                 cwd=BASE_DIR,
                 capture_output=True,
                 text=True,
@@ -2071,14 +2521,21 @@ def run_batch_single():
         # Determine extracted CSV path
         version_num = 1
         if version_dir:
-            version_match = re.search(r'\.v(\d+)$', os.path.basename(version_dir))
-            if version_match:
-                version_num = int(version_match.group(1))
-            extracted_csv = os.path.join(version_dir, f"{original_filename}.{prompt_name}.v{version_num}.mistral.out_data")
+            
+            # Determine CSV filename based on extraction version
+            if use_v2:
+                # V2 saves as {image}_extracted.csv
+                extracted_csv = os.path.join(version_dir, f"{base_name}_extracted.csv")
+            else:
+                # V1 saves as {filename}.{prompt}.v{N}.mistral.out_data
+                extracted_csv = os.path.join(version_dir, f"{original_filename}.{prompt_name}.v{version_num}.mistral.out_data")
         else:
             name_for_folder = original_filename.replace('.', '_')
             fallback_dir = os.path.join(batch_image_dir, f"{name_for_folder}.{prompt_name}.v{version_num}")
-            extracted_csv = os.path.join(fallback_dir, f"{original_filename}.{prompt_name}.v{version_num}.mistral.out_data")
+            if use_v2:
+                extracted_csv = os.path.join(fallback_dir, f"{base_name}_extracted.csv")
+            else:
+                extracted_csv = os.path.join(fallback_dir, f"{original_filename}.{prompt_name}.v{version_num}.mistral.out_data")
         
         # Try to find original CSV in batch_image_dir
         original_csv = None
@@ -2245,13 +2702,17 @@ def run_batch_single():
                 # Parse summary stats
                 outputs['summary'] = _parse_summary_stats(version_dir)
         
+        # Always return outputs and results, regardless of validation status
+        # This ensures plots with validation="no" are still displayed
         return jsonify({
             'success': success,
             'console': '\n'.join(console_output),
             'outputs': outputs,
             'version_dir': version_dir,
             'timings': timings,
-            'filename': original_filename
+            'filename': original_filename,
+            'validation_status': outputs['summary'].get('validation_result', 'Unknown'),
+            'show_outputs': True  # Always show outputs in batch mode
         })
             
     except Exception as e:
@@ -2408,37 +2869,46 @@ def synthetic_regenerate():
 
 @app.route('/synthetic/get_existing_plots')
 def get_existing_plots():
-    """Get list of existing synthetic plots that can be edited."""
+    """Get list of existing synthetic plots that can be edited.
+    
+    Looks in nested letter folders (A/, B/, C/, etc.)."""
     plots = []
     
     if os.path.exists(SYNTHETIC_DIR):
-        for item in sorted(os.listdir(SYNTHETIC_DIR)):
-            item_path = os.path.join(SYNTHETIC_DIR, item)
-            if os.path.isdir(item_path):
-                png_file = os.path.join(item_path, f'{item}.png')
-                csv_file = os.path.join(item_path, f'{item}-original.csv')
-                
-                if not os.path.exists(png_file):
-                    for f in os.listdir(item_path):
-                        if f.endswith('.png'):
-                            png_file = os.path.join(item_path, f)
-                            break
-                
-                if os.path.exists(png_file):
-                    plots.append({
-                        'name': item,
-                        'folder': item_path,
-                        'has_csv': os.path.exists(csv_file)
-                    })
+        # Look in nested letter folders (A/, B/, C/, D/, ...)
+        for letter_folder in sorted(os.listdir(SYNTHETIC_DIR)):
+            letter_path = os.path.join(SYNTHETIC_DIR, letter_folder)
+            if os.path.isdir(letter_path) and len(letter_folder) == 1 and letter_folder.isalpha():
+                # This is a letter folder, scan inside it
+                for item in sorted(os.listdir(letter_path)):
+                    item_path = os.path.join(letter_path, item)
+                    if os.path.isdir(item_path):
+                        png_file = os.path.join(item_path, f'{item}.png')
+                        csv_file = os.path.join(item_path, f'{item}-original.csv')
+                        
+                        if not os.path.exists(png_file):
+                            for f in os.listdir(item_path):
+                                if f.endswith('.png'):
+                                    png_file = os.path.join(item_path, f)
+                                    break
+                        
+                        if os.path.exists(png_file):
+                            plots.append({
+                                'name': item,
+                                'folder': item_path,
+                                'has_csv': os.path.exists(csv_file)
+                            })
     
     return jsonify(plots)
 
 @app.route('/synthetic/load_plot_for_edit/<plot_name>')
 def load_plot_for_edit(plot_name):
-    """Load an existing plot's data and settings for editing."""
-    plot_folder = os.path.join(SYNTHETIC_DIR, plot_name)
+    """Load an existing plot's data and settings for editing.
     
-    if not os.path.exists(plot_folder):
+    Supports nested letter folder structure."""
+    plot_folder = find_synthetic_plot_folder(plot_name)
+    
+    if not plot_folder:
         return jsonify({'success': False, 'error': 'Plot folder not found'})
     
     csv_file = os.path.join(plot_folder, f'{plot_name}-original.csv')
@@ -2612,6 +3082,12 @@ def save_edit():
         
         csv_path = os.path.join(plot_folder, f'{copy_name}-original.csv')
         save_synthetic_csv(curves_data, x_values, settings, csv_path)
+
+        # Save context metadata for the edited copy
+        context_path = os.path.join(plot_folder, f'{copy_name}.context.json')
+        context_payload = build_synthetic_context(settings, curves_data, x_values, copy_name)
+        with open(context_path, 'w', encoding='utf-8') as f:
+            json.dump(context_payload, f, indent=2)
         elapsed = time.time() - start_time
         
         return jsonify({
@@ -2620,6 +3096,7 @@ def save_edit():
                 'png': png_path,
                 'svg': svg_path,
                 'csv': csv_path,
+                'context': context_path,
                 'filename': copy_name,
                 'folder': plot_folder
             },

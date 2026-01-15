@@ -1,0 +1,41 @@
+import os
+import matplotlib.pyplot as plt
+import numpy as np
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic/C/CU\CU_png.pv2_prompt_4.v9\CU_png-replot.pv2_prompt_4.v9.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data points extracted from the plot
+time_points = [0, 2, 4, 6, 8, 10, 12, 20, 24]
+bacterial_counts = [5.92, 4.60, 4.30, 2.70, 2.55, 2.85, 3.00, 3.30, 3.40]  # log10 CFU/mL
+
+# Create the plot
+plt.figure(figsize=(6, 4))
+plt.plot(time_points, bacterial_counts,
+         color='black',
+         marker='o',
+         markersize=6,
+         linestyle='-',
+         linewidth=1.5,
+         label='Condition 1')
+
+# Axis labels and limits
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+plt.xlim(0, 26)
+plt.ylim(2, 6.5)
+
+# Ticks
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 20, 22, 24, 26])
+plt.yticks([2, 3, 4, 5, 6])
+
+# Add axis break (visual only)
+plt.gca().add_patch(plt.Rectangle((11.5, -0.5), 1, 11, fill=True, color='white', zorder=3))
+plt.plot([11, 13], [-0.5, -0.5], color='black', linewidth=1)
+plt.plot([11, 13], [10.5, 10.5], color='black', linewidth=1)
+
+# Legend
+plt.legend(loc='upper right', frameon=False)
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)

@@ -1,0 +1,11 @@
+{
+  "status": "complete",
+  "stage": "COMPLETE",
+  "stage_index": 5,
+  "total_stages": 5,
+  "percentage": 100.0,
+  "accumulated_facts": {},
+  "stage_duration_ms": 0,
+  "timestamp": 1768375065.8815784,
+  "console_output": "Extraction completed successfully"
+}

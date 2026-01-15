@@ -1005,6 +1005,7 @@
                 preview.style.display = 'block';
                 updateCsvInfo();
                 loadOutputFiles();
+                loadSyntheticContext();
             } else {
                 preview.style.display = 'none';
                 document.getElementById('originalCsvLabel').textContent = 'Select an image first';
@@ -1104,6 +1105,32 @@
             .then(res => res.json())
             .then(data => {
                 updateOutputDisplay(data.outputs);
+            });
+        }
+
+        function loadSyntheticContext() {
+            const imagePath = document.getElementById('imageSelect').value;
+            if (!imagePath || !imagePath.toLowerCase().startsWith('synthetic/')) return;
+
+            fetch('/v2/get_context', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image_path: imagePath })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.found || !data.content) return;
+                const articleField = document.getElementById('articleInfo');
+                if (articleField.value.trim()) return; // do not overwrite user-edited content
+
+                let text = data.content;
+                try {
+                    const parsed = JSON.parse(data.content);
+                    text = JSON.stringify(parsed, null, 2);
+                } catch (e) {
+                    // leave as-is if not valid JSON string
+                }
+                articleField.value = text;
             });
         }
         
@@ -1292,21 +1319,92 @@
             const btn = document.getElementById('btnRunAll');
             const consoleOutput = document.getElementById('consoleOutput');
             let startTime = Date.now();
+            let lastStageDisplayed = '';
             
             pollInterval = setInterval(() => {
                 if (!currentTaskId) {
                     clearInterval(pollInterval);
                     return;
                 }
+
+                let usedV2 = false;
+                let v2SaysComplete = false;
                 
-                fetch(`/task_status/${currentTaskId}`)
+                // Try V2 progress endpoint first (new tracking system)
+                fetch(`/v2/extraction_progress/${currentTaskId}`, { cache: 'no-store' })
                     .then(res => res.json())
+                    .then(progressData => {
+                        if (progressData.status !== 'not_found') {
+                            usedV2 = true;
+                            // V2 progress data available
+                            const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+                            const percentage = progressData.percentage || 0;
+                            const currentStage = progressData.stage || 'Processing';
+                            const stageTimeMs = progressData.stage_duration_ms || 0;
+                            const stageTime = (stageTimeMs / 1000).toFixed(2);
+                            
+                            btn.textContent = `⏳ ${percentage.toFixed(0)}% - ${currentStage} (${elapsed}s)`;
+                            
+                            // Build detailed console output
+                            let consoleText = `🔄 EXTRACTION IN PROGRESS\n`;
+                            consoleText += `${'='.repeat(60)}\n`;
+                            consoleText += `Overall Progress: ${percentage.toFixed(1)}% (${progressData.stage_index}/${progressData.total_stages} stages)\n`;
+                            consoleText += `Current Stage: ${currentStage}\n`;
+                            consoleText += `Stage Duration: ${stageTime}s\n`;
+                            consoleText += `Total Elapsed: ${elapsed}s\n`;
+                            consoleText += `${'='.repeat(60)}\n\n`;
+                            
+                            // Display stage-by-stage timeline if provided (preferred).
+                            // This preserves full evolution without overwriting prior stage dumps.
+                            if (progressData.console_output && progressData.console_output.trim().length > 0) {
+                                consoleText += progressData.console_output;
+                                consoleText += `\n`;
+                            } else if (progressData.accumulated_facts && Object.keys(progressData.accumulated_facts).length > 0) {
+                                // Fallback for older progress payloads
+                                consoleText += `📊 ACCUMULATED FACTS:\n`;
+                                consoleText += JSON.stringify(progressData.accumulated_facts, null, 2);
+                                consoleText += `\n\n`;
+                            }
+
+                            // Preserve scroll position unless the user was already at the bottom.
+                            // Keep the same distance from the bottom to prevent jumping while new text is appended.
+                            const wasAtBottom = consoleOutput.scrollTop + consoleOutput.clientHeight >= consoleOutput.scrollHeight - 10;
+                            const distanceFromBottom = consoleOutput.scrollHeight - consoleOutput.scrollTop - consoleOutput.clientHeight;
+                            consoleOutput.textContent = consoleText;
+                            if (wasAtBottom) {
+                                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                            } else {
+                                consoleOutput.scrollTop = Math.max(0, consoleOutput.scrollHeight - consoleOutput.clientHeight - distanceFromBottom);
+                            }
+
+                            // If V2 says complete, wait for /task_status to deliver the final result
+                            if (progressData.status === 'complete') {
+                                v2SaysComplete = true;
+                                return fetch(`/task_status/${currentTaskId}`, { cache: 'no-store' });
+                            }
+                            return null;
+                        }
+                        
+                        // Fall back to old task_status endpoint
+                        return fetch(`/task_status/${currentTaskId}`, { cache: 'no-store' });
+                    })
+                    .then(res => res ? res.json() : null)
                     .then(data => {
+                        if (!data) return; // Already handled by V2 endpoint
+                        
                         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
                         
                         if (data.status === 'running') {
-                            btn.textContent = `⏳ ${data.progress} (${elapsed}s)`;
-                            consoleOutput.textContent = `Task running...\nProgress: ${data.progress}\nElapsed: ${elapsed}s`;
+                            // If V2 is providing rich progress, don't overwrite the console with the legacy text.
+                            if (!usedV2) {
+                                btn.textContent = `⏳ ${data.progress} (${elapsed}s)`;
+                                consoleOutput.textContent = `Task running...\nProgress: ${data.progress}\nElapsed: ${elapsed}s`;
+                            }
+
+                            // If V2 reported completion but legacy status isn't completed yet, keep polling.
+                            if (v2SaysComplete) {
+                                return;
+                            }
                         } else if (data.status === 'completed') {
                             clearInterval(pollInterval);
                             pollInterval = null;

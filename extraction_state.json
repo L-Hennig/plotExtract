@@ -1,105 +1,106 @@
 {
   "success": true,
-  "console": "============================================================\nSTEP 1: Running Plot Extraction\n============================================================\nImage: synthetic/CS/CS.png\nPrompt: prompt_5.py\n\nInput plot: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS/CS.png\nUsing prompt: p5\nOutput folder: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.p5.v1 (version 1)\nExtracting data... FINISHED\nGenerating replot code... FINISHED\nReplotting with extracted data... FINISHED\nComparing source and replot... \n\nAxis x (result: Yes)\nAxis y (result: Yes)\nPoints n (result: Yes)\nTrends (result: Yes.)\n\nFINISHED (result: yes)\nStacking original and replotted images for comparison... FINISHED\nVERSION_DIR:C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.p5.v1\n\n\n\n\n\n[SUCCESS] Extraction completed.\n[TIME] Extraction took 25.57 seconds\n\n============================================================\nSTEP 2: Running Interpolation\n============================================================\nOriginal: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS-original.csv\nExtracted: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.p5.v1\\CS.png.p5.v1.mistral.out_data\nOutput dir: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.p5.v1\nAxis range: X=[0, 24], Y=[0, 8]\n\n\n[SUCCESS] Interpolation completed.\n[TIME] Interpolation took 6.87 seconds\n\n============================================================\nSTEP 3: Running Pointwise Comparison\n============================================================\nExtracted: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.p5.v1\\CS.png.p5.v1.mistral.out_data\nOriginal: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS-original.csv\nOutput dir: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.p5.v1\nAxis range: X=[0, 24], Y=[0, 8]\n\n\n[SUCCESS] Pointwise comparison completed.\n[TIME] Pointwise took 6.42 seconds\n\n============================================================\nPIPELINE FINISHED SUCCESSFULLY\nExtraction: success\nInterpolation: success\nPointwise: success\nTotal time: 38.87 seconds\n============================================================",
+  "console": "============================================================\nSTEP 1: Running PlotExtractV2\n============================================================\nImage: synthetic/C/CU/CU.png\nPrompt set: prompt_4\n\nPreprocessing article information...\nArticle information structured successfully\nInput plot: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU/CU.png\nUsing prompt set: prompt_4\nOutput folder: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU_png.pv2_prompt_4.v11 (version 11)\n[TRACKER] Starting stage: EXTRACT_STAGE_1\n[TRACKER] Completed stage 'EXTRACT_STAGE_1' (confidence: 0.70)\n===== STAGE 1 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"article_info\": {\n    \"figure_id\": \"CU\",\n    \"experimental_context\": {\n      \"assay_type\": \"time-kill plot\"\n    },\n    \"axis_definitions\": {\n      \"x_axis\": {\n        \"quantity\": \"Time\",\n        \"unit\": \"hours\"\n      },\n      \"y_axis\": {\n        \"quantity\": \"Bacterial Count\",\n        \"unit\": \"CFU/mL\"\n      }\n    },\n    \"curve_legend\": [\n      {\n        \"curve_label\": \"Condition 1\",\n        \"description\": \"kill + regrowth\",\n        \"expected_trend\": \"kill_regrowth\"\n      }\n    ]\n  },\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 1.0,\n    \"visually_verified\": true,\n    \"reason\": \"The assay type is explicitly declared as 'time-kill plot' in the experimental context, and the visual check confirms the x-axis as time and the y-axis as bacterial count, consistent with a time-kill plot.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"Time\",\n      \"unit\": \"hours\",\n      \"ticks_verified\": [\n        0,\n        26\n      ],\n      \"confidence\": 1.0\n    },\n    \"y_axis\": {\n      \"quantity\": \"Bacterial Count\",\n      \"unit\": \"CFU/mL\",\n      \"ticks_verified\": [\n        0.1,\n        6.9\n      ],\n      \"confidence\": 1.0\n    }\n  }\n}\n\n[TRACKER] Starting stage: EXTRACT_STAGE_2\n[TRACKER] Completed stage 'EXTRACT_STAGE_2' (confidence: 0.70)\n===== STAGE 2 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"article_info\": {\n    \"figure_id\": \"CU\",\n    \"experimental_context\": {\n      \"assay_type\": \"time-kill plot\"\n    },\n    \"axis_definitions\": {\n      \"x_axis\": {\n        \"quantity\": \"Time\",\n        \"unit\": \"hours\"\n      },\n      \"y_axis\": {\n        \"quantity\": \"Bacterial Count\",\n        \"unit\": \"CFU/mL\"\n      }\n    },\n    \"curve_legend\": [\n      {\n        \"curve_label\": \"Condition 1\",\n        \"description\": \"kill + regrowth\",\n        \"expected_trend\": \"kill_regrowth\"\n      }\n    ]\n  },\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 1.0,\n    \"visually_verified\": true,\n    \"reason\": \"The assay type is explicitly declared as 'time-kill plot' in the experimental context, and the visual check confirms the x-axis as time and the y-axis as bacterial count, consistent with a time-kill plot.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"Time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        20,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"\",\n        \"20\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 20,\n          \"reason\": \"Non-uniform interval indicating a break in time progression\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"Bacterial Count\",\n      \"unit\": \"CFU/mL\",\n      \"ticks_verified\": [\n        0.1,\n        6.9\n      ],\n      \"confidence\": 1.0\n    }\n  }\n}\n\n[TRACKER] Starting stage: EXTRACT_STAGE_3\n[TRACKER] Completed stage 'EXTRACT_STAGE_3' (confidence: 0.70)\n===== STAGE 3 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"article_info\": {\n    \"figure_id\": \"CU\",\n    \"experimental_context\": {\n      \"assay_type\": \"time-kill plot\"\n    },\n    \"axis_definitions\": {\n      \"x_axis\": {\n        \"quantity\": \"Time\",\n        \"unit\": \"hours\"\n      },\n      \"y_axis\": {\n        \"quantity\": \"Bacterial Count\",\n        \"unit\": \"CFU/mL\"\n      }\n    },\n    \"curve_legend\": [\n      {\n        \"curve_label\": \"Condition 1\",\n        \"description\": \"kill + regrowth\",\n        \"expected_trend\": \"kill_regrowth\"\n      }\n    ]\n  },\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 1.0,\n    \"visually_verified\": true,\n    \"reason\": \"The assay type is explicitly declared as 'time-kill plot' in the experimental context, and the visual check confirms the x-axis as time and the y-axis as bacterial count, consistent with a time-kill plot.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"Time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        20,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"\",\n        \"20\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 20,\n          \"reason\": \"Non-uniform interval indicating a break in time progression\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"Bacterial Count\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 7,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        1,\n        2,\n        3,\n        4,\n        5,\n        6\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"1\",\n        \"2\",\n        \"3\",\n        \"4\",\n        \"5\",\n        \"6\"\n      ],\n      \"breaks\": [],\n      \"confidence\": 0.98\n    }\n  }\n}\n\n[TRACKER] Starting stage: EXTRACT_STAGE_4\n[DEBUG STAGE 4] Initial extracted CSV lines: 9\n[DEBUG STAGE 4] First line: Time (hours),Bacterial Count (log10 CFU/mL) (Condition 1)\n[DEBUG STAGE 4] Found marker_facts in result_json\n[DEBUG STAGE 4] Number of curves: 1\n[DEBUG STAGE 4] First curve: Condition 1 with 8 points\n[DEBUG STAGE 4] Successfully rebuilt CSV from JSON curves\n[DEBUG STAGE 4] Rebuilt CSV first line: Time (hours),log10 CFU/mL (Condition 1)\nCSV data successfully saved from EXTRACT_STAGE_4\n[TRACKER] Stage 'EXTRACT_STAGE_4' extracted facts: ['num_columns', 'num_rows', 'columns', 'axis_labels']\n[TRACKER] Completed stage 'EXTRACT_STAGE_4' (confidence: 0.70)\n===== STAGE 4 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"article_info\": {\n    \"figure_id\": \"CU\",\n    \"experimental_context\": {\n      \"assay_type\": \"time-kill plot\"\n    },\n    \"axis_definitions\": {\n      \"x_axis\": {\n        \"quantity\": \"Time\",\n        \"unit\": \"hours\"\n      },\n      \"y_axis\": {\n        \"quantity\": \"Bacterial Count\",\n        \"unit\": \"CFU/mL\",\n        \"scale\": \"log10\"\n      }\n    },\n    \"curve_legend\": [\n      {\n        \"curve_label\": \"Condition 1\",\n        \"description\": \"kill + regrowth\",\n        \"expected_trend\": \"kill_regrowth\"\n      }\n    ]\n  },\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 1.0,\n    \"visually_verified\": true,\n    \"reason\": \"The assay type is explicitly declared as 'time-kill plot' in the experimental context, and the visual check confirms the x-axis as time and the y-axis as bacterial count, consistent with a time-kill plot.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"Time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        20,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"\",\n        \"20\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 20,\n          \"reason\": \"Non-uniform interval indicating a break in time progression\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"Bacterial Count\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 7,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        1,\n        2,\n        3,\n        4,\n        5,\n        6\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"1\",\n        \"2\",\n        \"3\",\n        \"4\",\n        \"5\",\n        \"6\"\n      ],\n      \"breaks\": [],\n      \"confidence\": 0.98\n    }\n  },\n  \"marker_facts\": {\n    \"markers_detected\": true,\n    \"curves\": [\n      {\n        \"curve_label\": \"Condition 1\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.0,\n            \"confidence\": 0.98\n          },\n          {\n            \"x\": 2,\n            \"y\": 4.5,\n            \"confidence\": 0.98\n          },\n          {\n            \"x\": 4,\n            \"y\": 4.2,\n            \"confidence\": 0.98\n          },\n          {\n            \"x\": 6,\n            \"y\": 2.7,\n            \"confidence\": 0.98\n          },\n          {\n            \"x\": 8,\n            \"y\": 2.5,\n            \"confidence\": 0.98\n          },\n          {\n            \"x\": 10,\n            \"y\": 2.8,\n            \"confidence\": 0.98\n          },\n          {\n            \"x\": 20,\n            \"y\": 3.1,\n            \"confidence\": 0.98\n          },\n          {\n            \"x\": 24,\n            \"y\": 3.3,\n            \"confidence\": 0.98\n          }\n        ]\n      }\n    ],\n    \"csv_output\": \"Time (hours),Bacterial Count (log10 CFU/mL) (Condition 1)\\n0,6.0\\n2,4.5\\n4,4.2\\n6,2.7\\n8,2.5\\n10,2.8\\n20,3.1\\n24,3.3\",\n    \"confidence\": 0.98\n  }\n}\n\n[TRACKER] Starting stage: EXTRACT_STAGE_5\n[TRACKER] Stage 'EXTRACT_STAGE_5' extracted facts: ['num_columns', 'num_rows', 'columns', 'axis_labels']\n[TRACKER] Completed stage 'EXTRACT_STAGE_5' (confidence: 0.70)\n===== STAGE 5 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"article_info\": {\n    \"figure_id\": \"CU\",\n    \"experimental_context\": {\n      \"assay_type\": \"time-kill plot\"\n    },\n    \"axis_definitions\": {\n      \"x_axis\": {\n        \"quantity\": \"Time\",\n        \"unit\": \"hours\"\n      },\n      \"y_axis\": {\n        \"quantity\": \"Bacterial Count\",\n        \"unit\": \"CFU/mL\",\n        \"scale\": \"log10\"\n      }\n    },\n    \"curve_legend\": [\n      {\n        \"curve_label\": \"Condition 1\",\n        \"description\": \"kill + regrowth\",\n        \"expected_trend\": \"kill_regrowth\"\n      }\n    ]\n  },\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 1.0,\n    \"visually_verified\": true,\n    \"reason\": \"The assay type is explicitly declared as 'time-kill plot' in the experimental context, and the visual check confirms the x-axis as time and the y-axis as bacterial count, consistent with a time-kill plot.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"Time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        20,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"\",\n        \"20\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 20,\n          \"reason\": \"Non-uniform interval indicating a break in time progression\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"Bacterial Count\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 7,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        1,\n        2,\n        3,\n        4,\n        5,\n        6\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"1\",\n        \"2\",\n        \"3\",\n        \"4\",\n        \"5\",\n        \"6\"\n      ],\n      \"breaks\": [],\n      \"confidence\": 0.98\n    }\n  },\n  \"marker_facts\": {\n    \"markers_detected\": true,\n    \"curves\": [\n      {\n        \"curve_label\": \"Condition 1\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.0,\n            \"confidence\": 0.98\n          },\n          {\n            \"x\": 2,\n            \"y\": 4.5,\n            \"confidence\": 0.98\n          },\n          {\n            \"x\": 4,\n            \"y\": 4.2,\n            \"confidence\": 0.98\n          },\n          {\n            \"x\": 6,\n            \"y\": 2.7,\n            \"confidence\": 0.98\n          },\n          {\n            \"x\": 8,\n            \"y\": 2.5,\n            \"confidence\": 0.98\n          },\n          {\n            \"x\": 10,\n            \"y\": 2.8,\n            \"confidence\": 0.98\n          },\n          {\n            \"x\": 20,\n            \"y\": 3.1,\n            \"confidence\": 0.98\n          },\n          {\n            \"x\": 24,\n            \"y\": 3.3,\n            \"confidence\": 0.98\n          }\n        ]\n      }\n    ],\n    \"csv_output\": \"Time (hours),Bacterial Count (log10 CFU/mL) (Condition 1)\\n0,6.0\\n2,4.5\\n4,4.2\\n6,2.7\\n8,2.5\\n10,2.8\\n20,3.1\\n24,3.3\",\n    \"confidence\": 0.98\n  },\n  \"validation_flags\": [\n    {\n      \"curve_label\": \"Condition 1\",\n      \"x\": 6,\n      \"y\": 2.7,\n      \"issue\": \"Impossible jump\",\n      \"details\": \"Sudden drop of 1.5 log10 CFU/mL from previous point (4.2 to 2.7)\"\n    },\n    {\n      \"curve_label\": \"Condition 1\",\n      \"issue\": \"Unexpected monotonicity\",\n      \"details\": \"Regrowth observed after 10 hours (2.8 to 3.3) aligns with expected 'kill_regrowth' trend, but initial kill phase shows sharp decline that may need verification\"\n    }\n  ]\n}\n\n[TRACKER] Extraction completed successfully\nUsing CSV from EXTRACT_STAGE_4 (data extraction stage)\nCSV saved to: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU_png.pv2_prompt_4.v11\\CU_extracted.csv\nReplotting with extracted data... ERROR in replot code, fixing error...\nSUCCESS, error fixed\nComparing source and replot... \n\nAxis x (result: Yes)\nAxis y (result: Yes)\nPoints n (result: yes)\nTrends (result: Yes)\n[TRACKER] Validation result: yes\n          Details: {'x_axis': 'Yes', 'y_axis': 'Yes', 'num_points': 'yes', 'trend': 'Yes'}\n\nFINISHED (result: yes)\nStacking original and replotted images for comparison... FINISHED\n[TRACKER] Report saved to C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU_png.pv2_prompt_4.v11\\CU.png.pv2_prompt_4.v11.mistral.out_tracking\n\n================================================================================\nEXTRACTION PROGRESS SUMMARY\n================================================================================\n\nImage: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU/CU.png\nPrompt: prompt_4\nStatus: completed\nValidation: yes\nOverall Confidence: 70.00%\n\n--- STAGE RESULTS ---\n  EXTRACT_STAGE_1                [completed ] confidence: 70.0% \n  EXTRACT_STAGE_2                [completed ] confidence: 70.0% \n  EXTRACT_STAGE_3                [completed ] confidence: 70.0% \n  EXTRACT_STAGE_4                [completed ] confidence: 70.0% \n  EXTRACT_STAGE_5                [completed ] confidence: 70.0% \n\n--- CONTRADICTIONS ---\n  None detected\n\n--- EXTRACTED FACTS ---\n  EXTRACT_STAGE_4:\n    - num_columns: 1\n    - num_rows: 141\n    - columns: ['Here is the output following the specified ex...\n    - axis_labels: ['Here is the output following the specified ex...\n  EXTRACT_STAGE_5:\n    - num_columns: 1\n    - num_rows: 69\n    - columns: ['```json']\n    - axis_labels: ['```json']\n\nExecution time: 79.44s\n================================================================================\n\nVERSION_DIR:C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU_png.pv2_prompt_4.v11\n\n\n\n\n\n[SUCCESS] Extraction completed.\n[TIME] Extraction took 87.23 seconds\n\n============================================================\nSTEP 2: Running Interpolation\n============================================================\nOriginal: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU-original.csv\nExtracted: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU_png.pv2_prompt_4.v11\\CU_extracted.csv\nOutput dir: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU_png.pv2_prompt_4.v11\nAxis range: X=[0, 26], Y=[0, 9]\n\nLoading original CSV: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU-original.csv\n  Found 1 curve(s): ['Condition 1']\nLoading extracted CSV: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU_png.pv2_prompt_4.v11\\CU_extracted.csv\n  Found 1 curve(s): ['log10 CFU/mL (Condition 1)']\nMatching curves using LLM... DONE\nCurve mapping: {'Condition 1': 'log10 CFU/mL (Condition 1)'}\nComparing 'Condition 1' vs 'log10 CFU/mL (Condition 1)'... MAE = 0.023828\nSaved figure: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU_png.pv2_prompt_4.v11\\interpolated_CU-original.csv_VS_CU_extracted.csv.png\nSaved statistics: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU_png.pv2_prompt_4.v11\\interpolated_CU-original.csv_VS_CU_extracted.csv.stats\n\nMean MAE across all curves: 0.023828\n\n\n[SUCCESS] Interpolation completed.\n[TIME] Interpolation took 5.72 seconds\n\n============================================================\nSTEP 3: Running Pointwise Comparison\n============================================================\nExtracted: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU_png.pv2_prompt_4.v11\\CU_extracted.csv\nOriginal: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU-original.csv\nOutput dir: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU_png.pv2_prompt_4.v11\nAxis range: X=[0, 26], Y=[0, 9]\n\nLoading extracted CSV: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU_png.pv2_prompt_4.v11\\CU_extracted.csv\n  Found 1 curve(s): ['log10 CFU/mL (Condition 1)']\nLoading original CSV: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU-original.csv\n  Found 1 curve(s): ['Condition 1']\nMatching curves using LLM... DONE\nCurve mapping: {'Condition 1': 'log10 CFU/mL (Condition 1)'}\nProcessing 'Condition 1' vs 'log10 CFU/mL (Condition 1)'... MAE X=0.00%, MAE Y=1.50%, Prec=0.88, Rec=0.88\nSaved figure: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU_png.pv2_prompt_4.v11\\pointwise_CU_extracted_VS_CU-original.png\nSaved statistics: C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU_png.pv2_prompt_4.v11\\pointwise_CU_extracted_VS_CU-original.stats\n\nMean MAE X: 0.00%\nMean MAE Y: 1.50%\nMean Precision: 0.8750\nMean Recall: 0.8750\n\n\n[SUCCESS] Pointwise comparison completed.\n[TIME] Pointwise took 5.50 seconds\n\n============================================================\nPIPELINE FINISHED SUCCESSFULLY\nExtraction: success\nInterpolation: success\nPointwise: success\nTotal time: 98.46 seconds\n============================================================",
   "outputs": {
     "images": [
       {
-        "path": "synthetic/CS/CS.png",
+        "path": "synthetic/C/CU/CU.png",
         "label": "Original Input",
-        "filename": "CS.png"
+        "filename": "CU.png"
       },
       {
-        "path": "synthetic/CS/CS_png.p5.v1/comparison_CS.p5.v1.png",
-        "label": "Comparison (CS_png.p5.v1)",
-        "filename": "comparison_CS.p5.v1.png"
+        "path": "synthetic/C/CU/CU_png.pv2_prompt_4.v11/comparison_CU.prompt_4.v11.png",
+        "label": "Comparison (CU_png.pv2_prompt_4.v11)",
+        "filename": "comparison_CU.prompt_4.v11.png"
       },
       {
-        "path": "synthetic/CS/CS_png.p5.v1/CS_png-replot.p5.v1.png",
-        "label": "Extracted Replot (CS_png.p5.v1)",
-        "filename": "CS_png-replot.p5.v1.png"
+        "path": "synthetic/C/CU/CU_png.pv2_prompt_4.v11/CU_png-replot.pv2_prompt_4.v11.png",
+        "label": "Extracted Replot (CU_png.pv2_prompt_4.v11)",
+        "filename": "CU_png-replot.pv2_prompt_4.v11.png"
       },
       {
-        "path": "synthetic/CS/CS_png.p5.v1/interpolated_CS-original.csv_VS_CS.png.p5.v1.mistral.out_data.png",
-        "label": "Interpolation (CS_png.p5.v1)",
-        "filename": "interpolated_CS-original.csv_VS_CS.png.p5.v1.mistral.out_data.png"
+        "path": "synthetic/C/CU/CU_png.pv2_prompt_4.v11/interpolated_CU-original.csv_VS_CU_extracted.csv.png",
+        "label": "Interpolation (CU_png.pv2_prompt_4.v11)",
+        "filename": "interpolated_CU-original.csv_VS_CU_extracted.csv.png"
       },
       {
-        "path": "synthetic/CS/CS_png.p5.v1/pointwise_CS.png.p5.v1.mistral_VS_CS-original.png",
-        "label": "Pointwise (CS_png.p5.v1)",
-        "filename": "pointwise_CS.png.p5.v1.mistral_VS_CS-original.png"
+        "path": "synthetic/C/CU/CU_png.pv2_prompt_4.v11/pointwise_CU_extracted_VS_CU-original.png",
+        "label": "Pointwise (CU_png.pv2_prompt_4.v11)",
+        "filename": "pointwise_CU_extracted_VS_CU-original.png"
       }
     ],
     "stats": [
       {
-        "path": "synthetic/CS/CS_png.p5.v1/interpolated_CS-original.csv_VS_CS.png.p5.v1.mistral.out_data.stats",
-        "label": "Interpolation Stats (CS_png.p5.v1)",
-        "filename": "interpolated_CS-original.csv_VS_CS.png.p5.v1.mistral.out_data.stats"
+        "path": "synthetic/C/CU/CU_png.pv2_prompt_4.v11/interpolated_CU-original.csv_VS_CU_extracted.csv.stats",
+        "label": "Interpolation Stats (CU_png.pv2_prompt_4.v11)",
+        "filename": "interpolated_CU-original.csv_VS_CU_extracted.csv.stats"
       },
       {
-        "path": "synthetic/CS/CS_png.p5.v1/pointwise_CS.png.p5.v1.mistral_VS_CS-original.stats",
-        "label": "Pointwise Stats (CS_png.p5.v1)",
-        "filename": "pointwise_CS.png.p5.v1.mistral_VS_CS-original.stats"
+        "path": "synthetic/C/CU/CU_png.pv2_prompt_4.v11/pointwise_CU_extracted_VS_CU-original.stats",
+        "label": "Pointwise Stats (CU_png.pv2_prompt_4.v11)",
+        "filename": "pointwise_CU_extracted_VS_CU-original.stats"
       }
     ],
     "data": [
       {
-        "path": "synthetic/CS/CS-original.csv",
+        "path": "synthetic/C/CU/CU-original.csv",
         "label": "Original Data",
-        "filename": "CS-original.csv"
+        "filename": "CU-original.csv"
       },
       {
-        "path": "synthetic/CS/CS_png.p5.v1/CS.png.p5.v1.mistral.out_data",
-        "label": "Extracted Data (CS_png.p5.v1)",
-        "filename": "CS.png.p5.v1.mistral.out_data"
+        "path": "synthetic/C/CU/CU_png.pv2_prompt_4.v11/CU.png.pv2_prompt_4.v11.mistral.out_data",
+        "label": "Extracted Data (CU_png.pv2_prompt_4.v11)",
+        "filename": "CU.png.pv2_prompt_4.v11.mistral.out_data"
       }
     ],
     "other": [
       {
-        "path": "synthetic/CS/CS_png.p5.v1/CS.png.p5.v1.mistral.out_code",
-        "filename": "CS.png.p5.v1.mistral.out_code",
-        "version": "CS_png.p5.v1"
+        "path": "synthetic/C/CU/CU_png.pv2_prompt_4.v11/CU.png.pv2_prompt_4.v11.mistral.out_code",
+        "filename": "CU.png.pv2_prompt_4.v11.mistral.out_code",
+        "version": "CU_png.pv2_prompt_4.v11"
       },
       {
-        "path": "synthetic/CS/CS_png.p5.v1/CS.png.p5.v1.mistral.out_conversation",
-        "filename": "CS.png.p5.v1.mistral.out_conversation",
-        "version": "CS_png.p5.v1"
+        "path": "synthetic/C/CU/CU_png.pv2_prompt_4.v11/CU.png.pv2_prompt_4.v11.mistral.out_conversation",
+        "filename": "CU.png.pv2_prompt_4.v11.mistral.out_conversation",
+        "version": "CU_png.pv2_prompt_4.v11"
       },
       {
-        "path": "synthetic/CS/CS_png.p5.v1/CS.png.p5.v1.mistral.out_validate",
-        "filename": "CS.png.p5.v1.mistral.out_validate",
-        "version": "CS_png.p5.v1"
+        "path": "synthetic/C/CU/CU_png.pv2_prompt_4.v11/CU.png.pv2_prompt_4.v11.mistral.out_validate",
+        "filename": "CU.png.pv2_prompt_4.v11.mistral.out_validate",
+        "version": "CU_png.pv2_prompt_4.v11"
       }
     ],
     "summary": {
       "validation_result": "Yes",
       "validation_reason": "N/A",
-      "interpolation_mae": 0.029328,
+      "interpolation_mae": 0.023828,
       "pointwise_mae_x": "0.00%",
-      "pointwise_mae_y": "3.01%",
-      "precision": "70.0%",
-      "recall": "100.0%"
+      "pointwise_mae_y": "1.50%",
+      "precision": "87.5%",
+      "recall": "87.5%"
     }
   },
   "csv_status": {
     "original": {
-      "path": "synthetic/CS\\CS-original.csv",
+      "path": "synthetic/C/CU\\CU-original.csv",
       "exists": true
     },
     "extracted": {
-      "path": "synthetic/CS/CS_png.p5.v1/CS.png.p5.v1.mistral.out_data",
+      "path": "synthetic/C/CU/CU_png.pv2_prompt_4.v11/CU.png.pv2_prompt_4.v11.mistral.out_data",
       "exists": true
     },
-    "base_name": "CS",
-    "image_dir": "synthetic/CS"
+    "base_name": "CU",
+    "image_dir": "synthetic/C/CU"
   },
-  "version_dir": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CS\\CS_png.p5.v1",
+  "version_dir": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CU\\CU_png.pv2_prompt_4.v11",
   "timings": {
-    "extraction": 25.57184934616089,
-    "interpolation": 6.871446371078491,
-    "pointwise": 6.421525716781616,
-    "total": 38.86703443527222
+    "extraction": 87.22680068016052,
+    "interpolation": 5.719422101974487,
+    "pointwise": 5.504230976104736,
+    "total": 98.45703291893005
   },
-  "completed_at": 1767755819.9951518,
-  "image_path": "synthetic/CS/CS.png",
-  "prompt_file": "prompt_5.py"
+  "completed_at": 1768455449.332531,
+  "image_path": "synthetic/C/CU/CU.png",
+  "prompt_name": "prompt_4",
+  "pipeline": "v2"
 }

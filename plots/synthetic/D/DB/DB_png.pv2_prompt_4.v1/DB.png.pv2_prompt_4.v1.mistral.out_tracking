@@ -1,0 +1,127 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/D/DB/DB.png",
+  "prompt_name": "prompt_4",
+  "overall_status": "completed",
+  "validation_status": "no",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 517,
+      "execution_time_ms": 3198.2851028442383,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T17:13:48.944876",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 958,
+      "execution_time_ms": 5942.4498081207275,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T17:13:52.144017",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1294,
+      "execution_time_ms": 7053.241729736328,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T17:13:58.087509",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 117,
+        "columns": [
+          "Here is the data extraction output following the specified rules:"
+        ],
+        "axis_labels": [
+          "Here is the data extraction output following the specified rules:"
+        ]
+      },
+      "output_length": 3385,
+      "execution_time_ms": 18033.539533615112,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T17:14:05.141871",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 3,
+        "num_rows": 72,
+        "columns": [
+          "Given that the accumulated facts are currently empty",
+          " I will first reconstruct the `marker_facts` object based on the provided image (as if it were extracted in Stage 4)",
+          " then perform the validation checks and output the complete JSON as required."
+        ],
+        "axis_labels": [
+          "Given that the accumulated facts are currently empty",
+          " I will first reconstruct the `marker_facts` object based on the provided image (as if it were extracted in Stage 4)",
+          " then perform the validation checks and output the complete JSON as required."
+        ]
+      },
+      "output_length": 3446,
+      "execution_time_ms": 18417.222261428833,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T17:14:23.177532",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_4": {
+      "num_columns": 1,
+      "num_rows": 117,
+      "columns": [
+        "Here is the data extraction output following the specified rules:"
+      ],
+      "axis_labels": [
+        "Here is the data extraction output following the specified rules:"
+      ]
+    },
+    "EXTRACT_STAGE_5": {
+      "num_columns": 3,
+      "num_rows": 72,
+      "columns": [
+        "Given that the accumulated facts are currently empty",
+        " I will first reconstruct the `marker_facts` object based on the provided image (as if it were extracted in Stage 4)",
+        " then perform the validation checks and output the complete JSON as required."
+      ],
+      "axis_labels": [
+        "Given that the accumulated facts are currently empty",
+        " I will first reconstruct the `marker_facts` object based on the provided image (as if it were extracted in Stage 4)",
+        " then perform the validation checks and output the complete JSON as required."
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 77.995654,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "No",
+      "y_axis": "Yes",
+      "num_points": "yes",
+      "trend": "Yes"
+    }
+  }
+}

@@ -1,0 +1,53 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Data points extracted from the image
+time_hours = [0, 2, 4, 6, 8, 10, 12, 20, 24]
+bacterial_count_log10 = [5.92, 4.7, 4.3, 2.8, 2.5, 2.9, 3.1, 3.3, 3.4]
+
+# Create the plot
+plt.figure(figsize=(6, 4))
+
+# Plot the data points and line
+plt.plot(time_hours, bacterial_count_log10, marker='o', color='black', label='Condition 1')
+
+# Axis labels
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+
+# Axis limits and ticks
+plt.xlim(0, 26)
+plt.ylim(0, 6.5)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 20, 22, 24, 26])
+plt.yticks([0, 1, 2, 3, 4, 5, 6])
+
+# Add axis break
+plt.gca().set_xlim(0, 26)  # Ensure the x-axis limits are set before breaking
+plt.break_xaxis = True
+plt.gap = 6  # Size of the gap in hours
+plt.axes([0.1, 0.1, 0.75, 0.8], frameon=True)  # Main plot area
+plt.xticks(list(range(0, 14, 2)) + list(range(20, 27, 2)))
+
+# Draw break lines
+plt.plot([12.5, 13.5], [0, 0], color='white', linewidth=2, transform=plt.gca().transData, clip_on=False)
+plt.plot([12.5, 13.5], [6.5, 6.5], color='white', linewidth=2, transform=plt.gca().transData, clip_on=False)
+plt.plot([12, 12.5], [-0.5, 0], color='black', linewidth=1, transform=plt.gca().transData, clip_on=False)
+plt.plot([13.5, 14], [0, -0.5], color='black', linewidth=1, transform=plt.gca().transData, clip_on=False)
+plt.plot([12, 12.5], [6.5, 7], color='black', linewidth=1, transform=plt.gca().transData, clip_on=False)
+plt.plot([13.5, 14], [7, 6.5], color='black', linewidth=1, transform=plt.gca().transData, clip_on=False)
+
+# Create the second part of the axis (right side)
+plt.axes([0.85, 0.1, 0.07, 0.8], frameon=True)
+plt.xlim(19, 26)
+plt.ylim(0, 6.5)
+plt.xticks([20, 22, 24])
+plt.yticks([])  # No y-ticks on the right plot
+
+# Plot the data points and line for the right side
+plt.plot(time_hours, bacterial_count_log10, marker='o', color='black', label='_nolegend_')
+
+# Add legend
+plt.legend(loc='upper left', frameon=False)
+
+# Save the plot
+plt.savefig(r'C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\C\CU\CU_png.pv2_prompt_4.v5\CU_png-replot.pv2_prompt_4.v5.png', bbox_inches='tight', dpi=300)

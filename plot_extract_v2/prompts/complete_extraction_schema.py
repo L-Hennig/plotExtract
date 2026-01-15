@@ -1,0 +1,102 @@
+# =====================================================================
+# Complete Extraction Schema
+# This schema defines the structure for all extraction stages:
+# - article_info: Preprocessed article context
+# - axis_facts: Stage 1 & 2 axis verification outputs
+# - marker_facts: Stage 3 marker extraction output
+# =====================================================================
+
+ARTICLE_INFO_SCHEMA = """{
+  "article_info": {
+    "figure_id": "string",
+    "figure_caption": "string",
+    "experimental_context": {
+      "assay_type": "string",
+      "organism": "string",
+      "model": "string"
+    },
+    "axis_definitions": {
+      "x_axis": {
+        "quantity": "string",
+        "unit": "string"
+      },
+      "y_axis": {
+        "quantity": "string",
+        "unit": "string",
+        "scale": "string"
+      }
+    },
+    "curve_legend": [
+      {
+        "curve_label": "string",
+        "description": "string",
+        "expected_trend": "string"
+      }
+    ]
+  },
+  "plot_type_facts": {
+    "declared_in_article_info": "boolean or unknown",
+    "visually_verified": "boolean",
+    "plot_type": "string",
+    "confidence": "0-1",
+    "reason": "string"
+  },
+  "axis_facts": {
+    "x_axis": {
+      "quantity": "string",
+      "unit": "string",
+      "discrete": "boolean",
+      "ticks_verified": ["number array"],
+      "tick_labels": ["string array"],
+      "breaks": [
+        {
+          "start": "number",
+          "end": "number",
+          "reason": "string"
+        }
+      ],
+      "confidence": "0-1"
+    },
+    "y_axis": {
+      "quantity": "string",
+      "unit": "string",
+      "scale": "string",
+      "upper_plausible_limit": "number",
+      "lower_plausible_limit": "number",
+      "ticks_verified": ["number array"],
+      "tick_labels": ["string array"],
+      "breaks": [
+        {
+          "start": "number",
+          "end": "number",
+          "reason": "string"
+        }
+      ],
+      "confidence": "0-1"
+    }
+  },
+  "marker_facts": {
+    "markers_detected": "boolean",
+    "curves": [
+      {
+        "curve_label": "string",
+        "points": [
+          {
+            "x": "number",
+            "y": "number",
+            "confidence": "0-1"
+          }
+        ]
+      }
+    ],
+    "csv_output": "string",
+    "confidence": "0-1"
+  }
+}"""
+
+SCHEMA_CONSTRAINTS = """Additional constraints:
+- `experimental_context` is optional.
+- `axis_definitions` should only be filled if the text explicitly defines them.
+- `expected_trend` is optional and must come from explicit textual statements.
+- If no curve legend is present, omit `curve_legend` entirely.
+- Do not add empty objects or empty arrays."""

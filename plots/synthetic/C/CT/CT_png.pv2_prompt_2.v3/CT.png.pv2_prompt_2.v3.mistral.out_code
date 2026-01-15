@@ -1,0 +1,38 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Data extracted from the plot
+time_hours = [0, 2, 4, 6, 8, 10, 12, 20, 22, 24]
+condition_1 = [6.0, 4.5, 3.0, 2.5, 2.7, 3.0, 3.2, 3.5, 3.6, 3.7]  # log10 CFU/mL
+condition_2 = [6.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  # log10 CFU/mL
+condition_3 = [6.0, 6.8, 7.2, 7.8, 8.1, 8.2, 8.3, 8.6, 8.6, 8.6]  # log10 CFU/mL
+
+# Create the plot
+plt.figure(figsize=(6, 4))
+
+# Plot each condition with specific styles
+plt.plot(time_hours, condition_1, marker='o', color='black', linestyle='-', label='Condition 1')
+plt.plot(time_hours, condition_2, marker='^', color='black', linestyle='-', label='Condition 2')
+plt.plot(time_hours, condition_3, marker='s', color='black', linestyle='-', label='Condition 3')
+
+# Set axis labels
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+
+# Set axis limits and ticks
+plt.xlim(0, 26)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 20, 22, 24, 26])
+plt.ylim(0, 9)
+plt.yticks([0, 2, 4, 6, 8])
+
+# Set y-axis to log scale visually (though data is already log10)
+plt.yscale('linear')  # Data is already in log10, so no transformation needed
+
+# Add legend
+plt.legend()
+
+# Save the plot
+plt.savefig(r'C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\CT\CT_png.pv2_prompt_2.v3\CT_png-replot.pv2_prompt_2.v3.png', bbox_inches='tight', dpi=300)
+
+# Do not display the plot
+plt.close()

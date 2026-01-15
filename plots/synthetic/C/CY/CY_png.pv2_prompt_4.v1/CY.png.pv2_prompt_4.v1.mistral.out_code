@@ -1,0 +1,45 @@
+import matplotlib.pyplot as plt
+import os
+
+# Create directory if it doesn't exist
+os.makedirs(r'C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\C\C\CY_png.pv2_prompt_4.v1', exist_ok=True)
+
+# Data points from the provided facts
+curve1_points = [(0, 6.11), (2, 4.88), (4, 3.70), (6, 3.08), (8, 2.85), (10, 2.70), (24, 3.30)]
+curve2_points = [(0, 6.08), (2, 3.30), (4, 0.30), (6, 0.00), (8, 0.00), (10, 0.00), (12, 0.00), (24, 0.00)]
+
+# Separate x and y values for each curve
+x1, y1 = zip(*curve1_points)
+x2, y2 = zip(*curve2_points)
+
+# Create the plot
+fig, ax = plt.subplots()
+
+# Plot each curve with specified styles
+ax.plot(x1, y1, 'o-', color='black', label='Condition 1', markersize=6)
+ax.plot(x2, y2, 's-', color='black', label='Condition 2', markersize=6)
+
+# Axis labels
+ax.set_xlabel('Time (hours)')
+ax.set_ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+
+# Axis limits and ticks
+ax.set_xlim(0, 26)
+ax.set_ylim(0, 7)
+ax.set_xticks([0, 2, 4, 6, 8, 10, 12, 20, 22, 24])
+ax.set_yticks([0, 1, 2, 3, 4, 5, 6, 7])
+
+# Add axis break
+ax.annotate('', xy=(11, 0), xycoords='data', xytext=(11, 0.5), textcoords='data',
+            arrowprops=dict(arrowstyle='-', linestyle='--', color='black'))
+ax.annotate('', xy=(11, 2.5), xycoords='data', xytext=(11, 3), textcoords='data',
+            arrowprops=dict(arrowstyle='-', linestyle='--', color='black'))
+
+# Legend
+ax.legend(loc='upper right')
+
+# Save the plot
+plt.savefig(r'C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\C\C\CY_png.pv2_prompt_4.v1\CY_png-replot.pv2_prompt_4.v1.png', bbox_inches='tight', dpi=300)
+
+# Do not display the plot
+plt.close()

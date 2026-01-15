@@ -1,0 +1,127 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/D/DD/DD.png",
+  "prompt_name": "prompt_4",
+  "overall_status": "completed",
+  "validation_status": "yes",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 534,
+      "execution_time_ms": 3162.9226207733154,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T17:16:37.386967",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1276,
+      "execution_time_ms": 7357.876300811768,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T17:16:40.550838",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1519,
+      "execution_time_ms": 7678.667306900024,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T17:16:47.909500",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 49,
+        "columns": [
+          "Here is the CSV output in wide format and the corresponding JSON with extracted data points:"
+        ],
+        "axis_labels": [
+          "Here is the CSV output in wide format and the corresponding JSON with extracted data points:"
+        ]
+      },
+      "output_length": 1534,
+      "execution_time_ms": 10601.331949234009,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T17:16:55.589062",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 3,
+        "num_rows": 69,
+        "columns": [
+          "Given that the accumulated facts are empty",
+          " I'll first reconstruct the `marker_facts` object from the visual data in the image",
+          " then perform the validation checks."
+        ],
+        "axis_labels": [
+          "Given that the accumulated facts are empty",
+          " I'll first reconstruct the `marker_facts` object from the visual data in the image",
+          " then perform the validation checks."
+        ]
+      },
+      "output_length": 2949,
+      "execution_time_ms": 16773.23842048645,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T17:17:06.192522",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_4": {
+      "num_columns": 1,
+      "num_rows": 49,
+      "columns": [
+        "Here is the CSV output in wide format and the corresponding JSON with extracted data points:"
+      ],
+      "axis_labels": [
+        "Here is the CSV output in wide format and the corresponding JSON with extracted data points:"
+      ]
+    },
+    "EXTRACT_STAGE_5": {
+      "num_columns": 3,
+      "num_rows": 69,
+      "columns": [
+        "Given that the accumulated facts are empty",
+        " I'll first reconstruct the `marker_facts` object from the visual data in the image",
+        " then perform the validation checks."
+      ],
+      "axis_labels": [
+        "Given that the accumulated facts are empty",
+        " I'll first reconstruct the `marker_facts` object from the visual data in the image",
+        " then perform the validation checks."
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 68.494104,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "Yes",
+      "num_points": "yes",
+      "trend": "Yes"
+    }
+  }
+}

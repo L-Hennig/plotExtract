@@ -1,0 +1,127 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/C/CW/CW.png",
+  "prompt_name": "prompt_4",
+  "overall_status": "completed",
+  "validation_status": "yes",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 442,
+      "execution_time_ms": 4035.6080532073975,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T17:07:09.339308",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 868,
+      "execution_time_ms": 5199.275493621826,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T17:07:13.375849",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1252,
+      "execution_time_ms": 6916.503667831421,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T17:07:18.575900",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 65,
+        "columns": [
+          "Here is the extracted data in the required format:"
+        ],
+        "axis_labels": [
+          "Here is the extracted data in the required format:"
+        ]
+      },
+      "output_length": 1651,
+      "execution_time_ms": 10766.508340835571,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T17:07:25.493310",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 3,
+        "num_rows": 101,
+        "columns": [
+          "Given that the accumulated facts are currently empty",
+          " I will first reconstruct the `marker_facts` object based on the provided plot image",
+          " then perform the validation/sanity checks as outlined."
+        ],
+        "axis_labels": [
+          "Given that the accumulated facts are currently empty",
+          " I will first reconstruct the `marker_facts` object based on the provided plot image",
+          " then perform the validation/sanity checks as outlined."
+        ]
+      },
+      "output_length": 3513,
+      "execution_time_ms": 18064.892530441284,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T17:07:36.263240",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_4": {
+      "num_columns": 1,
+      "num_rows": 65,
+      "columns": [
+        "Here is the extracted data in the required format:"
+      ],
+      "axis_labels": [
+        "Here is the extracted data in the required format:"
+      ]
+    },
+    "EXTRACT_STAGE_5": {
+      "num_columns": 3,
+      "num_rows": 101,
+      "columns": [
+        "Given that the accumulated facts are currently empty",
+        " I will first reconstruct the `marker_facts` object based on the provided plot image",
+        " then perform the validation/sanity checks as outlined."
+      ],
+      "axis_labels": [
+        "Given that the accumulated facts are currently empty",
+        " I will first reconstruct the `marker_facts` object based on the provided plot image",
+        " then perform the validation/sanity checks as outlined."
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 65.487398,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "Yes",
+      "num_points": "Yes",
+      "trend": "Yes"
+    }
+  }
+}

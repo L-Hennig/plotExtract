@@ -1,0 +1,42 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Data points from the provided facts
+time_condition1 = [0, 2, 4, 6, 8, 10, 24]
+bacterial_count_condition1 = [6.0, 6.7, 7.3, 7.6, 7.8, 7.9, 8.9]
+
+time_condition2 = [0, 2, 4, 6, 8, 10, 24]
+bacterial_count_condition2 = [6.0, 4.3, 3.0, 2.5, 2.8, 3.0, 3.7]
+
+# Create the plot
+fig, ax = plt.subplots(figsize=(6, 5))
+
+# Plot Condition 1
+ax.plot(time_condition1, bacterial_count_condition1,
+        marker='o', color='black', linestyle='-', label='Condition 1')
+
+# Plot Condition 2
+ax.plot(time_condition2, bacterial_count_condition2,
+        marker='D', color='black', linestyle='-', label='Condition 2')
+
+# Axis break
+ax.annotate('', xy=(11, 0), xytext=(11, 8.5),
+            arrowprops=dict(arrowstyle='-', linestyle='--', color='black'))
+ax.annotate('', xy=(11.5, 0), xytext=(11.5, 8.5),
+            arrowprops=dict(arrowstyle='-', linestyle='--', color='black'))
+
+# Set axis limits and ticks
+ax.set_xlim(0, 26)
+ax.set_ylim(0, 9.5)
+ax.set_xticks([0, 2, 4, 6, 8, 10, 12, 20, 22, 24])
+ax.set_yticks([0, 2, 4, 6, 8])
+
+# Axis labels
+ax.set_xlabel('Time (hours)')
+ax.set_ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+
+# Legend
+ax.legend(loc='upper left')
+
+# Save the plot
+plt.savefig(r'C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic/D/DD/DD_png.pv2_prompt_4.v1\DD_png-replot.pv2_prompt_4.v1.png', bbox_inches='tight', dpi=300)

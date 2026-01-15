@@ -1,0 +1,40 @@
+import matplotlib.pyplot as plt
+import os
+
+# Create directory if it doesn't exist
+os.makedirs(r'C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\C\CV_png.pv2_prompt_4.v3', exist_ok=True)
+
+# Data points from the provided facts
+time = [0, 2, 4, 6, 8, 10, 12, 24]
+bacterial_count = [6.0, 6.2, 6.5, 7.0, 7.5, 7.8, 7.9, 9.7]
+
+# Create the plot
+fig, ax = plt.subplots(figsize=(6, 4))
+
+# Plot the data
+ax.plot(time, bacterial_count, marker='o', color='black', linestyle='-', label='Condition 1')
+
+# Axis break details
+ax.set_xlim(0, 26)
+ax.set_ylim(0, 10.5)
+
+# Axis labels
+ax.set_xlabel('Time (hours)')
+ax.set_ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+
+# Ticks
+ax.set_xticks([0, 2, 4, 6, 8, 10, 12, 20, 22, 24])
+ax.set_yticks([0, 2, 4, 6, 8, 10])
+
+# Axis break indication
+ax.plot([12, 12], [0, 1.5], color='black', linestyle='--')
+ax.plot([20, 20], [0, 1.5], color='black', linestyle='--')
+ax.plot([12, 20], [0, 0], color='black', linestyle='-')
+ax.plot([12, 20], [1.5, 1.5], color='black', linestyle='-')
+
+# Legend
+ax.legend(loc='upper left')
+
+# Save the plot
+plt.savefig(r'C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\C\CV_png.pv2_prompt_4.v3\CV_png-replot.pv2_prompt_4.v3.png', bbox_inches='tight', dpi=300)
+plt.close()

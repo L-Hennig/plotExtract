@@ -1,0 +1,36 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Data points extracted from the plot
+time = [0, 2, 4, 6, 8, 10, 12, 20, 22, 24]
+bacterial_count = [5.92, 4.7, 4.3, 2.8, 2.5, 2.9, 3.1, 3.3, 3.35, 3.4]
+
+# Create the plot
+fig, ax = plt.subplots(figsize=(6, 4))
+
+# Plot the data
+ax.plot(time, bacterial_count, marker='o', color='black', label='Condition 1')
+
+# Axis break indication
+ax.annotate('', xy=(12.5, 0), xycoords=('data', 'axes fraction'),
+            xytext=(13.5, 0), textcoords=('data', 'axes fraction'),
+            arrowprops=dict(arrowstyle='-', color='black', linewidth=1.5))
+ax.annotate('', xy=(12, 0.02), xycoords=('data', 'axes fraction'),
+            xytext=(14, 0.02), textcoords=('data', 'axes fraction'),
+            arrowprops=dict(arrowstyle='-', color='white', linewidth=1))
+
+# Set axis limits and ticks
+ax.set_xlim(0, 26)
+ax.set_ylim(2, 6.5)
+ax.set_xticks([0, 2, 4, 6, 8, 10, 12, 20, 22, 24, 26])
+ax.set_yticks([2, 3, 4, 5, 6])
+
+# Axis labels
+ax.set_xlabel('Time (hours)')
+ax.set_ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+
+# Legend
+ax.legend()
+
+# Save the plot
+plt.savefig(r'C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\C\CU\CU_png.pv2_prompt_4.v4\CU_png-replot.pv2_prompt_4.v4.png', bbox_inches='tight', dpi=300)

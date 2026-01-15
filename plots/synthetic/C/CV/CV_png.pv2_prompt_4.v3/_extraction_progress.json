@@ -1,0 +1,11 @@
+{
+  "status": "running",
+  "stage": "EXTRACT_STAGE_5",
+  "stage_index": 5,
+  "total_stages": 5,
+  "percentage": 100.0,
+  "accumulated_facts": {},
+  "stage_duration_ms": 13050.103187561035,
+  "timestamp": 1768374395.93327,
+  "console_output": ""
+}

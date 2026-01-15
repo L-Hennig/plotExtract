@@ -1,0 +1,146 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CU/CU.png",
+  "prompt_name": "prompt_4",
+  "overall_status": "completed",
+  "validation_status": "yes",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 2,
+        "num_rows": 61,
+        "columns": [
+          "Based on the accumulated facts and the current stage",
+          " no update to `plot_type_facts` is needed as it has already been confidently determined. Proceeding to extract the marker points for the curve:"
+        ],
+        "axis_labels": [
+          "Based on the accumulated facts and the current stage",
+          " no update to `plot_type_facts` is needed as it has already been confidently determined. Proceeding to extract the marker points for the curve:"
+        ]
+      },
+      "output_length": 1357,
+      "execution_time_ms": 6940.821170806885,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T14:48:47.599450",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1463,
+      "execution_time_ms": 8231.378078460693,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T14:48:54.540395",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1396,
+      "execution_time_ms": 9105.425834655762,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T14:49:02.771847",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 81,
+        "columns": [
+          "Here is the extraction output following the specified rules:"
+        ],
+        "axis_labels": [
+          "Here is the extraction output following the specified rules:"
+        ]
+      },
+      "output_length": 1862,
+      "execution_time_ms": 10886.431694030762,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T14:49:11.877371",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 2,
+        "num_rows": 39,
+        "columns": [
+          "Based on the validation steps and the provided data",
+          " here's the output JSON with validation flags:"
+        ],
+        "axis_labels": [
+          "Based on the validation steps and the provided data",
+          " here's the output JSON with validation flags:"
+        ]
+      },
+      "output_length": 1544,
+      "execution_time_ms": 8721.764326095581,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-14T14:49:22.765491",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_1": {
+      "num_columns": 2,
+      "num_rows": 61,
+      "columns": [
+        "Based on the accumulated facts and the current stage",
+        " no update to `plot_type_facts` is needed as it has already been confidently determined. Proceeding to extract the marker points for the curve:"
+      ],
+      "axis_labels": [
+        "Based on the accumulated facts and the current stage",
+        " no update to `plot_type_facts` is needed as it has already been confidently determined. Proceeding to extract the marker points for the curve:"
+      ]
+    },
+    "EXTRACT_STAGE_4": {
+      "num_columns": 1,
+      "num_rows": 81,
+      "columns": [
+        "Here is the extraction output following the specified rules:"
+      ],
+      "axis_labels": [
+        "Here is the extraction output following the specified rules:"
+      ]
+    },
+    "EXTRACT_STAGE_5": {
+      "num_columns": 2,
+      "num_rows": 39,
+      "columns": [
+        "Based on the validation steps and the provided data",
+        " here's the output JSON with validation flags:"
+      ],
+      "axis_labels": [
+        "Based on the validation steps and the provided data",
+        " here's the output JSON with validation flags:"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 63.125487,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "yes",
+      "num_points": "Yes",
+      "trend": "Yes"
+    }
+  }
+}

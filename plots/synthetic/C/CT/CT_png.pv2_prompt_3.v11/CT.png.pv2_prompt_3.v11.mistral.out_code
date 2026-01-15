@@ -1,0 +1,48 @@
+import matplotlib.pyplot as plt
+import os
+
+# Data extracted from the plot
+time_hours = {
+    'Condition 1': [0, 2, 4, 6, 8, 10, 12, 24],
+    'Condition 2': [0, 2, 4, 6, 8, 10, 12, 20, 22, 24],
+    'Condition 3': [0, 2, 4, 6, 8, 10, 12, 24]
+}
+
+bacterial_count = {
+    'Condition 1': [6.0, 4.8, 3.5, 2.8, 2.5, 2.7, 3.0, 3.8],
+    'Condition 2': [6.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'Condition 3': [6.0, 6.8, 7.2, 7.8, 8.0, 8.1, 8.2, 8.9]
+}
+
+# Create the plot
+plt.figure(figsize=(6, 5))
+
+# Plot each condition with specific markers and styles
+plt.plot(time_hours['Condition 1'], bacterial_count['Condition 1'],
+         marker='o', color='black', linestyle='-', label='Condition 1')
+plt.plot(time_hours['Condition 2'], bacterial_count['Condition 2'],
+         marker='v', color='black', linestyle='-', label='Condition 2')
+plt.plot(time_hours['Condition 3'], bacterial_count['Condition 3'],
+         marker='s', color='black', linestyle='-', label='Condition 3')
+
+# Set axis labels
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+
+# Set axis limits and ticks
+plt.xlim(0, 26)
+plt.ylim(0, 9.5)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 20, 22, 24])
+plt.yticks([0, 2, 4, 6, 8])
+
+# Add legend
+plt.legend()
+
+# Ensure directory exists
+os.makedirs('plots/synthetic/CT/CT_png.pv2_prompt_3.v11', exist_ok=True)
+
+# Save the plot
+plt.savefig('plots/synthetic/CT/CT_png.pv2_prompt_3.v11/CT_png-replot.pv2_prompt_3.v11.png', bbox_inches='tight', dpi=300)
+
+# Do not display the plot
+plt.close()

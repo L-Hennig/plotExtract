@@ -1,0 +1,41 @@
+{
+  "plot_type": "time-kill plot",
+  "source": "synthetic_generator",
+  "name": "CU",
+  "legend": {
+    "total_curves": 1,
+    "curves": [
+      {
+        "id": "Condition 1",
+        "color": "#000000",
+        "marker": "circle",
+        "line_type": "solid"
+      }
+    ]
+  },
+  "axes": {
+    "x": {
+      "label": "Time",
+      "units": "hours",
+      "range": {
+        "min": 0,
+        "max": 26.0
+      }
+    },
+    "y": {
+      "label": "Bacterial Count",
+      "units": "CFU/mL",
+      "range": {
+        "min": 0.1,
+        "max": 6.9
+      }
+    }
+  },
+  "curves_trends": [
+    {
+      "id": "Condition 1",
+      "trend": "kill_regrowth",
+      "description": "kill + regrowth"
+    }
+  ]
+}

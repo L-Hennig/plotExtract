@@ -1,0 +1,127 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/CU/CU.png",
+  "prompt_name": "prompt_3",
+  "overall_status": "completed",
+  "validation_status": "yes",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 512,
+      "execution_time_ms": 3241.3370609283447,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-13T14:10:51.094029",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 808,
+      "execution_time_ms": 6498.444080352783,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-13T14:10:54.335458",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1273,
+      "execution_time_ms": 7456.924676895142,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-13T14:11:00.834030",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 70,
+        "columns": [
+          "Here is the extraction output following the specified rules:"
+        ],
+        "axis_labels": [
+          "Here is the extraction output following the specified rules:"
+        ]
+      },
+      "output_length": 1856,
+      "execution_time_ms": 11730.366468429565,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-13T14:11:08.291051",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 3,
+        "num_rows": 75,
+        "columns": [
+          "Given that the accumulated facts are currently empty",
+          " I will first reconstruct the `marker_facts` object based on the provided image (as if it were extracted in Stage 4)",
+          " then perform the validation checks."
+        ],
+        "axis_labels": [
+          "Given that the accumulated facts are currently empty",
+          " I will first reconstruct the `marker_facts` object based on the provided image (as if it were extracted in Stage 4)",
+          " then perform the validation checks."
+        ]
+      },
+      "output_length": 3233,
+      "execution_time_ms": 17654.701232910156,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-13T14:11:20.023079",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_4": {
+      "num_columns": 1,
+      "num_rows": 70,
+      "columns": [
+        "Here is the extraction output following the specified rules:"
+      ],
+      "axis_labels": [
+        "Here is the extraction output following the specified rules:"
+      ]
+    },
+    "EXTRACT_STAGE_5": {
+      "num_columns": 3,
+      "num_rows": 75,
+      "columns": [
+        "Given that the accumulated facts are currently empty",
+        " I will first reconstruct the `marker_facts` object based on the provided image (as if it were extracted in Stage 4)",
+        " then perform the validation checks."
+      ],
+      "axis_labels": [
+        "Given that the accumulated facts are currently empty",
+        " I will first reconstruct the `marker_facts` object based on the provided image (as if it were extracted in Stage 4)",
+        " then perform the validation checks."
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 64.77478,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "Yes",
+      "num_points": "Yes",
+      "trend": "Yes"
+    }
+  }
+}

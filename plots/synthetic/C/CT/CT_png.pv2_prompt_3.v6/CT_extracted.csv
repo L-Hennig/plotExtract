@@ -1,0 +1,19 @@
+time,hours,bacterial_count,CFU_per_mL,condition
+0,0,5.8,Condition 1
+2,2,4.5,Condition 1
+4,4,3.2,Condition 1
+6,6,2.5,Condition 1
+8,8,2.8,Condition 1
+10,10,3.0,Condition 1
+24,24,3.8,Condition 1
+0,0,6.2,Condition 2
+2,2,3.0,Condition 2
+4,4,0.5,Condition 2
+6,6,0.0,Condition 2
+0,0,6.3,Condition 3
+2,2,7.0,Condition 3
+4,4,7.5,Condition 3
+6,6,7.8,Condition 3
+8,8,8.0,Condition 3
+10,10,8.2,Condition 3
+24,24,8.9,Condition 3
