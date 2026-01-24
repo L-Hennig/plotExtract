@@ -1,0 +1,104 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/G/GC/GC.png",
+  "prompt_name": "prompt_9",
+  "overall_status": "completed",
+  "validation_status": "yes",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 378,
+      "execution_time_ms": 4432.585716247559,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T14:31:03.133346",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 404,
+      "execution_time_ms": 4463.674545288086,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T14:31:07.567931",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 627,
+      "execution_time_ms": 4347.377061843872,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T14:31:12.033236",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 2731,
+      "execution_time_ms": 11013.557195663452,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T14:31:16.383416",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 2,
+        "num_rows": 294,
+        "columns": [
+          "Based on the accumulated facts and the strict extraction rules",
+          " here is the output:"
+        ],
+        "axis_labels": [
+          "Based on the accumulated facts and the strict extraction rules",
+          " here is the output:"
+        ]
+      },
+      "output_length": 8595,
+      "execution_time_ms": 43832.403898239136,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T14:31:27.400976",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_5": {
+      "num_columns": 2,
+      "num_rows": 294,
+      "columns": [
+        "Based on the accumulated facts and the strict extraction rules",
+        " here is the output:"
+      ],
+      "axis_labels": [
+        "Based on the accumulated facts and the strict extraction rules",
+        " here is the output:"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 97.660187,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "Yes",
+      "num_points": "Yes",
+      "trend": "Yes"
+    }
+  }
+}

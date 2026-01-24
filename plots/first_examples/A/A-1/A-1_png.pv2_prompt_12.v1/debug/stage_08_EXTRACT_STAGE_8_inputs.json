@@ -1,0 +1,9 @@
+{
+  "stage_index": 7,
+  "stage_name": "EXTRACT_STAGE_8",
+  "no_image_stage": true,
+  "prompt_chars": 15164,
+  "accumulated_facts_chars": 19869,
+  "csv_text_chars": 5202,
+  "csv_diagnostics_chars": 0
+}

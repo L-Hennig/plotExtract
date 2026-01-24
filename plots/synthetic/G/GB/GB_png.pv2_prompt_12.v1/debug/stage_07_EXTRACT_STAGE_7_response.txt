@@ -1,0 +1,140 @@
+```json
+{
+  "re_extraction": {
+    "results": [
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Initial point confirmed correct; no change needed for time 0.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "baseline alignment"
+        }
+      },
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 5.2,
+        "confidence": "high",
+        "reason": "Corrected increasing trend to decreasing bacterial count.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "direction flip"
+        }
+      },
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 4,
+        "new_log10_cfu_ml": 4.8,
+        "confidence": "high",
+        "reason": "Corrected increasing trend to reflect bacterial kill.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "direction flip"
+        }
+      },
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 3.0,
+        "confidence": "high",
+        "reason": "Corrected final bacterial count to reflect sustained kill.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "direction flip"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Initial point confirmed correct; no change needed for time 0.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "baseline alignment"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 1.5,
+        "confidence": "high",
+        "reason": "Confirmed initial drop in bacterial count.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "consistent decrease"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 4,
+        "new_log10_cfu_ml": 0.7,
+        "confidence": "high",
+        "reason": "Corrected upward reversal to maintain decreasing trend.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "midcurve switch"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 6,
+        "new_log10_cfu_ml": 0.5,
+        "confidence": "high",
+        "reason": "Corrected upward reversal to maintain decreasing trend.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "midcurve switch"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 8,
+        "new_log10_cfu_ml": 0.4,
+        "confidence": "high",
+        "reason": "Corrected upward reversal to maintain consistent kill.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "midcurve switch"
+        }
+      },
+      {
+        "curve_label": "Condition 4",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Confirmed initial bacterial count aligns with other curves.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "baseline alignment"
+        }
+      },
+      {
+        "curve_label": "Condition 4",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 1.0,
+        "confidence": "high",
+        "reason": "Confirmed initial drop in bacterial count aligns with trend.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "bad intercept"
+        }
+      }
+    ]
+  }
+}
+```

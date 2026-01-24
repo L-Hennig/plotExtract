@@ -1,0 +1,88 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/G/GF/GF.png",
+  "prompt_name": "prompt_6",
+  "overall_status": "completed",
+  "validation_status": "yes",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 393,
+      "execution_time_ms": 3385.7738971710205,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-21T14:28:09.227840",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 404,
+      "execution_time_ms": 4310.545921325684,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-21T14:28:12.615490",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 577,
+      "execution_time_ms": 3887.5603675842285,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-21T14:28:16.927622",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 87,
+        "columns": [
+          "{"
+        ],
+        "axis_labels": [
+          "{"
+        ]
+      },
+      "output_length": 2541,
+      "execution_time_ms": 15449.201345443726,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-21T14:28:20.818837",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_4": {
+      "num_columns": 1,
+      "num_rows": 87,
+      "columns": [
+        "{"
+      ],
+      "axis_labels": [
+        "{"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 56.203644,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "yes",
+      "num_points": "Yes",
+      "trend": "Yes"
+    }
+  }
+}

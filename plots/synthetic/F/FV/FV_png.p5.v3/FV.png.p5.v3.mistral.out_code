@@ -1,0 +1,72 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data preparation
+data = {
+    'Time_1': [0, 2, 4, 6, 8, 10, 12, 24],
+    'CFU_1': [6.0, 8.0, 8.5, 9.0, 9.0, 9.0, 9.0, 9.2],
+    'Time_2': [0, 2, 4, 6, 8, 10, 24],
+    'CFU_2': [6.0, 7.8, 4.0, 2.0, 1.5, 1.0, 0.5],
+    'Time_3': [0, 2, 4, 6, 8, 10, 12, 24],
+    'CFU_3': [6.0, 1.0, 1.0, 1.0, 1.5, 1.0, 2.0, 2.0],
+    'Time_4': [0, 2, 4, 6, 8, 10, 12, 24],
+    'CFU_4': [6.0, 8.0, 8.2, 8.0, 8.0, 8.0, 8.0, 8.0],
+    'Time_5': [0, 2, 4, 6, 8, 10, 12, 24],
+    'CFU_5': [6.0, 3.5, 3.8, 3.0, 3.2, 3.0, 3.5, 4.5],
+    'Time_6': [0, 2, 4, 6, 8, 10, 12, 24],
+    'CFU_6': [6.0, 2.0, None, None, 2.0, 1.5, 1.0, 1.0]
+}
+
+# Create figure and axis
+plt.figure(figsize=(8, 6))
+ax = plt.gca()
+
+# Plot each condition with specific line and marker styles
+# Condition 1: solid line, square markers
+ax.plot(data['Time_1'], data['CFU_1'], color='black', linestyle='-', marker='s', markersize=7, label='Condition 1')
+
+# Condition 2: dashed line, triangle up markers
+ax.plot(data['Time_2'], data['CFU_2'], color='black', linestyle='--', marker='^', markersize=7, label='Condition 2')
+
+# Condition 3: dotted line, circle markers
+ax.plot(data['Time_3'], data['CFU_3'], color='black', linestyle=':', marker='o', markersize=7, label='Condition 3')
+
+# Condition 4: dash-dot line, diamond markers
+ax.plot(data['Time_4'], data['CFU_4'], color='black', linestyle='-.', marker='D', markersize=7, label='Condition 4')
+
+# Condition 5: solid line with gray color, filled circle markers
+ax.plot(data['Time_5'], data['CFU_5'], color='gray', linestyle='-', marker='o', markersize=7, label='Condition 5')
+
+# Condition 6: dashed line with gray color, triangle down markers
+ax.plot([t for t, v in zip(data['Time_6'], data['CFU_6']) if v is not None],
+        [v for v in data['CFU_6'] if v is not None],
+        color='gray', linestyle='--', marker='v', markersize=7, label='Condition 6')
+
+# Set axis labels and limits
+ax.set_xlabel('Time (hours)', fontsize=12)
+ax.set_ylabel('Bacterial Count (CFU/mL) (log10 scale)', fontsize=12)
+ax.set_xlim(0, 26)
+ax.set_ylim(1, 10)
+
+# Set log scale for y-axis
+ax.set_yscale('log')
+
+# Set x and y ticks
+ax.set_xticks([0, 2, 4, 6, 8, 10, 12, 20, 22, 24])
+ax.set_yticks([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+ax.set_yticklabels(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
+
+# Add axis break on x-axis
+ax.plot([12.5, 13.5], [0.9, 0.9], color='black', linewidth=1.5, clip_on=False)
+ax.plot([12.5, 13.5], [10.1, 10.1], color='black', linewidth=1.5, clip_on=False)
+
+# Adjust axis to show break
+ax.spines['right'].set_visible(False)
+ax.spines['top'].set_visible(False)
+
+# Save the plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\FV\FV_png.p5.v3"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "FV_png-replot.p5.v3.png"), dpi=300, bbox_inches='tight')
+plt.close()

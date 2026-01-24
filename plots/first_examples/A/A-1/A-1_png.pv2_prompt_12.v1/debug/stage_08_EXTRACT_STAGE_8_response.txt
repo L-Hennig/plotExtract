@@ -1,0 +1,26 @@
+```csv
+"curve_label","time_hours","new_log10_cfu_ml","confidence","reason","used_curve_definition","matches_expected_trend_if_known"
+"Blank",22,10.5,"high","Extended growth trend plateau after 12 hours confirmed.",TRUE,TRUE
+"Blank",24,10.6,"high","Maintained growth plateau consistent with earlier trend.",TRUE,TRUE
+"Blank",26,10.7,"high","Slight increase consistent with late-phase growth.",TRUE,TRUE
+"COL 0.125µg/mL",22,10.1,"high","Stabilized growth after 12 hours confirmed.",TRUE,TRUE
+"COL 0.125µg/mL",24,10.2,"high","Continued stabilization consistent with earlier points.",TRUE,TRUE
+"COL 0.125µg/mL",26,10.3,"high","Slight increase aligned with expected variability.",TRUE,TRUE
+"MEM 4µg/mL",2,0.5,"medium","Sharp drop confirmed but potential overlap with other curves.",TRUE,TRUE
+"MEM 4µg/mL",4,0.0,"high","Complete kill confirmed at 4 hours.",TRUE,TRUE
+"MEM 4µg/mL",22,0.0,"high","No regrowth after 12 hours confirmed.",TRUE,TRUE
+"MEM 4µg/mL",24,0.0,"high","Sustained kill confirmed.",TRUE,TRUE
+"MEM 4µg/mL",26,0.0,"high","No regrowth detected.",TRUE,TRUE
+"RFP 0.06µg/mL",22,0.0,"high","No regrowth after 12 hours confirmed.",TRUE,TRUE
+"RFP 0.06µg/mL",24,0.0,"high","Sustained kill confirmed.",TRUE,TRUE
+"RFP 0.06µg/mL",26,0.0,"high","No regrowth detected.",TRUE,TRUE
+"COL 0.125µg/mL + MEM 4µg/mL",22,0.0,"high","No regrowth after 12 hours confirmed.",TRUE,TRUE
+"COL 0.125µg/mL + MEM 4µg/mL",24,0.0,"high","Sustained kill confirmed.",TRUE,TRUE
+"COL 0.125µg/mL + MEM 4µg/mL",26,0.0,"high","No regrowth detected.",TRUE,TRUE
+"COL 0.125µg/mL + MINO 1µg/mL",22,0.0,"high","No regrowth after 12 hours confirmed.",TRUE,TRUE
+"COL 0.125µg/mL + MINO 1µg/mL",24,0.0,"high","Sustained kill confirmed.",TRUE,TRUE
+"COL 0.125µg/mL + MINO 1µg/mL",26,0.0,"high","No regrowth detected.",TRUE,TRUE
+"COL 0.125µg/mL + RFP 0.06µg/mL",22,0.0,"high","No regrowth after 12 hours confirmed.",TRUE,TRUE
+"COL 0.125µg/mL + RFP 0.06µg/mL",24,0.0,"high","Sustained kill confirmed.",TRUE,TRUE
+"COL 0.125µg/mL + RFP 0.06µg/mL",26,0.0,"high","No regrowth detected.",TRUE,TRUE
+```

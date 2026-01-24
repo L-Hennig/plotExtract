@@ -1,0 +1,700 @@
+{
+  "status": "running",
+  "stage": "EXTRACT_STAGE_8",
+  "stage_index": 8,
+  "total_stages": 8,
+  "percentage": 100.0,
+  "accumulated_facts": {
+    "article_info": {
+      "figure_id": "GA",
+      "axis_definitions": {
+        "x_axis": {
+          "quantity": "Time",
+          "unit": "hours"
+        },
+        "y_axis": {
+          "quantity": "Bacterial Count",
+          "unit": "Log CFU/mL",
+          "scale": "logarithmic"
+        }
+      },
+      "curve_legend": [
+        {
+          "curve_label": "Blank",
+          "description": "control without treatment",
+          "expected_trend": "growth/increase"
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL",
+          "description": "colistin at 0.125 \u00b5g/mL",
+          "expected_trend": "variable"
+        },
+        {
+          "curve_label": "MINO 1\u00b5g/mL",
+          "description": "minocycline at 1 \u00b5g/mL",
+          "expected_trend": "variable"
+        },
+        {
+          "curve_label": "MEM 4\u00b5g/mL",
+          "description": "meropenem at 4 \u00b5g/mL",
+          "expected_trend": "variable"
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "description": "rifampicin at 0.06 \u00b5g/mL",
+          "expected_trend": "variable"
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL",
+          "description": "combination of colistin and meropenem",
+          "expected_trend": "kill/decrease"
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL",
+          "description": "combination of colistin and minocycline",
+          "expected_trend": "kill/decrease"
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL",
+          "description": "combination of colistin and rifampicin",
+          "expected_trend": "kill/decrease"
+        }
+      ],
+      "figure_caption": "Time-kill curves of bacterial growth and antibiotic effect over time",
+      "experimental_context": {
+        "assay_type": "time-kill assay",
+        "organism": "unknown",
+        "model": "unknown"
+      }
+    },
+    "plot_type_facts": {
+      "declared_in_article_info": true,
+      "plot_type": "time-kill plot",
+      "confidence": 1,
+      "reason": "Assay type explicitly stated as time-kill assay in experimental context, and visual confirmation of time on x-axis and bacterial count (log CFU/mL) on y-axis with multiple treatment curves.",
+      "visually_verified": true
+    },
+    "axis_facts": {
+      "x_axis": {
+        "quantity": "Time",
+        "unit": "hours",
+        "discrete": false,
+        "lower_plausible_limit": 0,
+        "upper_plausible_limit": 26,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          22,
+          24,
+          26
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "22",
+          "24",
+          "26"
+        ],
+        "breaks": [],
+        "confidence": 1
+      },
+      "y_axis": {
+        "quantity": "bacterial burden",
+        "unit": "Log CFU/mL",
+        "scale": "log10",
+        "upper_plausible_limit": 16,
+        "lower_plausible_limit": 0,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "14",
+          "16"
+        ],
+        "breaks": [],
+        "grid": {
+          "present": true,
+          "aligned_y_ticks": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            14,
+            16
+          ],
+          "aligned_x_ticks": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            22,
+            24,
+            26
+          ]
+        },
+        "confidence": 1
+      }
+    },
+    "curve_style_facts": {
+      "curves": [
+        {
+          "curve_label": "Blank",
+          "colour": "#000000",
+          "line_type": "dotted",
+          "marker_symbol": "x",
+          "source": "figure_legend",
+          "confidence": 1
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL",
+          "colour": "#000000",
+          "line_type": "solid",
+          "marker_symbol": "square",
+          "source": "figure_legend",
+          "confidence": 1
+        },
+        {
+          "curve_label": "MINO 1\u00b5g/mL",
+          "colour": "#000000",
+          "line_type": "dashed",
+          "marker_symbol": "triangle",
+          "source": "figure_legend",
+          "confidence": 1
+        },
+        {
+          "curve_label": "MEM 4\u00b5g/mL",
+          "colour": "#000000",
+          "line_type": "dotted",
+          "marker_symbol": "diamond",
+          "source": "figure_legend",
+          "confidence": 1
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "colour": "#000000",
+          "line_type": "dotted",
+          "marker_symbol": "inverted_triangle",
+          "source": "figure_legend",
+          "confidence": 1
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL",
+          "colour": "#000000",
+          "line_type": "dotted",
+          "marker_symbol": "circle",
+          "source": "figure_legend",
+          "confidence": 1
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL",
+          "colour": "#000000",
+          "line_type": "dashed",
+          "marker_symbol": "triangle",
+          "source": "figure_legend",
+          "confidence": 1
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL",
+          "colour": "#000000",
+          "line_type": "dotted",
+          "marker_symbol": "inverted_triangle_filled",
+          "source": "figure_legend",
+          "confidence": 1
+        }
+      ]
+    },
+    "re_extraction": {
+      "requests": [
+        {
+          "curve_label": "Blank",
+          "issue_type": "truncation",
+          "target_times_hours": [
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "growth/increase",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 1.0,
+            "pct_decreasing": 0.0,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 2.5,
+              "from_time": 0,
+              "to_time": 2,
+              "delta": 2.5
+            }
+          },
+          "visual_guidance": "Verify if the curve plateaus after 12 hours; ensure continuity with earlier growth trend."
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL",
+          "issue_type": "truncation",
+          "target_times_hours": [
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "variable",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 1.0,
+            "pct_decreasing": 0.0,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 1.0,
+              "from_time": 0,
+              "to_time": 2,
+              "delta": 1.0
+            }
+          },
+          "visual_guidance": "Check if the curve stabilizes or continues to rise after 12 hours; maintain consistency with earlier data points."
+        },
+        {
+          "curve_label": "MEM 4\u00b5g/mL",
+          "issue_type": "midcurve_switch",
+          "target_times_hours": [
+            2,
+            4,
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "variable",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.11,
+            "pct_decreasing": 0.67,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 6.0,
+              "from_time": 0,
+              "to_time": 2,
+              "delta": -6.0
+            }
+          },
+          "visual_guidance": "Re-examine the sharp drop at 2 hours; ensure the curve does not re-grow prematurely after 12 hours."
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "issue_type": "truncation",
+          "target_times_hours": [
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "variable",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.0,
+            "pct_decreasing": 0.89,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 4.0,
+              "from_time": 0,
+              "to_time": 2,
+              "delta": -4.0
+            }
+          },
+          "visual_guidance": "Confirm if the curve remains at 0 or shows regrowth after 12 hours; avoid misreading grid lines."
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL",
+          "issue_type": "truncation",
+          "target_times_hours": [
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "kill/decrease",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.0,
+            "pct_decreasing": 1.0,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 6.0,
+              "from_time": 0,
+              "to_time": 2,
+              "delta": -6.0
+            }
+          },
+          "visual_guidance": "Check for any regrowth after 12 hours; ensure the curve stays at 0 if no regrowth is expected."
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL",
+          "issue_type": "truncation",
+          "target_times_hours": [
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "kill/decrease",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.0,
+            "pct_decreasing": 1.0,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 6.0,
+              "from_time": 0,
+              "to_time": 2,
+              "delta": -6.0
+            }
+          },
+          "visual_guidance": "Verify if the curve remains at 0 or shows regrowth after 12 hours; avoid misinterpreting grid lines."
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL",
+          "issue_type": "truncation",
+          "target_times_hours": [
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "kill/decrease",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.0,
+            "pct_decreasing": 1.0,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 6.0,
+              "from_time": 0,
+              "to_time": 2,
+              "delta": -6.0
+            }
+          },
+          "visual_guidance": "Ensure the curve stays at 0 after 12 hours; check for any unexpected regrowth."
+        }
+      ],
+      "results": [
+        {
+          "curve_label": "Blank",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 10.5,
+          "confidence": "high",
+          "reason": "Extended growth trend plateau after 12 hours confirmed.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "Blank",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 10.6,
+          "confidence": "high",
+          "reason": "Maintained growth plateau consistent with earlier trend.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "Blank",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 10.7,
+          "confidence": "high",
+          "reason": "Slight increase consistent with late-phase growth.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 10.1,
+          "confidence": "high",
+          "reason": "Stabilized growth after 12 hours confirmed.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 10.2,
+          "confidence": "high",
+          "reason": "Continued stabilization consistent with earlier points.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 10.3,
+          "confidence": "high",
+          "reason": "Slight increase aligned with expected variability.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "MEM 4\u00b5g/mL",
+          "time_hours": 2,
+          "new_log10_cfu_ml": 0.5,
+          "confidence": "medium",
+          "reason": "Sharp drop confirmed but potential overlap with other curves.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "midcurve switch verified"
+          }
+        },
+        {
+          "curve_label": "MEM 4\u00b5g/mL",
+          "time_hours": 4,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Complete kill confirmed at 4 hours.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "midcurve switch verified"
+          }
+        },
+        {
+          "curve_label": "MEM 4\u00b5g/mL",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "No regrowth after 12 hours confirmed.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "MEM 4\u00b5g/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Sustained kill confirmed.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "MEM 4\u00b5g/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "No regrowth detected.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "No regrowth after 12 hours confirmed.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Sustained kill confirmed.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "No regrowth detected.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "No regrowth after 12 hours confirmed.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Sustained kill confirmed.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "No regrowth detected.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "No regrowth after 12 hours confirmed.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Sustained kill confirmed.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "No regrowth detected.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "No regrowth after 12 hours confirmed.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Sustained kill confirmed.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "No regrowth detected.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation resolved"
+          }
+        }
+      ]
+    }
+  },
+  "stage_duration_ms": 11247.092008590698,
+  "timestamp": 1769157968.7400913,
+  "console_output": "===== STAGE 1 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"article_info\": {\n    \"figure_id\": \"GA\",\n    \"axis_definitions\": {\n      \"x_axis\": {\n        \"quantity\": \"Time\",\n        \"unit\": \"hours\"\n      },\n      \"y_axis\": {\n        \"quantity\": \"Bacterial Count\",\n        \"unit\": \"Log CFU/mL\",\n        \"scale\": \"logarithmic\"\n      }\n    },\n    \"curve_legend\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"description\": \"control without treatment\",\n        \"expected_trend\": \"growth/increase\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"description\": \"colistin at 0.125 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"MINO 1\u00b5g/mL\",\n        \"description\": \"minocycline at 1 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"description\": \"meropenem at 4 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"description\": \"rifampicin at 0.06 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"description\": \"combination of colistin and meropenem\",\n        \"expected_trend\": \"kill/decrease\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"description\": \"combination of colistin and minocycline\",\n        \"expected_trend\": \"kill/decrease\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"description\": \"combination of colistin and rifampicin\",\n        \"expected_trend\": \"kill/decrease\"\n      }\n    ],\n    \"figure_caption\": \"Time-kill curves of bacterial growth and antibiotic effect over time\",\n    \"experimental_context\": {\n      \"assay_type\": \"time-kill assay\",\n      \"organism\": \"unknown\",\n      \"model\": \"unknown\"\n    }\n  },\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 1,\n    \"reason\": \"Assay type explicitly stated as time-kill assay in experimental context, and visual confirmation of time on x-axis and bacterial count (log CFU/mL) on y-axis with multiple treatment curves.\",\n    \"visually_verified\": true\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"Time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"confidence\": 1\n    },\n    \"y_axis\": {\n      \"quantity\": \"Bacterial Count\",\n      \"unit\": \"Log CFU/mL\",\n      \"scale\": \"logarithmic\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"confidence\": 1\n    }\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"MINO 1\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle_up\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"diamond\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle_filled\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      }\n    ]\n  }\n}\n===== STAGE 2 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"article_info\": {\n    \"figure_id\": \"GA\",\n    \"axis_definitions\": {\n      \"x_axis\": {\n        \"quantity\": \"Time\",\n        \"unit\": \"hours\"\n      },\n      \"y_axis\": {\n        \"quantity\": \"Bacterial Count\",\n        \"unit\": \"Log CFU/mL\",\n        \"scale\": \"logarithmic\"\n      }\n    },\n    \"curve_legend\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"description\": \"control without treatment\",\n        \"expected_trend\": \"growth/increase\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"description\": \"colistin at 0.125 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"MINO 1\u00b5g/mL\",\n        \"description\": \"minocycline at 1 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"description\": \"meropenem at 4 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"description\": \"rifampicin at 0.06 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"description\": \"combination of colistin and meropenem\",\n        \"expected_trend\": \"kill/decrease\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"description\": \"combination of colistin and minocycline\",\n        \"expected_trend\": \"kill/decrease\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"description\": \"combination of colistin and rifampicin\",\n        \"expected_trend\": \"kill/decrease\"\n      }\n    ],\n    \"figure_caption\": \"Time-kill curves of bacterial growth and antibiotic effect over time\",\n    \"experimental_context\": {\n      \"assay_type\": \"time-kill assay\",\n      \"organism\": \"unknown\",\n      \"model\": \"unknown\"\n    }\n  },\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 1,\n    \"reason\": \"Assay type explicitly stated as time-kill assay in experimental context, and visual confirmation of time on x-axis and bacterial count (log CFU/mL) on y-axis with multiple treatment curves.\",\n    \"visually_verified\": true\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"Time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [],\n      \"confidence\": 1\n    },\n    \"y_axis\": {\n      \"quantity\": \"Bacterial Count\",\n      \"unit\": \"Log CFU/mL\",\n      \"scale\": \"logarithmic\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"confidence\": 1\n    }\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"MINO 1\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle_up\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"diamond\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle_filled\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      }\n    ]\n  }\n}\n===== STAGE 3 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"article_info\": {\n    \"figure_id\": \"GA\",\n    \"axis_definitions\": {\n      \"x_axis\": {\n        \"quantity\": \"Time\",\n        \"unit\": \"hours\"\n      },\n      \"y_axis\": {\n        \"quantity\": \"Bacterial Count\",\n        \"unit\": \"Log CFU/mL\",\n        \"scale\": \"logarithmic\"\n      }\n    },\n    \"curve_legend\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"description\": \"control without treatment\",\n        \"expected_trend\": \"growth/increase\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"description\": \"colistin at 0.125 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"MINO 1\u00b5g/mL\",\n        \"description\": \"minocycline at 1 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"description\": \"meropenem at 4 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"description\": \"rifampicin at 0.06 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"description\": \"combination of colistin and meropenem\",\n        \"expected_trend\": \"kill/decrease\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"description\": \"combination of colistin and minocycline\",\n        \"expected_trend\": \"kill/decrease\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"description\": \"combination of colistin and rifampicin\",\n        \"expected_trend\": \"kill/decrease\"\n      }\n    ],\n    \"figure_caption\": \"Time-kill curves of bacterial growth and antibiotic effect over time\",\n    \"experimental_context\": {\n      \"assay_type\": \"time-kill assay\",\n      \"organism\": \"unknown\",\n      \"model\": \"unknown\"\n    }\n  },\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 1,\n    \"reason\": \"Assay type explicitly stated as time-kill assay in experimental context, and visual confirmation of time on x-axis and bacterial count (log CFU/mL) on y-axis with multiple treatment curves.\",\n    \"visually_verified\": true\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"Time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [],\n      \"confidence\": 1\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"Log CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 1\n    }\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"MINO 1\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle_up\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"diamond\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle_filled\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      }\n    ]\n  }\n}\n===== STAGE 4 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"article_info\": {\n    \"figure_id\": \"GA\",\n    \"axis_definitions\": {\n      \"x_axis\": {\n        \"quantity\": \"Time\",\n        \"unit\": \"hours\"\n      },\n      \"y_axis\": {\n        \"quantity\": \"Bacterial Count\",\n        \"unit\": \"Log CFU/mL\",\n        \"scale\": \"logarithmic\"\n      }\n    },\n    \"curve_legend\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"description\": \"control without treatment\",\n        \"expected_trend\": \"growth/increase\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"description\": \"colistin at 0.125 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"MINO 1\u00b5g/mL\",\n        \"description\": \"minocycline at 1 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"description\": \"meropenem at 4 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"description\": \"rifampicin at 0.06 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"description\": \"combination of colistin and meropenem\",\n        \"expected_trend\": \"kill/decrease\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"description\": \"combination of colistin and minocycline\",\n        \"expected_trend\": \"kill/decrease\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"description\": \"combination of colistin and rifampicin\",\n        \"expected_trend\": \"kill/decrease\"\n      }\n    ],\n    \"figure_caption\": \"Time-kill curves of bacterial growth and antibiotic effect over time\",\n    \"experimental_context\": {\n      \"assay_type\": \"time-kill assay\",\n      \"organism\": \"unknown\",\n      \"model\": \"unknown\"\n    }\n  },\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 1,\n    \"reason\": \"Assay type explicitly stated as time-kill assay in experimental context, and visual confirmation of time on x-axis and bacterial count (log CFU/mL) on y-axis with multiple treatment curves.\",\n    \"visually_verified\": true\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"Time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [],\n      \"confidence\": 1\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"Log CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 1\n    }\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"MINO 1\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"diamond\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle_filled\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      }\n    ]\n  }\n}\n===== STAGE 5 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"article_info\": {\n    \"figure_id\": \"GA\",\n    \"axis_definitions\": {\n      \"x_axis\": {\n        \"quantity\": \"Time\",\n        \"unit\": \"hours\"\n      },\n      \"y_axis\": {\n        \"quantity\": \"Bacterial Count\",\n        \"unit\": \"Log CFU/mL\",\n        \"scale\": \"logarithmic\"\n      }\n    },\n    \"curve_legend\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"description\": \"control without treatment\",\n        \"expected_trend\": \"growth/increase\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"description\": \"colistin at 0.125 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"MINO 1\u00b5g/mL\",\n        \"description\": \"minocycline at 1 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"description\": \"meropenem at 4 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"description\": \"rifampicin at 0.06 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"description\": \"combination of colistin and meropenem\",\n        \"expected_trend\": \"kill/decrease\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"description\": \"combination of colistin and minocycline\",\n        \"expected_trend\": \"kill/decrease\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"description\": \"combination of colistin and rifampicin\",\n        \"expected_trend\": \"kill/decrease\"\n      }\n    ],\n    \"figure_caption\": \"Time-kill curves of bacterial growth and antibiotic effect over time\",\n    \"experimental_context\": {\n      \"assay_type\": \"time-kill assay\",\n      \"organism\": \"unknown\",\n      \"model\": \"unknown\"\n    }\n  },\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 1,\n    \"reason\": \"Assay type explicitly stated as time-kill assay in experimental context, and visual confirmation of time on x-axis and bacterial count (log CFU/mL) on y-axis with multiple treatment curves.\",\n    \"visually_verified\": true\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"Time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [],\n      \"confidence\": 1\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"Log CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 1\n    }\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"MINO 1\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"diamond\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle_filled\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      }\n    ]\n  }\n}\n===== STAGE 6 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"article_info\": {\n    \"figure_id\": \"GA\",\n    \"axis_definitions\": {\n      \"x_axis\": {\n        \"quantity\": \"Time\",\n        \"unit\": \"hours\"\n      },\n      \"y_axis\": {\n        \"quantity\": \"Bacterial Count\",\n        \"unit\": \"Log CFU/mL\",\n        \"scale\": \"logarithmic\"\n      }\n    },\n    \"curve_legend\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"description\": \"control without treatment\",\n        \"expected_trend\": \"growth/increase\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"description\": \"colistin at 0.125 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"MINO 1\u00b5g/mL\",\n        \"description\": \"minocycline at 1 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"description\": \"meropenem at 4 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"description\": \"rifampicin at 0.06 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"description\": \"combination of colistin and meropenem\",\n        \"expected_trend\": \"kill/decrease\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"description\": \"combination of colistin and minocycline\",\n        \"expected_trend\": \"kill/decrease\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"description\": \"combination of colistin and rifampicin\",\n        \"expected_trend\": \"kill/decrease\"\n      }\n    ],\n    \"figure_caption\": \"Time-kill curves of bacterial growth and antibiotic effect over time\",\n    \"experimental_context\": {\n      \"assay_type\": \"time-kill assay\",\n      \"organism\": \"unknown\",\n      \"model\": \"unknown\"\n    }\n  },\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 1,\n    \"reason\": \"Assay type explicitly stated as time-kill assay in experimental context, and visual confirmation of time on x-axis and bacterial count (log CFU/mL) on y-axis with multiple treatment curves.\",\n    \"visually_verified\": true\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"Time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [],\n      \"confidence\": 1\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"Log CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 1\n    }\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"MINO 1\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"diamond\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle_filled\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      }\n    ]\n  },\n  \"re_extraction\": {\n    \"requests\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"growth/increase\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 1.0,\n          \"pct_decreasing\": 0.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 2.5,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": 2.5\n          }\n        },\n        \"visual_guidance\": \"Verify if the curve plateaus after 12 hours; ensure continuity with earlier growth trend.\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"variable\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 1.0,\n          \"pct_decreasing\": 0.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 1.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": 1.0\n          }\n        },\n        \"visual_guidance\": \"Check if the curve stabilizes or continues to rise after 12 hours; maintain consistency with earlier data points.\"\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"issue_type\": \"midcurve_switch\",\n        \"target_times_hours\": [\n          2,\n          4,\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"variable\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.11,\n          \"pct_decreasing\": 0.67,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 6.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": -6.0\n          }\n        },\n        \"visual_guidance\": \"Re-examine the sharp drop at 2 hours; ensure the curve does not re-grow prematurely after 12 hours.\"\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"variable\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.0,\n          \"pct_decreasing\": 0.89,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 4.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": -4.0\n          }\n        },\n        \"visual_guidance\": \"Confirm if the curve remains at 0 or shows regrowth after 12 hours; avoid misreading grid lines.\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.0,\n          \"pct_decreasing\": 1.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 6.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": -6.0\n          }\n        },\n        \"visual_guidance\": \"Check for any regrowth after 12 hours; ensure the curve stays at 0 if no regrowth is expected.\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.0,\n          \"pct_decreasing\": 1.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 6.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": -6.0\n          }\n        },\n        \"visual_guidance\": \"Verify if the curve remains at 0 or shows regrowth after 12 hours; avoid misinterpreting grid lines.\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.0,\n          \"pct_decreasing\": 1.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 6.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": -6.0\n          }\n        },\n        \"visual_guidance\": \"Ensure the curve stays at 0 after 12 hours; check for any unexpected regrowth.\"\n      }\n    ]\n  }\n}\n===== STAGE 7 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"article_info\": {\n    \"figure_id\": \"GA\",\n    \"axis_definitions\": {\n      \"x_axis\": {\n        \"quantity\": \"Time\",\n        \"unit\": \"hours\"\n      },\n      \"y_axis\": {\n        \"quantity\": \"Bacterial Count\",\n        \"unit\": \"Log CFU/mL\",\n        \"scale\": \"logarithmic\"\n      }\n    },\n    \"curve_legend\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"description\": \"control without treatment\",\n        \"expected_trend\": \"growth/increase\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"description\": \"colistin at 0.125 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"MINO 1\u00b5g/mL\",\n        \"description\": \"minocycline at 1 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"description\": \"meropenem at 4 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"description\": \"rifampicin at 0.06 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"description\": \"combination of colistin and meropenem\",\n        \"expected_trend\": \"kill/decrease\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"description\": \"combination of colistin and minocycline\",\n        \"expected_trend\": \"kill/decrease\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"description\": \"combination of colistin and rifampicin\",\n        \"expected_trend\": \"kill/decrease\"\n      }\n    ],\n    \"figure_caption\": \"Time-kill curves of bacterial growth and antibiotic effect over time\",\n    \"experimental_context\": {\n      \"assay_type\": \"time-kill assay\",\n      \"organism\": \"unknown\",\n      \"model\": \"unknown\"\n    }\n  },\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 1,\n    \"reason\": \"Assay type explicitly stated as time-kill assay in experimental context, and visual confirmation of time on x-axis and bacterial count (log CFU/mL) on y-axis with multiple treatment curves.\",\n    \"visually_verified\": true\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"Time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [],\n      \"confidence\": 1\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"Log CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 1\n    }\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"MINO 1\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"diamond\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle_filled\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      }\n    ]\n  },\n  \"re_extraction\": {\n    \"requests\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"growth/increase\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 1.0,\n          \"pct_decreasing\": 0.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 2.5,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": 2.5\n          }\n        },\n        \"visual_guidance\": \"Verify if the curve plateaus after 12 hours; ensure continuity with earlier growth trend.\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"variable\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 1.0,\n          \"pct_decreasing\": 0.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 1.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": 1.0\n          }\n        },\n        \"visual_guidance\": \"Check if the curve stabilizes or continues to rise after 12 hours; maintain consistency with earlier data points.\"\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"issue_type\": \"midcurve_switch\",\n        \"target_times_hours\": [\n          2,\n          4,\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"variable\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.11,\n          \"pct_decreasing\": 0.67,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 6.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": -6.0\n          }\n        },\n        \"visual_guidance\": \"Re-examine the sharp drop at 2 hours; ensure the curve does not re-grow prematurely after 12 hours.\"\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"variable\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.0,\n          \"pct_decreasing\": 0.89,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 4.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": -4.0\n          }\n        },\n        \"visual_guidance\": \"Confirm if the curve remains at 0 or shows regrowth after 12 hours; avoid misreading grid lines.\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.0,\n          \"pct_decreasing\": 1.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 6.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": -6.0\n          }\n        },\n        \"visual_guidance\": \"Check for any regrowth after 12 hours; ensure the curve stays at 0 if no regrowth is expected.\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.0,\n          \"pct_decreasing\": 1.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 6.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": -6.0\n          }\n        },\n        \"visual_guidance\": \"Verify if the curve remains at 0 or shows regrowth after 12 hours; avoid misinterpreting grid lines.\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.0,\n          \"pct_decreasing\": 1.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 6.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": -6.0\n          }\n        },\n        \"visual_guidance\": \"Ensure the curve stays at 0 after 12 hours; check for any unexpected regrowth.\"\n      }\n    ],\n    \"results\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 10.5,\n        \"confidence\": \"high\",\n        \"reason\": \"Extended growth trend plateau after 12 hours confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 10.6,\n        \"confidence\": \"high\",\n        \"reason\": \"Maintained growth plateau consistent with earlier trend.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 10.7,\n        \"confidence\": \"high\",\n        \"reason\": \"Slight increase consistent with late-phase growth.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 10.1,\n        \"confidence\": \"high\",\n        \"reason\": \"Stabilized growth after 12 hours confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 10.2,\n        \"confidence\": \"high\",\n        \"reason\": \"Continued stabilization consistent with earlier points.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 10.3,\n        \"confidence\": \"high\",\n        \"reason\": \"Slight increase aligned with expected variability.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"time_hours\": 2,\n        \"new_log10_cfu_ml\": 0.5,\n        \"confidence\": \"medium\",\n        \"reason\": \"Sharp drop confirmed but potential overlap with other curves.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"midcurve switch verified\"\n        }\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"time_hours\": 4,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Complete kill confirmed at 4 hours.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"midcurve switch verified\"\n        }\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth after 12 hours confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Sustained kill confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth detected.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth after 12 hours confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Sustained kill confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth detected.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth after 12 hours confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Sustained kill confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth detected.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth after 12 hours confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Sustained kill confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth detected.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth after 12 hours confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Sustained kill confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth detected.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      }\n    ]\n  }\n}\n===== STAGE 8 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"article_info\": {\n    \"figure_id\": \"GA\",\n    \"axis_definitions\": {\n      \"x_axis\": {\n        \"quantity\": \"Time\",\n        \"unit\": \"hours\"\n      },\n      \"y_axis\": {\n        \"quantity\": \"Bacterial Count\",\n        \"unit\": \"Log CFU/mL\",\n        \"scale\": \"logarithmic\"\n      }\n    },\n    \"curve_legend\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"description\": \"control without treatment\",\n        \"expected_trend\": \"growth/increase\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"description\": \"colistin at 0.125 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"MINO 1\u00b5g/mL\",\n        \"description\": \"minocycline at 1 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"description\": \"meropenem at 4 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"description\": \"rifampicin at 0.06 \u00b5g/mL\",\n        \"expected_trend\": \"variable\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"description\": \"combination of colistin and meropenem\",\n        \"expected_trend\": \"kill/decrease\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"description\": \"combination of colistin and minocycline\",\n        \"expected_trend\": \"kill/decrease\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"description\": \"combination of colistin and rifampicin\",\n        \"expected_trend\": \"kill/decrease\"\n      }\n    ],\n    \"figure_caption\": \"Time-kill curves of bacterial growth and antibiotic effect over time\",\n    \"experimental_context\": {\n      \"assay_type\": \"time-kill assay\",\n      \"organism\": \"unknown\",\n      \"model\": \"unknown\"\n    }\n  },\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 1,\n    \"reason\": \"Assay type explicitly stated as time-kill assay in experimental context, and visual confirmation of time on x-axis and bacterial count (log CFU/mL) on y-axis with multiple treatment curves.\",\n    \"visually_verified\": true\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"Time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [],\n      \"confidence\": 1\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"Log CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 1\n    }\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"MINO 1\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"diamond\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"colour\": \"#000000\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle_filled\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 1\n      }\n    ]\n  },\n  \"re_extraction\": {\n    \"requests\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"growth/increase\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 1.0,\n          \"pct_decreasing\": 0.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 2.5,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": 2.5\n          }\n        },\n        \"visual_guidance\": \"Verify if the curve plateaus after 12 hours; ensure continuity with earlier growth trend.\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"variable\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 1.0,\n          \"pct_decreasing\": 0.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 1.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": 1.0\n          }\n        },\n        \"visual_guidance\": \"Check if the curve stabilizes or continues to rise after 12 hours; maintain consistency with earlier data points.\"\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"issue_type\": \"midcurve_switch\",\n        \"target_times_hours\": [\n          2,\n          4,\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"variable\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.11,\n          \"pct_decreasing\": 0.67,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 6.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": -6.0\n          }\n        },\n        \"visual_guidance\": \"Re-examine the sharp drop at 2 hours; ensure the curve does not re-grow prematurely after 12 hours.\"\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"variable\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.0,\n          \"pct_decreasing\": 0.89,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 4.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": -4.0\n          }\n        },\n        \"visual_guidance\": \"Confirm if the curve remains at 0 or shows regrowth after 12 hours; avoid misreading grid lines.\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.0,\n          \"pct_decreasing\": 1.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 6.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": -6.0\n          }\n        },\n        \"visual_guidance\": \"Check for any regrowth after 12 hours; ensure the curve stays at 0 if no regrowth is expected.\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.0,\n          \"pct_decreasing\": 1.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 6.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": -6.0\n          }\n        },\n        \"visual_guidance\": \"Verify if the curve remains at 0 or shows regrowth after 12 hours; avoid misinterpreting grid lines.\"\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"issue_type\": \"truncation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.0,\n          \"pct_decreasing\": 1.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 6.0,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": -6.0\n          }\n        },\n        \"visual_guidance\": \"Ensure the curve stays at 0 after 12 hours; check for any unexpected regrowth.\"\n      }\n    ],\n    \"results\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 10.5,\n        \"confidence\": \"high\",\n        \"reason\": \"Extended growth trend plateau after 12 hours confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 10.6,\n        \"confidence\": \"high\",\n        \"reason\": \"Maintained growth plateau consistent with earlier trend.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 10.7,\n        \"confidence\": \"high\",\n        \"reason\": \"Slight increase consistent with late-phase growth.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 10.1,\n        \"confidence\": \"high\",\n        \"reason\": \"Stabilized growth after 12 hours confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 10.2,\n        \"confidence\": \"high\",\n        \"reason\": \"Continued stabilization consistent with earlier points.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 10.3,\n        \"confidence\": \"high\",\n        \"reason\": \"Slight increase aligned with expected variability.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"time_hours\": 2,\n        \"new_log10_cfu_ml\": 0.5,\n        \"confidence\": \"medium\",\n        \"reason\": \"Sharp drop confirmed but potential overlap with other curves.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"midcurve switch verified\"\n        }\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"time_hours\": 4,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Complete kill confirmed at 4 hours.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"midcurve switch verified\"\n        }\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth after 12 hours confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Sustained kill confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"MEM 4\u00b5g/mL\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth detected.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth after 12 hours confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Sustained kill confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06\u00b5g/mL\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth detected.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth after 12 hours confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Sustained kill confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth detected.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth after 12 hours confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Sustained kill confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth detected.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth after 12 hours confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Sustained kill confirmed.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 0.0,\n        \"confidence\": \"high\",\n        \"reason\": \"No regrowth detected.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"truncation resolved\"\n        }\n      }\n    ]\n  }\n}\n"
+}

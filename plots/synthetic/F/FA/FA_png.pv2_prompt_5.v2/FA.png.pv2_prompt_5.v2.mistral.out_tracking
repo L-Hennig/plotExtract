@@ -1,0 +1,119 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/F/FA/FA.png",
+  "prompt_name": "prompt_5",
+  "overall_status": "completed",
+  "validation_status": "no",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 344,
+      "execution_time_ms": 3329.073429107666,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-20T14:03:53.047516",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 411,
+      "execution_time_ms": 3819.3864822387695,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-20T14:03:56.379174",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 388,
+      "execution_time_ms": 3707.0960998535156,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-20T14:04:00.201806",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 47,
+        "columns": [
+          "{"
+        ],
+        "axis_labels": [
+          "{"
+        ]
+      },
+      "output_length": 1770,
+      "execution_time_ms": 10757.363319396973,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-20T14:04:03.912539",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 166,
+        "columns": [
+          "{"
+        ],
+        "axis_labels": [
+          "{"
+        ]
+      },
+      "output_length": 3543,
+      "execution_time_ms": 17605.291843414307,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-20T14:04:14.674840",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_4": {
+      "num_columns": 1,
+      "num_rows": 47,
+      "columns": [
+        "{"
+      ],
+      "axis_labels": [
+        "{"
+      ]
+    },
+    "EXTRACT_STAGE_5": {
+      "num_columns": 1,
+      "num_rows": 166,
+      "columns": [
+        "{"
+      ],
+      "axis_labels": [
+        "{"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 77.27393,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "No",
+      "num_points": "Yes",
+      "trend": "Yes"
+    }
+  }
+}

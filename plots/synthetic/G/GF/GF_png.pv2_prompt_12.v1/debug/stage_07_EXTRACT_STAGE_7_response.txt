@@ -1,0 +1,212 @@
+```json
+{
+  "re_extraction": {
+    "results": [
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Baseline consistency verified with other curves.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "baseline corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 0.7,
+        "confidence": "high",
+        "reason": "Sudden increase after initial drop corrected.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "continuity ensured"
+        }
+      },
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 8,
+        "new_log10_cfu_ml": 0.7,
+        "confidence": "high",
+        "reason": "Avoids sudden increase after initial drop.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "continuity ensured"
+        }
+      },
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 10,
+        "new_log10_cfu_ml": 0.7,
+        "confidence": "high",
+        "reason": "Avoids sudden increase after initial drop.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "continuity ensured"
+        }
+      },
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 0.7,
+        "confidence": "high",
+        "reason": "Avoids sudden increase after initial drop.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "continuity ensured"
+        }
+      },
+      {
+        "curve_label": "Condition 2",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Baseline consistency verified with other curves.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "baseline corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 2",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 6.3,
+        "confidence": "medium",
+        "reason": "Adjusted to align with expected baseline consistency.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": false,
+          "avoids_previous_issue": "baseline corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Baseline consistency verified with other curves.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "baseline corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 5.5,
+        "confidence": "high",
+        "reason": "Trend adjusted to align with expected kill/decrease pattern.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "trend corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 12,
+        "new_log10_cfu_ml": 6.5,
+        "confidence": "high",
+        "reason": "Trend adjusted to align with expected kill/decrease pattern.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "trend corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Trend adjusted to align with expected kill/decrease pattern.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "trend corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 4",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Baseline consistency verified with other curves.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "baseline corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 4",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 1.5,
+        "confidence": "high",
+        "reason": "Adjusted to align with expected baseline consistency.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "baseline corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 5",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Baseline consistency verified with other curves.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "baseline corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 5",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 1.5,
+        "confidence": "high",
+        "reason": "Adjusted to align with expected baseline consistency.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "baseline corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 6",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Baseline consistency verified with other curves.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "baseline corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 6",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 6.3,
+        "confidence": "medium",
+        "reason": "Adjusted to align with expected baseline consistency.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": false,
+          "avoids_previous_issue": "baseline corrected"
+        }
+      }
+    ]
+  }
+}
+```

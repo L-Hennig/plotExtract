@@ -1,0 +1,42 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Data preparation
+data = {
+    'Time_1': [0, 2, 4, 6, 8, 10, 12],
+    'CFU_1': [6.0, 5.8, 6.8, 8.3, 8.4, 8.5, 8.6],
+    'Time_2': [0, 2, 4, 6, 8, 10, 16, 18, 20, 22, 24],
+    'CFU_2': [6.0, 8.0, 2.5, 2.7, 2.3, 1.0, 2.0, 2.3, 2.7, 3.0, 3.5],
+    'Time_3': [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
+    'CFU_3': [6.0, 1.0, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
+    'Time_4': [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
+    'CFU_4': [6.0, 5.8, 8.5, 8.7, 8.8, 8.8, 8.9, 8.9, 9.0, 9.0, 9.0, 9.1, 9.2]
+}
+
+# Create figure and axis
+fig, ax = plt.subplots(figsize=(8, 6))
+
+# Plot each condition with specific styles
+ax.plot(data['Time_1'], data['CFU_1'], 's-', color='black', label='Condition 1', markersize=8, linewidth=1.5)
+ax.plot(data['Time_2'], data['CFU_2'], '^--', color='black', label='Condition 2', markersize=8, linewidth=1.5)
+ax.plot(data['Time_3'], data['CFU_3'], 'o:', color='black', label='Condition 3', markersize=8, linewidth=1.5)
+ax.plot(data['Time_4'], data['CFU_4'], 'D-', color='black', label='Condition 4', markersize=8, linewidth=1.5)
+
+# Set axis labels and title
+ax.set_xlabel('Time (hours)', fontsize=12)
+ax.set_ylabel('Bacterial Count (CFU/mL) (log10 scale)', fontsize=12)
+
+# Set axis limits and scale
+ax.set_xlim(0, 24)
+ax.set_ylim(0.5, 10)
+ax.set_yscale('log')
+ax.set_yticks([1, 2, 4, 6, 8, 10])
+ax.set_yticklabels(['1', '2', '4', '6', '8', '10'])
+
+# Add grid and adjust layout
+ax.grid(True, which="both", ls="--", alpha=0.5)
+plt.tight_layout()
+
+# Save the plot
+plt.savefig(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\FJ\FJ_png.p5.v3\FJ_png-replot.p5.v3.png", dpi=300, bbox_inches='tight')
+plt.close()

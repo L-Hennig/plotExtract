@@ -2,6 +2,9 @@ import os
 import subprocess
 import glob
 import json
+import copy
+import math
+import sys
 import numpy as np
 
 # Set matplotlib backend to Agg (non-interactive) BEFORE importing pyplot
@@ -18,6 +21,7 @@ import base64
 import threading
 import time
 import uuid
+from collections import Counter
 from flask import Flask, render_template, request, jsonify, send_from_directory
 
 app = Flask(__name__)
@@ -30,14 +34,62 @@ PROMPTS_V2_DIR = os.path.join(BASE_DIR, 'plot_extract_v2', 'prompts')
 PROMPTS_V2_CHAINS_DIR = os.path.join(PROMPTS_V2_DIR, 'chains')
 SYNTHETIC_DIR = os.path.join(PLOTS_DIR, 'synthetic')
 
+PYTHON_EXE = sys.executable or 'python'
+
+
+def _resolve_path_under_plots(path_value):
+    """Resolve absolute/relative paths that may have been persisted before moving the repo.
+
+    If a stored path contains a ".../plots/..." segment, rebuild it under the current
+    `PLOTS_DIR`. This keeps old batch/extraction state usable after renames/moves.
+    """
+    if not path_value:
+        return path_value
+
+    try:
+        raw = str(path_value)
+    except Exception:
+        return path_value
+
+    # Already valid on disk.
+    try:
+        if os.path.exists(raw):
+            return raw
+    except Exception:
+        pass
+
+    norm = raw.replace('\\', '/')
+    marker = '/plots/'
+    if marker in norm:
+        suffix = norm.split(marker, 1)[1]
+        candidate = os.path.join(PLOTS_DIR, suffix.replace('/', os.sep))
+        return candidate
+
+    # If it looks relative, assume it's relative to plots.
+    try:
+        if not os.path.isabs(raw):
+            return os.path.join(PLOTS_DIR, raw.replace('/', os.sep))
+    except Exception:
+        pass
+
+    return raw
+
 # Create synthetic folder if it doesn't exist
 os.makedirs(SYNTHETIC_DIR, exist_ok=True)
 
 # Settings file for synthetic generator
 SETTINGS_FILE = os.path.join(BASE_DIR, 'synthetic_settings.json')
 
+# Settings file for synthetic generator v2 (kept separate so v1 and v2 don't
+# overwrite each other's last-used UI settings)
+SETTINGS_FILE_V2 = os.path.join(BASE_DIR, 'synthetic_settings_v2.json')
+
 # File to persist extraction results
 EXTRACTION_STATE_FILE = os.path.join(BASE_DIR, 'extraction_state.json')
+
+# Batch run registry (persistent) - used by Batch Results page
+BATCH_RUNS_FILE = os.path.join(BASE_DIR, 'batch_runs.json')
+batch_runs_lock = threading.Lock()
 
 # =============================================================================
 # Background Task Management
@@ -47,12 +99,133 @@ EXTRACTION_STATE_FILE = os.path.join(BASE_DIR, 'extraction_state.json')
 extraction_tasks = {}
 extraction_tasks_lock = threading.Lock()
 
+
+class TaskCancelledError(Exception):
+    pass
+
+
+def _is_cancel_requested(task_id: str) -> bool:
+    with extraction_tasks_lock:
+        task = extraction_tasks.get(task_id)
+        return bool(task and task.get('cancel_requested'))
+
+
+def _set_active_pid(task_id: str, pid):
+    with extraction_tasks_lock:
+        if task_id in extraction_tasks:
+            extraction_tasks[task_id]['active_pid'] = pid
+
+
+def _run_subprocess_with_cancel(task_id: str, args, *, cwd=None, timeout_s: float | None = None, env_overrides: dict | None = None):
+    """Run a subprocess while allowing best-effort cancellation via cancel_requested.
+
+    Returns a dict with keys: returncode, stdout, stderr.
+    Raises:
+      - TaskCancelledError if cancellation was requested.
+      - subprocess.TimeoutExpired if timeout elapsed.
+    """
+    env = None
+    if env_overrides:
+        env = os.environ.copy()
+        for k, v in env_overrides.items():
+            env[str(k)] = str(v)
+
+    proc = subprocess.Popen(
+        args,
+        cwd=cwd,
+        env=env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        bufsize=1,
+        universal_newlines=True,
+    )
+    _set_active_pid(task_id, proc.pid)
+
+    stdout_lines = []
+    stderr_lines = []
+
+    def _reader(pipe, sink):
+        try:
+            for line in iter(pipe.readline, ''):
+                sink.append(line)
+        except Exception:
+            pass
+        finally:
+            try:
+                pipe.close()
+            except Exception:
+                pass
+
+    t_out = threading.Thread(target=_reader, args=(proc.stdout, stdout_lines))
+    t_err = threading.Thread(target=_reader, args=(proc.stderr, stderr_lines))
+    t_out.daemon = True
+    t_err.daemon = True
+    t_out.start()
+    t_err.start()
+
+    start = time.time()
+    try:
+        while proc.poll() is None:
+            if _is_cancel_requested(task_id):
+                try:
+                    proc.terminate()
+                except Exception:
+                    pass
+                # Give it a moment then force kill
+                for _ in range(10):
+                    if proc.poll() is not None:
+                        break
+                    time.sleep(0.1)
+                if proc.poll() is None:
+                    try:
+                        proc.kill()
+                    except Exception:
+                        pass
+                raise TaskCancelledError('Cancellation requested')
+
+            if timeout_s is not None and (time.time() - start) > float(timeout_s):
+                try:
+                    proc.terminate()
+                except Exception:
+                    pass
+                for _ in range(10):
+                    if proc.poll() is not None:
+                        break
+                    time.sleep(0.1)
+                if proc.poll() is None:
+                    try:
+                        proc.kill()
+                    except Exception:
+                        pass
+                raise subprocess.TimeoutExpired(cmd=args, timeout=timeout_s)
+
+            time.sleep(0.2)
+
+        # Ensure pipes drained
+        try:
+            t_out.join(timeout=2)
+            t_err.join(timeout=2)
+        except Exception:
+            pass
+
+        return {
+            'returncode': proc.returncode,
+            'stdout': ''.join(stdout_lines),
+            'stderr': ''.join(stderr_lines),
+        }
+    finally:
+        _set_active_pid(task_id, None)
+
 def load_extraction_state():
     """Load the last extraction result from file."""
     if os.path.exists(EXTRACTION_STATE_FILE):
         try:
             with open(EXTRACTION_STATE_FILE, 'r') as f:
-                return json.load(f)
+                state = json.load(f)
+            if isinstance(state, dict) and state.get('version_dir'):
+                state['version_dir'] = _resolve_path_under_plots(state.get('version_dir'))
+            return state
         except Exception as e:
             print(f"Error loading extraction state: {e}")
     return None
@@ -64,6 +237,383 @@ def save_extraction_state(state):
             json.dump(state, f, indent=2)
     except Exception as e:
         print(f"Error saving extraction state: {e}")
+
+
+def _load_batch_runs_state():
+    """Load batch run registry from file."""
+    if os.path.exists(BATCH_RUNS_FILE):
+        try:
+            with open(BATCH_RUNS_FILE, 'r', encoding='utf-8') as f:
+                state = json.load(f)
+            if isinstance(state, dict):
+                state.setdefault('next_batch_number', 1)
+                state.setdefault('batches', {})
+
+                # Normalize persisted version_dir values so batch pages keep working
+                # after the repo is moved/renamed.
+                for rec in (state.get('batches') or {}).values():
+                    if not isinstance(rec, dict):
+                        continue
+                    for item in rec.get('items') or []:
+                        if isinstance(item, dict) and item.get('version_dir'):
+                            item['version_dir'] = _resolve_path_under_plots(item.get('version_dir'))
+
+                return state
+        except Exception as e:
+            print(f"Error loading batch runs: {e}")
+    return {'next_batch_number': 1, 'batches': {}}
+
+
+def _save_batch_runs_state(state):
+    """Save batch run registry to file."""
+    try:
+        with open(BATCH_RUNS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(state, f, indent=2)
+    except Exception as e:
+        print(f"Error saving batch runs: {e}")
+
+
+def _allocate_batch_number():
+    with batch_runs_lock:
+        state = _load_batch_runs_state()
+        batch_number = int(state.get('next_batch_number', 1))
+        state['next_batch_number'] = batch_number + 1
+        _save_batch_runs_state(state)
+        return batch_number
+
+
+def _normalize_batch_name(name):
+    if name is None:
+        return None
+    normalized = str(name).strip()
+    return normalized if normalized else None
+
+
+def _is_duplicate_batch_name(state, batch_name):
+    """Check for duplicate batch names in persistent registry (case-insensitive)."""
+    if not batch_name:
+        return False
+    name_key = batch_name.strip().lower()
+    batches = state.get('batches') or {}
+    for rec in batches.values():
+        existing = rec.get('batch_name')
+        if existing and str(existing).strip().lower() == name_key:
+            return True
+    return False
+
+
+def _basename(p):
+    try:
+        return os.path.basename(p.replace('\\', '/'))
+    except Exception:
+        return str(p)
+
+
+def _parse_percent_to_float(val):
+    """Parse values like '54.3%' -> 54.3. Returns None if not parseable."""
+    if val is None:
+        return None
+    if isinstance(val, (int, float)):
+        return float(val)
+    try:
+        s = str(val).strip()
+        if s.endswith('%'):
+            s = s[:-1].strip()
+        return float(s)
+    except Exception:
+        return None
+
+
+def _split_validation_reasons(reason_text):
+    if not reason_text:
+        return []
+    reason_text = str(reason_text).strip()
+    if not reason_text or reason_text.lower() in ('n/a', 'na', 'none'):
+        return []
+    # Allow multiple reasons, e.g. "X-axis, Y-axis" or "X-axis; Trends"
+    parts = []
+    for chunk in reason_text.replace(';', ',').replace('\n', ',').split(','):
+        chunk = chunk.strip()
+        if chunk:
+            parts.append(chunk)
+    return parts
+
+
+def create_batch_run_record(extraction_version, prompt, images, *, pipeline=None, task_id=None, batch_name=None):
+    """Create a new batch run record and return the assigned batch_number."""
+    normalized_name = _normalize_batch_name(batch_name)
+    now = time.time()
+    with batch_runs_lock:
+        state = _load_batch_runs_state()
+        if _is_duplicate_batch_name(state, normalized_name):
+            raise ValueError("duplicate batch_name")
+        batch_number = int(state.get('next_batch_number', 1))
+        state['next_batch_number'] = batch_number + 1
+        record = {
+            'batch_number': batch_number,
+            'batch_name': normalized_name,
+            'status': 'running',
+            'created_at': now,
+            'started_at': now,
+            'completed_at': None,
+            'extraction_version': extraction_version,
+            'pipeline': pipeline,
+            'task_id': task_id,
+            'prompt': prompt,
+            'images': [{'image_path': p, 'name': _basename(p)} for p in (images or [])],
+            'items': [
+                {
+                    'image_path': p,
+                    'name': _basename(p),
+                    'status': 'pending',
+                    'time_s': None,
+                    'summary': {},
+                    'error': None,
+                    'task_id': None,
+                    'version_dir': None,
+                    'console': None,
+                }
+                for p in (images or [])
+            ],
+        }
+        state.setdefault('batches', {})
+        state['batches'][str(batch_number)] = record
+        _save_batch_runs_state(state)
+
+    return batch_number
+
+
+def update_batch_run_item(batch_number, image_path, *, status=None, time_s=None, summary=None, error=None,
+                          task_id=None, version_dir=None, console=None):
+    with batch_runs_lock:
+        state = _load_batch_runs_state()
+        record = (state.get('batches') or {}).get(str(batch_number))
+        if not record:
+            return False
+
+        for item in record.get('items', []):
+            if item.get('image_path') == image_path:
+                if status is not None:
+                    item['status'] = status
+                if time_s is not None:
+                    item['time_s'] = time_s
+                if summary is not None:
+                    item['summary'] = summary
+                if error is not None:
+                    item['error'] = error
+                if task_id is not None:
+                    item['task_id'] = task_id
+                if version_dir is not None:
+                    item['version_dir'] = version_dir
+                if console is not None:
+                    item['console'] = console
+                break
+
+        state['batches'][str(batch_number)] = record
+        _save_batch_runs_state(state)
+        return True
+
+
+def complete_batch_run(batch_number, *, status='completed'):
+    with batch_runs_lock:
+        state = _load_batch_runs_state()
+        record = (state.get('batches') or {}).get(str(batch_number))
+        if not record:
+            return False
+        record['status'] = status
+        record['completed_at'] = time.time()
+        state['batches'][str(batch_number)] = record
+        _save_batch_runs_state(state)
+        return True
+
+
+def compute_batch_aggregates(record):
+    """Compute mean metrics, validation fraction, and validation reason counts."""
+    items = record.get('items', []) if isinstance(record, dict) else []
+
+    precision_vals = []
+    recall_vals = []
+    interp_mae_vals = []
+    pointwise_x_vals = []
+    pointwise_y_vals = []
+
+    validation_yes = 0
+    validation_total = 0
+    failed = 0
+
+    reasons = []
+    for it in items:
+        if it.get('status') == 'failed':
+            failed += 1
+        summary = it.get('summary') or {}
+
+        p = _parse_percent_to_float(summary.get('precision'))
+        r = _parse_percent_to_float(summary.get('recall'))
+        if p is not None:
+            precision_vals.append(p)
+        if r is not None:
+            recall_vals.append(r)
+
+        if isinstance(summary.get('interpolation_mae'), (int, float)):
+            interp_mae_vals.append(float(summary['interpolation_mae']))
+
+        px = _parse_percent_to_float(summary.get('pointwise_mae_x'))
+        py = _parse_percent_to_float(summary.get('pointwise_mae_y'))
+        if px is not None:
+            pointwise_x_vals.append(px)
+        if py is not None:
+            pointwise_y_vals.append(py)
+
+        vr = summary.get('validation_result')
+        if vr in ('Yes', 'No'):
+            validation_total += 1
+            if vr == 'Yes':
+                validation_yes += 1
+
+        reasons.extend(_split_validation_reasons(summary.get('validation_reason')))
+
+    reason_counts = Counter(reasons)
+
+    def _mean(vals):
+        return (sum(vals) / len(vals)) if vals else None
+
+    return {
+        'count_total': len(items),
+        'count_failed': failed,
+        'validation_fraction': {
+            'successful': validation_yes,
+            'total': validation_total,
+        },
+        'mean': {
+            'precision_percent': _mean(precision_vals),
+            'recall_percent': _mean(recall_vals),
+            'interpolation_mae': _mean(interp_mae_vals),
+            'pointwise_mae_x_percent': _mean(pointwise_x_vals),
+            'pointwise_mae_y_percent': _mean(pointwise_y_vals),
+        },
+        'validation_reason_counts': dict(reason_counts.most_common()),
+    }
+
+
+# =============================================================================
+# Batch Results Page + APIs
+# =============================================================================
+
+
+@app.route('/batch_results')
+def batch_results_page():
+    return render_template('batch_results.html')
+
+
+@app.route('/api/batch_runs')
+def api_batch_runs_list():
+    with batch_runs_lock:
+        state = _load_batch_runs_state()
+        batches = state.get('batches') or {}
+
+    rows = []
+    for k, rec in batches.items():
+        if not isinstance(rec, dict):
+            continue
+        try:
+            bn = int(rec.get('batch_number') or k)
+        except Exception:
+            continue
+
+        rows.append({
+            'batch_number': bn,
+            'batch_name': rec.get('batch_name'),
+            'status': rec.get('status'),
+            'created_at': rec.get('created_at'),
+            'completed_at': rec.get('completed_at'),
+            'extraction_version': rec.get('extraction_version'),
+            'pipeline': rec.get('pipeline'),
+            'prompt': rec.get('prompt'),
+            'num_images': len(rec.get('items') or []),
+            'task_id': rec.get('task_id'),
+        })
+
+    rows.sort(key=lambda r: r.get('batch_number', 0), reverse=True)
+    resp = jsonify({'batches': rows})
+    resp.headers['Cache-Control'] = 'no-store'
+    return resp
+
+
+@app.route('/api/batch_runs/<int:batch_number>')
+def api_batch_run_detail(batch_number: int):
+    with batch_runs_lock:
+        state = _load_batch_runs_state()
+        record = (state.get('batches') or {}).get(str(batch_number))
+
+    if not record:
+        return jsonify({'error': 'not_found'}), 404
+
+    # Enrich with derived outputs (images, parsed summary) without mutating persisted state.
+    # This powers the Batch Results "Details" view, matching the extraction pages.
+    record_view = copy.deepcopy(record)
+    extraction_version = (record_view.get('extraction_version') or '').lower()
+    prompt = record_view.get('prompt')
+    for item in record_view.get('items') or []:
+        try:
+            image_path = item.get('image_path')
+            version_dir = item.get('version_dir')
+            if not image_path or not version_dir:
+                item['outputs'] = {'images': [], 'stats': [], 'data': [], 'summary': item.get('summary') or {}}
+                continue
+
+            if extraction_version == 'v2':
+                outputs = get_output_files_v2(image_path, prompt, version_dir)
+            else:
+                outputs = get_output_files(image_path, prompt, version_dir)
+            item['outputs'] = outputs
+        except Exception as e:
+            # Keep the endpoint resilient; still return other items.
+            item['outputs'] = {'images': [], 'stats': [], 'data': [], 'summary': item.get('summary') or {}, 'error': str(e)}
+
+    aggregates = compute_batch_aggregates(record)
+    resp = jsonify({'record': record_view, 'aggregates': aggregates})
+    resp.headers['Cache-Control'] = 'no-store'
+    return resp
+
+
+@app.route('/batch/create', methods=['POST'])
+def create_batch_route():
+    data = request.get_json(force=True, silent=True) or {}
+    extraction_version = data.get('extraction_version') or 'v1'
+    prompt = data.get('prompt')
+    images = data.get('images') or []
+    pipeline = data.get('pipeline')
+    batch_name = data.get('batch_name')
+
+    if not prompt or not isinstance(images, list) or not images:
+        return jsonify({'error': 'prompt and images are required'}), 400
+
+    try:
+        batch_number = create_batch_run_record(
+            extraction_version=extraction_version,
+            prompt=prompt,
+            images=images,
+            pipeline=pipeline,
+            task_id=None,
+            batch_name=batch_name,
+        )
+    except ValueError:
+        return jsonify({'error': 'duplicate batch_name'}), 400
+    return jsonify({'batch_number': batch_number})
+
+
+@app.route('/batch/complete', methods=['POST'])
+def complete_batch_route():
+    data = request.get_json(force=True, silent=True) or {}
+    batch_number = data.get('batch_number')
+    status = data.get('status') or 'completed'
+    try:
+        batch_number = int(batch_number)
+    except Exception:
+        return jsonify({'error': 'invalid batch_number'}), 400
+
+    ok = complete_batch_run(batch_number, status=status)
+    return jsonify({'success': bool(ok)})
 
 # =============================================================================
 # Synthetic Generator Configuration
@@ -138,6 +688,450 @@ def save_synthetic_settings(settings):
             json.dump(settings, f, indent=2)
     except Exception as e:
         print(f"Error saving settings: {e}")
+
+
+def load_synthetic_settings_v2():
+    """Load settings for synthetic generator v2 from file, or return defaults."""
+    if os.path.exists(SETTINGS_FILE_V2):
+        try:
+            with open(SETTINGS_FILE_V2, 'r') as f:
+                saved = json.load(f)
+                settings = DEFAULT_SETTINGS.copy()
+                settings.update(saved)
+                return settings
+        except Exception as e:
+            print(f"Error loading synthetic v2 settings: {e}")
+    return DEFAULT_SETTINGS.copy()
+
+
+def save_synthetic_settings_v2(settings):
+    """Save synthetic generator v2 settings to file for persistence."""
+    try:
+        with open(SETTINGS_FILE_V2, 'w') as f:
+            json.dump(settings, f, indent=2)
+    except Exception as e:
+        print(f"Error saving synthetic v2 settings: {e}")
+
+
+# =============================================================================
+# Synthetic Generator v2 - Template Curve Library + Generator
+# =============================================================================
+
+def categorize_curve(time_points, log10cfu_values):
+    """Categorize a curve based on shape characteristics."""
+    if not time_points or not log10cfu_values:
+        return "UNKNOWN"
+    initial = log10cfu_values[0]
+    final = log10cfu_values[-1]
+    minimum = min(log10cfu_values)
+    min_idx = log10cfu_values.index(minimum)
+
+    initial_drop = initial - minimum
+    net_change = final - initial
+    regrowth = final - minimum if min_idx < len(log10cfu_values) - 2 else 0
+
+    if initial_drop >= 3.0 and regrowth >= 2.0:
+        return "KILL_WITH_REGROWTH"
+    elif minimum <= initial - 3.0 and final <= initial - 2.5:
+        return "KILL"
+    elif net_change > 1.5:
+        return "GROWTH"
+    elif -3.0 < net_change < -1.0:
+        return "PARTIAL_KILL"
+    elif abs(net_change) <= 1.5:
+        return "STABLE"
+    else:
+        return "BIPHASIC"
+
+
+# NOTE: These are real-curve templates provided by the user. Values are log10(CFU/mL).
+GROWTH_CURVES = [
+    {
+        "name": "09-95_Control_Rep1",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [6.023787256, 7.848107281, 9.093292064, 9.693208664, 9.465851167, 10.31393214, 9.772175273, 8.966575533],
+    },
+    {
+        "name": "09-95_Meropenem_4",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [6.005194894, 7.54886367, 9.458278503, 9.259634554, 9.506539211, 10.30540343, 9.109249252, 10.46024201],
+    },
+    {
+        "name": "09-95_Minocycline_1",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [6.005194894, 6.78411105, 8.095022219, 8.26878055, 8.07013454, 8.696095638, 8.464197364, 8.644780899],
+    },
+    {
+        "name": "09-95_Rifampicin_0.06",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [6.005194894, 7.994414337, 8.513972723, 9.033537292, 9.267141867, 9.021943511, 9.328700595, 8.791083855],
+    },
+    {
+        "name": "09-95_Minocycline_2",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.973394308, 5.659583642, 6.408081251, 6.698188753, 6.828223519, 7.031013692, 7.97596174, 8.251322523],
+    },
+    {
+        "name": "09-95_Meropenem_16",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.973394308, 7.25303743, 8.532683016, 8.793688848, 9.505806289, 9.286588987, 9.969597367, 9.997577941],
+    },
+    {
+        "name": "09-2092_Control_Rep1",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.734517673, 7.069078675, 7.973913099, 7.589491325, 8.279475203, 8.341308933, 8.667656448, 9.075731026],
+    },
+    {
+        "name": "09-2092_Colistin_0.125",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.7566548, 5.475408314, 6.46537647, 7.874637538, 8.105870253, 8.29717365, 8.528398113, 8.546305857],
+    },
+    {
+        "name": "09-2092_Meropenem_4",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.7566548, 7.185882591, 7.976191778, 8.027715741, 8.664934347, 8.463554749, 8.501779943, 8.552953179],
+    },
+    {
+        "name": "09-2092_Minocycline_1",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.7566548, 6.473732042, 6.658379865, 7.468643396, 7.706535811, 8.124116347, 7.922745001, 8.093714444],
+    },
+    {
+        "name": "09-2092_Rifampicin_0.06",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.7566548, 7.671743622, 8.11595058, 8.486946224, 8.232317908, 8.350405864, 8.561675983, 7.993880833],
+    },
+    {
+        "name": "09-2092_Control_Rep2",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.775212876, 6.994760539, 7.716654195, 8.061545273, 8.768380036, 8.841829258, 8.900219587, 9.063757048],
+    },
+    {
+        "name": "09-2092_Meropenem_16",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.772520473, 6.849863512, 8.26933576, 8.611464968, 8.342129208, 8.79344859, 8.7788899, 8.844404004],
+    },
+    {
+        "name": "50111_Control",
+        "time": [0, 1, 2, 4, 6, 8, 24],
+        "log10cfu": [6.457603026, 7.566125085, 8.34258076, 8.991401431, 9.169839167, 9.089868581, 9.308212125],
+    },
+    {
+        "name": "50111_Meropenem_4",
+        "time": [0, 1, 2, 4, 6, 8, 24],
+        "log10cfu": [6.457603026, 7.427746999, 8.333355555, 8.954480096, 9.040706797, 9.052988269, 9.262086096],
+    },
+    {
+        "name": "AB1845_Control",
+        "time": [0, 1, 2, 4, 6, 8, 24],
+        "log10cfu": [7.031535253, 7.811866051, 8.332534267, 8.705903665, 8.78247344, 8.831167006, 8.840505926],
+    },
+    {
+        "name": "AB1845_Meropenem_2",
+        "time": [0, 1, 2, 4, 6, 8, 24],
+        "log10cfu": [7.031535253, 7.774744624, 8.360363624, 8.724519038, 8.819579249, 8.821890553, 8.849751144],
+    },
+    {
+        "name": "AB2092_Control",
+        "time": [0, 1, 2, 4, 6, 8, 24],
+        "log10cfu": [6.634906393, 7.780039393, 8.429508315, 8.77502328, 8.701121468, 8.856090968, 8.836965788],
+    },
+    {
+        "name": "AB2092_Meropenem_8",
+        "time": [0, 1, 2, 4, 6, 8, 24],
+        "log10cfu": [6.634906393, 7.169931571, 8.429475964, 8.813155019, 9.091955616, 8.856139496, 8.732119681],
+    },
+]
+
+
+KILL_WITH_REGROWTH_CURVES = [
+    {
+        "name": "09-1769_Colistin_0.25",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.949387868, 4.055988942, 3.789700669, 3.810551141, 4.557224548, 4.80939902, 4.654766919, 8.240274107],
+    },
+    {
+        "name": "09-1769_Minocycline_4",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.854319699, 4.415876293, 4.528668682, 4.175351212, 4.572137665, 5.806459412, 7.652514577, 13.62703761],
+    },
+    {
+        "name": "10-548_Colistin_0.25",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.987236765, 2.982160457, 3.705624987, 4.612731057, 4.881106021, 7.137521645, 8.547603632, 13.85324079],
+    },
+    {
+        "name": "10-548_Minocycline_2",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.959769457, 3.512564503, 3.566053371, 2.979833015, 5.206854731, 7.920952413, 7.8581182, 10.7021051],
+    },
+    {
+        "name": "50111_Colistin_0.25",
+        "time": [0, 1, 2, 4, 6, 8, 24],
+        "log10cfu": [6.457603026, 3.654678856, 1.958799893, 2.072558628, 1.162360545, 3.62848522, 7.65690029],
+    },
+    {
+        "name": "AB1845_Colistin_0.25",
+        "time": [0, 1, 2, 4, 6, 8, 24],
+        "log10cfu": [6.37289152, 3.257127954, 2.098789532, 3.297716337, 4.366882128, 5.380295503, 8.608563384],
+    },
+    {
+        "name": "AB2092_Colistin_0.25",
+        "time": [0, 1, 2, 4, 6, 8, 24],
+        "log10cfu": [6.634906393, 3.509284636, 2.252231316, 3.322119913, 4.354135584, 6.596785438, 8.341350237],
+    },
+]
+
+
+KILL_CURVES = [
+    {
+        "name": "09-95_Col+Mino_0.125+1",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [6.005194894, 1.0, 1.0, 1.0, 2.191498556, 1.667000551, 1.0, 2.008042335],
+    },
+    {
+        "name": "09-95_Rif+Col_0.06+0.125",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [6.005194894, 1.789926358, 1.0, 1.532285193, 2.730149792, 1.0, 2.40600822, 1.0],
+    },
+    {
+        "name": "09-95_Mino+Mero_2+16",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.973394308, 4.786469485, 3.112045494, 2.114295077, 1.604036437, 2.010560474, 1.398437365, 1.0],
+    },
+    {
+        "name": "09-1769_Col+Mino_0.25+1",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.949387868, 1.415898818, 1.333060299, 1.545327704, 1.414641622, 1.961913124, 1.599920832, 2.521418563],
+    },
+    {
+        "name": "09-1769_Rif+Col_0.06+0.25",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.949387868, 1.0, 1.205451974, 1.0, 1.0, 1.690726533, 1.0, 3.271169728],
+    },
+    {
+        "name": "09-2092_Mero+Col_4+0.125",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.7566548, 1.18255893, 1.0, 1.877961199, 2.481910187, 1.0, 1.0, 2.948959834],
+    },
+    {
+        "name": "09-2092_Rif+Col_0.06+0.125",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.7566548, 3.671743622, 2.259045422, 1.45200446, 1.0, 1.608313485, 1.513423071, 1.0],
+    },
+    {
+        "name": "09-2092_Minocycline_4",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.772520473, 3.457688808, 3.035486806, 3.326660601, 3.181073703, 3.552320291, 4.192902639, 6.755232029],
+    },
+    {
+        "name": "09-2092_Mino+Mero_4+16",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.772520473, 2.074613285, 1.674249318, 1.950864422, 1.404913558, 1.179253867, 1.0, 1.0],
+    },
+    {
+        "name": "50111_Mero+Col_4+0.25",
+        "time": [0, 1, 2, 4, 6, 8, 24],
+        "log10cfu": [6.457603026, 2.759731336, 2.512332751, 1.445224123, 1.0, 1.0, 1.12541357],
+    },
+    {
+        "name": "AB1845_Mero+Col_2+0.25",
+        "time": [0, 1, 2, 4, 6, 8, 24],
+        "log10cfu": [6.623340116, 3.155071362, 1.46795954, 2.843217024, 1.0, 1.0, 1.0],
+    },
+    {
+        "name": "AB2092_Mero+Col_8+0.25",
+        "time": [0, 1, 2, 4, 6, 8, 24],
+        "log10cfu": [6.634906393, 2.441595947, 1.832733661, 1.939941433, 1.0, 1.649208491, 1.0],
+    },
+]
+
+
+PARTIAL_KILL_CURVES = [
+    {
+        "name": "09-1769_Mino+Mero_4+16",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.854319699, 3.177863877, 3.683900071, 3.002862983, 2.940861707, 3.177439549, 3.698050927, 4.807778037],
+    },
+    {
+        "name": "10-548_Mero+Col_4+0.25",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.987236765, 2.886361034, 2.955108588, 2.816315964, 2.629610268, 2.203365933, 2.200301776, 1.270422374],
+    },
+    {
+        "name": "10-548_Mino+Mero_2+16",
+        "time": [0, 2, 4, 6, 8, 10, 12, 24],
+        "log10cfu": [5.959769457, 3.243645103, 2.533819932, 2.514589944, 2.488139784, 2.178120564, 2.260699436, 1.266406376],
+    },
+]
+
+
+STABLE_CURVES = [
+    {
+        "name": "A10_Control_Rep1",
+        "time": [0, 1, 2, 4, 6, 8, 24],
+        "log10cfu": [7.841221887, 8.009950607, 7.900853594, 7.81743634, 7.607058936, 7.80952381, 7.920634921],
+    },
+    {
+        "name": "A10_Meropenem_512_Rep1",
+        "time": [0, 1, 2, 4, 6, 8, 24],
+        "log10cfu": [7.841221887, 7.509902652, 7.615019422, 7.618999664, 7.480074809, 7.571380617, 7.015849039],
+    },
+    {
+        "name": "A10_Control_Rep2",
+        "time": [0, 1, 2, 4, 6, 8, 24],
+        "log10cfu": [7.844036697, 8.004587156, 7.900229358, 7.811926606, 7.587155963, 7.79587156, 7.555045872],
+    },
+    {
+        "name": "A10_Meropenem_256",
+        "time": [0, 1, 2, 4, 6, 8, 24],
+        "log10cfu": [7.651376147, 7.587155963, 7.458715596, 7.153669725, 7.009174312, 6.904816514, 7.779816514],
+    },
+    {
+        "name": "A13_Control_Rep1",
+        "time": [0, 2, 4, 6, 8, 24],
+        "log10cfu": [7.376, 7.28, 7.424, 7.488, 7.552, 7.856],
+    },
+    {
+        "name": "A13_Meropenem_512_Rep1",
+        "time": [0, 2, 4, 6, 8, 24],
+        "log10cfu": [7.376, 6.64, 6.456, 6.464, 6.656, 6.984],
+    },
+    {
+        "name": "A13_Control_Rep2",
+        "time": [0, 2, 4, 6, 8, 24],
+        "log10cfu": [7.143979819, 7.182606899, 7.205283046, 7.307950835, 7.338618792, 7.399938363],
+    },
+    {
+        "name": "A13_Meropenem_256",
+        "time": [0, 2, 4, 6, 8, 24],
+        "log10cfu": [7.143979819, 6.270674401, 6.405333943, 6.4360019, 6.474653496, 6.863964129],
+    },
+]
+
+
+CURVE_TEMPLATES = {
+    "GROWTH": GROWTH_CURVES,
+    "KILL_WITH_REGROWTH": KILL_WITH_REGROWTH_CURVES,
+    "KILL": KILL_CURVES,
+    "PARTIAL_KILL": PARTIAL_KILL_CURVES,
+    "STABLE": STABLE_CURVES,
+}
+
+
+SYNTHETIC_V2_MAX_LOG10CFU = 10.0
+
+
+def _filter_templates_by_max_y(templates, max_y=SYNTHETIC_V2_MAX_LOG10CFU):
+    filtered = []
+    for template in templates or []:
+        ys = template.get('log10cfu') if isinstance(template, dict) else None
+        if not ys:
+            continue
+        try:
+            y_max = max(float(v) for v in ys)
+        except Exception:
+            continue
+        if y_max <= float(max_y):
+            filtered.append(template)
+    return filtered
+
+
+# Remove any real-template curves that exceed the allowed log10(CFU/mL) maximum.
+RAW_CURVE_TEMPLATES = CURVE_TEMPLATES
+CURVE_TEMPLATES = {
+    category: _filter_templates_by_max_y(templates)
+    for category, templates in (RAW_CURVE_TEMPLATES or {}).items()
+}
+
+
+def _trend_to_template_category(trend_key):
+    trend_key = (trend_key or '').strip().lower()
+    if trend_key == 'up':
+        return 'GROWTH'
+    if trend_key == 'down':
+        return 'KILL'
+    if trend_key == 'kill_regrowth':
+        return 'KILL_WITH_REGROWTH'
+    if trend_key == 'mixed':
+        # Mixed isn't explicitly provided; pick a diverse but reasonable default.
+        return 'PARTIAL_KILL'
+    return 'STABLE'
+
+
+def generate_curve_data_v2(x_values, curve_config, y_scale='log'):
+    """Generate Y-values using real-template curves + proportional noise.
+
+    - Picks a template category based on the curve's `trend`
+    - Interpolates template to requested `x_values`
+    - Aligns starting value to `initial_y`
+    - Scales deviations by `trend_magnitude`
+    - Adds proportional noise (per user's spec) and clamps to >= 1.0
+    """
+    import random
+
+    x_arr = np.asarray(x_values, dtype=float)
+
+    category = _trend_to_template_category(curve_config.get('trend'))
+    templates = CURVE_TEMPLATES.get(category) or CURVE_TEMPLATES.get('STABLE') or []
+    if not templates:
+        # If template library was fully filtered out, fall back to the original generator.
+        y_fallback = generate_curve_data(x_arr, curve_config, y_scale=y_scale)
+        if str(y_scale).lower() == 'log':
+            return np.minimum(np.asarray(y_fallback, dtype=float), SYNTHETIC_V2_MAX_LOG10CFU)
+        return y_fallback
+    template = random.choice(templates)
+
+    t = np.asarray(template['time'], dtype=float)
+    y_t = np.asarray(template['log10cfu'], dtype=float)
+    if len(t) == 0 or len(y_t) == 0:
+        # Fallback to original generator behavior if template is malformed
+        return generate_curve_data(x_arr, curve_config, y_scale=y_scale)
+
+    # Interpolate template onto desired x grid
+    y_interp = np.interp(x_arr, t, y_t, left=float(y_t[0]), right=float(y_t[-1]))
+
+    initial_y = float(curve_config.get('initial_y', 6.0))
+    magnitude = float(curve_config.get('trend_magnitude', 1.0) or 1.0)
+
+    # Align template start to requested initial_y, then scale deviations
+    y0 = float(y_interp[0])
+    y_base = initial_y + (y_interp - y0) * magnitude
+
+    noise_level = float(curve_config.get('noise_level', 0.1) or 0.0)
+    if noise_level < 0:
+        noise_level = 0.0
+
+    # Proportional noise per user's method
+    noise_magnitude = np.where(
+        y_base <= 2.0,
+        0.3 * noise_level,
+        np.abs(y_base) * 0.1 * noise_level,
+    )
+    noise = np.random.normal(0.0, noise_magnitude)
+    y_noisy = y_base + noise
+    # Detection limit clamp + enforce max range for v2 examples
+    y_noisy = np.maximum(y_noisy, 1.0)
+    y_noisy = np.minimum(y_noisy, SYNTHETIC_V2_MAX_LOG10CFU)
+
+    if str(y_scale).lower() == 'log':
+        return y_noisy
+    # Convert log10(CFU/mL) -> CFU/mL
+    return np.power(10.0, y_noisy)
+
+
+def generate_all_curves_v2(settings):
+    """Generate data for all curves using the v2 generator."""
+    x_values = generate_x_values(settings)
+    curves_data = []
+    for curve_config in settings['curves']:
+        y_values = generate_curve_data_v2(x_values, curve_config, settings.get('y_scale', 'log'))
+        curves_data.append({
+            'x': x_values.tolist(),
+            'y': y_values.tolist(),
+            'config': curve_config
+        })
+    return x_values.tolist(), curves_data
 
 def get_default_curves(num_curves):
     """Generate default curve configurations."""
@@ -288,42 +1282,6 @@ def generate_all_curves(settings):
 
 def create_synthetic_plot(settings, curves_data, x_values):
     """Create the matplotlib figure based on settings and data."""
-    # Helper: draw a broken line across the axis break
-    def draw_broken_line(ax1, ax2, x_before, y_before, x_after, y_after, break_start, break_end, color, linestyle, linewidth):
-        # Find the last point before the break and first after
-        if len(x_before) == 0 or len(x_after) == 0:
-            return
-        x0, y0 = x_before[-1], y_before[-1]
-        x1, y1 = x_after[0], y_after[0]
-        gap_left = break_start
-        gap_right = break_end
-
-        # Hardcoded virtual gap (e.g., 5 hours)
-        virtual_gap = 5.0
-        # Calculate the virtual slope
-        slope = (y1 - y0) / virtual_gap
-
-        # The total real x-gap between the two points
-        real_gap = x1 - x0
-        # The fraction of the real gap that is before the break
-        left_frac = (gap_left - x0) / real_gap if real_gap != 0 else 0.5
-        # The fraction of the real gap that is after the break
-        right_frac = (x1 - gap_right) / real_gap if real_gap != 0 else 0.5
-
-        # The virtual x for the left and right ends
-        virtual_x_left = x0 + left_frac * virtual_gap
-        virtual_x_right = x0 + (1 - right_frac) * virtual_gap
-
-        # For the left segment: from x0 to gap_left
-        if x0 < gap_left:
-            y_gap_left = y0 + slope * (virtual_x_left - x0)
-            ax1.plot([x0, gap_left], [y0, y_gap_left], color=color, linestyle=linestyle, linewidth=linewidth, alpha=0.7, zorder=10)
-
-        # For the right segment: from gap_right to x1
-        if x1 > gap_right:
-            y_gap_right = y0 + slope * (virtual_x_right - x0)
-            ax2.plot([gap_right, x1], [y_gap_right, y1], color=color, linestyle=linestyle, linewidth=linewidth, alpha=0.7, zorder=10)
-    
     fig, ax = plt.subplots(figsize=(settings['figure_width'], settings['figure_height']))
     
     for curve_data in curves_data:
@@ -392,13 +1350,18 @@ def create_synthetic_plot(settings, curves_data, x_values):
     
     # Calculate y limits first (needed for both regular and broken axis)
     if settings['y_scale'] == 'log':
+        all_y = [val for curve in curves_data for val in curve.get('y', [])]
         if settings['y_min'] != '':
             try:
                 y_min = float(settings['y_min'])
             except:
                 y_min = 0.1
         else:
-            y_min = 0.1
+            # Auto y-min (log10-space) based on data
+            if all_y:
+                y_min = max(0.1, float(min(all_y)) - 0.5)
+            else:
+                y_min = 0.1
         
         if settings['y_max'] != '':
             try:
@@ -406,7 +1369,17 @@ def create_synthetic_plot(settings, curves_data, x_values):
             except:
                 y_max = 6.9
         else:
-            y_max = 6.9
+            # Auto y-max (log10-space) based on data
+            if all_y:
+                y_max = float(math.ceil(max(all_y)) + 1)
+            else:
+                y_max = 6.9
+
+        # Keep sane bounds for log10(CFU/mL) synthetic plots
+        y_min = max(0.1, float(y_min))
+        y_max = min(13.0, float(y_max))
+        if y_max <= y_min:
+            y_max = min(13.0, y_min + 1.0)
         
         ax.set_ylim(y_min, y_max)
         
@@ -450,15 +1423,15 @@ def create_synthetic_plot(settings, curves_data, x_values):
     axis_break_type = settings.get('axis_break_type', 'x')
     axis_break_start = settings.get('axis_break_start', '')
     axis_break_end = settings.get('axis_break_end', '')
-    
+
     # Handle both string and numeric inputs from JavaScript
-    axis_break_start_valid = (axis_break_start is not None and 
-                             axis_break_start != '' and 
+    axis_break_start_valid = (axis_break_start is not None and
+                             axis_break_start != '' and
                              str(axis_break_start).strip() != '')
-    axis_break_end_valid = (axis_break_end is not None and 
-                           axis_break_end != '' and 
+    axis_break_end_valid = (axis_break_end is not None and
+                           axis_break_end != '' and
                            str(axis_break_end).strip() != '')
-    
+
     if axis_break_enabled and axis_break_type == 'x' and axis_break_start_valid and axis_break_end_valid:
         try:
             # Convert to float (handles both string and numeric)
@@ -466,102 +1439,131 @@ def create_synthetic_plot(settings, curves_data, x_values):
             break_end = float(axis_break_end)
 
             if break_start < break_end and x_min < break_start and break_end < x_max:
-                # Create a broken x-axis using three subplots: left | gap | right
-                # The middle axis is invisible and reserves visual space equal to the removed range,
-                # keeping line slopes visually consistent across the break.
+                # Create broken x-axis using two subplots side by side
                 fig.clf()
-                y_plot_min = y_min
-                y_plot_max = y_max
-                from matplotlib import gridspec
-                gs = gridspec.GridSpec(1, 2, width_ratios=[break_start - x_min, x_max - break_end], 
-                                     wspace=0.05, left=0.1, right=0.95, top=0.9, bottom=0.1)
-                ax1 = fig.add_subplot(gs[0, 0])
-                ax2 = fig.add_subplot(gs[0, 1], sharey=ax1)
-                # Hide the spines between the axes, but keep top border continuous
-                ax1.spines['right'].set_visible(False)
-                ax2.spines['left'].set_visible(False)
-                # Ensure top spines are visible (no gap at top)
-                ax1.spines['top'].set_visible(True)
-                ax2.spines['top'].set_visible(True)
-                # Only show y-axis on the left
-                ax2.yaxis.set_visible(False)
-                ax1.yaxis.tick_left()
-                ax2.tick_params(labelleft=False)
-                # Only show x-axis ticks on bottom, and remove any top x-axis
-                ax1.xaxis.set_ticks_position('bottom')
-                ax2.xaxis.set_ticks_position('bottom')
-                ax1.xaxis.set_ticks([] if not (len(ax1.get_xticks()) > 0) else ax1.get_xticks())
-                ax2.xaxis.set_ticks([] if not (len(ax2.get_xticks()) > 0) else ax2.get_xticks())
-                ax1.xaxis.set_label_position('bottom')
-                ax2.xaxis.set_label_position('bottom')
-                ax1.xaxis.set_visible(True)
-                ax2.xaxis.set_visible(True)
-                # Add diagonal lines to indicate break (bottom only)
-                d = 0.015  # Size of diagonal lines
-                kwargs = dict(transform=ax1.transAxes, color='k', clip_on=False, linewidth=1)
-                # Bottom break (right edge of left axis)
-                ax1.plot((1-d, 1+d), (-d, +d), **kwargs)
-                kwargs2 = dict(transform=ax2.transAxes, color='k', clip_on=False, linewidth=1)
-                # Bottom break (left edge of right axis)
-                ax2.plot((-d, +d), (-d, +d), **kwargs2)
-                # Plot curves on both axes
+
+                # Create two subplots with width proportional to data range
+                fig, (ax1, ax2) = plt.subplots(
+                    1, 2,
+                    sharey=True,
+                    figsize=(settings['figure_width'], settings['figure_height']),
+                    gridspec_kw={
+                        'width_ratios': [break_start - x_min, x_max - break_end],
+                        'wspace': 0.05
+                    }
+                )
+
+                # Plot all curves on both axes
                 for curve_data in curves_data:
                     config = curve_data['config']
                     x = np.array(curve_data['x'])
                     y = np.array(curve_data['y'])
-                    y_plot = y
-                    mask_before = x <= break_start
-                    mask_after = x >= break_end
-                    marker_kwargs = {
-                        'marker': config['marker'],
-                        'linestyle': 'none',
+
+                    # Prepare plot kwargs
+                    plot_kwargs = {
                         'color': config['color'],
-                        'markersize': config['marker_size']
+                        'linewidth': config['line_width'],
+                        'markersize': config['marker_size'],
+                        'label': config['name']
                     }
-                    color_lower = config['color'].lower()
-                    if color_lower == '#000000' or color_lower == '#000' or color_lower == 'black':
-                        marker_kwargs['markeredgecolor'] = 'none'
-                    # Plot on first axis
-                    x_before = x[mask_before]
-                    y_before = y_plot[mask_before]
-                    if len(x_before) > 0:
-                        if config['show_line']:
-                            ax1.plot(x_before, y_before,
-                                   linestyle=config['line_style'],
-                                   color=config['color'],
-                                   linewidth=config['line_width'],
-                                   label=config['name'])
-                        ax1.plot(x_before, y_before, **marker_kwargs)
-                    # Plot on second axis
-                    x_after = x[mask_after]
-                    y_after = y_plot[mask_after]
-                    if len(x_after) > 0:
-                        if config['show_line']:
-                            ax2.plot(x_after, y_after,
-                                   linestyle=config['line_style'],
-                                   color=config['color'],
-                                   linewidth=config['line_width'],
-                                   label=None)
-                        marker_kwargs_copy = marker_kwargs.copy()
-                        marker_kwargs_copy['label'] = None
-                        ax2.plot(x_after, y_after, **marker_kwargs_copy)
-                    # Use the helper to draw the broken connecting line in data coordinates
-                    if config['show_line'] and len(x_before) > 0 and len(x_after) > 0:
-                        draw_broken_line(
-                            ax1, ax2,
-                            x_before, y_before, x_after, y_after,
-                            break_start, break_end,
-                            config['color'], config['line_style'], config['line_width']
-                        )
+
+                    # Handle marker edge color for black markers
+                    if config['color'].lower() in ['#000000', '#000', 'black']:
+                        plot_kwargs['markeredgecolor'] = 'none'
+
+                    if config['show_line']:
+                        plot_kwargs['linestyle'] = config['line_style']
+                        plot_kwargs['marker'] = config['marker']
+                    else:
+                        plot_kwargs['linestyle'] = 'none'
+                        plot_kwargs['marker'] = config['marker']
+
+                    # Plot on left axis (data before break)
+                    mask_left = x <= break_start
+                    if mask_left.any():
+                        ax1.plot(x[mask_left], y[mask_left], **plot_kwargs)
+
+                    # Plot on right axis (data after break) - no label to avoid duplicate
+                    plot_kwargs_right = plot_kwargs.copy()
+                    plot_kwargs_right['label'] = None
+                    mask_right = x >= break_end
+                    if mask_right.any():
+                        ax2.plot(x[mask_right], y[mask_right], **plot_kwargs_right)
+
+                    # Draw connecting line across the break if show_line is True
+                    if config['show_line'] and mask_left.any() and mask_right.any():
+                        x_before = x[mask_left]
+                        y_before = y[mask_left]
+                        x_after = x[mask_right]
+                        y_after = y[mask_right]
+
+                        # Last point before gap, first point after gap
+                        x0, y0 = x_before[-1], y_before[-1]
+                        x1, y1 = x_after[0], y_after[0]
+
+                        actual_gap = x1 - x0
+                        if actual_gap != 0:
+                            # Visual gap is compressed, so slopes should reflect that.
+                            visual_gap = 1.5
+                            slope = (y1 - y0) / visual_gap
+
+                            left_segment_x = break_start - x0
+                            left_fraction = left_segment_x / actual_gap
+                            left_segment_y = slope * (visual_gap * left_fraction)
+
+                            right_segment_x = x1 - break_end
+                            right_fraction = right_segment_x / actual_gap
+                            right_segment_y = slope * (visual_gap * right_fraction)
+
+                            y_at_break_left = y0 + left_segment_y
+                            ax1.plot(
+                                [x0, break_start], [y0, y_at_break_left],
+                                color=config['color'],
+                                linestyle=config['line_style'],
+                                linewidth=config['line_width'],
+                                alpha=0.7,
+                            )
+
+                            y_at_break_right = y1 - right_segment_y
+                            ax2.plot(
+                                [break_end, x1], [y_at_break_right, y1],
+                                color=config['color'],
+                                linestyle=config['line_style'],
+                                linewidth=config['line_width'],
+                                alpha=0.7,
+                            )
+
                 # Set axis limits
                 ax1.set_xlim(x_min, break_start)
                 ax2.set_xlim(break_end, x_max)
-                ax1.set_ylim(y_plot_min, y_plot_max)
-                ax2.set_ylim(y_plot_min, y_plot_max)
-                # Add minor ticks at every 1 unit for y-axis
-                ax1.yaxis.set_minor_locator(ticker.MultipleLocator(1))
-                ax1.tick_params(axis='y', which='minor', left=True, right=False)
-                # Set x-axis ticks for broken axis
+                ax1.set_ylim(y_min, y_max)
+                ax2.set_ylim(y_min, y_max)
+
+                # Hide the spines between the axes and on top
+                ax1.spines['right'].set_visible(False)
+                ax2.spines['left'].set_visible(False)
+                ax1.spines['top'].set_visible(False)
+                ax2.spines['top'].set_visible(False)
+
+                # Only show y-axis on the left
+                ax2.yaxis.set_visible(False)
+                ax1.yaxis.tick_left()
+
+                # Only show x-axis ticks on bottom
+                ax1.xaxis.set_ticks_position('bottom')
+                ax2.xaxis.set_ticks_position('bottom')
+                ax1.tick_params(top=False)
+                ax2.tick_params(top=False)
+
+                # Add diagonal lines to indicate break (ONLY on bottom)
+                d = 0.015
+                kwargs = dict(transform=ax1.transAxes, color='k', clip_on=False, linewidth=1)
+                ax1.plot((1-d, 1+d), (-d, +d), **kwargs)
+
+                kwargs2 = dict(transform=ax2.transAxes, color='k', clip_on=False, linewidth=1)
+                ax2.plot((-d, +d), (-d, +d), **kwargs2)
+
+                # Set x-axis ticks
                 x_tick_mode_break = settings.get('x_tick_mode', 'custom')
                 x_tick_interval_break = settings.get('x_tick_interval', 2)
                 if isinstance(x_tick_interval_break, str):
@@ -571,63 +1573,64 @@ def create_synthetic_plot(settings, curves_data, x_values):
                         x_tick_interval_break = 2
                 elif x_tick_interval_break is None or x_tick_interval_break == 0:
                     x_tick_interval_break = 2
+
                 if x_tick_mode_break == 'custom' and x_tick_interval_break > 0:
                     tick_interval = float(x_tick_interval_break)
+
                     ticks_before = np.arange(x_min, break_start + tick_interval, tick_interval)
                     ticks_before = ticks_before[(ticks_before >= x_min) & (ticks_before <= break_start)]
                     ticks_before = [tick for tick in ticks_before if int(round(tick)) % 2 == 0]
+
                     first_tick_after = int(np.ceil(break_end))
                     if first_tick_after % 2 != 0:
                         first_tick_after += 1
                     ticks_after = np.arange(first_tick_after, x_max + tick_interval, tick_interval)
                     ticks_after = [tick for tick in ticks_after if int(round(tick)) % 2 == 0 and tick >= break_end and tick <= x_max]
+
                     if len(ticks_before) > 0:
                         ax1.set_xticks(ticks_before)
                     if len(ticks_after) > 0:
                         ax2.set_xticks(ticks_after)
-                    # Add minor ticks at every 1 unit for broken axis
+
                     ax1.xaxis.set_minor_locator(ticker.MultipleLocator(1))
                     ax1.tick_params(axis='x', which='minor', bottom=True, top=False)
                     ax2.xaxis.set_minor_locator(ticker.MultipleLocator(1))
                     ax2.tick_params(axis='x', which='minor', bottom=True, top=False)
+
+                # Add minor ticks for y-axis
+                if settings.get('y_scale', '').lower() == 'log':
+                    ax1.yaxis.set_minor_locator(ticker.MultipleLocator(1))
+                    ax1.tick_params(axis='y', which='minor', left=True, right=False)
+
                 # Set labels
                 x_label = settings['x_label']
                 if settings['x_unit']:
                     x_label += f" ({settings['x_unit']})"
                 fig.text(0.5, 0.02, x_label, ha='center', fontsize=11)
+
                 y_label = settings['y_label']
                 if settings['y_unit']:
                     y_label += f" ({settings['y_unit']})"
                 if settings.get('y_scale', '').lower() == 'log':
                     y_label += " (log10 scale)"
                 ax1.set_ylabel(y_label, fontsize=11)
+
                 # Title
                 if settings['title']:
                     fig.suptitle(settings['title'], fontsize=12, fontweight='bold')
-                # Legend
+
+                # Legend (only on left axis to avoid duplicates)
                 if settings['show_legend']:
-                    from matplotlib.lines import Line2D
-                    legend_handles = []
-                    for curve_data in curves_data:
-                        config = curve_data['config']
-                        handle = Line2D(
-                            [0], [0],
-                            color=config['color'],
-                            linestyle=config['line_style'] if config['show_line'] else 'none',
-                            linewidth=config['line_width'],
-                            marker=config['marker'],
-                            markersize=config['marker_size'],
-                            markerfacecolor=config['color'],
-                            markeredgecolor='none' if config['color'].lower() in ['#000000', '#000', 'black'] else config['color'],
-                            label=config['name']
-                        )
-                        legend_handles.append(handle)
-                    ax1.legend(handles=legend_handles, loc='best', framealpha=0.9)
-                # Grid (only on left axis)
+                    ax1.legend(loc='best', framealpha=0.9)
+
+                # Grid (on both axes)
                 if settings['show_grid']:
                     ax1.grid(True, alpha=0.3, linestyle='--')
+                    ax2.grid(True, alpha=0.3, linestyle='--')
+
                 plt.tight_layout()
                 return fig
+
         except Exception as e:
             print(f"Warning: Could not create axis break: {e}")
             import traceback
@@ -670,7 +1673,31 @@ def create_synthetic_plot(settings, curves_data, x_values):
         ax.set_title(settings['title'], fontsize=12, fontweight='bold')
     
     if settings['show_legend']:
-        ax.legend(loc='best', framealpha=0.9)
+        from matplotlib.lines import Line2D
+        legend_handles = []
+        for curve_data in curves_data:
+            config = curve_data.get('config') or {}
+            color = config.get('color', '#000000')
+            marker = config.get('marker', 'o')
+            marker_size = config.get('marker_size', 6)
+            line_style = config.get('line_style', '-')
+            line_width = config.get('line_width', 1.5)
+            show_line = bool(config.get('show_line', True))
+            name = config.get('name', 'Condition')
+
+            handle = Line2D(
+                [0], [0],
+                color=color,
+                linestyle=line_style if show_line else 'none',
+                linewidth=line_width,
+                marker=marker,
+                markersize=marker_size,
+                markerfacecolor=color,
+                markeredgecolor='none' if str(color).lower() in ['#000000', '#000', 'black'] else color,
+                label=name,
+            )
+            legend_handles.append(handle)
+        ax.legend(handles=legend_handles, loc='best', framealpha=0.9)
     
     if settings['show_grid']:
         ax.grid(True, alpha=0.3, linestyle='--')
@@ -742,16 +1769,21 @@ def build_synthetic_context(settings, curves_data, x_values, base_name):
             if str(settings.get('y_min', '')).strip() != '':
                 y_min_val = float(settings['y_min'])
             else:
-                y_min_val = 0.1
+                y_min_val = max(0.1, float(min(all_y)) - 0.5) if all_y else 0.1
         except Exception:
             y_min_val = 0.1
         try:
             if str(settings.get('y_max', '')).strip() != '':
                 y_max_val = float(settings['y_max'])
             else:
-                y_max_val = 6.9
+                y_max_val = float(math.ceil(max(all_y)) + 1) if all_y else 6.9
         except Exception:
             y_max_val = 6.9
+
+        y_min_val = max(0.1, float(y_min_val))
+        y_max_val = min(13.0, float(y_max_val))
+        if y_max_val <= y_min_val:
+            y_max_val = min(13.0, y_min_val + 1.0)
     else:
         try:
             if str(settings.get('y_min', '')).strip() != '':
@@ -1093,6 +2125,8 @@ def find_extracted_csv_v2(image_path, prompt_name):
 
 def get_output_files_v2(image_path, prompt_name=None, version_dir=None):
     """Get output files for PlotExtractV2 runs."""
+    if version_dir:
+        version_dir = _resolve_path_under_plots(version_dir)
     image_dir = os.path.dirname(os.path.join(PLOTS_DIR, image_path))
     image_name = os.path.basename(image_path)
     base_name = os.path.splitext(image_name)[0]
@@ -1149,6 +2183,8 @@ def get_output_files_v2(image_path, prompt_name=None, version_dir=None):
 
 def get_output_files(image_path, prompt_file=None, version_dir=None):
     """Get output files related to an image. If version_dir is provided, only show that version."""
+    if version_dir:
+        version_dir = _resolve_path_under_plots(version_dir)
     image_dir = os.path.dirname(os.path.join(PLOTS_DIR, image_path))
     image_name = os.path.basename(image_path)
     base_name = os.path.splitext(image_name)[0]
@@ -1607,6 +2643,9 @@ def run_all():
     right_x = str(data.get('rightX', 100))
     bottom_y = str(data.get('bottomY', 0))
     top_y = str(data.get('topY', 100))
+
+    # Optional: batch metadata (for persistent batch results page)
+    batch_number = data.get('batch_number')
     
     # Generate unique task ID
     task_id = str(uuid.uuid4())[:8]
@@ -1619,7 +2658,11 @@ def run_all():
             'console': [],
             'started_at': time.time(),
             'image_path': image_path,
-            'prompt_file': prompt_file
+            'prompt_file': prompt_file,
+            'batch_number': batch_number
+            ,
+            'cancel_requested': False,
+            'active_pid': None,
         }
     
     # Start background thread
@@ -1642,6 +2685,7 @@ def run_all_v2():
     image_path = data.get('image')
     prompt_name = data.get('prompt') or data.get('prompt_name')
     article_info = data.get('articleInfo', '').strip()
+    debug_mode = bool(data.get('debug', False))
     run_interpolation = data.get('runInterpolation', False)
     run_pointwise = data.get('runPointwise', False)
     left_x = str(data.get('leftX', 0))
@@ -1658,12 +2702,15 @@ def run_all_v2():
             'started_at': time.time(),
             'image_path': image_path,
             'prompt_name': prompt_name,
-            'pipeline': 'v2'
+            'pipeline': 'v2',
+            'debug': debug_mode,
+            'cancel_requested': False,
+            'active_pid': None,
         }
 
     thread = threading.Thread(
         target=run_extraction_task_v2,
-        args=(task_id, image_path, prompt_name, article_info, run_interpolation, run_pointwise,
+        args=(task_id, image_path, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
               left_x, right_x, bottom_y, top_y)
     )
     thread.daemon = True
@@ -1724,6 +2771,14 @@ def get_extraction_progress(task_id):
         with open(latest_progress_path, 'r', encoding='utf-8') as f:
             progress_data = json.load(f)
 
+        # Add server-derived elapsed time so the UI timer doesn't reset on reload.
+        with extraction_tasks_lock:
+            task = extraction_tasks.get(task_id)
+            started_at = (task or {}).get('started_at')
+        if started_at:
+            progress_data.setdefault('started_at', started_at)
+            progress_data['elapsed'] = time.time() - float(started_at)
+
         resp = jsonify(progress_data)
         resp.headers['Cache-Control'] = 'no-store'
         return resp
@@ -1732,6 +2787,316 @@ def get_extraction_progress(task_id):
         resp = jsonify({'error': str(e), 'status': 'error'})
         resp.headers['Cache-Control'] = 'no-store'
         return resp, 500
+
+
+# =============================================================================
+# V2 Batch Extraction (server-side orchestration)
+# =============================================================================
+
+@app.route('/v2/run_batch', methods=['POST'])
+def run_batch_v2():
+    """Start a V2 batch extraction as a background task.
+
+    This enables batch processing to continue even if the user navigates away.
+    Payload:
+      images: list[str] (plot paths relative to PLOTS_DIR)
+      prompt: string (e.g., "prompt_1.py")
+      articleInfo: string
+      runInterpolation/runPointwise: bool
+      axis ranges: leftX/rightX/bottomY/topY
+    """
+    data = request.get_json(force=True, silent=True) or {}
+    images = data.get('images') or []
+    prompt_file = data.get('prompt', 'prompt_1.py')
+    batch_name = data.get('batch_name')
+    article_info = data.get('articleInfo', '')
+    debug_mode = bool(data.get('debug', False))
+    run_interpolation = bool(data.get('runInterpolation', False))
+    run_pointwise = bool(data.get('runPointwise', False))
+    left_x = str(data.get('leftX', '0'))
+    right_x = str(data.get('rightX', '100'))
+    bottom_y = str(data.get('bottomY', '0'))
+    top_y = str(data.get('topY', '100'))
+
+    if not isinstance(images, list) or not images:
+        return jsonify({'error': 'No images provided'}), 400
+
+    # Extract prompt name for v2 runner (e.g. "prompt_1.py" -> "prompt_1")
+    prompt_name = os.path.splitext(prompt_file)[0]
+
+    task_id = str(uuid.uuid4())
+
+    # Create a persistent batch record (used by /batch_results)
+    try:
+        batch_number = create_batch_run_record(
+            extraction_version='v2',
+            prompt=prompt_file,
+            images=images,
+            pipeline='v2_batch',
+            task_id=task_id,
+            batch_name=batch_name,
+        )
+    except ValueError:
+        return jsonify({'error': 'duplicate batch_name'}), 400
+    except Exception as e:
+        print(f"Failed to create batch record for v2 batch: {e}")
+        batch_number = None
+    with extraction_tasks_lock:
+        extraction_tasks[task_id] = {
+            'status': 'running',
+            'progress': 'Starting batch... ',
+            'console': [],
+            'started_at': time.time(),
+            'pipeline': 'v2_batch',
+            'prompt_name': prompt_name,
+            'batch_number': batch_number,
+            'batch': {
+                'total': len(images),
+                'completed': 0,
+                'failed': 0,
+                'current_index': 0,
+                'current_image': None,
+                'items': [
+                    {
+                        'image_path': img,
+                        'status': 'pending',
+                        'task_id': None,
+                        'time_s': None,
+                        'error': None,
+                        'result': None,
+                    }
+                    for img in images
+                ],
+            },
+            'cancel_requested': False,
+        }
+
+    thread = threading.Thread(
+        target=run_batch_task_v2,
+        args=(task_id, images, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
+              left_x, right_x, bottom_y, top_y),
+    )
+    thread.daemon = True
+    thread.start()
+    return jsonify({'task_id': task_id, 'status': 'started', 'batch_number': batch_number})
+
+
+@app.route('/v2/batch_progress/<task_id>')
+def get_batch_progress(task_id):
+    """Get real-time progress for a V2 batch task."""
+    with extraction_tasks_lock:
+        task = extraction_tasks.get(task_id)
+        if not task or task.get('pipeline') != 'v2_batch':
+            resp = jsonify({'status': 'not_found'})
+            resp.headers['Cache-Control'] = 'no-store'
+            return resp
+
+        payload = {
+            'status': task.get('status', 'running'),
+            'progress': task.get('progress', ''),
+            'elapsed': time.time() - task.get('started_at', time.time()),
+            'batch_number': task.get('batch_number'),
+            'batch': task.get('batch', {}),
+            'result': task.get('result'),
+        }
+
+    resp = jsonify(payload)
+    resp.headers['Cache-Control'] = 'no-store'
+    return resp
+
+
+@app.route('/v2/cancel_task/<task_id>', methods=['POST'])
+def cancel_task(task_id):
+    """Request cancellation for a running task (best-effort).
+
+    For batch tasks, this stops after the current image finishes.
+    """
+    with extraction_tasks_lock:
+        if task_id not in extraction_tasks:
+            return jsonify({'status': 'not_found'}), 404
+        extraction_tasks[task_id]['cancel_requested'] = True
+        return jsonify({'status': 'cancellation_requested'})
+
+
+@app.route('/cancel_task/<task_id>', methods=['POST'])
+def cancel_task_v1(task_id):
+    """Request cancellation for a running task (v1 + generic).
+
+    This is best-effort: the server will attempt to terminate the currently
+    running subprocess and mark the task as cancelled.
+    """
+    with extraction_tasks_lock:
+        if task_id not in extraction_tasks:
+            return jsonify({'status': 'not_found'}), 404
+        extraction_tasks[task_id]['cancel_requested'] = True
+        extraction_tasks[task_id]['progress'] = 'Cancellation requested.'
+        return jsonify({'status': 'cancellation_requested'})
+
+
+def run_batch_task_v2(task_id, images, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
+                      left_x, right_x, bottom_y, top_y):
+    """Background batch runner.
+
+    This orchestrates multiple single-image v2 tasks sequentially on the server,
+    so batch continues even if the client disconnects.
+    """
+    batch_results = []
+    batch_start = time.time()
+
+    with extraction_tasks_lock:
+        batch_number = (extraction_tasks.get(task_id) or {}).get('batch_number')
+
+    def update_batch(**kwargs):
+        with extraction_tasks_lock:
+            if task_id not in extraction_tasks:
+                return
+            batch = extraction_tasks[task_id].setdefault('batch', {})
+            batch.update(kwargs)
+
+    for idx, image_path in enumerate(images):
+        with extraction_tasks_lock:
+            task = extraction_tasks.get(task_id)
+            if not task:
+                return
+            if task.get('cancel_requested'):
+                task['progress'] = 'Cancelled.'
+                task['status'] = 'completed'
+                task['result'] = {
+                    'success': False,
+                    'cancelled': True,
+                    'batch_results': batch_results,
+                    'completed_at': time.time(),
+                }
+
+                if batch_number:
+                    try:
+                        complete_batch_run(batch_number, status='cancelled')
+                    except Exception as e:
+                        print(f"Failed to mark batch {batch_number} cancelled: {e}")
+                return
+
+            task['progress'] = f'Processing {idx + 1}/{len(images)}: {image_path}'
+            task['batch']['current_index'] = idx
+            task['batch']['current_image'] = image_path
+            task['batch']['items'][idx]['status'] = 'processing'
+
+        child_task_id = str(uuid.uuid4())
+        with extraction_tasks_lock:
+            extraction_tasks[child_task_id] = {
+                'status': 'running',
+                'progress': 'Starting... ',
+                'console': [],
+                'started_at': time.time(),
+                'image_path': image_path,
+                'prompt_name': prompt_name,
+                'pipeline': 'v2',
+                'cancel_requested': False,
+                'active_pid': None,
+            }
+            extraction_tasks[task_id]['batch']['items'][idx]['task_id'] = child_task_id
+
+        start_time = time.time()
+        try:
+            run_extraction_task_v2(
+                child_task_id,
+                image_path,
+                prompt_name,
+                article_info,
+                debug_mode,
+                run_interpolation,
+                run_pointwise,
+                left_x,
+                right_x,
+                bottom_y,
+                top_y,
+            )
+            with extraction_tasks_lock:
+                child = extraction_tasks.get(child_task_id, {})
+                child_result = child.get('result')
+
+            elapsed_s = round(time.time() - start_time, 2)
+            ok = bool(child_result and child_result.get('success'))
+
+            with extraction_tasks_lock:
+                parent = extraction_tasks.get(task_id)
+                if parent:
+                    parent_item = parent['batch']['items'][idx]
+                    parent_item['status'] = 'completed' if ok else 'failed'
+                    parent_item['time_s'] = elapsed_s
+                    parent_item['result'] = child_result
+                    if not ok:
+                        parent_item['error'] = (child_result or {}).get('console', '')[:5000] or 'Extraction failed'
+
+                    parent['batch']['completed'] += 1
+                    if not ok:
+                        parent['batch']['failed'] += 1
+
+            # Persist this item to the batch registry
+            if batch_number:
+                try:
+                    summary = ((child_result or {}).get('outputs') or {}).get('summary') or {}
+                    status = 'success' if ok else 'failed'
+                    console_text = (child_result or {}).get('console')
+                    if console_text and len(console_text) > 8000:
+                        console_text = console_text[:8000] + "\n... (truncated)"
+                    update_batch_run_item(
+                        batch_number,
+                        image_path,
+                        status=status,
+                        time_s=elapsed_s,
+                        summary=summary,
+                        error=None if ok else 'Extraction failed',
+                        task_id=child_task_id,
+                        version_dir=(child_result or {}).get('version_dir'),
+                        console=console_text,
+                    )
+                except Exception as e:
+                    print(f"Failed to persist batch item (batch {batch_number}, {image_path}): {e}")
+        except Exception as e:
+            elapsed_s = round(time.time() - start_time, 2)
+            with extraction_tasks_lock:
+                parent = extraction_tasks.get(task_id)
+                if parent:
+                    parent_item = parent['batch']['items'][idx]
+                    parent_item['status'] = 'failed'
+                    parent_item['time_s'] = elapsed_s
+                    parent_item['error'] = str(e)
+                    parent['batch']['completed'] += 1
+                    parent['batch']['failed'] += 1
+
+            if batch_number:
+                try:
+                    update_batch_run_item(
+                        batch_number,
+                        image_path,
+                        status='failed',
+                        time_s=elapsed_s,
+                        summary={},
+                        error=str(e),
+                        task_id=child_task_id,
+                    )
+                except Exception:
+                    pass
+
+        # Keep parent results lightweight and deterministic for the UI
+        batch_results.append({'image_path': image_path, 'task_id': child_task_id})
+
+    with extraction_tasks_lock:
+        if task_id in extraction_tasks:
+            extraction_tasks[task_id]['status'] = 'completed'
+            extraction_tasks[task_id]['progress'] = 'Batch complete.'
+            extraction_tasks[task_id]['result'] = {
+                'success': True,
+                'batch_results': batch_results,
+                'completed_at': time.time(),
+                'total_time_s': round(time.time() - batch_start, 2),
+            }
+
+    if batch_number:
+        try:
+            complete_batch_run(batch_number, status='completed')
+        except Exception as e:
+            print(f"Failed to mark batch {batch_number} completed: {e}")
 
 
 @app.route('/v2/extraction_console/<image_name>/<prompt_name>')
@@ -1852,6 +3217,7 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
     
     console_output = []
     success = True
+    cancelled = False
     version_dir = None
     timings = {}
     step_status = {
@@ -1880,32 +3246,36 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
     
     step1_start = time.time()
     try:
-        result = subprocess.run(
-            ['python', 'plotExtract.py', full_image_path, full_prompt_path],
+        result = _run_subprocess_with_cancel(
+            task_id,
+            [PYTHON_EXE, 'plotExtract.py', full_image_path, full_prompt_path],
             cwd=BASE_DIR,
-            capture_output=True,
-            text=True,
-            timeout=300
+            timeout_s=300,
         )
         
-        if result.stdout:
-            console_output.append(result.stdout)
+        if result.get('stdout'):
+            console_output.append(result['stdout'])
             # Parse VERSION_DIR from output
-            for line in result.stdout.split('\n'):
+            for line in result['stdout'].split('\n'):
                 if line.startswith('VERSION_DIR:'):
                     version_dir = line.replace('VERSION_DIR:', '').strip()
                     break
-        if result.stderr:
-            console_output.append(f"[STDERR] {result.stderr}")
+        if result.get('stderr'):
+            console_output.append(f"[STDERR] {result['stderr']}")
         
-        if result.returncode != 0:
+        if result.get('returncode', 0) != 0:
             success = False
-            step_status['extraction'] = f"failed (exit code {result.returncode})"
-            console_output.append(f"\n[ERROR] Extraction failed with exit code {result.returncode}")
+            step_status['extraction'] = f"failed (exit code {result.get('returncode')})"
+            console_output.append(f"\n[ERROR] Extraction failed with exit code {result.get('returncode')}")
         else:
             step_status['extraction'] = 'success'
             console_output.append("\n[SUCCESS] Extraction completed.")
             
+    except TaskCancelledError:
+        success = False
+        cancelled = True
+        step_status['extraction'] = 'cancelled'
+        console_output.append("[CANCELLED] Extraction cancelled by user.")
     except subprocess.TimeoutExpired:
         success = False
         step_status['extraction'] = 'failed (timeout)'
@@ -1958,32 +3328,36 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
             
             step2_start = time.time()
             try:
-                cmd = ['python', 'interpolation.py', original_csv, extracted_csv,
+                cmd = [PYTHON_EXE, 'interpolation.py', original_csv, extracted_csv,
                        left_x, right_x, bottom_y, top_y]
                 if version_dir:
                     cmd.append(version_dir)
                 
-                result = subprocess.run(
+                result = _run_subprocess_with_cancel(
+                    task_id,
                     cmd,
                     cwd=BASE_DIR,
-                    capture_output=True,
-                    text=True,
-                    timeout=300
+                    timeout_s=300,
                 )
                 
-                if result.stdout:
-                    console_output.append(result.stdout)
-                if result.stderr:
-                    console_output.append(f"[STDERR] {result.stderr}")
+                if result.get('stdout'):
+                    console_output.append(result['stdout'])
+                if result.get('stderr'):
+                    console_output.append(f"[STDERR] {result['stderr']}")
                 
-                if result.returncode != 0:
+                if result.get('returncode', 0) != 0:
                     success = False
-                    step_status['interpolation'] = f"failed (exit code {result.returncode})"
-                    console_output.append(f"\n[ERROR] Interpolation failed with exit code {result.returncode}")
+                    step_status['interpolation'] = f"failed (exit code {result.get('returncode')})"
+                    console_output.append(f"\n[ERROR] Interpolation failed with exit code {result.get('returncode')}")
                 else:
                     step_status['interpolation'] = 'success'
                     console_output.append("\n[SUCCESS] Interpolation completed.")
                     
+            except TaskCancelledError:
+                success = False
+                cancelled = True
+                step_status['interpolation'] = 'cancelled'
+                console_output.append("[CANCELLED] Interpolation cancelled by user.")
             except subprocess.TimeoutExpired:
                 success = False
                 step_status['interpolation'] = 'failed (timeout)'
@@ -2026,32 +3400,36 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
             
             step3_start = time.time()
             try:
-                cmd = ['python', 'pointwise.py', extracted_csv, original_csv,
+                cmd = [PYTHON_EXE, 'pointwise.py', extracted_csv, original_csv,
                        left_x, right_x, bottom_y, top_y]
                 if version_dir:
                     cmd.append(version_dir)
                 
-                result = subprocess.run(
+                result = _run_subprocess_with_cancel(
+                    task_id,
                     cmd,
                     cwd=BASE_DIR,
-                    capture_output=True,
-                    text=True,
-                    timeout=300
+                    timeout_s=300,
                 )
                 
-                if result.stdout:
-                    console_output.append(result.stdout)
-                if result.stderr:
-                    console_output.append(f"[STDERR] {result.stderr}")
+                if result.get('stdout'):
+                    console_output.append(result['stdout'])
+                if result.get('stderr'):
+                    console_output.append(f"[STDERR] {result['stderr']}")
                 
-                if result.returncode != 0:
+                if result.get('returncode', 0) != 0:
                     success = False
-                    step_status['pointwise'] = f"failed (exit code {result.returncode})"
-                    console_output.append(f"\n[ERROR] Pointwise comparison failed with exit code {result.returncode}")
+                    step_status['pointwise'] = f"failed (exit code {result.get('returncode')})"
+                    console_output.append(f"\n[ERROR] Pointwise comparison failed with exit code {result.get('returncode')}")
                 else:
                     step_status['pointwise'] = 'success'
                     console_output.append("\n[SUCCESS] Pointwise comparison completed.")
                     
+            except TaskCancelledError:
+                success = False
+                cancelled = True
+                step_status['pointwise'] = 'cancelled'
+                console_output.append("[CANCELLED] Pointwise comparison cancelled by user.")
             except subprocess.TimeoutExpired:
                 success = False
                 step_status['pointwise'] = 'failed (timeout)'
@@ -2089,6 +3467,7 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
     # Build final result
     final_result = {
         'success': success,
+        'cancelled': cancelled,
         'console': '\n'.join(console_output),
         'outputs': outputs,
         'csv_status': csv_status,
@@ -2100,15 +3479,42 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
     }
     
     # Update task state
+    batch_number = None
     with extraction_tasks_lock:
         if task_id in extraction_tasks:
             extraction_tasks[task_id]['status'] = 'completed'
             extraction_tasks[task_id]['result'] = final_result
+
+            # If this was part of a batch, update persistent batch registry
+            batch_number = extraction_tasks[task_id].get('batch_number')
+
+    if batch_number:
+        try:
+            summary = (final_result.get('outputs') or {}).get('summary') or {}
+            status = 'success' if final_result.get('success') else 'failed'
+            time_s = (final_result.get('timings') or {}).get('total')
+            console_text = final_result.get('console')
+            if console_text and len(console_text) > 8000:
+                console_text = console_text[:8000] + "\n... (truncated)"
+
+            update_batch_run_item(
+                batch_number,
+                image_path,
+                status=status,
+                time_s=time_s,
+                summary=summary,
+                error=None if status == 'success' else 'Extraction failed',
+                task_id=task_id,
+                version_dir=final_result.get('version_dir'),
+                console=console_text,
+            )
+        except Exception as e:
+            print(f"Batch registry update failed (batch {batch_number}): {e}")
     
     # Save to file for persistence
     save_extraction_state(final_result)
 
-def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, run_interpolation, run_pointwise,
+def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
                            left_x, right_x, bottom_y, top_y):
     """Background task for PlotExtractV2 pipeline."""
     import re
@@ -2127,6 +3533,7 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, run_i
 
     console_output = []
     success = True
+    cancelled = False
     version_dir = None
     timings = {}
     step_status = {
@@ -2152,31 +3559,37 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, run_i
 
     step1_start = time.time()
     try:
-        result = subprocess.run(
-            ['python', os.path.join('plot_extract_v2', 'runner.py'), full_image_path, prompt_name, article_info],
+        env_overrides = {'PLOTEXTRACT_DEBUG': '1'} if debug_mode else None
+        result = _run_subprocess_with_cancel(
+            task_id,
+            [PYTHON_EXE, os.path.join('plot_extract_v2', 'runner.py'), full_image_path, prompt_name, article_info],
             cwd=BASE_DIR,
-            capture_output=True,
-            text=True,
-            timeout=300
+            timeout_s=300,
+            env_overrides=env_overrides,
         )
 
-        if result.stdout:
-            console_output.append(result.stdout)
-            for line in result.stdout.split('\n'):
+        if result.get('stdout'):
+            console_output.append(result['stdout'])
+            for line in result['stdout'].split('\n'):
                 if line.startswith('VERSION_DIR:'):
                     version_dir = line.replace('VERSION_DIR:', '').strip()
                     break
-        if result.stderr:
-            console_output.append(f"[STDERR] {result.stderr}")
+        if result.get('stderr'):
+            console_output.append(f"[STDERR] {result['stderr']}")
 
-        if result.returncode != 0:
+        if result.get('returncode', 0) != 0:
             success = False
-            step_status['extraction'] = f"failed (exit code {result.returncode})"
-            console_output.append(f"\n[ERROR] Extraction failed with exit code {result.returncode}")
+            step_status['extraction'] = f"failed (exit code {result.get('returncode')})"
+            console_output.append(f"\n[ERROR] Extraction failed with exit code {result.get('returncode')}")
         else:
             step_status['extraction'] = 'success'
             console_output.append("\n[SUCCESS] Extraction completed.")
 
+    except TaskCancelledError:
+        success = False
+        cancelled = True
+        step_status['extraction'] = 'cancelled'
+        console_output.append("[CANCELLED] Extraction cancelled by user.")
     except subprocess.TimeoutExpired:
         success = False
         step_status['extraction'] = 'failed (timeout)'
@@ -2230,31 +3643,35 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, run_i
 
             step2_start = time.time()
             try:
-                cmd = ['python', 'interpolation.py', original_csv, extracted_csv, left_x, right_x, bottom_y, top_y]
+                cmd = [PYTHON_EXE, 'interpolation.py', original_csv, extracted_csv, left_x, right_x, bottom_y, top_y]
                 if version_dir:
                     cmd.append(version_dir)
 
-                result = subprocess.run(
+                result = _run_subprocess_with_cancel(
+                    task_id,
                     cmd,
                     cwd=BASE_DIR,
-                    capture_output=True,
-                    text=True,
-                    timeout=300
+                    timeout_s=300,
                 )
 
-                if result.stdout:
-                    console_output.append(result.stdout)
-                if result.stderr:
-                    console_output.append(f"[STDERR] {result.stderr}")
+                if result.get('stdout'):
+                    console_output.append(result['stdout'])
+                if result.get('stderr'):
+                    console_output.append(f"[STDERR] {result['stderr']}")
 
-                if result.returncode != 0:
+                if result.get('returncode', 0) != 0:
                     success = False
-                    step_status['interpolation'] = f"failed (exit code {result.returncode})"
-                    console_output.append(f"\n[ERROR] Interpolation failed with exit code {result.returncode}")
+                    step_status['interpolation'] = f"failed (exit code {result.get('returncode')})"
+                    console_output.append(f"\n[ERROR] Interpolation failed with exit code {result.get('returncode')}")
                 else:
                     step_status['interpolation'] = 'success'
                     console_output.append("\n[SUCCESS] Interpolation completed.")
 
+            except TaskCancelledError:
+                success = False
+                cancelled = True
+                step_status['interpolation'] = 'cancelled'
+                console_output.append("[CANCELLED] Interpolation cancelled by user.")
             except subprocess.TimeoutExpired:
                 success = False
                 step_status['interpolation'] = 'failed (timeout)'
@@ -2296,31 +3713,35 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, run_i
 
             step3_start = time.time()
             try:
-                cmd = ['python', 'pointwise.py', extracted_csv, original_csv, left_x, right_x, bottom_y, top_y]
+                cmd = [PYTHON_EXE, 'pointwise.py', extracted_csv, original_csv, left_x, right_x, bottom_y, top_y]
                 if version_dir:
                     cmd.append(version_dir)
 
-                result = subprocess.run(
+                result = _run_subprocess_with_cancel(
+                    task_id,
                     cmd,
                     cwd=BASE_DIR,
-                    capture_output=True,
-                    text=True,
-                    timeout=300
+                    timeout_s=300,
                 )
 
-                if result.stdout:
-                    console_output.append(result.stdout)
-                if result.stderr:
-                    console_output.append(f"[STDERR] {result.stderr}")
+                if result.get('stdout'):
+                    console_output.append(result['stdout'])
+                if result.get('stderr'):
+                    console_output.append(f"[STDERR] {result['stderr']}")
 
-                if result.returncode != 0:
+                if result.get('returncode', 0) != 0:
                     success = False
-                    step_status['pointwise'] = f"failed (exit code {result.returncode})"
-                    console_output.append(f"\n[ERROR] Pointwise comparison failed with exit code {result.returncode}")
+                    step_status['pointwise'] = f"failed (exit code {result.get('returncode')})"
+                    console_output.append(f"\n[ERROR] Pointwise comparison failed with exit code {result.get('returncode')}")
                 else:
                     step_status['pointwise'] = 'success'
                     console_output.append("\n[SUCCESS] Pointwise comparison completed.")
 
+            except TaskCancelledError:
+                success = False
+                cancelled = True
+                step_status['pointwise'] = 'cancelled'
+                console_output.append("[CANCELLED] Pointwise comparison cancelled by user.")
             except subprocess.TimeoutExpired:
                 success = False
                 step_status['pointwise'] = 'failed (timeout)'
@@ -2353,6 +3774,7 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, run_i
 
     final_result = {
         'success': success,
+        'cancelled': cancelled,
         'console': '\n'.join(console_output),
         'outputs': outputs,
         'csv_status': csv_status,
@@ -2449,7 +3871,7 @@ def run_batch_single():
         if use_v2:
             # Extract prompt name from file (e.g., 'prompt_1.py' -> 'prompt_1')
             prompt_name_v2 = os.path.splitext(prompt_file)[0]
-            extraction_cmd = ['python', 'plot_extract_v2/runner.py', image_path, prompt_name_v2]
+            extraction_cmd = [PYTHON_EXE, 'plot_extract_v2/runner.py', image_path, prompt_name_v2]
             if article_info:
                 extraction_cmd.append(article_info)
             prompt_short = prompt_name_v2.replace('prompt_', 'p')
@@ -2457,7 +3879,7 @@ def run_batch_single():
         else:
             # Use v1 extraction
             full_prompt_path = os.path.join(PROMPTS_DIR, prompt_file)
-            extraction_cmd = ['python', 'plotExtract.py', image_path, full_prompt_path]
+            extraction_cmd = [PYTHON_EXE, 'plotExtract.py', image_path, full_prompt_path]
             prompt_short = os.path.splitext(prompt_file)[0].replace('prompt_', 'p')
             output_pattern = f".{prompt_short}.v"
         
@@ -2562,7 +3984,7 @@ def run_batch_single():
                 
                 step2_start = time.time()
                 try:
-                    cmd = ['python', 'interpolation.py', original_csv, extracted_csv,
+                    cmd = [PYTHON_EXE, 'interpolation.py', original_csv, extracted_csv,
                            left_x, right_x, bottom_y, top_y]
                     if version_dir:
                         cmd.append(version_dir)
@@ -2615,7 +4037,7 @@ def run_batch_single():
                 
                 step3_start = time.time()
                 try:
-                    cmd = ['python', 'pointwise.py', extracted_csv, original_csv,
+                    cmd = [PYTHON_EXE, 'pointwise.py', extracted_csv, original_csv,
                            left_x, right_x, bottom_y, top_y]
                     if version_dir:
                         cmd.append(version_dir)
@@ -2733,7 +4155,30 @@ def synthetic():
     settings = load_synthetic_settings()
     if not settings['curves']:
         settings['curves'] = get_default_curves(settings['num_curves'])
-    return render_template('synthetic.html', settings=settings)
+    return render_template(
+        'synthetic.html',
+        settings=settings,
+        active_tab='synthetic',
+        api_prefix='/synthetic',
+        page_title='🧫 Synthetic Time-Kill Plot Generator',
+        save_history_key='syntheticGeneratorSaveHistory',
+    )
+
+
+@app.route('/synthetic_v2')
+def synthetic_v2():
+    """Render the synthetic generator v2 page (template-curve generator)."""
+    settings = load_synthetic_settings_v2()
+    if not settings['curves']:
+        settings['curves'] = get_default_curves(settings['num_curves'])
+    return render_template(
+        'synthetic.html',
+        settings=settings,
+        active_tab='synthetic_v2',
+        api_prefix='/synthetic_v2',
+        page_title='🧫 Synthetic Time-Kill Plot Generator v2',
+        save_history_key='syntheticGeneratorV2SaveHistory',
+    )
 
 @app.route('/synthetic/editor')
 def synthetic_editor():
@@ -2744,6 +4189,15 @@ def synthetic_editor():
 def synthetic_get_settings():
     """Return current synthetic settings as JSON."""
     settings = load_synthetic_settings()
+    if not settings['curves']:
+        settings['curves'] = get_default_curves(settings['num_curves'])
+    return jsonify(settings)
+
+
+@app.route('/synthetic_v2/get_settings')
+def synthetic_v2_get_settings():
+    """Return current synthetic v2 settings as JSON."""
+    settings = load_synthetic_settings_v2()
     if not settings['curves']:
         settings['curves'] = get_default_curves(settings['num_curves'])
     return jsonify(settings)
@@ -2774,6 +4228,32 @@ def synthetic_update_curves():
     
     return jsonify({'curves': current_curves})
 
+
+@app.route('/synthetic_v2/update_curves', methods=['POST'])
+def synthetic_v2_update_curves():
+    """Update the number of curves (v2) and return new curve configs."""
+    data = request.json
+    num_curves = int(data.get('num_curves', 3))
+
+    settings = load_synthetic_settings_v2()
+    current_curves = settings.get('curves', [])
+
+    if num_curves > len(current_curves):
+        for i in range(len(current_curves), num_curves):
+            curve = DEFAULT_CURVE.copy()
+            curve['name'] = f'Condition {i + 1}'
+            curve['color'] = COLOR_PALETTE[i % len(COLOR_PALETTE)]
+            trends = ['stable', 'down', 'up', 'kill_regrowth', 'mixed']
+            curve['trend'] = trends[i % len(trends)]
+            current_curves.append(curve)
+    elif num_curves < len(current_curves):
+        current_curves = current_curves[:num_curves]
+
+    settings['curves'] = current_curves
+    settings['num_curves'] = num_curves
+    save_synthetic_settings_v2(settings)
+    return jsonify({'curves': current_curves})
+
 @app.route('/synthetic/preview', methods=['POST'])
 def synthetic_preview():
     """Generate a preview of the synthetic plot."""
@@ -2794,6 +4274,34 @@ def synthetic_preview():
     save_synthetic_settings(settings)
     elapsed = time.time() - start_time
     
+    return jsonify({
+        'success': True,
+        'image': img_base64,
+        'x_values': x_values,
+        'curves_data': curves_data,
+        'time_seconds': round(elapsed, 2)
+    })
+
+
+@app.route('/synthetic_v2/preview', methods=['POST'])
+def synthetic_v2_preview():
+    """Generate a preview of the synthetic plot (v2 template-curve generator)."""
+    start_time = time.time()
+    settings = request.json
+
+    settings.setdefault('x_tick_mode', 'custom')
+    settings.setdefault('x_tick_interval', 2)
+    settings.setdefault('axis_break_enabled', False)
+    settings.setdefault('axis_break_type', 'x')
+    settings.setdefault('axis_break_start', '')
+    settings.setdefault('axis_break_end', '')
+
+    x_values, curves_data = generate_all_curves_v2(settings)
+    fig = create_synthetic_plot(settings, curves_data, x_values)
+    img_base64 = fig_to_base64(fig)
+    save_synthetic_settings_v2(settings)
+    elapsed = time.time() - start_time
+
     return jsonify({
         'success': True,
         'image': img_base64,
@@ -2828,12 +4336,47 @@ def synthetic_save():
         'time_seconds': round(elapsed, 2)
     })
 
+
+@app.route('/synthetic_v2/save', methods=['POST'])
+def synthetic_v2_save():
+    """Save the synthetic plot and data to files (v2 generator)."""
+    start_time = time.time()
+    settings = request.json
+
+    settings.setdefault('x_tick_mode', 'custom')
+    settings.setdefault('x_tick_interval', 2)
+    settings.setdefault('axis_break_enabled', False)
+    settings.setdefault('axis_break_type', 'x')
+    settings.setdefault('axis_break_start', '')
+    settings.setdefault('axis_break_end', '')
+
+    x_values, curves_data = generate_all_curves_v2(settings)
+    saved_files = save_synthetic_plot_and_data(settings, curves_data, x_values)
+    save_synthetic_settings_v2(settings)
+    elapsed = time.time() - start_time
+
+    return jsonify({
+        'success': True,
+        'files': saved_files,
+        'message': f"Saved to {saved_files['filename']}",
+        'time_seconds': round(elapsed, 2)
+    })
+
 @app.route('/synthetic/reset', methods=['POST'])
 def synthetic_reset():
     """Reset all synthetic settings to defaults."""
     settings = DEFAULT_SETTINGS.copy()
     settings['curves'] = get_default_curves(settings['num_curves'])
     save_synthetic_settings(settings)
+    return jsonify(settings)
+
+
+@app.route('/synthetic_v2/reset', methods=['POST'])
+def synthetic_v2_reset():
+    """Reset all synthetic v2 settings to defaults."""
+    settings = DEFAULT_SETTINGS.copy()
+    settings['curves'] = get_default_curves(settings['num_curves'])
+    save_synthetic_settings_v2(settings)
     return jsonify(settings)
 
 @app.route('/synthetic/regenerate', methods=['POST'])
@@ -2855,6 +4398,33 @@ def synthetic_regenerate():
     img_base64 = fig_to_base64(fig)
     elapsed = time.time() - start_time
     
+    return jsonify({
+        'success': True,
+        'image': img_base64,
+        'x_values': x_values,
+        'curves_data': curves_data,
+        'time_seconds': round(elapsed, 2)
+    })
+
+
+@app.route('/synthetic_v2/regenerate', methods=['POST'])
+def synthetic_v2_regenerate():
+    """Regenerate curve data with same settings (v2, new random values)."""
+    start_time = time.time()
+    settings = request.json
+
+    settings.setdefault('x_tick_mode', 'custom')
+    settings.setdefault('x_tick_interval', 2)
+    settings.setdefault('axis_break_enabled', False)
+    settings.setdefault('axis_break_type', 'x')
+    settings.setdefault('axis_break_start', '')
+    settings.setdefault('axis_break_end', '')
+
+    x_values, curves_data = generate_all_curves_v2(settings)
+    fig = create_synthetic_plot(settings, curves_data, x_values)
+    img_base64 = fig_to_base64(fig)
+    elapsed = time.time() - start_time
+
     return jsonify({
         'success': True,
         'image': img_base64,
@@ -3055,36 +4625,39 @@ def save_edit():
         settings.setdefault('show_legend', True)
         settings.setdefault('show_grid', True)
         
-        plot_folder = os.path.join(SYNTHETIC_DIR, original_name)
-        
-        if not os.path.exists(plot_folder):
+        original_folder = find_synthetic_plot_folder(original_name)
+        if not original_folder:
             return jsonify({'success': False, 'error': 'Plot folder not found'})
-        
+
+        # Create a new sibling folder for the copy so it shows up in the editor list
+        letter_folder = os.path.dirname(original_folder)
         copy_num = 1
         while True:
             copy_name = f'{original_name}_copy{copy_num}'
-            png_path = os.path.join(plot_folder, f'{copy_name}.png')
-            if not os.path.exists(png_path):
+            copy_folder = os.path.join(letter_folder, copy_name)
+            if not os.path.exists(copy_folder):
                 break
             copy_num += 1
+
+        os.makedirs(copy_folder, exist_ok=True)
         
         fig = create_synthetic_plot(settings, curves_data, x_values)
         
-        png_path = os.path.join(plot_folder, f'{copy_name}.png')
-        fig.savefig(png_path, dpi=150, bbox_inches='tight')
+        png_path = os.path.join(copy_folder, f'{copy_name}.png')
+        fig.savefig(png_path, dpi=int(settings.get('dpi', 150)), bbox_inches='tight')
         
         svg_path = None
         if settings.get('save_svg', False):
-            svg_path = os.path.join(plot_folder, f'{copy_name}.svg')
+            svg_path = os.path.join(copy_folder, f'{copy_name}.svg')
             fig.savefig(svg_path, format='svg', bbox_inches='tight')
         
         plt.close(fig)
         
-        csv_path = os.path.join(plot_folder, f'{copy_name}-original.csv')
+        csv_path = os.path.join(copy_folder, f'{copy_name}-original.csv')
         save_synthetic_csv(curves_data, x_values, settings, csv_path)
 
         # Save context metadata for the edited copy
-        context_path = os.path.join(plot_folder, f'{copy_name}.context.json')
+        context_path = os.path.join(copy_folder, f'{copy_name}.context.json')
         context_payload = build_synthetic_context(settings, curves_data, x_values, copy_name)
         with open(context_path, 'w', encoding='utf-8') as f:
             json.dump(context_payload, f, indent=2)
@@ -3098,7 +4671,7 @@ def save_edit():
                 'csv': csv_path,
                 'context': context_path,
                 'filename': copy_name,
-                'folder': plot_folder
+                'folder': copy_folder
             },
             'message': f'Saved as {copy_name}',
             'time_seconds': round(elapsed, 2)

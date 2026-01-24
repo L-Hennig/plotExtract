@@ -1,0 +1,867 @@
+
+You have access to:
+- Plot image
+- Accumulated facts (curve definitions, colours/line/marker, expected trends when available)
+- Stage 6 output JSON containing re-extraction requests
+
+ACCUMULATED FACTS:
+{
+  "article_info": {
+    "figure_id": "GA",
+    "axis_definitions": {
+      "x_axis": {
+        "quantity": "Time",
+        "unit": "hours"
+      },
+      "y_axis": {
+        "quantity": "Bacterial Count",
+        "unit": "CFU/mL"
+      }
+    },
+    "curve_legend": [
+      {
+        "curve_label": "Condition 1",
+        "description": "growth (increasing)",
+        "expected_trend": "growth/increase"
+      },
+      {
+        "curve_label": "Condition 2",
+        "description": "stable (flat)"
+      },
+      {
+        "curve_label": "Condition 3",
+        "description": "kill (decreasing)",
+        "expected_trend": "kill/decrease"
+      },
+      {
+        "curve_label": "Condition 4",
+        "description": ""
+      },
+      {
+        "curve_label": "Condition 5",
+        "description": ""
+      },
+      {
+        "curve_label": "Condition 6",
+        "description": ""
+      }
+    ]
+  },
+  "plot_type_facts": {
+    "declared_in_article_info": "unknown",
+    "visually_verified": true,
+    "plot_type": "time-kill plot",
+    "confidence": 0.9,
+    "reason": "x-axis represents time in hours, y-axis represents bacterial count in CFU/mL (log10 scale), and multiple curves with distinct line/marker styles indicate bacterial growth or kill over time. Visual verification aligns with expected time-kill plot characteristics."
+  },
+  "axis_facts": {
+    "x_axis": {
+      "quantity": "Time",
+      "unit": "hours",
+      "discrete": false,
+      "lower_plausible_limit": 0,
+      "upper_plausible_limit": 26,
+      "ticks_verified": [
+        0,
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        14,
+        16,
+        18,
+        20,
+        22,
+        24
+      ],
+      "tick_labels": [
+        "0",
+        "2",
+        "4",
+        "6",
+        "8",
+        "10",
+        "12",
+        "14",
+        "16",
+        "18",
+        "20",
+        "22",
+        "24"
+      ],
+      "breaks": [],
+      "confidence": 0.98
+    },
+    "y_axis": {
+      "quantity": "Bacterial Count",
+      "unit": "CFU/mL",
+      "scale": "log10",
+      "upper_plausible_limit": 10,
+      "lower_plausible_limit": 0,
+      "ticks_verified": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "tick_labels": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10"
+      ],
+      "breaks": [],
+      "grid": {
+        "present": false,
+        "aligned_y_ticks": [],
+        "aligned_x_ticks": []
+      },
+      "confidence": 0.95
+    }
+  },
+  "curve_style_facts": {
+    "curves": [
+      {
+        "curve_label": "Condition 1",
+        "colour": "#000000",
+        "line_type": "solid",
+        "marker_symbol": "square",
+        "source": "figure_legend",
+        "confidence": 1
+      },
+      {
+        "curve_label": "Condition 2",
+        "colour": "#000000",
+        "line_type": "dashed",
+        "marker_symbol": "triangle_up",
+        "source": "figure_legend",
+        "confidence": 1
+      },
+      {
+        "curve_label": "Condition 3",
+        "colour": "#000000",
+        "line_type": "dotted",
+        "marker_symbol": "circle",
+        "source": "figure_legend",
+        "confidence": 1
+      },
+      {
+        "curve_label": "Condition 4",
+        "colour": "#000000",
+        "line_type": "solid",
+        "marker_symbol": "circle",
+        "source": "direct_visual",
+        "confidence": 0.98
+      },
+      {
+        "curve_label": "Condition 5",
+        "colour": "#000000",
+        "line_type": "dotted",
+        "marker_symbol": "triangle_down",
+        "source": "direct_visual",
+        "confidence": 0.98
+      },
+      {
+        "curve_label": "Condition 6",
+        "colour": "#000000",
+        "line_type": "dashed",
+        "marker_symbol": "square",
+        "source": "direct_visual",
+        "confidence": 0.98
+      }
+    ]
+  },
+  "marker_facts": {
+    "markers_detected": true,
+    "curves": [
+      {
+        "curve_label": "Condition 1",
+        "points": [
+          {
+            "x": 0,
+            "y": 6.0,
+            "confidence": 0.95
+          },
+          {
+            "x": 2,
+            "y": 7.9,
+            "confidence": 0.95
+          },
+          {
+            "x": 4,
+            "y": 8.2,
+            "confidence": 0.95
+          },
+          {
+            "x": 6,
+            "y": 8.3,
+            "confidence": 0.95
+          },
+          {
+            "x": 8,
+            "y": 8.3,
+            "confidence": 0.95
+          },
+          {
+            "x": 10,
+            "y": 8.4,
+            "confidence": 0.95
+          },
+          {
+            "x": 12,
+            "y": 8.3,
+            "confidence": 0.95
+          },
+          {
+            "x": 24,
+            "y": 8.3,
+            "confidence": 0.95
+          }
+        ]
+      },
+      {
+        "curve_label": "Condition 2",
+        "points": [
+          {
+            "x": 0,
+            "y": 6.0,
+            "confidence": 0.95
+          },
+          {
+            "x": 2,
+            "y": 8.3,
+            "confidence": 0.95
+          },
+          {
+            "x": 4,
+            "y": 8.5,
+            "confidence": 0.95
+          },
+          {
+            "x": 6,
+            "y": 8.6,
+            "confidence": 0.95
+          },
+          {
+            "x": 8,
+            "y": 8.7,
+            "confidence": 0.95
+          },
+          {
+            "x": 10,
+            "y": 8.7,
+            "confidence": 0.95
+          },
+          {
+            "x": 12,
+            "y": 8.5,
+            "confidence": 0.95
+          },
+          {
+            "x": 24,
+            "y": 8.3,
+            "confidence": 0.95
+          }
+        ]
+      },
+      {
+        "curve_label": "Condition 3",
+        "points": [
+          {
+            "x": 0,
+            "y": 6.0,
+            "confidence": 0.95
+          },
+          {
+            "x": 2,
+            "y": 6.8,
+            "confidence": 0.95
+          },
+          {
+            "x": 4,
+            "y": 7.2,
+            "confidence": 0.95
+          },
+          {
+            "x": 6,
+            "y": 7.8,
+            "confidence": 0.95
+          },
+          {
+            "x": 8,
+            "y": 8.1,
+            "confidence": 0.95
+          },
+          {
+            "x": 10,
+            "y": 8.0,
+            "confidence": 0.95
+          },
+          {
+            "x": 12,
+            "y": 7.8,
+            "confidence": 0.95
+          },
+          {
+            "x": 14,
+            "y": 7.7,
+            "confidence": 0.95
+          },
+          {
+            "x": 24,
+            "y": 8.0,
+            "confidence": 0.95
+          }
+        ]
+      },
+      {
+        "curve_label": "Condition 4",
+        "points": [
+          {
+            "x": 0,
+            "y": 6.0,
+            "confidence": 0.95
+          },
+          {
+            "x": 2,
+            "y": 1.0,
+            "confidence": 0.95
+          },
+          {
+            "x": 4,
+            "y": 0.7,
+            "confidence": 0.95
+          },
+          {
+            "x": 6,
+            "y": 1.0,
+            "confidence": 0.95
+          },
+          {
+            "x": 8,
+            "y": 1.5,
+            "confidence": 0.95
+          },
+          {
+            "x": 10,
+            "y": 1.7,
+            "confidence": 0.95
+          },
+          {
+            "x": 12,
+            "y": 1.5,
+            "confidence": 0.95
+          },
+          {
+            "x": 24,
+            "y": 2.0,
+            "confidence": 0.95
+          }
+        ]
+      },
+      {
+        "curve_label": "Condition 5",
+        "points": [
+          {
+            "x": 0,
+            "y": 6.0,
+            "confidence": 0.95
+          },
+          {
+            "x": 2,
+            "y": 1.5,
+            "confidence": 0.95
+          },
+          {
+            "x": 4,
+            "y": 1.0,
+            "confidence": 0.95
+          },
+          {
+            "x": 6,
+            "y": 2.5,
+            "confidence": 0.95
+          },
+          {
+            "x": 8,
+            "y": 1.8,
+            "confidence": 0.95
+          },
+          {
+            "x": 10,
+            "y": 1.5,
+            "confidence": 0.95
+          },
+          {
+            "x": 12,
+            "y": 1.7,
+            "confidence": 0.95
+          },
+          {
+            "x": 14,
+            "y": 1.8,
+            "confidence": 0.95
+          },
+          {
+            "x": 24,
+            "y": 1.5,
+            "confidence": 0.95
+          }
+        ]
+      },
+      {
+        "curve_label": "Condition 6",
+        "points": [
+          {
+            "x": 0,
+            "y": 6.0,
+            "confidence": 0.95
+          },
+          {
+            "x": 2,
+            "y": 1.0,
+            "confidence": 0.95
+          },
+          {
+            "x": 4,
+            "y": 0.7,
+            "confidence": 0.95
+          },
+          {
+            "x": 6,
+            "y": 0.7,
+            "confidence": 0.95
+          },
+          {
+            "x": 8,
+            "y": 0.7,
+            "confidence": 0.95
+          },
+          {
+            "x": 10,
+            "y": 0.7,
+            "confidence": 0.95
+          },
+          {
+            "x": 12,
+            "y": 0.7,
+            "confidence": 0.95
+          },
+          {
+            "x": 24,
+            "y": 0.7,
+            "confidence": 0.95
+          }
+        ]
+      }
+    ],
+    "csv_output": "Time (hours),log10 CFU/mL (Condition 1),Time (hours),log10 CFU/mL (Condition 2),Time (hours),log10 CFU/mL (Condition 3),Time (hours),log10 CFU/mL (Condition 4),Time (hours),log10 CFU/mL (Condition 5),Time (hours),log10 CFU/mL (Condition 6)\n0,6.0,0,6.0,0,6.0,0,6.0,0,6.0,0,6.0\n2,7.9,2,8.3,2,6.8,2,1.0,2,1.5,2,1.0\n4,8.2,4,8.5,4,7.2,4,0.7,4,1.0,4,0.7\n6,8.3,6,8.6,6,7.8,6,1.0,6,2.5,6,0.7\n8,8.3,8,8.7,8,8.1,8,1.5,8,1.8,8,0.7\n10,8.4,10,8.7,10,8.0,10,1.7,10,1.5,10,0.7\n12,8.3,12,8.5,12,7.8,12,1.5,12,1.7,12,0.7\n14,,14,,14,7.7,14,,14,1.8,14,,\n16,,16,,16,,16,,16,,16,,\n18,,18,,18,,18,,18,,18,,\n20,,20,,20,,20,,20,,20,,\n22,,22,,22,,22,,22,,22,,\n24,8.3,24,8.3,24,8.0,24,2.0,24,1.5,24,0.7",
+    "confidence": 0.95
+  },
+  "re_extraction": {
+    "requests": [
+      {
+        "curve_label": "Condition 1",
+        "issue_type": "truncation",
+        "target_times_hours": [
+          14,
+          24
+        ],
+        "expected_trend": "growth/increase",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 9,
+          "times_missing": [
+            14.0
+          ],
+          "pct_increasing": 0.8,
+          "pct_decreasing": 0.2,
+          "baseline_delta_from_median": -2.3000000000000007,
+          "largest_jump": {
+            "abs_jump": 1.9000000000000004,
+            "from_time": 0.0,
+            "to_time": 2.0,
+            "delta": 1.9000000000000004
+          }
+        },
+        "visual_guidance": "Check for the solid line with square markers at 14 hours, ensuring continuity with the increasing trend."
+      },
+      {
+        "curve_label": "Condition 2",
+        "issue_type": "truncation",
+        "target_times_hours": [
+          14,
+          24
+        ],
+        "expected_trend": "stable (flat)",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 9,
+          "times_missing": [
+            14.0
+          ],
+          "pct_increasing": 0.6666666666666666,
+          "pct_decreasing": 0.3333333333333333,
+          "baseline_delta_from_median": -2.5,
+          "largest_jump": {
+            "abs_jump": 2.3000000000000007,
+            "from_time": 0.0,
+            "to_time": 2.0,
+            "delta": 2.3000000000000007
+          }
+        },
+        "visual_guidance": "Check for the dashed line with triangle_up markers at 14 hours, ensuring it remains flat."
+      },
+      {
+        "curve_label": "Condition 4",
+        "issue_type": "truncation",
+        "target_times_hours": [
+          14,
+          24
+        ],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 9,
+          "times_missing": [
+            14.0
+          ],
+          "pct_increasing": 0.5714285714285714,
+          "pct_decreasing": 0.42857142857142855,
+          "baseline_delta_from_median": 4.5,
+          "largest_jump": {
+            "abs_jump": 5.0,
+            "from_time": 0.0,
+            "to_time": 2.0,
+            "delta": -5.0
+          }
+        },
+        "visual_guidance": "Check for the solid line with circle markers at 14 hours, ensuring continuity with the observed pattern."
+      },
+      {
+        "curve_label": "Condition 6",
+        "issue_type": "truncation",
+        "target_times_hours": [
+          14,
+          24
+        ],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 9,
+          "times_missing": [
+            14.0
+          ],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 1.0,
+          "baseline_delta_from_median": 5.3,
+          "largest_jump": {
+            "abs_jump": 5.0,
+            "from_time": 0.0,
+            "to_time": 2.0,
+            "delta": -5.0
+          }
+        },
+        "visual_guidance": "Check for the dashed line with square markers at 14 hours, ensuring continuity with the flat trend."
+      },
+      {
+        "curve_label": "Condition 4",
+        "issue_type": "bad_intercept",
+        "target_times_hours": [
+          0,
+          2
+        ],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 9,
+          "times_missing": [
+            14.0
+          ],
+          "pct_increasing": 0.5714285714285714,
+          "pct_decreasing": 0.42857142857142855,
+          "baseline_delta_from_median": 4.5,
+          "largest_jump": {
+            "abs_jump": 5.0,
+            "from_time": 0.0,
+            "to_time": 2.0,
+            "delta": -5.0
+          }
+        },
+        "visual_guidance": "Re-check the solid line with circle markers at time 0 and 2 hours, ensuring the initial drop is accurate."
+      },
+      {
+        "curve_label": "Condition 5",
+        "issue_type": "bad_intercept",
+        "target_times_hours": [
+          0,
+          2
+        ],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 9,
+          "expected_n_points": 9,
+          "times_missing": [],
+          "pct_increasing": 0.375,
+          "pct_decreasing": 0.625,
+          "baseline_delta_from_median": 4.3,
+          "largest_jump": {
+            "abs_jump": 4.5,
+            "from_time": 0.0,
+            "to_time": 2.0,
+            "delta": -4.5
+          }
+        },
+        "visual_guidance": "Re-check the dotted line with triangle_down markers at time 0 and 2 hours, ensuring the initial drop is accurate."
+      },
+      {
+        "curve_label": "Condition 6",
+        "issue_type": "bad_intercept",
+        "target_times_hours": [
+          0,
+          2
+        ],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 9,
+          "times_missing": [
+            14.0
+          ],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 1.0,
+          "baseline_delta_from_median": 5.3,
+          "largest_jump": {
+            "abs_jump": 5.0,
+            "from_time": 0.0,
+            "to_time": 2.0,
+            "delta": -5.0
+          }
+        },
+        "visual_guidance": "Re-check the dashed line with square markers at time 0 and 2 hours, ensuring the initial drop is accurate."
+      },
+      {
+        "curve_label": "Condition 3",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [
+          0,
+          2,
+          10,
+          12,
+          14,
+          24
+        ],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 9,
+          "expected_n_points": 9,
+          "times_missing": [],
+          "pct_increasing": 0.625,
+          "pct_decreasing": 0.375,
+          "baseline_delta_from_median": -1.7999999999999998,
+          "largest_jump": {
+            "abs_jump": 0.7999999999999998,
+            "from_time": 0.0,
+            "to_time": 2.0,
+            "delta": 0.7999999999999998
+          }
+        },
+        "visual_guidance": "Re-check the dotted line with circle markers, focusing on the decreasing trend expected for a kill condition."
+      }
+    ]
+  }
+}
+
+STAGE 6 OUTPUT (RE-EXTRACTION REQUESTS):
+```json
+{
+  "re_extraction": {
+    "requests": [
+      {
+        "curve_label": "Condition 1",
+        "issue_type": "truncation",
+        "target_times_hours": [14, 24],
+        "expected_trend": "growth/increase",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 9,
+          "times_missing": [14.0],
+          "pct_increasing": 0.8,
+          "pct_decreasing": 0.2,
+          "baseline_delta_from_median": -2.3000000000000007,
+          "largest_jump": {"abs_jump": 1.9000000000000004, "from_time": 0.0, "to_time": 2.0, "delta": 1.9000000000000004}
+        },
+        "visual_guidance": "Check for the solid line with square markers at 14 hours, ensuring continuity with the increasing trend."
+      },
+      {
+        "curve_label": "Condition 2",
+        "issue_type": "truncation",
+        "target_times_hours": [14, 24],
+        "expected_trend": "stable (flat)",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 9,
+          "times_missing": [14.0],
+          "pct_increasing": 0.6666666666666666,
+          "pct_decreasing": 0.3333333333333333,
+          "baseline_delta_from_median": -2.5,
+          "largest_jump": {"abs_jump": 2.3000000000000007, "from_time": 0.0, "to_time": 2.0, "delta": 2.3000000000000007}
+        },
+        "visual_guidance": "Check for the dashed line with triangle_up markers at 14 hours, ensuring it remains flat."
+      },
+      {
+        "curve_label": "Condition 4",
+        "issue_type": "truncation",
+        "target_times_hours": [14, 24],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 9,
+          "times_missing": [14.0],
+          "pct_increasing": 0.5714285714285714,
+          "pct_decreasing": 0.42857142857142855,
+          "baseline_delta_from_median": 4.5,
+          "largest_jump": {"abs_jump": 5.0, "from_time": 0.0, "to_time": 2.0, "delta": -5.0}
+        },
+        "visual_guidance": "Check for the solid line with circle markers at 14 hours, ensuring continuity with the observed pattern."
+      },
+      {
+        "curve_label": "Condition 6",
+        "issue_type": "truncation",
+        "target_times_hours": [14, 24],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 9,
+          "times_missing": [14.0],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 1.0,
+          "baseline_delta_from_median": 5.3,
+          "largest_jump": {"abs_jump": 5.0, "from_time": 0.0, "to_time": 2.0, "delta": -5.0}
+        },
+        "visual_guidance": "Check for the dashed line with square markers at 14 hours, ensuring continuity with the flat trend."
+      },
+      {
+        "curve_label": "Condition 4",
+        "issue_type": "bad_intercept",
+        "target_times_hours": [0, 2],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 9,
+          "times_missing": [14.0],
+          "pct_increasing": 0.5714285714285714,
+          "pct_decreasing": 0.42857142857142855,
+          "baseline_delta_from_median": 4.5,
+          "largest_jump": {"abs_jump": 5.0, "from_time": 0.0, "to_time": 2.0, "delta": -5.0}
+        },
+        "visual_guidance": "Re-check the solid line with circle markers at time 0 and 2 hours, ensuring the initial drop is accurate."
+      },
+      {
+        "curve_label": "Condition 5",
+        "issue_type": "bad_intercept",
+        "target_times_hours": [0, 2],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 9,
+          "expected_n_points": 9,
+          "times_missing": [],
+          "pct_increasing": 0.375,
+          "pct_decreasing": 0.625,
+          "baseline_delta_from_median": 4.3,
+          "largest_jump": {"abs_jump": 4.5, "from_time": 0.0, "to_time": 2.0, "delta": -4.5}
+        },
+        "visual_guidance": "Re-check the dotted line with triangle_down markers at time 0 and 2 hours, ensuring the initial drop is accurate."
+      },
+      {
+        "curve_label": "Condition 6",
+        "issue_type": "bad_intercept",
+        "target_times_hours": [0, 2],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 9,
+          "times_missing": [14.0],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 1.0,
+          "baseline_delta_from_median": 5.3,
+          "largest_jump": {"abs_jump": 5.0, "from_time": 0.0, "to_time": 2.0, "delta": -5.0}
+        },
+        "visual_guidance": "Re-check the dashed line with square markers at time 0 and 2 hours, ensuring the initial drop is accurate."
+      },
+      {
+        "curve_label": "Condition 3",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [0, 2, 10, 12, 14, 24],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 9,
+          "expected_n_points": 9,
+          "times_missing": [],
+          "pct_increasing": 0.625,
+          "pct_decreasing": 0.375,
+          "baseline_delta_from_median": -1.7999999999999998,
+          "largest_jump": {"abs_jump": 0.7999999999999998, "from_time": 0.0, "to_time": 2.0, "delta": 0.7999999999999998}
+        },
+        "visual_guidance": "Re-check the dotted line with circle markers, focusing on the decreasing trend expected for a kill condition."
+      }
+    ]
+  }
+}
+```
+
+---
+
+STAGE 7 — RE-EXTRACTION (TARGETED POINTS ONLY)
+
+GOAL:
+Re-extract ONLY the specified (curve_id, time_hours) points.
+
+HARD RULES:
+- Do NOT add new time points.
+- Do NOT add points for curves not requested.
+- Use curve definitions (colour/line/marker) from accumulated facts to select the correct curve.
+- If a curve is ambiguous (overlap/crossing), lower confidence and explain why in ONE short note.
+- Output JSON only. No extra text. No backticks.
+
+METHOD (for each request):
+1) Locate the curve (use colour/line/marker) and ensure continuity from nearby points.
+2) Locate the specified x-value (time in hours) and read the y-value precisely.
+3) Sanity check: compare against adjacent extracted points from the original CSV and/or expected trend.
+4) Record only the corrected value.
+
+OUTPUT JSON SCHEMA (MERGE INTO ACCUMULATED FACTS):
+{
+  "re_extraction": {
+    "results": [
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 6,
+        "new_log10_cfu_ml": 5.2,
+        "confidence": "high | medium | low",
+        "reason": "One short sentence: what was fixed (e.g., wrong curve / wrong decade / truncation).",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "short phrase"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,73 @@
+Time (hours),log10 CFU/mL (Condition 1),Time (hours),log10 CFU/mL (Condition 2),Time (hours),log10 CFU/mL (Condition 3),Time (hours),log10 CFU/mL (Condition 4)
+0,6.1,0,6.0,0,6.0,0,7.0
+2,,2,2.5,2,3.5,2,8.0
+4,7.5,4,2.5,4,3.2,4,8.3
+6,7.8,6,2.3,6,3.3,6,8.2
+8,8.0,8,,8,3.5,8,8.3
+10,8.3,10,,10,3.8,10,8.2
+12,8.5,12,,12,4.0,12,8.1
+14,,14,,14,4.3,14,
+24,9.3,24,1.5,24,6.8,24,8.2
+"declared_in_article_info": "unknown",
+"visually_verified": true,
+"plot_type": "time-kill plot",
+"confidence": 0.9,
+"reason": "The x-axis represents time in hours, and the y-axis represents bacterial count (CFU/mL) on a log10 scale, which are typical characteristics of a time-kill plot. Multiple curves with distinct markers indicate different experimental conditions, consistent with time-kill assay visualization."
+},
+"quantity": "time",
+"unit": "hours",
+"discrete": false,
+"lower_plausible_limit": 0,
+"upper_plausible_limit": 26,
+"ticks_verified": [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
+"tick_labels": ["0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22", "24"],
+"breaks": [],
+},
+"quantity": "bacterial count",
+"unit": "log10 CFU/mL",
+"scale": "log10",
+"upper_plausible_limit": 10,
+"lower_plausible_limit": 0,
+"ticks_verified": [0, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+"tick_labels": ["0", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+"breaks": [],
+},
+"markers_detected": true,
+"curve_label": "Condition 1",
+{"x": 0, "y": 6.1},
+{"x": 4, "y": 7.5},
+{"x": 6, "y": 7.8},
+{"x": 8, "y": 8.0},
+{"x": 10, "y": 8.3},
+{"x": 12, "y": 8.5},
+{"x": 24, "y": 9.3}
+},
+"curve_label": "Condition 2",
+{"x": 0, "y": 6.0},
+{"x": 2, "y": 2.5},
+{"x": 4, "y": 2.5},
+{"x": 6, "y": 2.3},
+{"x": 24, "y": 1.5}
+},
+"curve_label": "Condition 3",
+{"x": 0, "y": 6.0},
+{"x": 2, "y": 3.5},
+{"x": 4, "y": 3.2},
+{"x": 6, "y": 3.3},
+{"x": 8, "y": 3.5},
+{"x": 10, "y": 3.8},
+{"x": 12, "y": 4.0},
+{"x": 14, "y": 4.3},
+{"x": 24, "y": 6.8}
+},
+"curve_label": "Condition 4",
+{"x": 0, "y": 7.0},
+{"x": 2, "y": 8.0},
+{"x": 4, "y": 8.3},
+{"x": 6, "y": 8.2},
+{"x": 8, "y": 8.3},
+{"x": 10, "y": 8.2},
+{"x": 12, "y": 8.1},
+{"x": 24, "y": 8.2}
+],
+"csv_output": "Time (hours),log10 CFU/mL (Condition 1),Time (hours),log10 CFU/mL (Condition 2),Time (hours),log10 CFU/mL (Condition 3),Time (hours),log10 CFU/mL (Condition 4)\n0,6.1,0,6.0,0,6.0,0,7.0\n2,,2,2.5,2,3.5,2,8.0\n4,7.5,4,2.5,4,3.2,4,8.3\n6,7.8,6,2.3,6,3.3,6,8.2\n8,8.0,8,,8,3.5,8,8.3\n10,8.3,10,,10,3.8,10,8.2\n12,8.5,12,,12,4.0,12,8.1\n14,,14,,14,4.3,14,\n24,9.3,24,1.5,24,6.8,24,8.2",

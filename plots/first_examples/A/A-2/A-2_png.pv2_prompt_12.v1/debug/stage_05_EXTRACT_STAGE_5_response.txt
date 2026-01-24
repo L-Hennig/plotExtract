@@ -1,0 +1,123 @@
+```json
+{
+  "marker_facts": {
+    "markers_detected": true,
+    "curves": [
+      {
+        "curve_label": "Blank",
+        "points": [
+          {"x": 0, "y": 6, "confidence": 1},
+          {"x": 2, "y": 9, "confidence": 1},
+          {"x": 4, "y": 10, "confidence": 1},
+          {"x": 6, "y": 12, "confidence": 1},
+          {"x": 8, "y": 13, "confidence": 1},
+          {"x": 10, "y": 14, "confidence": 1},
+          {"x": 12, "y": 14.5, "confidence": 1},
+          {"x": 24, "y": 15, "confidence": 1},
+          {"x": 26, "y": 15.5, "confidence": 1}
+        ]
+      },
+      {
+        "curve_label": "COL 0.25µg/mL",
+        "points": [
+          {"x": 0, "y": 6, "confidence": 1},
+          {"x": 2, "y": 4.5, "confidence": 1},
+          {"x": 4, "y": 4, "confidence": 1},
+          {"x": 6, "y": 4, "confidence": 1},
+          {"x": 8, "y": 4.5, "confidence": 1},
+          {"x": 10, "y": 4.5, "confidence": 1},
+          {"x": 12, "y": 5, "confidence": 1},
+          {"x": 24, "y": 7, "confidence": 1},
+          {"x": 26, "y": 8, "confidence": 1}
+        ]
+      },
+      {
+        "curve_label": "MEM 8µg/mL",
+        "points": [
+          {"x": 0, "y": 6, "confidence": 1},
+          {"x": 2, "y": 8, "confidence": 1},
+          {"x": 4, "y": 10, "confidence": 1},
+          {"x": 6, "y": 11, "confidence": 1},
+          {"x": 8, "y": 11.5, "confidence": 1},
+          {"x": 10, "y": 12, "confidence": 1},
+          {"x": 12, "y": 1, "confidence": 1},
+          {"x": 24, "y": 1, "confidence": 1},
+          {"x": 26, "y": 1, "confidence": 1}
+        ]
+      },
+      {
+        "curve_label": "MINO 1µg/mL",
+        "points": [
+          {"x": 0, "y": 6, "confidence": 1},
+          {"x": 2, "y": 1, "confidence": 1},
+          {"x": 4, "y": 1, "confidence": 1},
+          {"x": 6, "y": 1, "confidence": 1},
+          {"x": 8, "y": 1, "confidence": 1},
+          {"x": 10, "y": 1, "confidence": 1},
+          {"x": 12, "y": 1, "confidence": 1},
+          {"x": 24, "y": 3, "confidence": 1},
+          {"x": 26, "y": 4, "confidence": 1}
+        ]
+      },
+      {
+        "curve_label": "RFP 0.06µg/mL",
+        "points": [
+          {"x": 0, "y": 6, "confidence": 1},
+          {"x": 2, "y": 9, "confidence": 1},
+          {"x": 4, "y": 10, "confidence": 1},
+          {"x": 6, "y": 11, "confidence": 1},
+          {"x": 8, "y": 11, "confidence": 1},
+          {"x": 10, "y": 11.5, "confidence": 1},
+          {"x": 12, "y": 12, "confidence": 1},
+          {"x": 24, "y": 1, "confidence": 1},
+          {"x": 26, "y": 1, "confidence": 1}
+        ]
+      },
+      {
+        "curve_label": "COL 0.25µg/mL + MEM 8µg/mL",
+        "points": [
+          {"x": 0, "y": 6, "confidence": 1},
+          {"x": 2, "y": 0, "confidence": 1},
+          {"x": 4, "y": 0, "confidence": 1},
+          {"x": 6, "y": 0, "confidence": 1},
+          {"x": 8, "y": 0, "confidence": 1},
+          {"x": 10, "y": 0, "confidence": 1},
+          {"x": 12, "y": 0, "confidence": 1},
+          {"x": 24, "y": 0, "confidence": 1},
+          {"x": 26, "y": 0, "confidence": 1}
+        ]
+      },
+      {
+        "curve_label": "COL 0.25µg/mL + MINO 1µg/mL",
+        "points": [
+          {"x": 0, "y": 6, "confidence": 1},
+          {"x": 2, "y": 0, "confidence": 1},
+          {"x": 4, "y": 0, "confidence": 1},
+          {"x": 6, "y": 0, "confidence": 1},
+          {"x": 8, "y": 0, "confidence": 1},
+          {"x": 10, "y": 0, "confidence": 1},
+          {"x": 12, "y": 0, "confidence": 1},
+          {"x": 24, "y": 0, "confidence": 1},
+          {"x": 26, "y": 0, "confidence": 1}
+        ]
+      },
+      {
+        "curve_label": "COL 0.25µg/mL + RFP 0.06µg/mL",
+        "points": [
+          {"x": 0, "y": 6, "confidence": 1},
+          {"x": 2, "y": 0, "confidence": 1},
+          {"x": 4, "y": 0, "confidence": 1},
+          {"x": 6, "y": 0, "confidence": 1},
+          {"x": 8, "y": 0, "confidence": 1},
+          {"x": 10, "y": 0, "confidence": 1},
+          {"x": 12, "y": 0, "confidence": 1},
+          {"x": 24, "y": 0, "confidence": 1},
+          {"x": 26, "y": 3, "confidence": 1}
+        ]
+      }
+    ],
+    "csv_output": "Time (hours),Log cfu/mL (Blank),Time (hours),Log cfu/mL (COL 0.25µg/mL),Time (hours),Log cfu/mL (MEM 8µg/mL),Time (hours),Log cfu/mL (MINO 1µg/mL),Time (hours),Log cfu/mL (RFP 0.06µg/mL),Time (hours),Log cfu/mL (COL 0.25µg/mL + MEM 8µg/mL),Time (hours),Log cfu/mL (COL 0.25µg/mL + MINO 1µg/mL),Time (hours),Log cfu/mL (COL 0.25µg/mL + RFP 0.06µg/mL)\n0,6,0,6,0,6,0,6,0,6,0,6,0,6,0,6\n2,9,2,4.5,2,8,2,1,2,9,2,0,2,0,2,0\n4,10,4,4,4,10,4,1,4,10,4,0,4,0,4,0\n6,12,6,4,6,11,6,1,6,11,6,0,6,0,6,0\n8,13,8,4.5,8,11.5,8,1,8,11,8,0,8,0,8,0\n10,14,10,4.5,10,12,10,1,10,11.5,10,0,10,0,10,0\n12,14.5,12,5,12,1,12,1,12,12,12,0,12,0,12,0\n24,15,24,7,24,1,24,3,24,1,24,0,24,0,24,0\n26,15.5,26,8,26,1,26,4,26,1,26,0,26,0,26,3",
+    "confidence": 1
+  }
+}
+```

@@ -1,0 +1,205 @@
+{
+  "status": "complete",
+  "stage": "COMPLETE",
+  "stage_index": 5,
+  "total_stages": 5,
+  "percentage": 100.0,
+  "accumulated_facts": {
+    "plot_type_facts": {
+      "declared_in_article_info": "unknown",
+      "visually_verified": true,
+      "plot_type": "time-kill plot",
+      "confidence": 0.8,
+      "reason": "The x-axis represents time in hours, and the y-axis represents bacterial count (CFU/mL) on a log10 scale, which are key indicators of a time-kill plot. Multiple timepoints with consistent markers and a single curve further support this classification. No contradictory information was found in the figure caption or axis labels."
+    },
+    "axis_facts": {
+      "x_axis": {
+        "quantity": "time",
+        "unit": "hours",
+        "discrete": false,
+        "lower_plausible_limit": 0,
+        "upper_plausible_limit": 26,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          24
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "24"
+        ],
+        "breaks": [
+          {
+            "start": 12,
+            "end": 20,
+            "reason": "Non-uniform tick spacing indicating a break or skipped timepoints for clarity"
+          }
+        ],
+        "confidence": 0.95
+      },
+      "y_axis": {
+        "quantity": "bacterial count",
+        "unit": "CFU/mL",
+        "scale": "log10",
+        "upper_plausible_limit": 10,
+        "lower_plausible_limit": 0,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10"
+        ],
+        "breaks": [],
+        "confidence": 0.95
+      }
+    },
+    "marker_facts": {
+      "markers_detected": true,
+      "curves": [
+        {
+          "curve_label": "Condition 1",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 2,
+              "y": 5.9,
+              "confidence": 0.95
+            },
+            {
+              "x": 4,
+              "y": 5.8,
+              "confidence": 0.95
+            },
+            {
+              "x": 6,
+              "y": 5.75,
+              "confidence": 0.95
+            },
+            {
+              "x": 8,
+              "y": 5.7,
+              "confidence": 0.95
+            },
+            {
+              "x": 10,
+              "y": 5.7,
+              "confidence": 0.95
+            },
+            {
+              "x": 12,
+              "y": 5.65,
+              "confidence": 0.95
+            },
+            {
+              "x": 24,
+              "y": 5.4,
+              "confidence": 0.95
+            }
+          ]
+        }
+      ],
+      "csv_output": "Time (hours),Bacterial Count (log10 CFU/mL) (Condition 1)\n0,6.0\n2,5.9\n4,5.8\n6,5.75\n8,5.7\n10,5.7\n12,5.65\n24,5.4",
+      "confidence": 0.95
+    },
+    "accumulated_facts": {
+      "plot_type_facts": {
+        "declared_in_article_info": "unknown",
+        "visually_verified": true,
+        "plot_type": "time-kill plot",
+        "confidence": 0.8,
+        "reason": "The x-axis represents time in hours, and the y-axis represents bacterial count (CFU/mL) on a log10 scale, which are key indicators of a time-kill plot. Multiple timepoints with consistent markers and a single curve further support this classification. No contradictory information was found in the figure caption or axis labels."
+      },
+      "axis_facts": {
+        "x_axis": {
+          "quantity": "time",
+          "unit": "hours",
+          "discrete": false,
+          "lower_plausible_limit": 0,
+          "upper_plausible_limit": 26,
+          "ticks_verified": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            24
+          ],
+          "tick_labels": [
+            "0",
+            "2",
+            "4",
+            "6",
+            "8",
+            "10",
+            "12",
+            "24"
+          ],
+          "breaks": [
+            {
+              "start": 12,
+              "end": 20,
+              "reason": "Non-uniform tick spacing indicating a break or skipped timepoints for clarity"
+            }
+          ],
+          "confidence": 0.95
+        },
+        "y_axis": {
+          "quantity": "bacterial count",
+          "unit": "CFU/mL",
+          "scale": "log10",
+          "upper_plausible_limit": 10,
+          "lower_plausible_limit": 0,
+          "ticks_verified": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10
+          ],
+          "tick_labels": [
+            "0",
+            "2",
+            "4",
+            "6",
+            "8",
+            "10"
+          ],
+          "breaks": [],
+          "confidence": 0.95
+        }
+      }
+    },
+    "validation_flags": []
+  },
+  "stage_duration_ms": 0,
+  "timestamp": 1768546126.7473955,
+  "console_output": "Extraction completed successfully"
+}

@@ -1,0 +1,82 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+data = {
+    "Blank": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.2, 9.5, 10.0, 10.0, 10.0, 10.5, 9.5, 9.0]
+    },
+    "COL 0.125µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.2, 7.0, 8.0, 9.0, 9.5, 10.0, 10.0, 10.0]
+    },
+    "MINO 1µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.2, 8.0, 8.5, 9.0, 9.5, 9.5, 9.0, 8.5]
+    },
+    "COL 0.125µg/mL + MEM 4µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    },
+    "COL 0.125µg/mL + MINO 1µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    },
+    "MEM 4µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 6.2, 0.5, 1.0, 1.5, 2.0, 1.5, 1.0, 0.0]
+    },
+    "RFP 0.06µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.2, 8.5, 9.0, 9.5, 10.0, 10.0, 10.0, 9.5]
+    },
+    "COL 0.125µg/mL + RFP 0.06µg/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.2, 0.0, 1.0, 1.5, 2.0, 1.0, 0.0, 0.0]
+    }
+}
+
+# Correct MEM 4µg/mL data (remove duplicate 6.2)
+data["MEM 4µg/mL"]["x"] = [0, 2, 4, 6, 8, 10, 12, 24]
+data["MEM 4µg/mL"]["y"] = [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+# Line styles, markers, and colors
+styles = {
+    "Blank": {"linestyle": "--", "marker": "x", "color": "black"},
+    "COL 0.125µg/mL": {"linestyle": "-", "marker": "s", "color": "black"},
+    "MINO 1µg/mL": {"linestyle": "--", "marker": "^", "color": "black"},
+    "COL 0.125µg/mL + MEM 4µg/mL": {"linestyle": "-.", "marker": "o", "color": "black"},
+    "COL 0.125µg/mL + MINO 1µg/mL": {"linestyle": "--", "marker": "D", "color": "black"},
+    "MEM 4µg/mL": {"linestyle": ":", "marker": "o", "color": "black"},
+    "RFP 0.06µg/mL": {"linestyle": ":", "marker": "v", "color": "black"},
+    "COL 0.125µg/mL + RFP 0.06µg/mL": {"linestyle": "--", "marker": "1", "color": "black"}
+}
+
+# Create the plot
+fig, ax = plt.subplots()
+
+# Plot each curve
+for label, values in data.items():
+    ax.plot(values["x"], values["y"],
+            linestyle=styles[label]["linestyle"],
+            marker=styles[label]["marker"],
+            color=styles[label]["color"],
+            label=label)
+
+# Set axis labels and limits
+ax.set_xlabel("Time (h)")
+ax.set_ylabel("Log cfu/mL")
+ax.set_xlim(0, 26)
+ax.set_ylim(0, 16)
+
+# Add legend
+ax.legend()
+
+# Ensure directory exists
+os.makedirs("C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\first_examples\\A\\A-1_png.p3.v1", exist_ok=True)
+
+# Save the plot
+plt.savefig("C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\first_examples\\A\\A-1_png.p3.v1\\A-1_png-replot.p3.v1.png")
+plt.close()

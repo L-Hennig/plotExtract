@@ -1,0 +1,72 @@
+```json
+{
+  "re_extraction": {
+    "requests": [
+      {
+        "curve_label": "Condition 1",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [0, 2, 4, 6, 24],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.8,
+          "pct_decreasing": 0.2,
+          "baseline_delta_from_median": -2.9499999999999993,
+          "largest_jump": {"abs_jump": 2.8000000000000007, "from_time": 4.0, "to_time": 6.0, "delta": 2.8000000000000007}
+        },
+        "visual_guidance": "Check for continuity with Condition 1's solid line and square markers; avoid sudden jumps inconsistent with bacterial growth trends."
+      },
+      {
+        "curve_label": "Condition 1",
+        "issue_type": "bad_intercept",
+        "target_times_hours": [0, 2],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.8,
+          "pct_decreasing": 0.2,
+          "baseline_delta_from_median": -2.9499999999999993,
+          "largest_jump": {"abs_jump": 2.8000000000000007, "from_time": 4.0, "to_time": 6.0, "delta": 2.8000000000000007}
+        },
+        "visual_guidance": "Re-check the starting bacterial count at time 0 for Condition 1; ensure it aligns with other conditions' baselines."
+      },
+      {
+        "curve_label": "Condition 3",
+        "issue_type": "midcurve_switch",
+        "target_times_hours": [8, 10, 12, 24],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.25,
+          "pct_decreasing": 0.75,
+          "baseline_delta_from_median": 2.6,
+          "largest_jump": {"abs_jump": 3.0, "from_time": 8.0, "to_time": 10.0, "delta": -3.0}
+        },
+        "visual_guidance": "Verify the sharp drop at 10 hours for Condition 3's dotted line and circle markers; ensure no misreading of log scale."
+      },
+      {
+        "curve_label": "Condition 4",
+        "issue_type": "bad_intercept",
+        "target_times_hours": [0, 2],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.6666666666666666,
+          "pct_decreasing": 0.3333333333333333,
+          "baseline_delta_from_median": -0.09999999999999964,
+          "largest_jump": {"abs_jump": 0.09999999999999964, "from_time": 0.0, "to_time": 2.0, "delta": -0.09999999999999964}
+        },
+        "visual_guidance": "Re-examine the starting bacterial count at time 0 for Condition 4; ensure it is consistent with other high-baseline conditions."
+      }
+    ]
+  }
+}
+```

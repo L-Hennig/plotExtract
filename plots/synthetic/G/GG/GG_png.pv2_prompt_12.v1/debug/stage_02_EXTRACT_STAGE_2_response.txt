@@ -1,0 +1,25 @@
+{
+  "axis_facts": {
+    "x_axis": {
+      "quantity": "Time",
+      "unit": "hours",
+      "discrete": false,
+      "lower_plausible_limit": 0,
+      "upper_plausible_limit": 26,
+      "ticks_verified": [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
+      "tick_labels": ["0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22", "24"],
+      "breaks": [],
+      "confidence": 0.98
+    },
+    "y_axis": {
+      "quantity": "Bacterial Count",
+      "unit": "CFU/mL",
+      "scale": "log10",
+      "upper_plausible_limit": 10,
+      "lower_plausible_limit": 0,
+      "ticks_verified": [],
+      "tick_labels": [],
+      "confidence": 1
+    }
+  }
+}

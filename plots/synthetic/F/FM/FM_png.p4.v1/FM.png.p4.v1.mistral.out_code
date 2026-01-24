@@ -1,0 +1,40 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time_cond1 = [0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24]
+count_cond1 = [6.0, 7.8, 8.3, 8.3, 8.4, 8.3, 8.3, 8.2, 8.2, 8.2, 8.2]
+
+time_cond2 = [0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24]
+count_cond2 = [6.0, 6.8, 7.2, 7.9, 8.2, 8.1, 1.8, 1.6, 1.5, 1.5, 1.6]
+
+time_cond3 = [0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24]
+count_cond3 = [6.0, 1.0, 0.8, 0.9, 0.8, 0.9, 0.8, np.nan, np.nan, np.nan, np.nan]
+
+time_cond4 = [0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24]
+count_cond4 = [6.0, 6.8, 7.3, 7.8, 8.1, 8.0, 8.0, 1.7, 1.6, 1.5, 1.6]
+
+time_cond5 = [0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24]
+count_cond5 = [6.0, 3.0, 2.8, 2.5, 2.3, 2.2, 2.1, 2.0, 1.5, 1.2, 1.0]
+
+# Plot
+plt.figure(figsize=(8, 6))
+plt.plot(time_cond1, count_cond1, 'k-s', label='Condition 1', markersize=6, linewidth=1.5)
+plt.plot(time_cond2, count_cond2, 'k--^', label='Condition 2', markersize=6, linewidth=1.5)
+plt.plot(time_cond3, count_cond3, 'k:o', label='Condition 3', markersize=6, linewidth=1.5)
+plt.plot(time_cond4, count_cond4, 'k-.d', label='Condition 4', markersize=6, linewidth=1.5)
+plt.plot(time_cond5, count_cond5, 'k-', label='Condition 5', marker='o', markersize=6, linewidth=1.5, markerfacecolor='none')
+
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+plt.ylim(0, 10)
+plt.xlim(0, 26)
+plt.yticks(np.arange(0, 11, 1))
+plt.xticks(np.arange(0, 27, 2))
+
+# Save plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\FM\FM_png.p4.v1"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "FM_png-replot.p4.v1.png"), dpi=300, bbox_inches='tight')
+plt.close()

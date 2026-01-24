@@ -1,0 +1,37 @@
+# Curve-by-curve statistics
+Curve 'blank' -> 'y-axis label (Blank)':
+  MAE: 0.040736
+  LeftMissed: 0.000000
+  RightMissed: -0.069930
+Curve 'COL 0.125µg/mL' -> 'y-axis label (COL 0.125µg/mL)':
+  MAE: 0.033843
+  LeftMissed: 0.000000
+  RightMissed: -0.069930
+Curve 'MINO 1µg/mL' -> 'y-axis label (MINO 1µg/mL)':
+  MAE: 0.076979
+  LeftMissed: 0.000000
+  RightMissed: -0.069930
+Curve 'COL 0.125µg/mL + MEM 4µg/mL' -> 'y-axis label (COL 0.125µg/mL + MEM 4µg/mL)':
+  MAE: 0.083445
+  LeftMissed: 0.000000
+  RightMissed: -0.069930
+Curve 'MEM 4µg/mL' -> 'y-axis label (RFP 0.06µg/mL)':
+  MAE: 0.203327
+  LeftMissed: 0.000000
+  RightMissed: -0.069930
+Curve 'RFP 0.06µg/mL' -> 'y-axis label (MEM 4µg/mL)':
+  MAE: 0.737794
+  LeftMissed: 0.000000
+  RightMissed: -0.069930
+Curve 'COL 0.125µg/mL + MINO 1µg/mL' -> 'y-axis label (COL 0.125µg/mL + MINO 1µg/mL)':
+  MAE: 0.044574
+  LeftMissed: 0.000000
+  RightMissed: -0.069930
+Curve 'COL 0.125µg/mL + RFP 0.06µg/mL' -> 'y-axis label (COL 0.125µg/mL + RFP 0.06µg/mL)':
+  MAE: 0.139229
+  LeftMissed: 0.000000
+  RightMissed: -0.069930
+
+# Summary
+Number of curves: 8
+Mean MAE: 0.169991

@@ -1,0 +1,41 @@
+import matplotlib.pyplot as plt
+import os
+
+# Data
+time_cond1 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu_cond1 = [6.1, 7.9, 8.3, 8.4, 8.3, 8.3, 8.2, 7.9]
+
+time_cond2 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu_cond2 = [6.2, 6.5, 5.7, 6.8, 6.8, 6.6, 5.9, 5.8]
+
+time_cond3 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu_cond3 = [5.8, 1.0, 1.0, 1.0, 1.0, 1.3, 1.0, 3.2]
+
+# Create directory if it doesn't exist
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\F\FD_png.p5.v1"
+os.makedirs(output_dir, exist_ok=True)
+
+# Plot settings
+plt.figure(figsize=(8, 6))
+plt.plot(time_cond1, cfu_cond1, 's-', color='black', label='Condition 1', markersize=8, linewidth=2)
+plt.plot(time_cond2, cfu_cond2, '^--', color='black', label='Condition 2', markersize=8, linewidth=2, markerfacecolor='none')
+plt.plot(time_cond3, cfu_cond3, 'o:', color='black', label='Condition 3', markersize=8, linewidth=2, markerfacecolor='none')
+
+# Axis labels and title
+plt.xlabel('Time (hours)', fontsize=12)
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)', fontsize=12)
+plt.yscale('log')
+plt.ylim(0.5, 10)
+plt.xlim(-1, 25)
+
+# Tick settings
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24], fontsize=10)
+plt.yticks([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'], fontsize=10)
+
+# Grid and legend
+plt.grid(False)
+plt.legend(loc='upper right', fontsize=10)
+
+# Save the plot
+plt.savefig(os.path.join(output_dir, "FD_png-replot.p5.v1.png"), bbox_inches='tight', dpi=300)
+plt.close()

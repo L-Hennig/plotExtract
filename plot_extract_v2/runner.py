@@ -12,10 +12,28 @@ import numpy as np
 from dotenv import load_dotenv
 from mistralai import Mistral
 import tempfile
+from typing import Optional
 
-# Import article info schema
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'prompts'))
-from complete_extraction_schema import ARTICLE_INFO_SCHEMA, SCHEMA_CONSTRAINTS
+# -----------------------------------------------------------------------------
+# Paths and imports that require sys.path adjustments
+# -----------------------------------------------------------------------------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
+PROMPTS_DIR = os.path.join(BASE_DIR, 'prompts')
+
+# Ensure imports work when running as a script (python plot_extract_v2/runner.py ...)
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+if PROMPTS_DIR not in sys.path:
+    sys.path.insert(0, PROMPTS_DIR)
+
+# Import complete schema + constraints
+from plot_extract_v2.prompts.complete_extraction_schema import (
+    ACCUMULATED_FACTS_SCHEMA,
+    SCHEMA_CONSTRAINTS,
+)
+
+from plot_extract_v2.stage6a_csv_diagnostics import compute_csv_diagnostics_from_text
 
 # Import extraction tracker
 from extraction_tracker import ExtractionTracker
@@ -24,6 +42,9 @@ from extraction_tracker import ExtractionTracker
 load_dotenv(override=True)
 API_KEY = os.getenv("API_KEY_1")
 
+# Debug mode (writes per-stage prompts/outputs to disk)
+DEBUG_VERBOSE = str(os.getenv("PLOTEXTRACT_DEBUG", "")).strip().lower() in {"1", "true", "yes", "on"}
+
 if len(sys.argv) < 3:
     print("Usage: python plot_extract_v2/runner.py <path_to_plot_image> <prompt_name> [article_info]\nError: Missing required argument. Please provide the path to the plot image and the prompt name (e.g., prompt_1).")
     sys.exit(1)
@@ -31,10 +52,6 @@ if len(sys.argv) < 3:
 input_plot = sys.argv[1]
 prompt_name = sys.argv[2]
 article_info_text = sys.argv[3] if len(sys.argv) > 3 else ""
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(BASE_DIR)
-PROMPTS_DIR = os.path.join(BASE_DIR, 'prompts')
 
 # -----------------------------------------------------------------------------
 # Helpers
@@ -49,20 +66,27 @@ def load_module(module_path):
 
 def save_stage_update(output_dir, stage_name, stage_index, total_stages, accumulated_facts, stage_time_ms, console_output=""):
     """Save real-time stage update for the web UI to poll.
-    
-    Creates a JSON file with current extraction progress, accumulated facts, and timing."""
+
+    Notes on semantics:
+    - `stage_index` represents the number of *completed* stages (0..total_stages).
+    - `stage` represents the current stage name (or the most recently completed stage).
+    - Progress percentage is derived only from completed stages.
+    """
     try:
         # Determine if this is a completion update.
         # IMPORTANT: Do not treat the last stage as "complete" because the pipeline still
         # performs post-processing after the stage loop (CSV finalization, replot, comparisons).
         is_complete = stage_name == "COMPLETE"
         
+        completed_stages = max(0, min(int(stage_index), int(total_stages))) if total_stages is not None else 0
+        percentage = round((completed_stages / total_stages) * 100, 1) if total_stages and total_stages > 0 else 0
+
         update_data = {
             "status": "complete" if is_complete else "running",
             "stage": stage_name,
-            "stage_index": stage_index,
+            "stage_index": completed_stages,
             "total_stages": total_stages,
-            "percentage": round((stage_index / total_stages) * 100, 1) if total_stages > 0 else 100,
+            "percentage": 100.0 if is_complete else percentage,
             "accumulated_facts": accumulated_facts,
             "stage_duration_ms": stage_time_ms,
             "timestamp": time.time(),
@@ -258,11 +282,24 @@ def create_Q_1p(convo):
 
 
 def prompt_mistral(client, messages):
+    # Prevent indefinite hangs (e.g. network stalls / provider queueing).
+    # Override per run with env var PLOTEXTRACT_MISTRAL_TIMEOUT_MS.
+    timeout_ms = None
+    try:
+        timeout_ms_env = os.getenv("PLOTEXTRACT_MISTRAL_TIMEOUT_MS")
+        if timeout_ms_env:
+            timeout_ms = int(timeout_ms_env)
+        else:
+            timeout_ms = 240_000  # 4 minutes
+    except Exception:
+        timeout_ms = 240_000
+
     response = client.chat.complete(
         model="mistral-large-2512",
         messages=messages,
         max_tokens=4096,
         temperature=0,
+        timeout_ms=timeout_ms,
     )
     return messages, response.choices[0].message.content
 
@@ -403,6 +440,13 @@ def rebuild_csv_from_json_curves(accumulated_facts):
     except Exception as e:
         print(f"Error rebuilding CSV from JSON: {e}")
         return None
+
+
+def _result_has_marker_facts(result_json) -> bool:
+    if not isinstance(result_json, dict):
+        return False
+    marker_facts = result_json.get("marker_facts")
+    return isinstance(marker_facts, dict)
 
 
 def normalize_csv_to_wide(csv_text: str) -> str:
@@ -600,6 +644,9 @@ except (FileNotFoundError, ValueError) as e:
 
 CHAIN_NAME = getattr(chain_module, "CHAIN_NAME", prompt_name)
 EXTRACT_STAGES = chain_module.EXTRACT_STAGES
+COMPLETE_SCHEMA = getattr(chain_module, "COMPLETE_SCHEMA", ACCUMULATED_FACTS_SCHEMA)
+COMPLETE_SCHEMA_CONSTRAINTS = getattr(chain_module, "COMPLETE_SCHEMA_CONSTRAINTS", SCHEMA_CONSTRAINTS)
+NO_IMAGE_STAGES = set(getattr(chain_module, "NO_IMAGE_STAGES", []))
 
 # Verify all stages exist in prompts module
 for stage_name in EXTRACT_STAGES:
@@ -720,8 +767,8 @@ article_info_json = ""
 if article_info_text:
     print("Preprocessing article information...")
     article_prompt = ARTICLE_INFO_PROMPT.format(
-        schema=ARTICLE_INFO_SCHEMA,
-        constraints=SCHEMA_CONSTRAINTS,
+        schema=COMPLETE_SCHEMA,
+        constraints=COMPLETE_SCHEMA_CONSTRAINTS,
         article_text=article_info_text
     )
     messages = [{"role": "user", "content": article_prompt}]
@@ -754,6 +801,10 @@ full_prompt_name = f"pv2_{prompt_name}"
 version_num, version_dir = get_next_version(os.path.dirname(input_plot), name_for_folder, full_prompt_name)
 os.makedirs(version_dir, exist_ok=True)
 
+debug_dir = os.path.join(version_dir, "debug")
+if DEBUG_VERBOSE:
+    os.makedirs(debug_dir, exist_ok=True)
+
 output_out = os.path.join(version_dir, f"{image_filename}.{full_prompt_name}.v{version_num}.mistral.out")
 replot_plot = os.path.join(version_dir, f"{name_for_folder}-replot.{full_prompt_name}.v{version_num}.png")
 
@@ -784,6 +835,17 @@ accumulated_facts = {}
 if article_info_json:
     accumulated_facts = json.loads(article_info_json)
 
+# Create an initial progress file immediately so the UI can show 0% from the start.
+save_stage_update(
+    version_dir,
+    "STARTING",
+    0,
+    len(EXTRACT_STAGES),
+    accumulated_facts,
+    0,
+    console_output="Extraction starting..."
+)
+
 # Stage processing loop
 for stage_index, stage_name in enumerate(EXTRACT_STAGES):
     # Get the prompt text from the prompts module
@@ -791,20 +853,132 @@ for stage_index, stage_name in enumerate(EXTRACT_STAGES):
         print(f"Error: Stage '{stage_name}' not found in prompts module")
         sys.exit(1)
     
+    # Emit a "stage started" update where progress reflects only completed stages.
+    save_stage_update(
+        version_dir,
+        stage_name,
+        stage_index,
+        len(EXTRACT_STAGES),
+        accumulated_facts,
+        0,
+        console_output=console_timeline
+    )
+
     tracker.start_stage(stage_name)
     stage_start_time = time.time()
     
     prompt_payload = getattr(prompts_module, stage_name)
+
+    # Optional extra inputs for specific stages (kept opt-in via placeholders)
+    csv_text_for_stage: Optional[str] = None
+    csv_diagnostics_json_for_stage: Optional[str] = None
+    stage6_output_json_for_stage: Optional[str] = None
+    stage7_output_json_for_stage: Optional[str] = None
+
+    if "{csv_text}" in prompt_payload or "{csv_diagnostics_json}" in prompt_payload:
+        # Prefer the preserved CSV from the marker_facts-emitting stage
+        candidate_csv = stage_context.get("_saved_csv", "")
+        if not candidate_csv:
+            # fallback: attempt to extract from immediate previous stage output
+            prev_stage = EXTRACT_STAGES[stage_index - 1] if stage_index > 0 else None
+            if prev_stage and prev_stage in stage_context:
+                candidate_csv = extract_csv_from_text(stage_context.get(prev_stage, ""))
+
+        candidate_csv = normalize_csv_to_wide(candidate_csv or "")
+        csv_text_for_stage = candidate_csv
+
+        if "{csv_diagnostics_json}" in prompt_payload:
+            # Compute deterministically from CSV text
+            diagnostics_start = time.perf_counter()
+            diagnostics_obj = compute_csv_diagnostics_from_text(csv_text_for_stage or "")
+            diagnostics_ms = int((time.perf_counter() - diagnostics_start) * 1000)
+            csv_diagnostics_json_for_stage = json.dumps(diagnostics_obj, indent=2)
+
+            # Debug marker: make it unambiguous that Stage 6a ran.
+            # This writes to the debug folder only; it does not alter stage inputs.
+            if DEBUG_VERBOSE:
+                try:
+                    stage6a_debug = {
+                        "stage6a_ran": True,
+                        "requested_by_stage_index": stage_index,
+                        "requested_by_stage_name": stage_name,
+                        "compute_ms": diagnostics_ms,
+                        "csv_text_chars": len(csv_text_for_stage or ""),
+                        "csv_text_lines": (csv_text_for_stage or "").count("\n") + (1 if (csv_text_for_stage or "") else 0),
+                        "csv_diagnostics_chars": len(csv_diagnostics_json_for_stage or ""),
+                        "diagnostics": diagnostics_obj,
+                    }
+                    with open(
+                        os.path.join(debug_dir, f"stage_06a_{stage_index+1:02d}_{stage_name}_csv_diagnostics.json"),
+                        "w",
+                        encoding="utf-8",
+                    ) as f:
+                        json.dump(stage6a_debug, f, indent=2)
+
+                    print(
+                        f"[DEBUG] Stage 6a ran for {stage_name}: "
+                        f"compute_ms={diagnostics_ms} csv_chars={len(csv_text_for_stage or '')}"
+                    )
+                except Exception as e:
+                    print(f"[DEBUG] Failed to write Stage 6a marker for {stage_name}: {e}")
+
+    if "{stage6_output_json}" in prompt_payload:
+        stage6_output_json_for_stage = stage_context.get("EXTRACT_STAGE_6", "")
+    if "{stage7_output_json}" in prompt_payload:
+        stage7_output_json_for_stage = stage_context.get("EXTRACT_STAGE_7", "")
     
     # Format prompt with complete schema and accumulated facts
     accumulated_facts_str = json.dumps(accumulated_facts, indent=2) if accumulated_facts else "Empty (no facts extracted yet)"
-    
-    if "{complete_schema}" in prompt_payload or "{accumulated_facts}" in prompt_payload:
-        prompt_payload = prompt_payload.format(
-            complete_schema=complete_schema_str,
-            accumulated_facts=accumulated_facts_str,
-            replot_path=replot_plot,
-        )
+
+    # Render known placeholders only (do not treat arbitrary '{...}' as formatting).
+    # This prevents crashes when prompts include literal JSON examples.
+    placeholder_values = {
+        "complete_schema": complete_schema_str,
+        "accumulated_facts": accumulated_facts_str,
+        "replot_path": replot_plot,
+        "csv_text": csv_text_for_stage or "",
+        "csv_diagnostics_json": csv_diagnostics_json_for_stage or "",
+        "stage6_output_json": stage6_output_json_for_stage or "",
+        "stage7_output_json": stage7_output_json_for_stage or "",
+    }
+    for placeholder_key, placeholder_val in placeholder_values.items():
+        token = "{" + placeholder_key + "}"
+        if token in prompt_payload:
+            prompt_payload = prompt_payload.replace(token, str(placeholder_val))
+
+    # Debug logging: record rendered prompt and key input sizes before calling the model
+    if DEBUG_VERBOSE:
+        try:
+            stage_debug = {
+                "stage_index": stage_index,
+                "stage_name": stage_name,
+                "no_image_stage": stage_name in NO_IMAGE_STAGES,
+                "prompt_chars": len(prompt_payload or ""),
+                "accumulated_facts_chars": len(accumulated_facts_str or ""),
+                "csv_text_chars": len(csv_text_for_stage or "") if csv_text_for_stage is not None else 0,
+                "csv_diagnostics_chars": len(csv_diagnostics_json_for_stage or "") if csv_diagnostics_json_for_stage is not None else 0,
+            }
+            with open(
+                os.path.join(debug_dir, f"stage_{stage_index+1:02d}_{stage_name}_inputs.json"),
+                "w",
+                encoding="utf-8",
+            ) as f:
+                json.dump(stage_debug, f, indent=2)
+
+            with open(
+                os.path.join(debug_dir, f"stage_{stage_index+1:02d}_{stage_name}_prompt.txt"),
+                "w",
+                encoding="utf-8",
+            ) as f:
+                f.write(prompt_payload or "")
+
+            # Print a quick one-liner for live monitoring
+            print(
+                f"[DEBUG] Stage {stage_index+1}/{len(EXTRACT_STAGES)} {stage_name}: "
+                f"no_image={stage_name in NO_IMAGE_STAGES} prompt_chars={len(prompt_payload or '')}"
+            )
+        except Exception as e:
+            print(f"[DEBUG] Failed to write debug prompt for {stage_name}: {e}")
     elif "{data_context}" in prompt_payload:
         # Fallback for old-style prompts
         accumulated_context = ""
@@ -820,9 +994,33 @@ for stage_index, stage_name in enumerate(EXTRACT_STAGES):
             replot_path=replot_plot,
         )
 
-    messages = create_Q_1p([[base64_image, prompt_payload]])
+    if stage_name in NO_IMAGE_STAGES:
+        messages = [{"role": "user", "content": prompt_payload}]
+    else:
+        messages = create_Q_1p([[base64_image, prompt_payload]])
     conversation_log.extend(messages)
+
+    # Model call (add timing + persist raw response in debug mode)
+    call_start = time.time()
     messages, result_text = prompt_mistral(client, messages)
+    call_ms = (time.time() - call_start) * 1000
+    if DEBUG_VERBOSE:
+        try:
+            with open(
+                os.path.join(debug_dir, f"stage_{stage_index+1:02d}_{stage_name}_response.txt"),
+                "w",
+                encoding="utf-8",
+            ) as f:
+                f.write(result_text or "")
+
+            with open(
+                os.path.join(debug_dir, f"stage_{stage_index+1:02d}_{stage_name}_timing.json"),
+                "w",
+                encoding="utf-8",
+            ) as f:
+                json.dump({"model_call_ms": call_ms}, f, indent=2)
+        except Exception as e:
+            print(f"[DEBUG] Failed to write debug response for {stage_name}: {e}")
     conversation_log.append({"role": "assistant", "content": result_text})
     stage_context[stage_name] = result_text
     
@@ -849,13 +1047,13 @@ for stage_index, stage_name in enumerate(EXTRACT_STAGES):
     if "csv" in result_text.lower() or stage_index == len(EXTRACT_STAGES) - 1:
         facts = tracker.extract_facts_from_csv(result_text, stage_name)
     
-    # Save CSV immediately after data extraction stage (e.g., EXTRACT_STAGE_4)
+    # Save CSV immediately after data extraction stage (stage that emits marker_facts)
     # This ensures CSV is preserved and can be reused by later stages
-    if stage_name == "EXTRACT_STAGE_4":
+    if _result_has_marker_facts(result_json):
         try:
             csv_data = extract_csv_from_text(result_text)
-            print(f"[DEBUG STAGE 4] Initial extracted CSV lines: {len(csv_data.split(chr(10)))}")
-            print(f"[DEBUG STAGE 4] First line: {csv_data.split(chr(10))[0][:100] if csv_data else 'EMPTY'}")
+            print(f"[DEBUG DATA EXTRACTION] Initial extracted CSV lines: {len(csv_data.split(chr(10)))}")
+            print(f"[DEBUG DATA EXTRACTION] First line: {csv_data.split(chr(10))[0][:100] if csv_data else 'EMPTY'}")
             
             # Try to rebuild CSV from JSON curves for better quality
             # This avoids using the LLM's often-malformed csv_output string
@@ -865,38 +1063,39 @@ for stage_index, stage_name in enumerate(EXTRACT_STAGES):
                 result_json = _extract_json_object_from_text(result_text)
                 
                 if isinstance(result_json, dict) and "marker_facts" in result_json:
-                    print(f"[DEBUG STAGE 4] Found marker_facts in result_json")
+                    print(f"[DEBUG DATA EXTRACTION] Found marker_facts in result_json")
                     curves = result_json["marker_facts"].get("curves", [])
-                    print(f"[DEBUG STAGE 4] Number of curves: {len(curves)}")
+                    print(f"[DEBUG DATA EXTRACTION] Number of curves: {len(curves)}")
                     if curves:
-                        print(f"[DEBUG STAGE 4] First curve: {curves[0].get('curve_label')} with {len(curves[0].get('points', []))} points")
+                        print(f"[DEBUG DATA EXTRACTION] First curve: {curves[0].get('curve_label')} with {len(curves[0].get('points', []))} points")
                     
                     accumulated_facts_copy["marker_facts"] = result_json["marker_facts"]
                     rebuilt_csv = rebuild_csv_from_json_curves(accumulated_facts_copy)
                     if rebuilt_csv:
-                        print(f"[DEBUG STAGE 4] Successfully rebuilt CSV from JSON curves")
-                        print(f"[DEBUG STAGE 4] Rebuilt CSV first line: {rebuilt_csv.split(chr(10))[0][:100]}")
+                        print(f"[DEBUG DATA EXTRACTION] Successfully rebuilt CSV from JSON curves")
+                        print(f"[DEBUG DATA EXTRACTION] Rebuilt CSV first line: {rebuilt_csv.split(chr(10))[0][:100]}")
                         csv_data = rebuilt_csv
                     else:
-                        print(f"[DEBUG STAGE 4] rebuild_csv_from_json_curves returned None")
+                        print(f"[DEBUG DATA EXTRACTION] rebuild_csv_from_json_curves returned None")
                 else:
-                    print(f"[DEBUG STAGE 4] No marker_facts found in result_json or result_json is None")
+                    print(f"[DEBUG DATA EXTRACTION] No marker_facts found in result_json or result_json is None")
                     if result_json:
-                        print(f"[DEBUG STAGE 4] result_json keys: {result_json.keys()}")
+                        print(f"[DEBUG DATA EXTRACTION] result_json keys: {result_json.keys()}")
             except Exception as e:
-                print(f"[DEBUG STAGE 4] Could not rebuild CSV from JSON: {e}, using extracted CSV")
+                print(f"[DEBUG DATA EXTRACTION] Could not rebuild CSV from JSON: {e}, using extracted CSV")
                 import traceback
                 traceback.print_exc()
             
             if csv_data and csv_data != "None" and not csv_data.startswith("Here is the"):
                 # Store in a module-level variable for reuse if Stage 5 fails
                 stage_context["_saved_csv"] = csv_data
-                csv_backup_path = output_out + "_data_stage4"
+                stage_context["_saved_csv_stage"] = stage_name
+                csv_backup_path = output_out + f"_data_{stage_name.lower()}"
                 with open(csv_backup_path, "w", encoding="utf-8") as f:
                     f.write(csv_data)
-                print(f"CSV data successfully saved from EXTRACT_STAGE_4")
+                print(f"CSV data successfully saved from {stage_name}")
         except Exception as e:
-            print(f"Warning: Could not save CSV from EXTRACT_STAGE_4: {e}")
+            print(f"Warning: Could not save CSV from {stage_name}: {e}")
     
     # Use stage confidence if abort provided a confidence, else default
     stage_confidence = abort_confidence if abort_confidence is not None else 0.7
@@ -909,9 +1108,16 @@ for stage_index, stage_name in enumerate(EXTRACT_STAGES):
     console_timeline += stage_dump
     print(stage_dump)
     
-    # Save real-time progress update for web UI
-    save_stage_update(version_dir, stage_name, stage_index + 1, len(EXTRACT_STAGES), 
-                     accumulated_facts, stage_time, console_output=console_timeline)
+    # Save real-time progress update for web UI (completed stage count increments here)
+    save_stage_update(
+        version_dir,
+        stage_name,
+        stage_index + 1,
+        len(EXTRACT_STAGES),
+        accumulated_facts,
+        stage_time,
+        console_output=console_timeline,
+    )
 
     # Early stop on abort
     if abort:
@@ -952,18 +1158,21 @@ final_stage = EXTRACT_STAGES[-1]
 data_raw = stage_context.get(final_stage, "")
 data_from_final = extract_csv_from_text(data_raw)
 
-# Check if we have a saved CSV from Stage 4 (which is the data extraction stage)
+# Check if we have a saved CSV from the data extraction stage
 stage4_csv = stage_context.get("_saved_csv", "")
+saved_csv_stage = stage_context.get("_saved_csv_stage", "")
 
-# ALWAYS prefer Stage 4 CSV if it exists
-# Stage 5 is validation only and should not regenerate CSV
-if stage4_csv:
-    data = stage4_csv
-    print("Using CSV from EXTRACT_STAGE_4 (data extraction stage)")
-else:
-    # No Stage 4 backup, extract from final stage
+# Prefer final-stage CSV when the final stage differs from the data-extraction stage.
+if data_from_final and (not saved_csv_stage or final_stage != saved_csv_stage):
     data = data_from_final
-    print("Warning: No Stage 4 CSV found, using final stage output")
+    print(f"Using CSV from final stage: {final_stage}")
+elif stage4_csv:
+    data = stage4_csv
+    stage_label = saved_csv_stage or "data extraction stage"
+    print(f"Using CSV from {stage_label} (data extraction stage)")
+else:
+    data = data_from_final
+    print("Warning: No saved CSV found, using final stage output")
 
 # Normalize CSV to wide format if it came back in long format
 data = normalize_csv_to_wide(data)
@@ -1016,11 +1225,94 @@ if data and data != "None" and not data.startswith("Here is the"):
 error_output = None
 if code:
     print("Replotting with extracted data... ", end="", flush=True)
+    import builtins
+
+    _orig_import = builtins.__import__
+    _patched_once = {"done": False}
+
+    def _install_savefig_patch_if_possible():
+        if _patched_once["done"]:
+            return
+        try:
+            import matplotlib.pyplot as plt  # type: ignore
+            import matplotlib.figure as mpl_figure  # type: ignore
+        except Exception:
+            return
+
+        # This code runs inside a long-lived process that may execute many plots.
+        # If we wrap savefig more than once, the "original" can become our own wrapper,
+        # which then calls itself and triggers RecursionError.
+        def _is_already_patched(func):
+            return bool(getattr(func, "_plotextract_is_patched", False))
+
+        def _get_original(func):
+            return getattr(func, "_plotextract_original", func)
+
+        if _is_already_patched(plt.savefig) and _is_already_patched(mpl_figure.Figure.savefig):
+            _patched_once["done"] = True
+            return
+
+        _orig_plt_savefig = _get_original(plt.savefig)
+        _orig_fig_savefig = _get_original(mpl_figure.Figure.savefig)
+
+        def _apply_replot_axis_policy(fig):
+            try:
+                axes = getattr(fig, 'axes', []) or []
+                for ax in axes:
+                    try:
+                        # Y: always start at 0.001 (works for log plots too)
+                        if ax.get_yscale() == 'log':
+                            _, cur_top = ax.get_ylim()
+                            top = cur_top if (cur_top is not None and cur_top > 0.001) else 0.01
+                            ax.set_ylim(0.001, top)
+                        else:
+                            ax.set_ylim(bottom=0.001)
+
+                        # X: start at 0 only for linear axes
+                        if ax.get_xscale() == 'linear':
+                            ax.set_xlim(left=0.0)
+                    except Exception:
+                        continue
+            except Exception:
+                pass
+
+        def _patched_plt_savefig(*args, **kwargs):
+            try:
+                _apply_replot_axis_policy(plt.gcf())
+            except Exception:
+                pass
+            return _orig_plt_savefig(*args, **kwargs)
+
+        def _patched_fig_savefig(self, *args, **kwargs):
+            _apply_replot_axis_policy(self)
+            return _orig_fig_savefig(self, *args, **kwargs)
+
+        _patched_plt_savefig._plotextract_is_patched = True
+        _patched_plt_savefig._plotextract_original = _orig_plt_savefig
+        _patched_fig_savefig._plotextract_is_patched = True
+        _patched_fig_savefig._plotextract_original = _orig_fig_savefig
+
+        plt.savefig = _patched_plt_savefig
+        mpl_figure.Figure.savefig = _patched_fig_savefig
+        _patched_once["done"] = True
+
+    def _patched_import(name, globals=None, locals=None, fromlist=(), level=0):
+        mod = _orig_import(name, globals, locals, fromlist, level)
+        # Patch when matplotlib pyplot is imported in common patterns.
+        if name == 'matplotlib.pyplot' or (name == 'matplotlib' and fromlist and 'pyplot' in fromlist):
+            _install_savefig_patch_if_possible()
+        return mod
+
+    builtins.__import__ = _patched_import
     try:
+        # In case pyplot is already imported in this process.
+        _install_savefig_patch_if_possible()
         exec(code)
         print("FINISHED")
     except Exception:
         error_output = traceback.format_exc()
+    finally:
+        builtins.__import__ = _orig_import
 else:
     print("No CODE_PLOT prompt found, skipping replot generation")
     error_output = "SKIP_REPLOT"

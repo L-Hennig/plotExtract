@@ -1,0 +1,104 @@
+```json
+{
+  "re_extraction": {
+    "requests": [
+      {
+        "curve_label": "Condition 1",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [0, 2, 8, 10, 24],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.4,
+          "pct_decreasing": 0.6,
+          "baseline_delta_from_median": 4.2,
+          "largest_jump": {"abs_jump": 5.0, "from_time": 0.0, "to_time": 2.0, "delta": -5.0}
+        },
+        "visual_guidance": "Re-extract points for Condition 1 (black, solid line, square markers) ensuring continuity and avoiding sudden increases after initial drop."
+      },
+      {
+        "curve_label": "Condition 2",
+        "issue_type": "bad_intercept",
+        "target_times_hours": [0, 2],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.5714285714285714,
+          "pct_decreasing": 0.42857142857142855,
+          "baseline_delta_from_median": -1.5,
+          "largest_jump": {"abs_jump": 1.7999999999999998, "from_time": 0.0, "to_time": 2.0, "delta": 1.7999999999999998}
+        },
+        "visual_guidance": "Re-extract time 0 and 2 for Condition 2 (black, dashed line, triangle markers) to verify baseline consistency with other curves."
+      },
+      {
+        "curve_label": "Condition 3",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [0, 2, 12, 24],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.8571428571428571,
+          "pct_decreasing": 0.14285714285714285,
+          "baseline_delta_from_median": -0.6999999999999993,
+          "largest_jump": {"abs_jump": 0.7000000000000002, "from_time": 2.0, "to_time": 4.0, "delta": 0.7000000000000002}
+        },
+        "visual_guidance": "Re-extract points for Condition 3 (black, dotted line, circle markers) ensuring trend aligns with expected kill/decrease pattern."
+      },
+      {
+        "curve_label": "Condition 4",
+        "issue_type": "bad_intercept",
+        "target_times_hours": [0, 2],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.8333333333333334,
+          "pct_decreasing": 0.16666666666666666,
+          "baseline_delta_from_median": 4.1,
+          "largest_jump": {"abs_jump": 4.8, "from_time": 0.0, "to_time": 2.0, "delta": -4.8}
+        },
+        "visual_guidance": "Re-extract time 0 and 2 for Condition 4 (black, solid line, circle markers) to verify baseline consistency with other curves."
+      },
+      {
+        "curve_label": "Condition 5",
+        "issue_type": "bad_intercept",
+        "target_times_hours": [0, 2],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.25,
+          "pct_decreasing": 0.75,
+          "baseline_delta_from_median": 5.25,
+          "largest_jump": {"abs_jump": 4.2, "from_time": 0.0, "to_time": 2.0, "delta": -4.2}
+        },
+        "visual_guidance": "Re-extract time 0 and 2 for Condition 5 (black, dotted line, inverted_triangle markers) to verify baseline consistency with other curves."
+      },
+      {
+        "curve_label": "Condition 6",
+        "issue_type": "bad_intercept",
+        "target_times_hours": [0, 2],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.5714285714285714,
+          "pct_decreasing": 0.42857142857142855,
+          "baseline_delta_from_median": -1.7999999999999998,
+          "largest_jump": {"abs_jump": 1.7999999999999998, "from_time": 0.0, "to_time": 2.0, "delta": 1.7999999999999998}
+        },
+        "visual_guidance": "Re-extract time 0 and 2 for Condition 6 (black, dashed line, square markers) to verify baseline consistency with other curves."
+      }
+    ]
+  }
+}
+```

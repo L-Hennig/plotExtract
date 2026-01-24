@@ -1,0 +1,172 @@
+
+You have access to the complete extraction schema (showing all possible fields) and accumulated facts.
+
+COMPLETE SCHEMA:
+{
+  "article_info": {
+    "figure_id": "string",
+    "figure_caption": "string",
+    "experimental_context": {
+      "assay_type": "string",
+      "organism": "string",
+      "model": "string"
+    },
+    "axis_definitions": {
+      "x_axis": {
+        "quantity": "string",
+        "unit": "string"
+      },
+      "y_axis": {
+        "quantity": "string",
+        "unit": "string",
+        "scale": "string"
+      }
+    },
+    "curve_legend": [
+      {
+        "curve_label": "string",
+        "description": "string",
+        "expected_trend": "string"
+      }
+    ]
+  },
+  "plot_type_facts": {
+    "declared_in_article_info": "boolean or unknown",
+    "visually_verified": "boolean",
+    "plot_type": "string",
+    "confidence": "0-1",
+    "reason": "string"
+  },
+  "axis_facts": {
+    "x_axis": {
+      "quantity": "string",
+      "unit": "string",
+      "discrete": "boolean",
+      "ticks_verified": [
+        "number array"
+      ],
+      "tick_labels": [
+        "string array"
+      ],
+      "breaks": [
+        {
+          "start": "number",
+          "end": "number",
+          "reason": "string"
+        }
+      ],
+      "confidence": "0-1"
+    },
+    "y_axis": {
+      "quantity": "string",
+      "unit": "string",
+      "scale": "string",
+      "upper_plausible_limit": "number",
+      "lower_plausible_limit": "number",
+      "ticks_verified": [
+        "number array"
+      ],
+      "tick_labels": [
+        "string array"
+      ],
+      "breaks": [
+        {
+          "start": "number",
+          "end": "number",
+          "reason": "string"
+        }
+      ],
+      "confidence": "0-1"
+    }
+  },
+  "marker_facts": {
+    "markers_detected": "boolean",
+    "curves": [
+      {
+        "curve_label": "string",
+        "points": [
+          {
+            "x": "number",
+            "y": "number",
+            "confidence": "0-1"
+          }
+        ]
+      }
+    ],
+    "csv_output": "string",
+    "confidence": "0-1"
+  }
+}
+
+ACCUMULATED FACTS SO FAR:
+{
+  "plot_type_facts": {
+    "declared_in_article_info": "unknown",
+    "visually_verified": true,
+    "plot_type": "time-kill plot",
+    "confidence": 0.9,
+    "reason": "X-axis represents time in hours, y-axis represents bacterial count on a log10 scale, and multiple curves with distinct markers indicate different experimental conditions, consistent with a time-kill assay."
+  }
+}
+
+---
+
+STAGE 2 — VERIFY X-AXIS (TIME IN HOURS)
+
+Step 1 — Verify axis quantity and unit:
+
+Visually confirm x-axis represents time in hours.
+
+Cross-check article_info.axis_definitions.x_axis.quantity and .unit if present.
+
+Any contradiction or uncertainty → abort.
+
+Step 2 — Verify x-axis range:
+
+Confirm lower = 0, upper ∈ [12,36]. Prefer 24–26 for higher confidence.
+
+Cross-check article_info.axis_definitions.x_axis.range.
+
+Any major disagreement → abort.
+
+Step 3 — Extract ticks, labels, breaks:
+
+Extract ticks_verified and tick_labels.
+
+Determine discrete vs continuous.
+
+Record axis breaks if present (start, end, reason), else omit.
+
+Step 4 — Assign confidence:
+
+Based on clarity, consistency, and agreement with article info.
+
+Abort output if any hard check fails:
+
+{{
+  "abort": true,
+  "reason": "X-axis is not verifiable as time in hours with valid range",
+  "confidence": 0.0-1.0
+}}
+
+Output JSON (merge with accumulated facts):
+
+Do not write anything other than the explicit facts that have a specific place in the JSON schema. Do NOT add any extra commentary or explanation. Do NOT use any triple backticks.
+
+Before moving on the the next stage ensure that any triple backticks have been removed from your response.
+
+{{
+  "axis_facts": {{
+    "x_axis": {{
+      "quantity": "time",
+      "unit": "hours",
+      "discrete": true | false,
+      "lower_plausible_limit": 0,
+      "upper_plausible_limit": 26,
+      "ticks_verified": [],
+      "tick_labels": [],
+      "breaks": [],
+      "confidence": 0-1
+    }}
+  }}
+}}

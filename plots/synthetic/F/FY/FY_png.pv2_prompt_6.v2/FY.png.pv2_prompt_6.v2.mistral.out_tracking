@@ -1,0 +1,81 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/F/FY/FY.png",
+  "prompt_name": "prompt_6",
+  "overall_status": "completed",
+  "validation_status": "skipped",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 393,
+      "execution_time_ms": 3493.7727451324463,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-20T18:39:33.453496",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 515,
+      "execution_time_ms": 4288.731336593628,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-20T18:39:36.949804",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 577,
+      "execution_time_ms": 3923.597574234009,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-20T18:39:41.240756",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 245,
+        "columns": [
+          "```csv"
+        ],
+        "axis_labels": [
+          "```csv"
+        ]
+      },
+      "output_length": 6289,
+      "execution_time_ms": 34049.94487762451,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-20T18:39:45.167023",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_4": {
+      "num_columns": 1,
+      "num_rows": 245,
+      "columns": [
+        "```csv"
+      ],
+      "axis_labels": [
+        "```csv"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 103.837255,
+  "output_files": {}
+}

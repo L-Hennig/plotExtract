@@ -1,0 +1,104 @@
+import os
+import matplotlib.pyplot as plt
+import numpy as np
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic/E/EV\EV_png.pv2_prompt_4.v1\EV_png-replot.pv2_prompt_4.v1.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data from marker_facts
+curves_data = [
+    {
+        "label": "Condition 1",
+        "points": [
+            {"x": 0, "y": 6.1},
+            {"x": 2, "y": 1.7},
+            {"x": 24, "y": 8.1}
+        ]
+    },
+    {
+        "label": "Condition 2",
+        "points": [
+            {"x": 0, "y": 6.0},
+            {"x": 2, "y": 5.9},
+            {"x": 4, "y": 5.9},
+            {"x": 6, "y": 5.9},
+            {"x": 8, "y": 8.1},
+            {"x": 10, "y": 8.1},
+            {"x": 12, "y": 8.1},
+            {"x": 24, "y": 6.3}
+        ]
+    },
+    {
+        "label": "Condition 3",
+        "points": [
+            {"x": 0, "y": 6.0},
+            {"x": 2, "y": 5.8},
+            {"x": 4, "y": 5.7},
+            {"x": 6, "y": 8.2},
+            {"x": 8, "y": 8.3},
+            {"x": 12, "y": 8.8},
+            {"x": 24, "y": 9.0}
+        ]
+    },
+    {
+        "label": "Condition 4",
+        "points": [
+            {"x": 0, "y": 6.0},
+            {"x": 2, "y": 3.0},
+            {"x": 4, "y": 1.3},
+            {"x": 6, "y": 1.3},
+            {"x": 8, "y": 1.0},
+            {"x": 10, "y": 0.9},
+            {"x": 24, "y": 6.7}
+        ]
+    },
+    {
+        "label": "Condition 5",
+        "points": [
+            {"x": 0, "y": 6.0},
+            {"x": 2, "y": 2.5},
+            {"x": 4, "y": 2.3},
+            {"x": 6, "y": 3.2},
+            {"x": 8, "y": 2.5},
+            {"x": 10, "y": 3.5},
+            {"x": 12, "y": 3.8},
+            {"x": 24, "y": 0.8}
+        ]
+    }
+]
+
+# Create the plot
+plt.figure(figsize=(8, 6))
+
+# Define line styles and markers for each condition
+line_styles = ['-', '--', ':', '-.', '-']
+markers = ['s', '^', 'o', 'v', 'D']
+colors = ['black', 'black', 'black', 'black', 'black']
+
+# Plot each curve
+for i, curve in enumerate(curves_data):
+    x_vals = [p["x"] for p in curve["points"]]
+    y_vals = [p["y"] for p in curve["points"]]
+    plt.plot(x_vals, y_vals, linestyle=line_styles[i], marker=markers[i], color=colors[i], label=curve["label"])
+
+# Set axis limits and ticks
+plt.xlim(0, 26)
+plt.ylim(0, 10)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 24])
+plt.yticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+# Add axis labels
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+
+# Add legend
+plt.legend()
+
+# Add axis break indicator on x-axis
+plt.annotate('', xy=(13, 0), xytext=(19, 0),
+             arrowprops=dict(arrowstyle='-', color='black', lw=1.5))
+plt.annotate('', xy=(13, 0.5), xytext=(19, 0.5),
+             arrowprops=dict(arrowstyle='-', color='black', lw=1.5))
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)

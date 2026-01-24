@@ -1,0 +1,92 @@
+```json
+{
+  "re_extraction": {
+    "requests": [
+      {
+        "curve_label": "Condition 1",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [0, 2, 10, 12, 24],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.8571428571428571,
+          "pct_decreasing": 0.14285714285714285,
+          "baseline_delta_from_median": -0.75,
+          "largest_jump": {
+            "abs_jump": 0.7999999999999998,
+            "from_time": 10.0,
+            "to_time": 12.0,
+            "delta": 0.7999999999999998
+          }
+        },
+        "visual_guidance": "Curve should show bacterial kill (decrease) over time; verify points at 10h and 12h for continuity and correct log10 decade."
+      },
+      {
+        "curve_label": "Condition 3",
+        "issue_type": "bad_intercept",
+        "target_times_hours": [0, 2],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.3333333333333333,
+          "pct_decreasing": 0.6666666666666666,
+          "baseline_delta_from_median": 5.0,
+          "largest_jump": {
+            "abs_jump": 5.0,
+            "from_time": 0.0,
+            "to_time": 2.0,
+            "delta": -5.0
+          }
+        },
+        "visual_guidance": "Verify initial bacterial count at 0h and 2h; ensure correct log10 decade transition."
+      },
+      {
+        "curve_label": "Condition 4",
+        "issue_type": "midcurve_switch_suspicious_unknown_expectation",
+        "target_times_hours": [0, 2, 4, 24],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.8333333333333334,
+          "pct_decreasing": 0.16666666666666666,
+          "baseline_delta_from_median": 2.35,
+          "largest_jump": {
+            "abs_jump": 3.0,
+            "from_time": 0.0,
+            "to_time": 2.0,
+            "delta": -3.0
+          }
+        },
+        "visual_guidance": "Check for abrupt direction change at 2h; ensure continuity and correct log10 scale."
+      },
+      {
+        "curve_label": "Condition 5",
+        "issue_type": "midcurve_switch_suspicious_unknown_expectation",
+        "target_times_hours": [0, 2, 24],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 1.0,
+          "baseline_delta_from_median": 3.5,
+          "largest_jump": {
+            "abs_jump": 3.5,
+            "from_time": 0.0,
+            "to_time": 2.0,
+            "delta": -3.5
+          }
+        },
+        "visual_guidance": "Verify initial drop at 2h and final point at 24h; ensure correct log10 decade."
+      }
+    ]
+  }
+}
+```

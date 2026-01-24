@@ -1,0 +1,244 @@
+
+You have access to:
+- Original CSV (wide format)
+- Stage 7 output JSON (re-extraction results)
+
+ORIGINAL CSV:
+Time (hours),log10 CFU/mL (Condition 1),Time (hours),log10 CFU/mL (Condition 2),Time (hours),log10 CFU/mL (Condition 3),Time (hours),log10 CFU/mL (Condition 4),Time (hours),log10 CFU/mL (Condition 5),Time (hours),log10 CFU/mL (Condition 6)
+0,6.0,0,6.0,0,6.0,0,6.0,0,6.0,0,6.0
+2,7.9,2,8.3,2,6.8,2,1.0,2,1.5,2,1.0
+4,8.2,4,8.5,4,7.2,4,0.7,4,1.0,4,0.7
+6,8.3,6,8.6,6,7.8,6,1.0,6,2.5,6,0.7
+8,8.3,8,8.7,8,8.1,8,1.5,8,1.8,8,0.7
+10,8.4,10,8.7,10,8.0,10,1.7,10,1.5,10,0.7
+12,8.3,12,8.5,12,7.8,12,1.5,12,1.7,12,0.7
+24,8.3,24,8.3,24,8.0,24,2.0,24,1.5,24,0.7
+14,,14,,14,7.7,14,,14,1.8,14,
+
+STAGE 7 OUTPUT (RE-EXTRACTION RESULTS):
+```json
+{
+  "re_extraction": {
+    "results": [
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 14,
+        "new_log10_cfu_ml": 8.3,
+        "confidence": "high",
+        "reason": "Truncation at 14 hours corrected by ensuring continuity with the increasing trend.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "Condition 2",
+        "time_hours": 14,
+        "new_log10_cfu_ml": 8.4,
+        "confidence": "high",
+        "reason": "Truncation at 14 hours corrected by ensuring flat trend continuity.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "Condition 4",
+        "time_hours": 14,
+        "new_log10_cfu_ml": 1.6,
+        "confidence": "high",
+        "reason": "Truncation at 14 hours corrected by ensuring continuity with observed pattern.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "Condition 6",
+        "time_hours": 14,
+        "new_log10_cfu_ml": 0.7,
+        "confidence": "high",
+        "reason": "Truncation at 14 hours corrected by ensuring flat trend continuity.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "Condition 4",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Re-checked initial point to confirm accurate intercept.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "bad intercept corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 4",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 1.0,
+        "confidence": "high",
+        "reason": "Re-checked initial drop to confirm accurate intercept.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "bad intercept corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 5",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Re-checked initial point to confirm accurate intercept.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "bad intercept corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 5",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 1.5,
+        "confidence": "high",
+        "reason": "Re-checked initial drop to confirm accurate intercept.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "bad intercept corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 6",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Re-checked initial point to confirm accurate intercept.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "bad intercept corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 6",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 1.0,
+        "confidence": "high",
+        "reason": "Re-checked initial drop to confirm accurate intercept.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "bad intercept corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Re-checked initial point to confirm expected kill trend.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": false,
+          "avoids_previous_issue": "direction flip addressed"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 6.8,
+        "confidence": "medium",
+        "reason": "Re-checked point to align with expected kill trend but observed slight increase.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": false,
+          "avoids_previous_issue": "direction ambiguity noted"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 10,
+        "new_log10_cfu_ml": 7.9,
+        "confidence": "medium",
+        "reason": "Re-checked point to align with expected kill trend but observed slight inconsistency.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": false,
+          "avoids_previous_issue": "direction ambiguity noted"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 12,
+        "new_log10_cfu_ml": 7.7,
+        "confidence": "medium",
+        "reason": "Re-checked point to align with expected kill trend but observed slight inconsistency.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": false,
+          "avoids_previous_issue": "direction ambiguity noted"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 14,
+        "new_log10_cfu_ml": 7.6,
+        "confidence": "medium",
+        "reason": "Re-checked point to align with expected kill trend but observed slight inconsistency.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": false,
+          "avoids_previous_issue": "direction ambiguity noted"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 7.8,
+        "confidence": "medium",
+        "reason": "Re-checked point to align with expected kill trend but observed slight inconsistency.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": false,
+          "avoids_previous_issue": "direction ambiguity noted"
+        }
+      }
+    ]
+  }
+}
+```
+
+---
+
+STAGE 8 — COMPILE NEW CSV (MERGE FIXES)
+
+GOAL:
+Produce a NEW CSV with corrected values applied.
+
+HARD RULES:
+- Keep the exact same CSV structure and column ordering.
+- Replace ONLY the y-value cell(s) for the specified curve_id at the specified time_hours.
+- Do NOT add or remove rows.
+- Do NOT add new columns.
+- Do NOT modify other values.
+- Output MUST be the full updated CSV text only (no JSON, no commentary, no backticks).
+
+NOTES:
+- Match time_hours exactly against the Time (hours) column for that curve.
+- Match curve_label to the correct y-column by its header label (text in parentheses).
+- Read re-extraction results from stage7_output_json.re_extraction.results.
+- If a requested (curve_id, time_hours) cannot be found, leave the CSV unchanged for that entry.
+
+---
+
+OUTPUT:
+Return only the updated CSV text.

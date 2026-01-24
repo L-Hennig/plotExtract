@@ -1,0 +1,52 @@
+import os
+import matplotlib.pyplot as plt
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic/F/FF\FF_png.pv2_prompt_4.v1\FF_png-replot.pv2_prompt_4.v1.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+data = {
+    "Condition 1": {
+        "x": [0, 8, 12, 24],
+        "y": [6.0, 8.5, 9.0, 9.0],
+        "marker": 's',
+        "linestyle": '-'
+    },
+    "Condition 2": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [5.5, 5.0, 5.0, 5.0, 5.2, 5.3, 5.4, 5.5],
+        "marker": '^',
+        "linestyle": '--'
+    },
+    "Condition 3": {
+        "x": [0, 2, 4, 6, 12, 24],
+        "y": [6.0, 1.2, 1.1, 1.0, 1.0, 1.0],
+        "marker": 'o',
+        "linestyle": ':'
+    },
+    "Condition 4": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.0, 7.5, 8.0, 8.0, 8.5, 8.8, 9.0, 9.2],
+        "marker": 'D',
+        "linestyle": '-'
+    }
+}
+
+fig, ax = plt.subplots(figsize=(8, 6))
+
+for condition, values in data.items():
+    ax.plot(values["x"], values["y"],
+            marker=values["marker"],
+            linestyle=values["linestyle"],
+            color='black',
+            label=condition)
+
+ax.set_xlabel('Time (hours)')
+ax.set_ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+ax.set_xlim(0, 26)
+ax.set_ylim(0, 10)
+ax.set_xticks([0, 2, 4, 6, 8, 10, 12, 24])
+ax.set_yticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+ax.legend()
+
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)
+plt.close(fig)

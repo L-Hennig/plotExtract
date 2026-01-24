@@ -5,8 +5,7 @@
 # - axis_facts: Stage 1 & 2 axis verification outputs
 # - marker_facts: Stage 3 marker extraction output
 # =====================================================================
-
-ARTICLE_INFO_SCHEMA = """{
+ACCUMULATED_FACTS_SCHEMA = """{
   "article_info": {
     "figure_id": "string",
     "figure_caption": "string",
@@ -55,6 +54,10 @@ ARTICLE_INFO_SCHEMA = """{
           "reason": "string"
         }
       ],
+      "grid": {
+        "present": "boolean",
+        "aligned_ticks": ["number array"]
+      },
       "confidence": "0-1"
     },
     "y_axis": {
@@ -72,8 +75,24 @@ ARTICLE_INFO_SCHEMA = """{
           "reason": "string"
         }
       ],
+      "grid": {
+        "present": "boolean",
+        "aligned_ticks": ["number array"]
+      },
       "confidence": "0-1"
     }
+  },
+  "curve_style_facts": {
+    "curves": [
+      {
+        "curve_label": "string",
+        "colour": "string",
+        "line_type": "string",
+        "marker_symbol": "string",
+        "source": "article_text | figure_legend | direct_visual",
+        "confidence": "0-1"
+      }
+    ]
   },
   "marker_facts": {
     "markers_detected": "boolean",
@@ -99,4 +118,7 @@ SCHEMA_CONSTRAINTS = """Additional constraints:
 - `axis_definitions` should only be filled if the text explicitly defines them.
 - `expected_trend` is optional and must come from explicit textual statements.
 - If no curve legend is present, omit `curve_legend` entirely.
+- Every curve in `curve_style_facts` must have colour, line_type, and marker_symbol.
+- If `grid.present` is true, `aligned_ticks` must not be empty.
+- If grid lines are present but do not align with valid axis ticks, extraction must abort.
 - Do not add empty objects or empty arrays."""

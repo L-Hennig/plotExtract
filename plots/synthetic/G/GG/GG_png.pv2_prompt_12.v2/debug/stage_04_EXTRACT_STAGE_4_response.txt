@@ -1,0 +1,144 @@
+```json
+{
+  "article_info": {
+    "curve_legend": [
+      {
+        "curve_label": "Condition 1",
+        "description": "solid line with square markers",
+        "expected_trend": "bactericidal or bacteriostatic effect over time"
+      },
+      {
+        "curve_label": "Condition 2",
+        "description": "dashed line with triangle markers",
+        "expected_trend": "bactericidal or bacteriostatic effect over time"
+      },
+      {
+        "curve_label": "Condition 3",
+        "description": "dotted line with circle markers",
+        "expected_trend": "bactericidal or bacteriostatic effect over time"
+      },
+      {
+        "curve_label": "Condition 4",
+        "description": "solid line with filled circle markers",
+        "expected_trend": "bactericidal or bacteriostatic effect over time"
+      },
+      {
+        "curve_label": "Condition 5",
+        "description": "dotted line with inverted triangle markers",
+        "expected_trend": "bactericidal or bacteriostatic effect over time"
+      },
+      {
+        "curve_label": "Condition 6",
+        "description": "dashed line with square markers",
+        "expected_trend": "bactericidal or bacteriostatic effect over time"
+      }
+    ]
+  },
+  "curve_style_facts": {
+    "curves": [
+      {
+        "curve_label": "Condition 1",
+        "colour": "black",
+        "line_type": "solid",
+        "marker_symbol": "square",
+        "source": "direct_visual",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "Condition 2",
+        "colour": "black",
+        "line_type": "dashed",
+        "marker_symbol": "triangle",
+        "source": "direct_visual",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "Condition 3",
+        "colour": "black",
+        "line_type": "dotted",
+        "marker_symbol": "circle",
+        "source": "direct_visual",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "Condition 4",
+        "colour": "black",
+        "line_type": "solid",
+        "marker_symbol": "circle",
+        "source": "direct_visual",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "Condition 5",
+        "colour": "black",
+        "line_type": "dotted",
+        "marker_symbol": "inverted triangle",
+        "source": "direct_visual",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "Condition 6",
+        "colour": "black",
+        "line_type": "dashed",
+        "marker_symbol": "square",
+        "source": "direct_visual",
+        "confidence": 0.95
+      }
+    ]
+  }
+}
+```{
+  "curve_style_facts": {
+    "curves": [
+      {
+        "curve_label": "Condition 1",
+        "colour": "black",
+        "line_type": "solid",
+        "marker_symbol": "square",
+        "source": "direct_visual",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "Condition 2",
+        "colour": "black",
+        "line_type": "dashed",
+        "marker_symbol": "triangle",
+        "source": "direct_visual",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "Condition 3",
+        "colour": "black",
+        "line_type": "dotted",
+        "marker_symbol": "circle",
+        "source": "direct_visual",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "Condition 4",
+        "colour": "black",
+        "line_type": "solid",
+        "marker_symbol": "circle",
+        "source": "direct_visual",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "Condition 5",
+        "colour": "black",
+        "line_type": "dotted",
+        "marker_symbol": "inverted triangle",
+        "source": "direct_visual",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "Condition 6",
+        "colour": "black",
+        "line_type": "dashed",
+        "marker_symbol": "square",
+        "source": "direct_visual",
+        "confidence": 0.95
+      }
+    ]
+  }
+}
+```

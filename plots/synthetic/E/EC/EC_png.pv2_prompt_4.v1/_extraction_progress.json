@@ -1,0 +1,215 @@
+{
+  "status": "complete",
+  "stage": "COMPLETE",
+  "stage_index": 5,
+  "total_stages": 5,
+  "percentage": 100.0,
+  "accumulated_facts": {
+    "plot_type_facts": {
+      "declared_in_article_info": "unknown",
+      "visually_verified": true,
+      "plot_type": "time-kill plot",
+      "confidence": 0.8,
+      "reason": "The x-axis represents time in hours, and the y-axis represents bacterial count (CFU/mL) on a log10 scale, which are typical characteristics of a time-kill plot. Multiple timepoints and a bacterial growth/survival trend are visually confirmed, though no explicit declaration of 'time-kill' was found in the provided schema."
+    },
+    "axis_facts": {
+      "x_axis": {
+        "quantity": "time",
+        "unit": "hours",
+        "discrete": false,
+        "lower_plausible_limit": 0,
+        "upper_plausible_limit": 26,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          24
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "24"
+        ],
+        "breaks": [
+          {
+            "start": 12,
+            "end": 20,
+            "reason": "Non-uniform spacing between 12 and 24 hours, visually interpolated as a break or skipped timepoints."
+          }
+        ],
+        "confidence": 0.95
+      },
+      "y_axis": {
+        "quantity": "bacterial count",
+        "unit": "CFU/mL",
+        "scale": "log10",
+        "upper_plausible_limit": 10,
+        "lower_plausible_limit": 0,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10"
+        ],
+        "breaks": [],
+        "confidence": 0.95,
+        "reason": "Y-axis visually confirmed as bacterial count (CFU/mL) on a log10 scale. Tick spacing and labels are consistent with logarithmic scaling. Range (0-10) is plausible for CFU/mL on a log10 scale."
+      }
+    },
+    "accumulated_facts": {
+      "plot_type_facts": {
+        "declared_in_article_info": "unknown",
+        "visually_verified": true,
+        "plot_type": "time-kill plot",
+        "confidence": 0.8,
+        "reason": "The x-axis represents time in hours, and the y-axis represents bacterial count (CFU/mL) on a log10 scale, which are typical characteristics of a time-kill plot. Multiple timepoints and a bacterial growth/survival trend are visually confirmed, though no explicit declaration of 'time-kill' was found in the provided schema."
+      },
+      "axis_facts": {
+        "x_axis": {
+          "quantity": "time",
+          "unit": "hours",
+          "discrete": false,
+          "lower_plausible_limit": 0,
+          "upper_plausible_limit": 26,
+          "ticks_verified": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            24
+          ],
+          "tick_labels": [
+            "0",
+            "2",
+            "4",
+            "6",
+            "8",
+            "10",
+            "12",
+            "24"
+          ],
+          "breaks": [
+            {
+              "start": 12,
+              "end": 20,
+              "reason": "Non-uniform spacing between 12 and 24 hours, visually interpolated as a break or skipped timepoints."
+            }
+          ],
+          "confidence": 0.95
+        },
+        "y_axis": {
+          "quantity": "bacterial count",
+          "unit": "CFU/mL",
+          "scale": "log10",
+          "upper_plausible_limit": 10,
+          "lower_plausible_limit": 0,
+          "ticks_verified": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10
+          ],
+          "tick_labels": [
+            "0",
+            "2",
+            "4",
+            "6",
+            "8",
+            "10"
+          ],
+          "breaks": [],
+          "confidence": 0.95,
+          "reason": "Y-axis visually confirmed as bacterial count (CFU/mL) on a log10 scale. Tick spacing and labels are consistent with logarithmic scaling. Range (0-10) is plausible for CFU/mL on a log10 scale."
+        }
+      }
+    },
+    "marker_facts": {
+      "markers_detected": true,
+      "curves": [
+        {
+          "curve_label": "Condition 1",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 2,
+              "y": 4.2,
+              "confidence": 0.95
+            },
+            {
+              "x": 4,
+              "y": 4.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 6,
+              "y": 3.9,
+              "confidence": 0.95
+            },
+            {
+              "x": 8,
+              "y": 4.6,
+              "confidence": 0.95
+            },
+            {
+              "x": 10,
+              "y": 4.8,
+              "confidence": 0.95
+            },
+            {
+              "x": 12,
+              "y": 4.7,
+              "confidence": 0.95
+            },
+            {
+              "x": 24,
+              "y": 8.4,
+              "confidence": 0.95
+            }
+          ]
+        }
+      ],
+      "csv_output": "Time (hours),log10 CFU/mL (Condition 1)\n0,6.0\n2,4.2\n4,4.0\n6,3.9\n8,4.6\n10,4.8\n12,4.7\n24,8.4",
+      "confidence": 0.95
+    },
+    "validation_flags": [
+      {
+        "curve_label": "Condition 1",
+        "x": 24,
+        "y": 8.4,
+        "issue": "Impossible jump",
+        "details": "Sudden increase of 3.7 log10 CFU/mL from 12 hours (4.7) to 24 hours (8.4), which is biologically implausible for a typical time-kill curve without explicit justification."
+      }
+    ]
+  },
+  "stage_duration_ms": 0,
+  "timestamp": 1768546038.7665675,
+  "console_output": "Extraction completed successfully"
+}

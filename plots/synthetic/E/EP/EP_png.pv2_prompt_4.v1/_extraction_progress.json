@@ -1,0 +1,275 @@
+{
+  "status": "complete",
+  "stage": "COMPLETE",
+  "stage_index": 5,
+  "total_stages": 5,
+  "percentage": 100.0,
+  "accumulated_facts": {
+    "plot_type_facts": {
+      "declared_in_article_info": "unknown",
+      "visually_verified": true,
+      "plot_type": "time-kill plot",
+      "confidence": 0.9,
+      "reason": "The x-axis represents time in hours, and the y-axis represents bacterial count (CFU/mL) on a log10 scale, which are typical for time-kill plots. Multiple curves with distinct markers and line styles indicate different experimental conditions, consistent with a time-kill assay."
+    },
+    "axis_facts": {
+      "x_axis": {
+        "quantity": "time",
+        "unit": "hours",
+        "discrete": false,
+        "lower_plausible_limit": 0,
+        "upper_plausible_limit": 26,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          24
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "",
+          "24"
+        ],
+        "breaks": [
+          {
+            "start": 12,
+            "end": 20,
+            "reason": "Non-linear time progression, likely omitted for clarity due to minimal change in bacterial count."
+          }
+        ],
+        "confidence": 0.95
+      },
+      "y_axis": {
+        "quantity": "bacterial count",
+        "unit": "CFU/mL",
+        "scale": "log10",
+        "upper_plausible_limit": 9,
+        "lower_plausible_limit": 0,
+        "ticks_verified": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "tick_labels": [
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "breaks": [],
+        "confidence": 0.95,
+        "reason": "Y-axis visually confirmed as bacterial count (CFU/mL) on a log10 scale. Tick spacing and labels are consistent with logarithmic scaling. Range (4-10 log10 CFU/mL) is plausible for bacterial burden assays."
+      }
+    },
+    "article_info": {
+      "figure_id": "unknown",
+      "figure_caption": "unknown",
+      "experimental_context": {
+        "assay_type": "time-kill assay",
+        "organism": "unknown",
+        "model": "unknown"
+      },
+      "axis_definitions": {
+        "x_axis": {
+          "quantity": "time",
+          "unit": "hours"
+        },
+        "y_axis": {
+          "quantity": "bacterial count",
+          "unit": "CFU/mL",
+          "scale": "log10"
+        }
+      },
+      "curve_legend": [
+        {
+          "curve_label": "Condition 1",
+          "description": "unknown",
+          "expected_trend": "unknown"
+        },
+        {
+          "curve_label": "Condition 2",
+          "description": "unknown",
+          "expected_trend": "unknown"
+        },
+        {
+          "curve_label": "Condition 3",
+          "description": "unknown",
+          "expected_trend": "unknown"
+        }
+      ]
+    },
+    "marker_facts": {
+      "markers_detected": true,
+      "curves": [
+        {
+          "curve_label": "Condition 1",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 2,
+              "y": 7.5,
+              "confidence": 0.95
+            },
+            {
+              "x": 4,
+              "y": 7.9,
+              "confidence": 0.95
+            },
+            {
+              "x": 6,
+              "y": 8.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 8,
+              "y": 7.9,
+              "confidence": 0.95
+            },
+            {
+              "x": 10,
+              "y": 7.8,
+              "confidence": 0.95
+            },
+            {
+              "x": 12,
+              "y": 7.7,
+              "confidence": 0.95
+            },
+            {
+              "x": 24,
+              "y": 7.7,
+              "confidence": 0.95
+            }
+          ]
+        },
+        {
+          "curve_label": "Condition 2",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 2,
+              "y": 5.2,
+              "confidence": 0.95
+            },
+            {
+              "x": 4,
+              "y": 5.1,
+              "confidence": 0.95
+            },
+            {
+              "x": 6,
+              "y": 5.1,
+              "confidence": 0.95
+            },
+            {
+              "x": 8,
+              "y": 5.2,
+              "confidence": 0.95
+            },
+            {
+              "x": 12,
+              "y": 5.3,
+              "confidence": 0.95
+            },
+            {
+              "x": 24,
+              "y": 5.5,
+              "confidence": 0.95
+            }
+          ]
+        },
+        {
+          "curve_label": "Condition 3",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 2,
+              "y": 5.8,
+              "confidence": 0.95
+            },
+            {
+              "x": 4,
+              "y": 6.4,
+              "confidence": 0.95
+            },
+            {
+              "x": 6,
+              "y": 6.7,
+              "confidence": 0.95
+            },
+            {
+              "x": 8,
+              "y": 7.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 10,
+              "y": 7.2,
+              "confidence": 0.95
+            },
+            {
+              "x": 12,
+              "y": 7.3,
+              "confidence": 0.95
+            },
+            {
+              "x": 24,
+              "y": 8.3,
+              "confidence": 0.95
+            }
+          ]
+        }
+      ],
+      "csv_output": "Time (hours),Bacterial Count (log10 CFU/mL) (Condition 1),Time (hours),Bacterial Count (log10 CFU/mL) (Condition 2),Time (hours),Bacterial Count (log10 CFU/mL) (Condition 3)\n0,6.0,0,6.0,0,6.0\n2,7.5,2,5.2,2,5.8\n4,7.9,4,5.1,4,6.4\n6,8.0,6,5.1,6,6.7\n8,7.9,8,5.2,8,7.0\n10,7.8,,,10,7.2\n12,7.7,12,5.3,12,7.3\n24,7.7,24,5.5,24,8.3",
+      "confidence": 0.95
+    },
+    "validation_flags": [
+      {
+        "curve_label": "Condition 1",
+        "x": 2,
+        "y": 7.5,
+        "issue": "Impossible jump",
+        "details": "Sudden increase of 1.5 log10 CFU/mL from 6.0 to 7.5 between 0 and 2 hours, which exceeds the typical 1\u20132 log10 CFU/mL threshold for consecutive points."
+      },
+      {
+        "curve_label": "Condition 3",
+        "x": 24,
+        "y": 8.3,
+        "issue": "Unexpected trend divergence",
+        "details": "Sharp increase from 7.3 to 8.3 log10 CFU/mL between 12 and 24 hours, diverging from the earlier gradual trend. This may indicate bacterial regrowth, but it should be flagged for verification."
+      }
+    ]
+  },
+  "stage_duration_ms": 0,
+  "timestamp": 1768548627.115888,
+  "console_output": "Extraction completed successfully"
+}

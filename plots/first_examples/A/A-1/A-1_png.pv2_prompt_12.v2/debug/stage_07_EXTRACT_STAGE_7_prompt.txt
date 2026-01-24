@@ -1,0 +1,376 @@
+
+You have access to:
+- Plot image
+- Accumulated facts (curve definitions, colours/line/marker, expected trends when available)
+- Stage 6 output JSON containing re-extraction requests
+
+ACCUMULATED FACTS:
+{
+  "plot_type_facts": {
+    "declared_in_article_info": "unknown",
+    "visually_verified": true,
+    "plot_type": "time-kill plot",
+    "confidence": 0.9,
+    "reason": "The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, which aligns with typical time-kill kinetics."
+  },
+  "axis_facts": {
+    "x_axis": {
+      "quantity": "time",
+      "unit": "hours",
+      "discrete": false,
+      "lower_plausible_limit": 0,
+      "upper_plausible_limit": 26,
+      "ticks_verified": [
+        0,
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        22,
+        24,
+        26
+      ],
+      "tick_labels": [
+        "0",
+        "2",
+        "4",
+        "6",
+        "8",
+        "10",
+        "12",
+        "22",
+        "24",
+        "26"
+      ],
+      "breaks": [
+        {
+          "start": 12,
+          "end": 22,
+          "reason": "Non-uniform spacing between 12 and 22 hours to highlight extended observation period"
+        }
+      ],
+      "confidence": 0.98
+    },
+    "y_axis": {
+      "quantity": "bacterial burden",
+      "unit": "log10 CFU/mL",
+      "scale": "log10",
+      "upper_plausible_limit": 16,
+      "lower_plausible_limit": 0,
+      "ticks_verified": [
+        0,
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        14,
+        16
+      ],
+      "tick_labels": [
+        "0",
+        "2",
+        "4",
+        "6",
+        "8",
+        "10",
+        "12",
+        "14",
+        "16"
+      ],
+      "breaks": [],
+      "grid": {
+        "present": true,
+        "aligned_y_ticks": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16
+        ],
+        "aligned_x_ticks": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          22,
+          24,
+          26
+        ]
+      },
+      "confidence": 0.95
+    }
+  },
+  "curve_style_facts": {
+    "curves": [
+      {
+        "curve_label": "Blank",
+        "colour": "black",
+        "line_type": "dotted",
+        "marker_symbol": "x",
+        "source": "figure_legend",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "COL 0.125ug/mL",
+        "colour": "black",
+        "line_type": "solid",
+        "marker_symbol": "square",
+        "source": "figure_legend",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "MINO 1ug/mL",
+        "colour": "black",
+        "line_type": "dashed",
+        "marker_symbol": "triangle",
+        "source": "figure_legend",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "MEM 4ug/mL",
+        "colour": "black",
+        "line_type": "dash-dot",
+        "marker_symbol": "circle",
+        "source": "figure_legend",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "RFP 0.06ug/mL",
+        "colour": "black",
+        "line_type": "dotted",
+        "marker_symbol": "inverted_triangle",
+        "source": "figure_legend",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "COL 0.125ug/mL + MEM 4ug/mL",
+        "colour": "black",
+        "line_type": "dash-dot-dot",
+        "marker_symbol": "none",
+        "source": "direct_visual",
+        "confidence": 0.9
+      },
+      {
+        "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+        "colour": "black",
+        "line_type": "dash-dot",
+        "marker_symbol": "open_triangle",
+        "source": "direct_visual",
+        "confidence": 0.9
+      },
+      {
+        "curve_label": "COL 0.125ug/mL + RFP 0.06ug/mL",
+        "colour": "black",
+        "line_type": "dotted",
+        "marker_symbol": "inverted_open_triangle",
+        "source": "direct_visual",
+        "confidence": 0.9
+      }
+    ]
+  },
+  "re_extraction": {
+    "requests": [
+      {
+        "curve_label": "Blank",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          22,
+          24,
+          26
+        ],
+        "expected_trend": "growth/increase",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.6,
+          "pct_decreasing": 0.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {
+            "abs_jump": 2.8,
+            "from_time": 0,
+            "to_time": 2,
+            "delta": 2.8
+          }
+        },
+        "visual_guidance": "Verify the bacterial burden increases steadily over time for the untreated control, ensuring no unexpected drops or plateaus."
+      },
+      {
+        "curve_label": "COL 0.125ug/mL",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          22,
+          24,
+          26
+        ],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 1.0,
+          "pct_decreasing": 0.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {
+            "abs_jump": 1.5,
+            "from_time": 2,
+            "to_time": 4,
+            "delta": 1.5
+          }
+        },
+        "visual_guidance": "Re-extract points to reflect bacterial killing over time, ensuring values decrease or stabilize at low levels."
+      },
+      {
+        "curve_label": "RFP 0.06ug/mL",
+        "issue_type": "midcurve_switch",
+        "target_times_hours": [
+          8,
+          10,
+          12,
+          22,
+          24,
+          26
+        ],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.2,
+          "pct_decreasing": 0.6,
+          "baseline_delta_from_median": null,
+          "largest_jump": {
+            "abs_jump": 2.0,
+            "from_time": 12,
+            "to_time": 22,
+            "delta": 2.0
+          }
+        },
+        "visual_guidance": "Check for regrowth after 12 hours; ensure values continue decreasing or remain low, not increasing."
+      }
+    ]
+  }
+}
+
+STAGE 6 OUTPUT (RE-EXTRACTION REQUESTS):
+```json
+{
+  "re_extraction": {
+    "requests": [
+      {
+        "curve_label": "Blank",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+        "expected_trend": "growth/increase",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.6,
+          "pct_decreasing": 0.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 2.8, "from_time": 0, "to_time": 2, "delta": 2.8}
+        },
+        "visual_guidance": "Verify the bacterial burden increases steadily over time for the untreated control, ensuring no unexpected drops or plateaus."
+      },
+      {
+        "curve_label": "COL 0.125ug/mL",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 1.0,
+          "pct_decreasing": 0.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 1.5, "from_time": 2, "to_time": 4, "delta": 1.5}
+        },
+        "visual_guidance": "Re-extract points to reflect bacterial killing over time, ensuring values decrease or stabilize at low levels."
+      },
+      {
+        "curve_label": "RFP 0.06ug/mL",
+        "issue_type": "midcurve_switch",
+        "target_times_hours": [8, 10, 12, 22, 24, 26],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.2,
+          "pct_decreasing": 0.6,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 2.0, "from_time": 12, "to_time": 22, "delta": 2.0}
+        },
+        "visual_guidance": "Check for regrowth after 12 hours; ensure values continue decreasing or remain low, not increasing."
+      }
+    ]
+  }
+}
+```
+
+---
+
+STAGE 7 — RE-EXTRACTION (TARGETED POINTS ONLY)
+
+GOAL:
+Re-extract ONLY the specified (curve_id, time_hours) points.
+
+HARD RULES:
+- Do NOT add new time points.
+- Do NOT add points for curves not requested.
+- Use curve definitions (colour/line/marker) from accumulated facts to select the correct curve.
+- If a curve is ambiguous (overlap/crossing), lower confidence and explain why in ONE short note.
+- Output JSON only. No extra text. No backticks.
+
+METHOD (for each request):
+1) Locate the curve (use colour/line/marker) and ensure continuity from nearby points.
+2) Locate the specified x-value (time in hours) and read the y-value precisely.
+3) Sanity check: compare against adjacent extracted points from the original CSV and/or expected trend.
+4) Record only the corrected value.
+
+OUTPUT JSON SCHEMA (MERGE INTO ACCUMULATED FACTS):
+{
+  "re_extraction": {
+    "results": [
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 6,
+        "new_log10_cfu_ml": 5.2,
+        "confidence": "high | medium | low",
+        "reason": "One short sentence: what was fixed (e.g., wrong curve / wrong decade / truncation).",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "short phrase"
+        }
+      }
+    ]
+  }
+}

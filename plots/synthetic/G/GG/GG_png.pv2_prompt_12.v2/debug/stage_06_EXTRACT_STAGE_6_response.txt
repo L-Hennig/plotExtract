@@ -1,0 +1,56 @@
+```json
+{
+  "re_extraction": {
+    "requests": [
+      {
+        "curve_label": "Condition 2",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [0, 2, 22, 24],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 13,
+          "expected_n_points": 13,
+          "times_missing": [],
+          "pct_increasing": 0.5714285714285714,
+          "pct_decreasing": 0.42857142857142855,
+          "baseline_delta_from_median": -2.1999999999999993,
+          "largest_jump": {"abs_jump": 2.3000000000000007, "from_time": 0.0, "to_time": 2.0, "delta": 2.3000000000000007}
+        },
+        "visual_guidance": "Re-extract points for Condition 2 (dashed line with triangle markers) ensuring bacterial count decreases over time, consistent with bactericidal/bacteriostatic effect."
+      },
+      {
+        "curve_label": "Condition 3",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [0, 2, 22, 24],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 13,
+          "expected_n_points": 13,
+          "times_missing": [],
+          "pct_increasing": 1.0,
+          "pct_decreasing": 0.0,
+          "baseline_delta_from_median": -2.1999999999999993,
+          "largest_jump": {"abs_jump": 1.0, "from_time": 0.0, "to_time": 2.0, "delta": 1.0}
+        },
+        "visual_guidance": "Re-extract points for Condition 3 (dotted line with circle markers) ensuring bacterial count decreases over time, consistent with bactericidal/bacteriostatic effect."
+      },
+      {
+        "curve_label": "Condition 4",
+        "issue_type": "truncated_curve",
+        "target_times_hours": [18, 22],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 11,
+          "expected_n_points": 13,
+          "times_missing": [18.0, 22.0],
+          "pct_increasing": 0.3333333333333333,
+          "pct_decreasing": 0.6666666666666666,
+          "baseline_delta_from_median": 4.2,
+          "largest_jump": {"abs_jump": 4.2, "from_time": 0.0, "to_time": 2.0, "delta": -4.2}
+        },
+        "visual_guidance": "Re-extract missing points at 18 and 22 hours for Condition 4 (solid line with filled circle markers), ensuring continuity with the rest of the curve."
+      }
+    ]
+  }
+}
+```

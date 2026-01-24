@@ -1,0 +1,39 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time_cond1 = [0, 2, 4, 6, 8, 10, 12, 24]
+log_cfu_cond1 = [6.1, 6.7, 7.0, 7.8, 8.3, 8.5, 8.4, 8.3]
+
+time_cond2 = [0, 2, 4, 6, 8, 10, 12, 24]
+log_cfu_cond2 = [5.8, 5.7, 6.0, 6.1, 6.0, 6.2, 6.3, 5.8]
+
+time_cond3 = [0, 2, 4, 6, 8, 10, 12, 24]
+log_cfu_cond3 = [6.0, 4.8, 2.3, 1.7, 1.5, 1.4, 1.3, 1.1]
+
+# Create plot
+plt.figure(figsize=(8, 6))
+plt.plot(time_cond1, log_cfu_cond1, 's-', color='black', label='Condition 1', markersize=8, linewidth=2)
+plt.plot(time_cond2, log_cfu_cond2, '^--', color='black', label='Condition 2', markersize=8, linewidth=2)
+plt.plot(time_cond3, log_cfu_cond3, 'o:', color='black', label='Condition 3', markersize=8, linewidth=2)
+
+# Axis labels and title
+plt.xlabel('Time (hours)', fontsize=12)
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)', fontsize=12)
+plt.yscale('log')
+plt.ylim(1, 10)
+plt.xlim(0, 26)
+
+# Tick marks
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24], fontsize=10)
+plt.yticks([1, 2, 4, 6, 8, 10], ['1', '2', '4', '6', '8', '10'], fontsize=10)
+
+# Legend
+plt.legend(loc='upper right', fontsize=10)
+
+# Save plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\G\GA\GA_png.p5.v1"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "GA_png-replot.p5.v1.png"), dpi=300, bbox_inches='tight')
+plt.close()

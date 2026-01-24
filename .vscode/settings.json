@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^\\$ErrorActionPreference='Stop'; Set-Location \"C:/Users/Lucas/OneDrive/UCL Internship/Plot_Extract/Prototype\"; \\$py=\"C:/Users/Lucas/OneDrive/UCL Internship/Plot_Extract/Prototype/\\.venv/Scripts/python\\.exe\"; \\$orig=\"C:/Users/Lucas/OneDrive/UCL Internship/Plot_Extract/Prototype/plots/synthetic/G/GA_copy1/GA_copy1-original\\.csv\"; \\$ext=\"C:/Users/Lucas/OneDrive/UCL Internship/Plot_Extract/Prototype/plots/synthetic/G/GA_copy1/GA_copy1_png\\.pv2_prompt_12\\.v3/GA_copy1_extracted\\.csv\"; \\$outdir=\"C:/Users/Lucas/OneDrive/UCL Internship/Plot_Extract/Prototype/plots/synthetic/G/GA_copy1/GA_copy1_png\\.pv2_prompt_12\\.v3\"; & \\$py interpolation\\.py \\$orig \\$ext 0 24 0 10 \\$outdir; & \\$py pointwise\\.py \\$ext \\$orig 0 24 0 10 \\$outdir$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

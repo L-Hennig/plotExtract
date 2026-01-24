@@ -1,0 +1,44 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time_cond1 = [0, 2, 4, 6, 8, 10, 12, 14, 24]
+count_cond1 = [6.0, 7.5, 7.7, 7.7, 7.6, 7.7, 7.7, 7.7, 7.8]
+
+time_cond2 = [0, 2, 4, 6, 8, 10]
+count_cond2 = [6.0, 6.3, 5.8, 5.5, 5.6, 6.2]
+
+time_cond3 = [0, 2, 4]
+count_cond3 = [6.0, 2.0, 0.8]
+time_cond3_24 = [24]
+count_cond3_24 = [6.1]
+
+time_cond4 = [0, 2, 4, 6, 8, 10, 12, 14, 24]
+count_cond4 = [6.0, 8.8, 8.9, 8.7, 9.1, 9.0, 9.0, 9.1, 9.2]
+
+# Plot setup
+plt.figure(figsize=(8, 6))
+plt.yscale('log')
+plt.ylim(0.5, 10)
+plt.xlim(0, 25)
+plt.yticks([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])
+
+# Plot each condition
+plt.plot(time_cond1, count_cond1, 's-', color='black', label='Condition 1', markersize=8, linewidth=1.5)
+plt.plot(time_cond2, count_cond2, '^--', color='black', label='Condition 2', markersize=8, linewidth=1.5)
+plt.plot(time_cond3, count_cond3, 'o:', color='black', label='Condition 3', markersize=8, linewidth=1.5)
+plt.plot(time_cond3_24, count_cond3_24, 'o:', color='black', markersize=8, linewidth=1.5)
+plt.plot(time_cond4, count_cond4, 'D-', color='black', label='Condition 4', markersize=8, linewidth=1.5)
+
+# Labels and legend
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+plt.legend()
+
+# Save plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\FE\FE_png.p4.v1"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "FE_png-replot.p4.v1.png"), bbox_inches='tight', dpi=300)
+plt.close()

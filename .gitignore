@@ -1,2 +1,14 @@
 .env
 __pycache__/
+
+# Python environments
+.venv/
+
+# Local plot artifacts / uploads
+plots/batch_uploads/
+
+# UI state files (local)
+UserInterface/extraction_state.json
+UserInterface/batch_runs.json
+UserInterface/synthetic_settings.json
+UserInterface/synthetic_settings_v2.json

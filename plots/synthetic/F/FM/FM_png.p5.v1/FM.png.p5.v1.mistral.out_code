@@ -1,0 +1,51 @@
+import matplotlib.pyplot as plt
+import os
+
+# Data preparation
+data = {
+    'Time_1': [0, 2, 4, 6, 8, 10, 12, 14, 24],
+    'CFU_1': [6.0, 7.8, 8.3, 8.2, 8.3, 8.2, 8.2, 8.2, 8.2],
+    'Time_2': [0, 2, 4, 6, 8, 10, 24],
+    'CFU_2': [6.0, 6.8, 7.2, 7.8, 8.1, 8.0, 1.8],
+    'Time_3': [0, 2, 4, 6, 8, 10, 12, 14, 24],
+    'CFU_3': [6.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+    'Time_4': [0, 2, 4, 6, 8, 10, 12, 14, 24],
+    'CFU_4': [6.0, 6.8, 7.2, 7.5, 8.0, 8.0, 1.8, 1.5, 1.5],
+    'Time_5': [0, 2, 4, 6, 8, 10, 12, 14, 24],
+    'CFU_5': [6.0, 3.0, 3.0, 2.8, 2.3, 2.0, 2.0, 1.8, 1.0]
+}
+
+# Create directory if it doesn't exist
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\F\FM\FM_png.p5.v1"
+os.makedirs(output_dir, exist_ok=True)
+
+# Plot setup
+plt.figure(figsize=(8, 6))
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['font.size'] = 12
+
+# Plot each condition
+plt.plot(data['Time_1'], data['CFU_1'], 's-', color='black', label='Condition 1', markersize=8, linewidth=1.5)
+plt.plot(data['Time_2'], data['CFU_2'], '^--', color='black', label='Condition 2', markersize=8, linewidth=1.5)
+plt.plot(data['Time_3'], data['CFU_3'], ':', color='black', marker='o', fillstyle='none', label='Condition 3', markersize=8, linewidth=1.5)
+plt.plot(data['Time_4'], data['CFU_4'], 'D-.', color='black', label='Condition 4', markersize=8, linewidth=1.5)
+plt.plot(data['Time_5'], data['CFU_5'], 'o-', color='black', markerfacecolor='none', label='Condition 5', markersize=8, linewidth=1.5)
+
+# Axis labels and limits
+plt.xlabel('Time (hours)', fontsize=12)
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)', fontsize=12)
+plt.xlim(0, 26)
+plt.ylim(0, 10)
+
+# Log scale for y-axis
+plt.yscale('log')
+plt.yticks([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
+
+# Grid and legend
+plt.grid(True, which="both", ls="--", linewidth=0.5)
+plt.legend(loc='upper right', fontsize=10)
+
+# Save the plot
+output_path = os.path.join(output_dir, "FM_png-replot.p5.v1.png")
+plt.savefig(output_path, dpi=300, bbox_inches='tight')
+plt.close()

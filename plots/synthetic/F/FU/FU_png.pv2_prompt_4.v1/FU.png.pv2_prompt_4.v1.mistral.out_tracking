@@ -1,0 +1,112 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/F/FU/FU.png",
+  "prompt_name": "prompt_4",
+  "overall_status": "completed",
+  "validation_status": "skipped",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 496,
+      "execution_time_ms": 3600.8520126342773,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-19T18:40:54.937581",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1396,
+      "execution_time_ms": 7505.9075355529785,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-19T18:40:58.540859",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1517,
+      "execution_time_ms": 8563.326358795166,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-19T18:41:06.048632",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 185,
+        "columns": [
+          "Here is the extracted data in the requested format:"
+        ],
+        "axis_labels": [
+          "Here is the extracted data in the requested format:"
+        ]
+      },
+      "output_length": 6579,
+      "execution_time_ms": 33016.55721664429,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-19T18:41:14.614318",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 262,
+        "columns": [
+          "```json"
+        ],
+        "axis_labels": [
+          "```json"
+        ]
+      },
+      "output_length": 5860,
+      "execution_time_ms": 25073.028087615967,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-19T18:41:47.637382",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_4": {
+      "num_columns": 1,
+      "num_rows": 185,
+      "columns": [
+        "Here is the extracted data in the requested format:"
+      ],
+      "axis_labels": [
+        "Here is the extracted data in the requested format:"
+      ]
+    },
+    "EXTRACT_STAGE_5": {
+      "num_columns": 1,
+      "num_rows": 262,
+      "columns": [
+        "```json"
+      ],
+      "axis_labels": [
+        "```json"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 122.757646,
+  "output_files": {}
+}

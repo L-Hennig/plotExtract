@@ -1,0 +1,70 @@
+import os
+import matplotlib.pyplot as plt
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic/F/FP\FP_png.pv2_prompt_4.v1\FP_png-replot.pv2_prompt_4.v1.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+curves_data = [
+    {
+        "label": "Condition 1",
+        "points": [(0, 6.0), (24, 0.5)],
+        "marker": 's',
+        "linestyle": '-',
+        "color": 'black'
+    },
+    {
+        "label": "Condition 2",
+        "points": [(0, 6.0), (2, 2.0), (4, 5.8), (6, 5.9), (8, 5.8), (10, 5.9)],
+        "marker": '^',
+        "linestyle": '--',
+        "color": 'black'
+    },
+    {
+        "label": "Condition 3",
+        "points": [(0, 6.0), (2, 1.0), (8, 2.0), (10, 1.5), (22, 2.0), (24, 2.0)],
+        "marker": 'o',
+        "linestyle": ':',
+        "color": 'black'
+    },
+    {
+        "label": "Condition 4",
+        "points": [(0, 6.0), (2, 7.5), (4, 8.0), (6, 8.5), (8, 9.0), (10, 9.0), (12, 9.0), (14, 9.1), (16, 9.1), (18, 9.1), (20, 9.2), (22, 9.2), (24, 9.3)],
+        "marker": 'D',
+        "linestyle": '-.',
+        "color": 'black'
+    },
+    {
+        "label": "Condition 5",
+        "points": [(0, 6.0), (2, 3.8), (4, 3.0), (6, 2.8), (8, 3.0), (10, 3.2), (12, 3.3), (22, 5.0)],
+        "marker": 'o',
+        "linestyle": '-',
+        "color": 'black'
+    },
+    {
+        "label": "Condition 6",
+        "points": [(0, 6.0), (4, 3.5), (24, 5.5)],
+        "marker": '>',
+        "linestyle": '--',
+        "color": 'black'
+    }
+]
+
+plt.figure(figsize=(8, 6))
+
+for curve in curves_data:
+    x_vals, y_vals = zip(*curve["points"])
+    plt.plot(x_vals, y_vals,
+             marker=curve["marker"],
+             linestyle=curve["linestyle"],
+             color=curve["color"],
+             label=curve["label"])
+
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+plt.xlim(0, 25)
+plt.ylim(0, 10)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])
+plt.yticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+plt.legend()
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)
+plt.close()

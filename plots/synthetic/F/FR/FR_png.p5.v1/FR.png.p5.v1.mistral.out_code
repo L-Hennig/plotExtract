@@ -1,0 +1,49 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Data preparation
+data = {
+    'Time': [0, 2, 4, 6, 8, 10, 12, 24],
+    'Condition 1': [6.0, 5.8, 6.5, 6.8, 7.2, 7.5, 7.8, 8.0],
+    'Condition 2': [6.0, 8.3, 8.5, 8.2, 8.7, 8.8, 8.9, 8.2],
+    'Condition 3': [6.0, 1.5, 1.0, 1.0, np.nan, np.nan, np.nan, 1.0],
+    'Condition 4': [6.0, 7.8, 8.0, 8.0, 8.1, 9.0, 8.9, 8.3],
+    'Condition 5': [6.0, 3.0, 2.5, 2.3, 2.5, 2.3, np.nan, 1.0],
+    'Condition 6': [6.0, 3.5, 2.5, 2.0, 2.0, 1.0, 2.2, 1.0]
+}
+
+# Create figure and axis
+plt.figure(figsize=(8, 6))
+ax = plt.gca()
+
+# Plot each condition with specific styles
+# Condition 1: square, solid line
+ax.plot(data['Time'], data['Condition 1'], 's-', color='black', label='Condition 1', markersize=8, linewidth=1.5)
+# Condition 2: triangle up, dashed line
+ax.plot(data['Time'], data['Condition 2'], '^--', color='black', label='Condition 2', markersize=8, linewidth=1.5)
+# Condition 3: circle, dotted line
+ax.plot(data['Time'], data['Condition 3'], 'o:', color='black', label='Condition 3', markersize=8, linewidth=1.5)
+# Condition 4: diamond, dash-dot line
+ax.plot(data['Time'], data['Condition 4'], 'D-.', color='black', label='Condition 4', markersize=8, linewidth=1.5)
+# Condition 5: filled circle, solid line
+ax.plot(data['Time'], data['Condition 5'], 'o-', color='black', label='Condition 5', markersize=8, linewidth=1.5, markerfacecolor='black')
+# Condition 6: filled diamond, dashed line
+ax.plot(data['Time'], data['Condition 6'], 'D--', color='black', label='Condition 6', markersize=8, linewidth=1.5, markerfacecolor='black')
+
+# Set axis labels and limits
+ax.set_xlabel('Time (hours)', fontsize=12)
+ax.set_ylabel('Bacterial Count (CFU/mL) (log10 scale)', fontsize=12)
+ax.set_xlim(0, 26)
+ax.set_ylim(1, 10)
+ax.set_yscale('log')
+ax.set_yticks([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+ax.set_yticklabels(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
+
+# Add grid and legend
+ax.grid(True, which="both", ls="--", linewidth=0.5)
+ax.legend(loc='upper right', fontsize=10)
+
+# Save the plot
+plt.tight_layout()
+plt.savefig(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\FR\FR_png.p5.v1\FR_png-replot.p5.v1.png", dpi=300)
+plt.close()

@@ -1,0 +1,9 @@
+{
+  "plot_type_facts": {
+    "declared_in_article_info": "unknown",
+    "visually_verified": true,
+    "plot_type": "time-kill plot",
+    "confidence": 0.9,
+    "reason": "x-axis represents time in hours, y-axis represents bacterial count in CFU/mL on a log scale, and multiple conditions are tracked over time with consistent markers and lines, confirming a time-kill plot visually."
+  }
+}

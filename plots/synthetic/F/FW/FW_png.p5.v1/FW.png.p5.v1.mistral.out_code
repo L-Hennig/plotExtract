@@ -1,0 +1,51 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Create directory if it doesn't exist
+os.makedirs(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\F_png.p5.v1", exist_ok=True)
+
+# Data preparation
+data = {
+    'Time': [0, 2, 4, 6, 8, 10, 12, 24],
+    'Condition 1': [6.1, 7.8, 7.9, 7.9, 7.9, 7.8, 7.7, 7.6],
+    'Condition 2': [6.1, 8.3, 8.3, 8.3, 8.3, 8.3, 8.3, 8.3],
+    'Condition 3': [6.0, 1.5, np.nan, np.nan, np.nan, np.nan, np.nan, 2.5],
+    'Condition 4': [6.1, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3],
+    'Condition 5': [6.1, 3.0, 2.6, 2.3, 2.3, 2.3, np.nan, 1.3],
+    'Condition 6': [6.1, 7.9, 7.9, 7.9, 7.9, 7.9, 7.9, 8.3]
+}
+
+# Create figure and axis
+fig, ax = plt.subplots(figsize=(8, 6))
+
+# Plot each condition with specific line and marker styles
+ax.plot(data['Time'], data['Condition 1'], color='black', linestyle='-', marker='s', label='Condition 1')
+ax.plot(data['Time'], data['Condition 2'], color='black', linestyle='--', marker='^', label='Condition 2')
+ax.plot(data['Time'], data['Condition 3'], color='black', linestyle=':', marker='o', label='Condition 3')
+ax.plot(data['Time'], data['Condition 4'], color='black', linestyle='-.', marker='D', label='Condition 4')
+ax.plot(data['Time'], data['Condition 5'], color='black', linestyle='-', marker='o', label='Condition 5')
+ax.plot(data['Time'], data['Condition 6'], color='black', linestyle='--', marker='d', label='Condition 6')
+
+# Set axis labels and scales
+ax.set_xlabel('Time (hours)')
+ax.set_ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+ax.set_yscale('log')
+ax.set_xlim(0, 26)
+ax.set_ylim(1, 10)
+
+# Set x and y ticks
+ax.set_xticks([0, 2, 4, 6, 8, 10, 12, 20, 22, 24])
+ax.set_yticks([1, 2, 4, 6, 8, 10])
+ax.set_yticklabels(['1', '2', '4', '6', '8', '10'])
+
+# Add axis break on x-axis
+ax.plot([13, 13.5], [1, 10], color='black', linewidth=1.5)
+ax.plot([13, 13.5], [10, 1], color='black', linewidth=1.5)
+
+# Add legend
+ax.legend(loc='upper right', frameon=False)
+
+# Save the plot
+plt.savefig(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\F_png.p5.v1\FW_png-replot.p5.v1.png", bbox_inches='tight', dpi=300)
+plt.close()

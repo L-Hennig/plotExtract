@@ -5,6 +5,11 @@
 
 CHAIN_NAME = "prompt_2"
 
+# Which complete schema to use for accumulated facts (constraint)
+from complete_extraction_schema import ACCUMULATED_FACTS_SCHEMA
+
+COMPLETE_SCHEMA = ACCUMULATED_FACTS_SCHEMA
+
 # Extraction stages in order
 EXTRACT_STAGES = [
     "EXTRACT_STAGE_1",  # Plot type verification (time-kill)

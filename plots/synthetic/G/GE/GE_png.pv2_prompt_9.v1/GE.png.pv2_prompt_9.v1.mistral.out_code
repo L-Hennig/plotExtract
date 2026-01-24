@@ -1,0 +1,68 @@
+import matplotlib.pyplot as plt
+import os
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic/G/GE\GE_png.pv2_prompt_9.v1\GE_png-replot.pv2_prompt_9.v1.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data from marker_facts
+data = {
+    "Condition 1": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6, 8, 8.5, 8.7, 9, 9, 9, 8.7],
+        "style": {"color": "black", "linestyle": "-", "marker": "s"}
+    },
+    "Condition 2": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6, 7.8, 8.2, 8.1, 8, 8, 8, 8.2],
+        "style": {"color": "black", "linestyle": "--", "marker": "^"}
+    },
+    "Condition 3": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6, 6.5, 7, 7.5, 7.8, 7.9, 8, 8.1],
+        "style": {"color": "black", "linestyle": ":", "marker": "o"}
+    },
+    "Condition 4": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6, 2.5, 2, 2.2, 1.8, 1.5, 1.5, 1.5],
+        "style": {"color": "black", "linestyle": "-", "marker": "o"}
+    },
+    "Condition 5": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6, 3.5, 2.5, 2, 1.8, 1.7, 1.6, 1.6],
+        "style": {"color": "black", "linestyle": ":", "marker": "v"}
+    },
+    "Condition 6": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6, 1.5, 1.2, 1.1, 1, 1, 1, 1.2],
+        "style": {"color": "black", "linestyle": "--", "marker": "s"}
+    }
+}
+
+# Create the plot
+plt.figure(figsize=(8, 6))
+
+# Plot each condition
+for condition, values in data.items():
+    plt.plot(values["x"], values["y"],
+             label=condition,
+             color=values["style"]["color"],
+             linestyle=values["style"]["linestyle"],
+             marker=values["style"]["marker"])
+
+# Set axis labels
+plt.xlabel("Time (hours)")
+plt.ylabel("Bacterial Count (CFU/mL) (log10 scale)")
+
+# Set axis limits
+plt.xlim(0, 24)
+plt.ylim(0, 10)
+
+# Set ticks
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 24])
+plt.yticks([0, 2, 4, 6, 8, 10])
+
+# Add legend
+plt.legend()
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)

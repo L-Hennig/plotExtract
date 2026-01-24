@@ -1,0 +1,120 @@
+```json
+{
+  "re_extraction": {
+    "requests": [
+      {
+        "curve_label": "Blank",
+        "issue_type": "truncation",
+        "target_times_hours": [22, 24, 26],
+        "expected_trend": "growth/increase",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 1.0,
+          "pct_decreasing": 0.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 2.5, "from_time": 0, "to_time": 2, "delta": 2.5}
+        },
+        "visual_guidance": "Verify if the curve plateaus after 12 hours; ensure continuity with earlier growth trend."
+      },
+      {
+        "curve_label": "COL 0.125µg/mL",
+        "issue_type": "truncation",
+        "target_times_hours": [22, 24, 26],
+        "expected_trend": "variable",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 1.0,
+          "pct_decreasing": 0.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 1.0, "from_time": 0, "to_time": 2, "delta": 1.0}
+        },
+        "visual_guidance": "Check if the curve stabilizes or continues to rise after 12 hours; maintain consistency with earlier data points."
+      },
+      {
+        "curve_label": "MEM 4µg/mL",
+        "issue_type": "midcurve_switch",
+        "target_times_hours": [2, 4, 22, 24, 26],
+        "expected_trend": "variable",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.11,
+          "pct_decreasing": 0.67,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 6.0, "from_time": 0, "to_time": 2, "delta": -6.0}
+        },
+        "visual_guidance": "Re-examine the sharp drop at 2 hours; ensure the curve does not re-grow prematurely after 12 hours."
+      },
+      {
+        "curve_label": "RFP 0.06µg/mL",
+        "issue_type": "truncation",
+        "target_times_hours": [22, 24, 26],
+        "expected_trend": "variable",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 0.89,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 4.0, "from_time": 0, "to_time": 2, "delta": -4.0}
+        },
+        "visual_guidance": "Confirm if the curve remains at 0 or shows regrowth after 12 hours; avoid misreading grid lines."
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + MEM 4µg/mL",
+        "issue_type": "truncation",
+        "target_times_hours": [22, 24, 26],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 1.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 6.0, "from_time": 0, "to_time": 2, "delta": -6.0}
+        },
+        "visual_guidance": "Check for any regrowth after 12 hours; ensure the curve stays at 0 if no regrowth is expected."
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + MINO 1µg/mL",
+        "issue_type": "truncation",
+        "target_times_hours": [22, 24, 26],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 1.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 6.0, "from_time": 0, "to_time": 2, "delta": -6.0}
+        },
+        "visual_guidance": "Verify if the curve remains at 0 or shows regrowth after 12 hours; avoid misinterpreting grid lines."
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + RFP 0.06µg/mL",
+        "issue_type": "truncation",
+        "target_times_hours": [22, 24, 26],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 1.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 6.0, "from_time": 0, "to_time": 2, "delta": -6.0}
+        },
+        "visual_guidance": "Ensure the curve stays at 0 after 12 hours; check for any unexpected regrowth."
+      }
+    ]
+  }
+}
+```

@@ -1,0 +1,92 @@
+import matplotlib.pyplot as plt
+import os
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic/G/GF\GF_png.pv2_prompt_12.v1\GF_png-replot.pv2_prompt_12.v1.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data from marker_facts
+data = {
+    "Condition 1": [
+        (0, 6.0), (2, 1.0), (4, 0.7), (6, 0.7), (8, 1.8), (10, 1.9), (12, 1.8), (24, 1.8)
+    ],
+    "Condition 2": [
+        (0, 6.0), (2, 7.8), (4, 7.5), (6, 7.6), (8, 7.4), (10, 7.5), (12, 7.4), (24, 7.5)
+    ],
+    "Condition 3": [
+        (0, 6.0), (2, 5.8), (4, 6.5), (6, 6.6), (8, 6.8), (10, 7.2), (12, 7.8), (24, 8.4)
+    ],
+    "Condition 4": [
+        (0, 6.0), (2, 1.2), (4, 1.3), (6, 1.5), (8, 1.8), (10, 2.0), (12, 2.0), (24, 2.8)
+    ],
+    "Condition 5": [
+        (0, 6.0), (2, 1.8), (4, 2.2), (6, 0.8), (8, 0.7), (10, 0.7), (12, 0.7), (24, 0.7)
+    ],
+    "Condition 6": [
+        (0, 6.0), (2, 7.8), (4, 7.6), (6, 7.8), (8, 7.9), (10, 7.8), (12, 7.7), (24, 7.9)
+    ]
+}
+
+# Re-extracted data points
+re_extracted_data = {
+    "Condition 1": [
+        (0, 6.0), (2, 0.7), (4, 0.7), (6, 0.7), (8, 0.7), (10, 0.7), (12, 0.7), (24, 0.7)
+    ],
+    "Condition 2": [
+        (0, 6.0), (2, 6.3), (4, 7.5), (6, 7.6), (8, 7.4), (10, 7.5), (12, 7.4), (24, 7.5)
+    ],
+    "Condition 3": [
+        (0, 6.0), (2, 5.5), (4, 6.5), (6, 6.6), (8, 6.8), (10, 7.2), (12, 6.5), (24, 6.0)
+    ],
+    "Condition 4": [
+        (0, 6.0), (2, 1.5), (4, 1.3), (6, 1.5), (8, 1.8), (10, 2.0), (12, 2.0), (24, 2.8)
+    ],
+    "Condition 5": [
+        (0, 6.0), (2, 1.5), (4, 2.2), (6, 0.8), (8, 0.7), (10, 0.7), (12, 0.7), (24, 0.7)
+    ],
+    "Condition 6": [
+        (0, 6.0), (2, 6.3), (4, 7.6), (6, 7.8), (8, 7.9), (10, 7.8), (12, 7.7), (24, 7.9)
+    ]
+}
+
+# Curve styles from curve_style_facts
+curve_styles = {
+    "Condition 1": {"line": "solid", "marker": "s", "color": "black"},
+    "Condition 2": {"line": "dashed", "marker": "^", "color": "black"},
+    "Condition 3": {"line": "dotted", "marker": "o", "color": "black"},
+    "Condition 4": {"line": "solid", "marker": "o", "color": "black"},
+    "Condition 5": {"line": "dotted", "marker": "v", "color": "black"},
+    "Condition 6": {"line": "dashed", "marker": "s", "color": "black"}
+}
+
+# Create the plot
+plt.figure(figsize=(8, 6))
+
+# Plot each condition with its style
+for condition, points in re_extracted_data.items():
+    x_vals, y_vals = zip(*points)
+    plt.plot(x_vals, y_vals,
+             linestyle=curve_styles[condition]["line"],
+             marker=curve_styles[condition]["marker"],
+             color=curve_styles[condition]["color"],
+             label=condition)
+
+# Set axis labels
+plt.xlabel("Time (hours)")
+plt.ylabel("Bacterial Count (CFU/mL) (log10 scale)")
+
+# Set axis limits
+plt.xlim(0, 25)
+plt.ylim(0, 10)
+
+# Set ticks
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])
+plt.yticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+# Add grid
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+
+# Add legend
+plt.legend()
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)

@@ -1,0 +1,41 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time = [0, 2, 4, 6, 8, 10, 24]
+blank = [6.0, 8.5, 9.5, 10.0, 10.0, 10.0, 10.0]
+col_0125 = [6.0, 7.0, 8.0, 9.0, 9.5, 10.0, 10.0]
+mino_1 = [6.0, 8.0, 9.0, 9.5, 10.0, 10.0, 9.0]
+mem_4 = [6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+rfp_006 = [6.0, 8.5, 9.0, 9.5, 10.0, 10.0, 10.0]
+col_mem = [6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+col_mino = [6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+col_rfp = [6.0, 0.0, 1.0, 1.5, 1.0, 1.0, 0.0]
+
+# Plot settings
+plt.figure(figsize=(8, 6))
+plt.ylim(0, 16)
+plt.xlim(-1, 26)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 22, 24])
+plt.yticks([0, 1, 2, 4, 6, 8, 10, 12, 14, 16])
+
+# Plot each curve with specific line and marker styles
+plt.plot(time, blank, linestyle=':', marker='x', color='black', label='Blank')
+plt.plot(time, col_0125, linestyle='-', marker='s', color='black', label='COL 0.125µg/mL')
+plt.plot(time, mino_1, linestyle='--', marker='^', color='black', label='MINO 1µg/mL')
+plt.plot(time, mem_4, linestyle='-.', marker='o', color='black', fillstyle='none', label='MEM 4µg/mL')
+plt.plot(time, rfp_006, linestyle=':', marker='v', color='black', fillstyle='none', label='RFP 0.06µg/mL')
+plt.plot(time, col_mem, linestyle='--', marker='o', color='black', label='COL 0.125µg/mL + MEM 4µg/mL')
+plt.plot(time, col_mino, linestyle='-.', marker='^', color='black', fillstyle='none', label='COL 0.125µg/mL + MINO 1µg/mL')
+plt.plot(time, col_rfp, linestyle=':', marker='v', color='black', label='COL 0.125µg/mL + RFP 0.06µg/mL')
+
+# Axis labels
+plt.xlabel('Time (h)')
+plt.ylabel('Log cfu/mL')
+
+# Save the plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\first_examples\A\A-1\A-1_png.p5.v6"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "A-1_png-replot.p5.v6.png"), dpi=300, bbox_inches='tight')
+plt.close()

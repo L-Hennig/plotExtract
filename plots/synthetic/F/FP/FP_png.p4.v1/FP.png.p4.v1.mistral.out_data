@@ -1,0 +1,12 @@
+Time (hours),Bacterial Count (CFU/mL) (Condition 1),Time (hours),Bacterial Count (CFU/mL) (Condition 2),Time (hours),Bacterial Count (CFU/mL) (Condition 3),Time (hours),Bacterial Count (CFU/mL) (Condition 4),Time (hours),Bacterial Count (CFU/mL) (Condition 5),Time (hours),Bacterial Count (CFU/mL) (Condition 6)
+0,6.0,0,6.0,0,6.0,0,6.0,0,6.0,0,6.0
+2,7.8,2,1.0,2,5.8,2,7.5,2,3.8,2,7.0
+4,7.9,4,0.7,4,5.9,4,8.0,4,3.0,4,7.8
+6,8.2,6,0.7,6,5.9,6,8.6,6,2.8,6,8.0
+8,8.5,8,0.7,8,5.9,8,9.0,8,2.5,8,8.7
+10,8.6,10,0.7,10,2.0,10,9.2,10,2.7,10,8.9
+12,8.7,12,0.7,12,1.8,12,9.2,12,3.0,12,9.1
+14,8.7,,14,0.7,14,1.7,14,9.2,14,3.3,14,9.1
+16,8.7,,16,0.7,16,1.7,16,9.2,16,3.6,16,9.1
+20,8.7,,20,0.7,20,1.8,20,9.3,20,4.5,20,9.1
+24,8.8,24,0.8,24,2.0,24,9.3,24,5.2,24,9.2

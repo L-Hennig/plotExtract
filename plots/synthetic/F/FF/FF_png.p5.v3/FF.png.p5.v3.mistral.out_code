@@ -1,0 +1,42 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
+data = {
+    'Time (h)': [0, 2, 4, 6, 8, 10, 12, 24],
+    'Condition 1': [6.0, 7.2, np.nan, 8.5, 8.8, 8.9, 9.0, 9.0],
+    'Condition 2': [5.2, 5.0, 4.9, 4.9, 5.0, 5.2, 5.4, 5.5],
+    'Condition 3': [6.0, 5.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+    'Condition 4': [6.0, 7.0, 8.0, 8.1, 8.3, 8.6, 8.8, 9.2]
+}
+
+df = pd.DataFrame(data)
+
+plt.figure(figsize=(8, 6))
+
+markers = ['s', '^', 'o', 'D']
+linestyles = ['-', '--', ':', '-.']
+colors = ['black', 'black', 'black', 'black']
+labels = ['Condition 1', 'Condition 2', 'Condition 3', 'Condition 4']
+
+for i, col in enumerate(['Condition 1', 'Condition 2', 'Condition 3', 'Condition 4']):
+    plt.plot(df['Time (h)'], df[col],
+             marker=markers[i],
+             linestyle=linestyles[i],
+             color=colors[i],
+             label=labels[i],
+             markersize=8,
+             linewidth=1.5)
+
+plt.ylim(0, 10)
+plt.xlim(0, 26)
+plt.xlabel('Time (hours)', fontsize=12)
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)', fontsize=12)
+plt.yscale('log')
+plt.yticks([1, 2, 4, 6, 8, 10], ['1', '2', '4', '6', '8', '10'], fontsize=10)
+plt.xticks(fontsize=10)
+plt.legend(fontsize=10, loc='upper left', frameon=False)
+
+plt.tight_layout()
+plt.savefig(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\FF\FF_png.p5.v3\FF_png-replot.p5.v3.png", dpi=300)
+plt.close()

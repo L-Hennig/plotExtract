@@ -1,0 +1,48 @@
+{
+  "marker_facts": {
+    "markers_detected": true,
+    "curves": [
+      {
+        "curve_label": "Condition 1",
+        "points": [
+          {"x": 0, "y": 6.2, "confidence": 0.95},
+          {"x": 2, "y": 6.8, "confidence": 0.95},
+          {"x": 4, "y": 7.1, "confidence": 0.95},
+          {"x": 6, "y": 7.9, "confidence": 0.95},
+          {"x": 8, "y": 8.1, "confidence": 0.95},
+          {"x": 10, "y": 8.5, "confidence": 0.95},
+          {"x": 12, "y": 8.3, "confidence": 0.95},
+          {"x": 24, "y": 8.4, "confidence": 0.95}
+        ]
+      },
+      {
+        "curve_label": "Condition 2",
+        "points": [
+          {"x": 0, "y": 6.0, "confidence": 0.95},
+          {"x": 2, "y": 5.6, "confidence": 0.95},
+          {"x": 4, "y": 6.2, "confidence": 0.95},
+          {"x": 6, "y": 6.3, "confidence": 0.95},
+          {"x": 8, "y": 5.9, "confidence": 0.95},
+          {"x": 10, "y": 6.0, "confidence": 0.95},
+          {"x": 12, "y": 6.5, "confidence": 0.95},
+          {"x": 24, "y": 5.9, "confidence": 0.95}
+        ]
+      },
+      {
+        "curve_label": "Condition 3",
+        "points": [
+          {"x": 0, "y": 5.8, "confidence": 0.95},
+          {"x": 2, "y": 3.5, "confidence": 0.95},
+          {"x": 4, "y": 2.2, "confidence": 0.95},
+          {"x": 6, "y": 1.8, "confidence": 0.95},
+          {"x": 8, "y": 1.9, "confidence": 0.95},
+          {"x": 10, "y": 1.5, "confidence": 0.95},
+          {"x": 12, "y": 1.2, "confidence": 0.95},
+          {"x": 24, "y": 0.7, "confidence": 0.95}
+        ]
+      }
+    ],
+    "csv_output": "Time (hours),log10 CFU/mL (Condition 1),Time (hours),log10 CFU/mL (Condition 2),Time (hours),log10 CFU/mL (Condition 3)\n0,6.2,0,6.0,0,5.8\n2,6.8,2,5.6,2,3.5\n4,7.1,4,6.2,4,2.2\n6,7.9,6,6.3,6,1.8\n8,8.1,8,5.9,8,1.9\n10,8.5,10,6.0,10,1.5\n12,8.3,12,6.5,12,1.2\n24,8.4,24,5.9,24,0.7\n",
+    "confidence": 0.95
+  }
+}

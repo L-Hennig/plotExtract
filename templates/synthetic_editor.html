@@ -34,6 +34,8 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 20px;
+            flex-wrap: wrap;
+            gap: 6px;
         }
         .navbar-brand {
             color: white;
@@ -54,13 +56,18 @@
             margin: 0;
             padding: 0;
             gap: 5px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
         .nav-link {
             color: rgba(255,255,255,0.85);
             text-decoration: none;
-            padding: 15px 20px;
+            padding: 12px 20px;
             display: block;
             font-weight: 500;
+            font-size: 14px;
+            line-height: 1.1;
+            white-space: nowrap;
             transition: all 0.2s;
             border-bottom: 3px solid transparent;
         }
@@ -72,6 +79,12 @@
             color: white;
             border-bottom-color: #f39c12;
             background: rgba(255,255,255,0.1);
+        }
+
+        @media (max-width: 900px) {
+            .navbar-container { padding: 0 10px; }
+            .navbar-brand { font-size: 20px; padding: 10px 0; }
+            .nav-link { padding: 10px 14px; font-size: 13px; line-height: 1.1; }
         }
         
         .main-content {
@@ -433,10 +446,12 @@
         <div class="navbar-container">
             <a href="/" class="navbar-brand">📊 PlotExtract</a>
             <ul class="navbar-nav">
-                <li><a href="/" class="nav-link">🔬 Extraction</a></li>
-                <li><a href="/synthetic" class="nav-link">🧫 Synthetic Generator</a></li>
-                <li><a href="/synthetic/editor" class="nav-link active">✏️ Synthetic Editor</a></li>
-                <li><a href="/results" class="nav-link">📈 Results Comparison</a></li>
+                <li><a href="/" class="nav-link">EX 1</a></li>
+                <li><a href="/v2" class="nav-link">EX 2</a></li>
+                <li><a href="/synthetic" class="nav-link">S Gen 1</a></li>
+                <li><a href="/synthetic_v2" class="nav-link">S Gen 2</a></li>
+                <li><a href="/synthetic/editor" class="nav-link active">S Editor</a></li>
+                <li><a href="/results" class="nav-link">Results</a></li>
             </ul>
         </div>
     </nav>
@@ -641,7 +656,7 @@
             // Set the select value and load the plot
             const select = document.getElementById('editorPlotSelect');
             select.value = plotName;
-            loadPlotForEditing();
+            loadPlotForEdit();
         }
         
         function clearSaveHistory() {

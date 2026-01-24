@@ -1,0 +1,61 @@
+{
+  "axis_facts": {
+    "y_axis": {
+      "quantity": "bacterial burden",
+      "unit": "Log CFU/mL",
+      "scale": "log10",
+      "upper_plausible_limit": 16,
+      "lower_plausible_limit": 0,
+      "ticks_verified": [
+        0,
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        14,
+        16
+      ],
+      "tick_labels": [
+        "0",
+        "2",
+        "4",
+        "6",
+        "8",
+        "10",
+        "12",
+        "14",
+        "16"
+      ],
+      "breaks": [],
+      "grid": {
+        "present": true,
+        "aligned_y_ticks": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16
+        ],
+        "aligned_x_ticks": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          22,
+          24,
+          26
+        ]
+      },
+      "confidence": 1
+    }
+  }
+}

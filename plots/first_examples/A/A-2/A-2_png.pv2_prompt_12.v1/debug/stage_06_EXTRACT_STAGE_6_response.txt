@@ -1,0 +1,56 @@
+```json
+{
+  "re_extraction": {
+    "requests": [
+      {
+        "curve_label": "MEM 8µg/mL",
+        "issue_type": "midcurve_switch",
+        "target_times_hours": [10, 12, 24],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 9,
+          "expected_n_points": 9,
+          "times_missing": [],
+          "pct_increasing": 0.8333333333333334,
+          "pct_decreasing": 0.16666666666666666,
+          "baseline_delta_from_median": -2.0,
+          "largest_jump": {"abs_jump": 11.0, "from_time": 10.0, "to_time": 12.0, "delta": -11.0}
+        },
+        "visual_guidance": "Check for a sharp drop at 12 hours; ensure continuity with the expected bactericidal effect (log scale)."
+      },
+      {
+        "curve_label": "RFP 0.06µg/mL",
+        "issue_type": "midcurve_switch",
+        "target_times_hours": [12, 24, 26],
+        "expected_trend": "kill/decrease or stable",
+        "evidence": {
+          "n_points": 9,
+          "expected_n_points": 9,
+          "times_missing": [],
+          "pct_increasing": 0.8333333333333334,
+          "pct_decreasing": 0.16666666666666666,
+          "baseline_delta_from_median": -4.0,
+          "largest_jump": {"abs_jump": 11.0, "from_time": 12.0, "to_time": 24.0, "delta": -11.0}
+        },
+        "visual_guidance": "Verify the sudden drop at 24 hours; ensure consistency with bacteriostatic/bactericidal expectations (log scale)."
+      },
+      {
+        "curve_label": "COL 0.25µg/mL + RFP 0.06µg/mL",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [0, 2, 24, 26],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 9,
+          "expected_n_points": 9,
+          "times_missing": [],
+          "pct_increasing": 0.5,
+          "pct_decreasing": 0.5,
+          "baseline_delta_from_median": 6.0,
+          "largest_jump": {"abs_jump": 6.0, "from_time": 0.0, "to_time": 2.0, "delta": -6.0}
+        },
+        "visual_guidance": "Re-check the increase at 26 hours; ensure alignment with the expected enhanced bactericidal effect (log scale)."
+      }
+    ]
+  }
+}
+```

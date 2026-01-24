@@ -1,0 +1,33 @@
+- X and Y axes are verified,ordered (6),- X and Y axes are verified,ordered (...),- X and Y axes are verified,ordered (log10 CFU/mL (Condition 2)),- X and Y axes are verified,ordered (6.0),- X and Y axes are verified,ordered (8.5),- X and Y axes are verified,ordered (6.5),- X and Y axes are verified,ordered ()
+- Verified x-axis tick values exist: [0,4,- Verified x-axis tick values exist: [0,,- Verified x-axis tick values exist: [0,,- Verified x-axis tick values exist: [0,,- Verified x-axis tick values exist: [0,,- Verified x-axis tick values exist: [0,,- Verified x-axis tick values exist: [0,
+I will extract points for each curve at verified x-values (0,,I will extract points for each curve at verified x-values (0,4,I will extract points for each curve at verified x-values (0,,I will extract points for each curve at verified x-values (0,,I will extract points for each curve at verified x-values (0,,I will extract points for each curve at verified x-values (0,,I will extract points for each curve at verified x-values (0,
+Time (hours),,Time (hours),,Time (hours),Time (hours),Time (hours),,Time (hours),,Time (hours),,Time (hours),
+0,,0,,0,,0,0,0,,0,,0,
+2,,2,,2,,2,,2,2,2,,2,
+4,,4,,4,,4,4,4,,4,,4,
+6,,6,,6,,6,,6,,6,6,6,
+8,,8,,8,,8,,8,,8,8,8,
+10,,10,,10,,10,,10,,10,10,10,
+12,,12,,12,,12,,12,,12,12,12,
+14,,14,,14,,14,,14,,14,14,14,
+16,,16,,16,,16,,16,,16,16,16,
+18,,18,,18,,18,,18,,18,18,18,
+20,,20,,20,,20,,20,,20,20,20,
+22,,22,,22,,22,,22,,22,22,22,
+24,,24,,24,,24,,24,,24,24,24,
+"description": "square,,"description": "square,,"description": "square,,"description": "square,,"description": "square,,"description": "square,,"description": "square,black"
+"description": "triangle,,"description": "triangle,,"description": "triangle,,"description": "triangle,,"description": "triangle,,"description": "triangle,,"description": "triangle,black"
+"description": "circle,,"description": "circle,,"description": "circle,,"description": "circle,,"description": "circle,,"description": "circle,,"description": "circle,black"
+"description": "inverted_triangle,,"description": "inverted_triangle,,"description": "inverted_triangle,,"description": "inverted_triangle,,"description": "inverted_triangle,,"description": "inverted_triangle,,"description": "inverted_triangle,black"
+{"x": 0,,{"x": 0,,{"x": 0,,{"x": 0,,{"x": 0,,{"x": 0,,{"x": 0,"confidence": 0.95}
+{"x": 2,,{"x": 2,,{"x": 2,,{"x": 2,,{"x": 2,,{"x": 2,,{"x": 2,"confidence": 0.95}
+{"x": 4,,{"x": 4,,{"x": 4,,{"x": 4,,{"x": 4,,{"x": 4,,{"x": 4,"confidence": 0.95}
+{"x": 6,,{"x": 6,,{"x": 6,,{"x": 6,,{"x": 6,,{"x": 6,,{"x": 6,"confidence": 0.95}
+{"x": 8,,{"x": 8,,{"x": 8,,{"x": 8,,{"x": 8,,{"x": 8,,{"x": 8,"confidence": 0.95}
+{"x": 10,,{"x": 10,,{"x": 10,,{"x": 10,,{"x": 10,,{"x": 10,,{"x": 10,"confidence": 0.95}
+{"x": 12,,{"x": 12,,{"x": 12,,{"x": 12,,{"x": 12,,{"x": 12,,{"x": 12,"confidence": 0.95}
+{"x": 14,,{"x": 14,,{"x": 14,,{"x": 14,,{"x": 14,,{"x": 14,,{"x": 14,"confidence": 0.95}
+{"x": 16,,{"x": 16,,{"x": 16,,{"x": 16,,{"x": 16,,{"x": 16,,{"x": 16,"confidence": 0.95}
+{"x": 18,,{"x": 18,,{"x": 18,,{"x": 18,,{"x": 18,,{"x": 18,,{"x": 18,"confidence": 0.95}
+{"x": 20,,{"x": 20,,{"x": 20,,{"x": 20,,{"x": 20,,{"x": 20,,{"x": 20,"confidence": 0.95}
+{"x": 22,,{"x": 22,,{"x": 22,,{"x": 22,,{"x": 22,,{"x": 22,,{"x": 22,"confidence": 0.95}

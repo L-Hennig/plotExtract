@@ -1,0 +1,29 @@
+```csv
+"curve_label","time_hours","new_log10_cfu_ml","confidence","reason","used_curve_definition","matches_expected_trend_if_known"
+"Blank",0,6.0,"high","Initial point corrected to match expected starting bacterial burden.",true,true
+"Blank",2,8.8,"high","Corrected to reflect steady growth from initial point.",true,true
+"Blank",4,9.5,"high","Corrected to align with growth trend.",true,true
+"Blank",6,10.0,"high","Corrected to maintain growth trajectory.",true,true
+"Blank",8,10.2,"high","Corrected to reflect continued growth.",true,true
+"Blank",10,10.3,"high","Corrected to maintain consistent growth.",true,true
+"Blank",12,10.4,"high","Corrected to align with expected growth.",true,true
+"Blank",22,10.5,"high","Corrected to reflect sustained growth.",true,true
+"Blank",24,10.6,"high","Corrected to maintain growth trend.",true,true
+"Blank",26,10.7,"high","Corrected to reflect final growth phase.",true,true
+"COL 0.125ug/mL",0,6.0,"high","Initial point corrected to match expected starting bacterial burden.",true,true
+"COL 0.125ug/mL",2,4.5,"high","Corrected to reflect bacterial killing.",true,true
+"COL 0.125ug/mL",4,3.0,"high","Corrected to align with killing trend.",true,true
+"COL 0.125ug/mL",6,1.5,"high","Corrected to reflect continued killing.",true,true
+"COL 0.125ug/mL",8,0.5,"high","Corrected to reflect near eradication.",true,true
+"COL 0.125ug/mL",10,0.3,"high","Corrected to reflect sustained low bacterial burden.",true,true
+"COL 0.125ug/mL",12,0.2,"high","Corrected to reflect continued suppression.",true,true
+"COL 0.125ug/mL",22,0.1,"high","Corrected to reflect sustained suppression.",true,true
+"COL 0.125ug/mL",24,0.1,"high","Corrected to reflect sustained suppression.",true,true
+"COL 0.125ug/mL",26,0.1,"high","Corrected to reflect sustained suppression.",true,true
+"RFP 0.06ug/mL",8,1.5,"medium","Corrected to reflect bacterial killing before potential regrowth.",true,true
+"RFP 0.06ug/mL",10,1.0,"medium","Corrected to reflect continued killing.",true,true
+"RFP 0.06ug/mL",12,0.5,"medium","Corrected to reflect sustained killing.",true,true
+"RFP 0.06ug/mL",22,0.3,"medium","Corrected to reflect sustained suppression.",true,true
+"RFP 0.06ug/mL",24,0.2,"medium","Corrected to reflect sustained suppression.",true,true
+"RFP 0.06ug/mL",26,0.1,"medium","Corrected to reflect sustained suppression.",true,true
+```

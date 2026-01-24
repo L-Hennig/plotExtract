@@ -1,0 +1,101 @@
+import os
+import matplotlib.pyplot as plt
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic/F/FX\FX_png.pv2_prompt_4.v1\FX_png-replot.pv2_prompt_4.v1.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+curves_data = [
+    {
+        "label": "Condition 1",
+        "points": [
+            {"x": 0, "y": 6.1}, {"x": 2, "y": 7.0}, {"x": 4, "y": 6.9},
+            {"x": 6, "y": 7.5}, {"x": 8, "y": 8.0}, {"x": 10, "y": 8.1},
+            {"x": 12, "y": 8.1}, {"x": 24, "y": 8.2}
+        ],
+        "marker": "s",
+        "linestyle": "-",
+        "color": "black"
+    },
+    {
+        "label": "Condition 2",
+        "points": [
+            {"x": 0, "y": 6.1}, {"x": 2, "y": 8.5}, {"x": 4, "y": 8.3},
+            {"x": 6, "y": 8.6}, {"x": 8, "y": 8.8}, {"x": 10, "y": 9.0},
+            {"x": 12, "y": 9.2}, {"x": 24, "y": 9.2}
+        ],
+        "marker": "^",
+        "linestyle": "--",
+        "color": "black"
+    },
+    {
+        "label": "Condition 3",
+        "points": [
+            {"x": 0, "y": 6.1}, {"x": 2, "y": 2.0}, {"x": 4, "y": 1.0},
+            {"x": 6, "y": 1.0}
+        ],
+        "marker": "o",
+        "linestyle": ":",
+        "color": "black"
+    },
+    {
+        "label": "Condition 4",
+        "points": [
+            {"x": 0, "y": 6.1}, {"x": 2, "y": 8.5}, {"x": 4, "y": 7.8},
+            {"x": 6, "y": 8.2}, {"x": 8, "y": 8.5}, {"x": 10, "y": 8.7},
+            {"x": 12, "y": 8.9}, {"x": 24, "y": 8.9}
+        ],
+        "marker": "D",
+        "linestyle": "-.",
+        "color": "black"
+    },
+    {
+        "label": "Condition 5",
+        "points": [
+            {"x": 0, "y": 6.1}, {"x": 2, "y": 3.0}, {"x": 4, "y": 2.5},
+            {"x": 6, "y": 2.3}, {"x": 8, "y": 2.3}, {"x": 10, "y": 2.2},
+            {"x": 24, "y": 1.5}
+        ],
+        "marker": "o",
+        "linestyle": "-",
+        "color": "black"
+    },
+    {
+        "label": "Condition 6",
+        "points": [
+            {"x": 0, "y": 6.1}, {"x": 2, "y": 1.5}, {"x": 4, "y": 1.0},
+            {"x": 6, "y": 1.0}, {"x": 8, "y": 1.0}, {"x": 10, "y": 1.0},
+            {"x": 12, "y": 1.0}, {"x": 24, "y": 1.3}
+        ],
+        "marker": "D",
+        "linestyle": "--",
+        "color": "black"
+    }
+]
+
+plt.figure(figsize=(8, 6))
+
+for curve in curves_data:
+    x_vals = [p["x"] for p in curve["points"]]
+    y_vals = [p["y"] for p in curve["points"]]
+    plt.plot(x_vals, y_vals,
+             marker=curve["marker"],
+             linestyle=curve["linestyle"],
+             color=curve["color"],
+             label=curve["label"],
+             markersize=6,
+             linewidth=1.5)
+
+plt.xlabel("Time (hours)", fontsize=12)
+plt.ylabel("Bacterial Count (CFU/mL) (log10 scale)", fontsize=12)
+plt.xlim(0, 26)
+plt.ylim(0, 10)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 24])
+plt.yticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+plt.plot([11.8, 12.2], [0, 0], color='black', linewidth=1)
+plt.plot([11.8, 12.2], [10, 10], color='black', linewidth=1)
+
+plt.legend(loc='upper left', fontsize=10, frameon=False)
+
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)
+plt.close()

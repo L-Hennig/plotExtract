@@ -1,0 +1,20 @@
+{
+  "axis_facts": {
+    "y_axis": {
+      "quantity": "Bacterial Count",
+      "unit": "log10 CFU/mL",
+      "scale": "log10",
+      "upper_plausible_limit": 10,
+      "lower_plausible_limit": 0,
+      "ticks_verified": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "tick_labels": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "breaks": [],
+      "grid": {
+        "present": false,
+        "aligned_y_ticks": [],
+        "aligned_x_ticks": []
+      },
+      "confidence": 0.98
+    }
+  }
+}

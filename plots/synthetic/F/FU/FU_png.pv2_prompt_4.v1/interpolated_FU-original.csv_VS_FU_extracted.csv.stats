@@ -1,0 +1,29 @@
+# Curve-by-curve statistics
+Curve 'Condition 1' -> 'log10 CFU/mL (Condition 1)':
+  MAE: 0.009959
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+Curve 'Condition 2' -> 'log10 CFU/mL (Condition 2)':
+  MAE: 0.001997
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+Curve 'Condition 3' -> 'log10 CFU/mL (Condition 3)':
+  MAE: 0.028045
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+Curve 'Condition 4' -> 'log10 CFU/mL (Condition 4)':
+  MAE: 0.014386
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+Curve 'Condition 5' -> 'log10 CFU/mL (Condition 5)':
+  MAE: 0.016228
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+Curve 'Condition 6' -> 'log10 CFU/mL (Condition 6)':
+  MAE: 0.676343
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+
+# Summary
+Number of curves: 6
+Mean MAE: 0.124493

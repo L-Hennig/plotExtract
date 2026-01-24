@@ -1,0 +1,72 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import os
+
+# Data preparation
+data = {
+    'Time': [0, 2, 4, 6, 8, 10, 12, 24],
+    'Condition 1': [6.1, 7.3, 8.5, 9.0, 9.5, 9.8, 10.0, 10.0],
+    'Condition 2': [6.0, 6.8, 7.5, 8.0, 8.2, 8.3, 8.3, 8.3],
+    'Condition 3': [6.0, 1.0, np.nan, np.nan, np.nan, np.nan, np.nan, 2.0],
+    'Condition 4': [6.0, 6.8, 7.6, 7.8, 8.0, 8.1, 8.2, 8.2],
+    'Condition 5': [6.0, 2.5, 2.5, 2.5, 2.5, np.nan, np.nan, 1.5],
+    'Condition 6': [6.0, 6.5, 7.3, 7.7, 8.0, 8.1, 8.2, 8.2]
+}
+
+df = pd.DataFrame(data)
+
+# Plot styling
+plt.figure(figsize=(8, 6))
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['font.size'] = 12
+
+# Define line and marker styles for each condition
+styles = {
+    'Condition 1': {'color': 'black', 'marker': 's', 'linestyle': '-', 'linewidth': 1.5, 'markersize': 6},
+    'Condition 2': {'color': 'black', 'marker': '^', 'linestyle': '--', 'linewidth': 1.5, 'markersize': 6},
+    'Condition 3': {'color': 'black', 'marker': 'o', 'linestyle': ':', 'linewidth': 1.5, 'markersize': 6},
+    'Condition 4': {'color': 'black', 'marker': 'D', 'linestyle': '-.', 'linewidth': 1.5, 'markersize': 6},
+    'Condition 5': {'color': 'black', 'marker': 'o', 'linestyle': '-', 'linewidth': 1.5, 'markersize': 6, 'fillstyle': 'none'},
+    'Condition 6': {'color': 'black', 'marker': '>', 'linestyle': '--', 'linewidth': 1.5, 'markersize': 6}
+}
+
+# Plot each condition
+for condition in styles:
+    plt.plot(df['Time'], df[condition],
+             label=condition,
+             color=styles[condition]['color'],
+             marker=styles[condition]['marker'],
+             linestyle=styles[condition]['linestyle'],
+             linewidth=styles[condition]['linewidth'],
+             markersize=styles[condition]['markersize'],
+             fillstyle=styles[condition].get('fillstyle', 'full'))
+
+# Axis settings
+plt.xlim(0, 26)
+plt.ylim(0, 10.5)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 20, 22, 24])
+plt.yticks([0, 2, 4, 6, 8, 10])
+
+# Axis labels
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+
+# Axis break indication
+plt.plot([13, 13.5], [0, 10.5], color='black', linewidth=1.0)
+plt.plot([13, 13.5], [0, 10.5], color='white', linewidth=4.0, solid_capstyle='butt')
+plt.plot([21, 21.5], [0, 10.5], color='black', linewidth=1.0)
+plt.plot([21, 21.5], [0, 10.5], color='white', linewidth=4.0, solid_capstyle='butt')
+
+# Legend
+plt.legend(loc='upper left', frameon=False)
+
+# Log scale for y-axis
+plt.yscale('log')
+plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f'{int(y)}'))
+
+# Save the plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\FU\FU_png.p5.v2"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "FU_png-replot.p5.v2.png"), dpi=300, bbox_inches='tight')
+plt.close()

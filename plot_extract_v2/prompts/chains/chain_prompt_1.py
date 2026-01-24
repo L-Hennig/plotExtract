@@ -4,6 +4,11 @@
 
 CHAIN_NAME = "prompt_1"
 
+# Which complete schema to use for accumulated facts (constraint)
+from complete_extraction_schema import ACCUMULATED_FACTS_SCHEMA
+
+COMPLETE_SCHEMA = ACCUMULATED_FACTS_SCHEMA
+
 # Ordered list of stage names to execute (must match variable names in prompts.py)
 EXTRACT_STAGES = [
     "EXTRACT_STAGE_1",  # X-axis verification

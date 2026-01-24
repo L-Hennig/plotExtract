@@ -6,10 +6,31 @@ import os
 import ast
 import io
 
+def _safe_reconfigure_text_stream(stream, encoding: str = 'utf-8', errors: str = 'replace'):
+    # On Windows, re-wrapping sys.stdout/sys.stderr using stream.buffer can invalidate
+    # the underlying handle (especially when launched with subprocess capture_output).
+    # Prefer reconfigure() (py3.7+), otherwise detach() then wrap.
+    try:
+        if hasattr(stream, 'reconfigure'):
+            stream.reconfigure(encoding=encoding, errors=errors)
+            return stream
+    except Exception:
+        return stream
+
+    try:
+        if hasattr(stream, 'detach'):
+            raw = stream.detach()
+            return io.TextIOWrapper(raw, encoding=encoding, errors=errors)
+    except Exception:
+        return stream
+
+    return stream
+
+
 # Configure stdout/stderr to use UTF-8 encoding on Windows
 if sys.platform == 'win32':
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+    sys.stdout = _safe_reconfigure_text_stream(sys.stdout)
+    sys.stderr = _safe_reconfigure_text_stream(sys.stderr)
 
 # Import Mistral for LLM-based curve matching
 from mistralai import Mistral
@@ -34,6 +55,53 @@ def prompt_mistral(prompt_text):
     )
     return response.choices[0].message.content
 
+
+def _read_csv_tolerant(filepath: str, encoding: str) -> pd.DataFrame:
+    """Read CSVs that may contain ragged rows (extra commas / missing fields).
+
+    Some extraction outputs occasionally include rows with an extra empty field
+    (e.g. `,,,,`) which makes the row have more columns than the header.
+    Pandas' default CSV reader raises a ParserError in that case.
+
+    Strategy:
+    - Determine expected number of columns from the header line.
+    - For each subsequent row:
+      - If too many fields: remove empty fields until the count matches.
+      - If still too many: truncate the row.
+      - If too few: pad with empty fields.
+    - Feed the normalized CSV text into pandas.
+
+    Note: This assumes no embedded commas inside quoted fields (true for our
+    generated numeric CSVs).
+    """
+    with open(filepath, 'r', encoding=encoding, errors='replace') as f:
+        lines = f.read().splitlines()
+
+    if not lines:
+        return pd.DataFrame()
+
+    header = lines[0]
+    expected_cols = len(header.split(','))
+    if expected_cols <= 0:
+        return pd.DataFrame()
+
+    out_lines = [header]
+    for raw in lines[1:]:
+        if raw.strip() == '':
+            continue
+        fields = raw.split(',')
+        if len(fields) > expected_cols:
+            # Prefer removing empty tokens first (these are almost always the issue).
+            while len(fields) > expected_cols and '' in fields:
+                fields.remove('')
+        if len(fields) > expected_cols:
+            fields = fields[:expected_cols]
+        elif len(fields) < expected_cols:
+            fields = fields + [''] * (expected_cols - len(fields))
+        out_lines.append(','.join(fields))
+
+    return pd.read_csv(io.StringIO('\n'.join(out_lines)), encoding=encoding)
+
 def load_multi_curve_csv(filepath):
     """
     Load a CSV with multiple curves (pairs of x,y columns).
@@ -41,9 +109,15 @@ def load_multi_curve_csv(filepath):
     """
     # Try UTF-8 first (for extracted CSVs), fall back to latin1 if needed
     try:
-        df = pd.read_csv(filepath, encoding='utf-8')
+        try:
+            df = pd.read_csv(filepath, encoding='utf-8')
+        except pd.errors.ParserError:
+            df = _read_csv_tolerant(filepath, encoding='utf-8')
     except UnicodeDecodeError:
-        df = pd.read_csv(filepath, encoding='latin1')
+        try:
+            df = pd.read_csv(filepath, encoding='latin1')
+        except pd.errors.ParserError:
+            df = _read_csv_tolerant(filepath, encoding='latin1')
     headers = df.columns.tolist()
     
     curves = {}
@@ -67,6 +141,76 @@ def load_multi_curve_csv(filepath):
         }
     
     return curves
+
+
+def _expand_limits(lo, hi, pad_ratio=0.05):
+    """Expand [lo, hi] by a fraction for nicer plotting."""
+    if lo is None or hi is None:
+        return lo, hi
+    if not np.isfinite(lo) or not np.isfinite(hi):
+        return lo, hi
+    if lo == hi:
+        pad = (abs(lo) * pad_ratio) if lo != 0 else 1.0
+        return lo - pad, hi + pad
+    span = hi - lo
+    pad = span * pad_ratio
+    return lo - pad, hi + pad
+
+
+def _nice_upper_bound(v: float) -> float:
+    """Return a 'nice' upper axis bound >= v.
+
+    - Uses 1/2/5/10 * 10^k rounding.
+    - If v is exactly a power of 10 (e.g. 1e9), returns the next decade (1e10).
+    """
+    if v is None:
+        return 1.0
+    try:
+        v = float(v)
+    except Exception:
+        return 1.0
+
+    if not np.isfinite(v) or v <= 0:
+        return 1.0
+
+    exp = int(np.floor(np.log10(v)))
+    base = 10.0 ** exp
+    frac = v / base
+
+    # Exact power-of-ten: only bump to next decade for large ranges.
+    # For small ranges (e.g. 10), a decade bump (100) is far too aggressive.
+    if np.isclose(frac, 1.0, rtol=1e-12, atol=0.0):
+        return (10.0 * base) if v >= 1e3 else (2.0 * base)
+
+    if frac <= 2.0:
+        return 2.0 * base
+    if frac <= 5.0:
+        return 5.0 * base
+    return 10.0 * base
+
+
+def _compute_data_bounds(*curves_dicts):
+    """Return (min_x, max_x, min_y, max_y) across all curves in dicts."""
+    min_x = min_y = np.inf
+    max_x = max_y = -np.inf
+
+    for curves in curves_dicts:
+        for curve_info in curves.values():
+            df = curve_info.get('data')
+            if df is None or df.empty:
+                continue
+            xs = pd.to_numeric(df['x'], errors='coerce').dropna()
+            ys = pd.to_numeric(df['y'], errors='coerce').dropna()
+            if xs.empty or ys.empty:
+                continue
+            min_x = min(min_x, float(xs.min()))
+            max_x = max(max_x, float(xs.max()))
+            min_y = min(min_y, float(ys.min()))
+            max_y = max(max_y, float(ys.max()))
+
+    if min_x == np.inf:
+        return None, None, None, None
+    return min_x, max_x, min_y, max_y
 
 def match_curves_with_llm(original_curves, extracted_curves, original_file, extracted_file):
     """
@@ -181,6 +325,8 @@ def interpolate_and_compare(orig_data, extr_data, xrange_arg, yrange_arg):
         'right_miss': right_miss / xrange_arg,
         'common_x': common_x_overlap,
         'differences': differences_overlap,
+        'interp_orig': interpolated_y1_overlap,
+        'interp_extr': interpolated_y2_overlap,
         'orig_data': orig_data,
         'extr_data': extr_data
     }
@@ -199,9 +345,6 @@ if len(sys.argv) > 7:
 else:
     output_dir = os.path.dirname(original_file)
 
-xrange_arg = rightX - leftX
-yrange_arg = topY - bottomY
-
 # Load both CSV files
 print(f"Loading original CSV: {original_file}")
 original_curves = load_multi_curve_csv(original_file)
@@ -210,6 +353,36 @@ print(f"  Found {len(original_curves)} curve(s): {list(original_curves.keys())}"
 print(f"Loading extracted CSV: {extracted_file}")
 extracted_curves = load_multi_curve_csv(extracted_file)
 print(f"  Found {len(extracted_curves)} curve(s): {list(extracted_curves.keys())}")
+
+# Axis ranges
+# - Always start at origin for interpolation plots.
+# - If the caller provided explicit caps (rightX/topY > 0), treat them as hard caps.
+# - Otherwise, auto-expand to include all data and round up to a "nice" bound.
+data_min_x, data_max_x, data_min_y, data_max_y = _compute_data_bounds(original_curves, extracted_curves)
+
+eff_leftX = 0.0
+eff_bottomY = 0.0
+
+if rightX > 0:
+    eff_rightX = rightX
+else:
+    raw_right_x = data_max_x if data_max_x is not None else 1.0
+    eff_rightX = _nice_upper_bound(raw_right_x)
+
+if topY > 0:
+    eff_topY = topY
+else:
+    raw_top_y = data_max_y if data_max_y is not None else 1.0
+    eff_topY = _nice_upper_bound(raw_top_y)
+
+print(f"Effective plot bounds: X=[{eff_leftX}, {eff_rightX}], Y=[{eff_bottomY}, {eff_topY}]")
+
+xrange_arg = eff_rightX - eff_leftX
+yrange_arg = eff_topY - eff_bottomY
+if xrange_arg == 0:
+    xrange_arg = 1e-12
+if yrange_arg == 0:
+    yrange_arg = 1e-12
 
 # Match curves using LLM
 curve_mapping = match_curves_with_llm(original_curves, extracted_curves, original_file, extracted_file)
@@ -264,15 +437,22 @@ for idx, (orig_label, result) in enumerate(results.items()):
     orig_data = result['orig_data']
     extr_data = result['extr_data']
     common_x = result['common_x']
-    differences = result['differences']
+    interp_orig = result['interp_orig']
+    interp_extr = result['interp_extr']
     
     # Plot original and extracted curves
     ax.plot(orig_data['x'], orig_data['y'], label='original', linestyle='-', color=colors[0])
     ax.plot(extr_data['x'], extr_data['y'], label='llm', linestyle='-', color=colors[1])
     
-    # Fill area for differences - starting from y=0
-    ax.fill_between(common_x, np.abs(differences), 0, 
-                    color='gray', alpha=0.5, label=f'MAE={result["mae"]:.4f}')
+    # Fill area between interpolated curves (keeps y-axis range consistent with the curves)
+    ax.fill_between(
+        common_x,
+        interp_orig,
+        interp_extr,
+        color='gray',
+        alpha=0.35,
+        label=f'MAE={result["mae"]:.4f}',
+    )
     
     # Add miss info to legend
     ax.scatter([None], [None], label=f'Miss L:{result["left_miss"]:.2f} R:{result["right_miss"]:.2f}')
@@ -283,15 +463,9 @@ for idx, (orig_label, result) in enumerate(results.items()):
     ax.legend(fontsize='small')
     ax.grid(True)
     
-    # Set axis limits - ensure axes start at origin (0,0)
-    x_min = max(0, min(leftX, ax.get_xlim()[0]))
-    y_min = max(0, min(bottomY, ax.get_ylim()[0]))
-    ax.set_xlim(x_min, max(rightX, ax.get_xlim()[1]))
-    ax.set_ylim(y_min, max(topY, ax.get_ylim()[1]))
-    
-    # Make axes meet at origin
-    ax.spines['left'].set_position(('data', x_min))
-    ax.spines['bottom'].set_position(('data', y_min))
+    # Axes: origin start and shared, nice upper bounds
+    ax.set_xlim(eff_leftX, eff_rightX)
+    ax.set_ylim(eff_bottomY, eff_topY)
 
 # Hide unused subplots
 for idx in range(num_curves, len(axes)):

@@ -1,0 +1,253 @@
+{
+  "status": "complete",
+  "stage": "COMPLETE",
+  "stage_index": 5,
+  "total_stages": 5,
+  "percentage": 100.0,
+  "accumulated_facts": {
+    "plot_type_facts": {
+      "declared_in_article_info": "unknown",
+      "visually_verified": true,
+      "plot_type": "time-kill plot",
+      "confidence": 0.8,
+      "reason": "The x-axis represents time in hours, and the y-axis represents bacterial count (CFU/mL) on a log10 scale, which are typical for time-kill plots. Multiple curves with consistent markers and line styles are present, visually confirming the plot type."
+    },
+    "axis_facts": {
+      "x_axis": {
+        "quantity": "time",
+        "unit": "hours",
+        "discrete": false,
+        "lower_plausible_limit": 0,
+        "upper_plausible_limit": 26,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          20,
+          22,
+          24
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "20",
+          "22",
+          "24"
+        ],
+        "breaks": [
+          {
+            "start": 12,
+            "end": 20,
+            "reason": "Non-uniform tick spacing indicating a break in the time axis"
+          }
+        ],
+        "confidence": 0.95
+      },
+      "y_axis": {
+        "quantity": "Bacterial Count",
+        "unit": "CFU/mL",
+        "scale": "log10",
+        "upper_plausible_limit": 10,
+        "lower_plausible_limit": 0,
+        "ticks_verified": [
+          0,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "breaks": [],
+        "confidence": 0.95
+      }
+    },
+    "article_info": {
+      "figure_id": "unknown",
+      "figure_caption": "unknown",
+      "experimental_context": {
+        "assay_type": "time-kill assay",
+        "organism": "unknown",
+        "model": "unknown"
+      },
+      "axis_definitions": {
+        "x_axis": {
+          "quantity": "time",
+          "unit": "hours"
+        },
+        "y_axis": {
+          "quantity": "Bacterial Count",
+          "unit": "CFU/mL",
+          "scale": "log10"
+        }
+      },
+      "curve_legend": [
+        {
+          "curve_label": "Condition 1",
+          "description": "unknown",
+          "expected_trend": "unknown"
+        },
+        {
+          "curve_label": "Condition 2",
+          "description": "unknown",
+          "expected_trend": "unknown"
+        }
+      ]
+    },
+    "marker_facts": {
+      "markers_detected": true,
+      "curves": [
+        {
+          "curve_label": "Condition 1",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 2,
+              "y": 6.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 4,
+              "y": 6.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 6,
+              "y": 5.8,
+              "confidence": 0.95
+            },
+            {
+              "x": 8,
+              "y": 5.8,
+              "confidence": 0.95
+            },
+            {
+              "x": 10,
+              "y": 5.8,
+              "confidence": 0.95
+            },
+            {
+              "x": 12,
+              "y": 5.8,
+              "confidence": 0.95
+            },
+            {
+              "x": 22,
+              "y": 5.6,
+              "confidence": 0.95
+            },
+            {
+              "x": 24,
+              "y": 5.5,
+              "confidence": 0.95
+            }
+          ]
+        },
+        {
+          "curve_label": "Condition 2",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 2,
+              "y": 3.8,
+              "confidence": 0.95
+            },
+            {
+              "x": 4,
+              "y": 3.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 6,
+              "y": 3.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 8,
+              "y": 3.2,
+              "confidence": 0.95
+            },
+            {
+              "x": 10,
+              "y": 3.3,
+              "confidence": 0.95
+            },
+            {
+              "x": 12,
+              "y": 3.5,
+              "confidence": 0.95
+            },
+            {
+              "x": 20,
+              "y": 5.8,
+              "confidence": 0.95
+            },
+            {
+              "x": 22,
+              "y": 6.8,
+              "confidence": 0.95
+            },
+            {
+              "x": 24,
+              "y": 7.0,
+              "confidence": 0.95
+            }
+          ]
+        }
+      ],
+      "csv_output": "Time (hours),Bacterial Count (log10 CFU/mL) (Condition 1),Time (hours),Bacterial Count (log10 CFU/mL) (Condition 2)\n0,6.0,0,6.0\n2,6.0,2,3.8\n4,6.0,4,3.0\n6,5.8,6,3.0\n8,5.8,8,3.2\n10,5.8,10,3.3\n12,5.8,12,3.5\n20,,20,5.8\n22,5.6,22,6.8\n24,5.5,24,7.0",
+      "confidence": 0.95
+    },
+    "validation_flags": [
+      {
+        "curve_label": "Condition 2",
+        "x": 20,
+        "y": 5.8,
+        "issue": "Impossible jump",
+        "details": "Sudden increase of 2.3 log10 CFU/mL from previous point (3.5 at 12 hours to 5.8 at 20 hours)"
+      },
+      {
+        "curve_label": "Condition 2",
+        "x": 22,
+        "y": 6.8,
+        "issue": "Impossible jump",
+        "details": "Sudden increase of 1.0 log10 CFU/mL from previous point (5.8 at 20 hours to 6.8 at 22 hours)"
+      }
+    ]
+  },
+  "stage_duration_ms": 0,
+  "timestamp": 1768546313.3130932,
+  "console_output": "Extraction completed successfully"
+}

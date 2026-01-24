@@ -1,0 +1,38 @@
+{
+  "stage6a_ran": true,
+  "requested_by_stage_index": 5,
+  "requested_by_stage_name": "EXTRACT_STAGE_6",
+  "compute_ms": 0,
+  "csv_text_chars": 6875,
+  "csv_text_lines": 208,
+  "csv_diagnostics_chars": 679,
+  "diagnostics": {
+    "assumptions": [
+      "y_values_are_log10_units: true",
+      "time0_tolerance_hours: 0.05",
+      "reference_times_rule: curve_with_most_points"
+    ],
+    "reference_times": [],
+    "curves": [
+      {
+        "curve_id": "Condition 1",
+        "expected_n_points": 0,
+        "n_points": 0,
+        "times_present": [],
+        "times_missing": [],
+        "y_at_time0": null,
+        "baseline_delta_from_median": null,
+        "step_directions": [],
+        "pct_increasing": 0.0,
+        "pct_decreasing": 0.0,
+        "largest_jump": {
+          "abs_jump": 0.0,
+          "from_time": null,
+          "to_time": null,
+          "delta": null
+        },
+        "first_direction_change_step_index": null
+      }
+    ]
+  }
+}

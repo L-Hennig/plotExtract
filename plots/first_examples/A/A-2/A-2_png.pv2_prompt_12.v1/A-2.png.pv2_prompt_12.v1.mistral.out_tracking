@@ -1,0 +1,215 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\first_examples/A/A-2/A-2.png",
+  "prompt_name": "prompt_12",
+  "overall_status": "completed",
+  "validation_status": "no",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 3129,
+      "execution_time_ms": 14533.892154693604,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T20:02:17.214206",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 670,
+      "execution_time_ms": 3979.456901550293,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T20:02:31.752068",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 592,
+      "execution_time_ms": 3948.2290744781494,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T20:02:35.736810",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 5463,
+      "execution_time_ms": 21110.207557678223,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T20:02:39.688252",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 122,
+        "columns": [
+          "```json"
+        ],
+        "axis_labels": [
+          "```json"
+        ]
+      },
+      "output_length": 4861,
+      "execution_time_ms": 29441.566944122314,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T20:03:00.802965",
+      "notes": []
+    },
+    "EXTRACT_STAGE_6": {
+      "stage_name": "EXTRACT_STAGE_6",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 2118,
+      "execution_time_ms": 16238.423347473145,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T20:03:30.253260",
+      "notes": []
+    },
+    "EXTRACT_STAGE_7": {
+      "stage_name": "EXTRACT_STAGE_7",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 2122,
+      "execution_time_ms": 9921.278238296509,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T20:03:46.500441",
+      "notes": []
+    },
+    "EXTRACT_STAGE_8": {
+      "stage_name": "EXTRACT_STAGE_8",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 16,
+        "num_rows": 9,
+        "columns": [
+          "Time (hours)",
+          "log10 CFU/mL (Blank)",
+          "Time (hours)",
+          "log10 CFU/mL (COL 0.25\u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (MEM 8\u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (MINO 1\u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (RFP 0.06\u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (COL 0.25\u00b5g/mL + MEM 8\u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (COL 0.25\u00b5g/mL + MINO 1\u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (COL 0.25\u00b5g/mL + RFP 0.06\u00b5g/mL)"
+        ],
+        "axis_labels": [
+          "Time (hours)",
+          "log10 CFU/mL (Blank)",
+          "Time (hours)",
+          "log10 CFU/mL (COL 0.25\u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (MEM 8\u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (MINO 1\u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (RFP 0.06\u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (COL 0.25\u00b5g/mL + MEM 8\u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (COL 0.25\u00b5g/mL + MINO 1\u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (COL 0.25\u00b5g/mL + RFP 0.06\u00b5g/mL)"
+        ]
+      },
+      "output_length": 715,
+      "execution_time_ms": 7363.962888717651,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T20:03:56.430891",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_5": {
+      "num_columns": 1,
+      "num_rows": 122,
+      "columns": [
+        "```json"
+      ],
+      "axis_labels": [
+        "```json"
+      ]
+    },
+    "EXTRACT_STAGE_8": {
+      "num_columns": 16,
+      "num_rows": 9,
+      "columns": [
+        "Time (hours)",
+        "log10 CFU/mL (Blank)",
+        "Time (hours)",
+        "log10 CFU/mL (COL 0.25\u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (MEM 8\u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (MINO 1\u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (RFP 0.06\u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (COL 0.25\u00b5g/mL + MEM 8\u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (COL 0.25\u00b5g/mL + MINO 1\u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (COL 0.25\u00b5g/mL + RFP 0.06\u00b5g/mL)"
+      ],
+      "axis_labels": [
+        "Time (hours)",
+        "log10 CFU/mL (Blank)",
+        "Time (hours)",
+        "log10 CFU/mL (COL 0.25\u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (MEM 8\u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (MINO 1\u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (RFP 0.06\u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (COL 0.25\u00b5g/mL + MEM 8\u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (COL 0.25\u00b5g/mL + MINO 1\u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (COL 0.25\u00b5g/mL + RFP 0.06\u00b5g/mL)"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 143.032788,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "Yes",
+      "num_points": "No",
+      "trend": "Yes"
+    }
+  }
+}

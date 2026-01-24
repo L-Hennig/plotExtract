@@ -1,0 +1,261 @@
+{
+  "status": "complete",
+  "stage": "COMPLETE",
+  "stage_index": 5,
+  "total_stages": 5,
+  "percentage": 100.0,
+  "accumulated_facts": {
+    "article_info": {
+      "figure_id": "DZ",
+      "axis_definitions": {
+        "x_axis": {
+          "quantity": "Time",
+          "unit": "hours"
+        },
+        "y_axis": {
+          "quantity": "Bacterial Count",
+          "unit": "CFU/mL",
+          "scale": "log10"
+        }
+      },
+      "curve_legend": [
+        {
+          "curve_label": "Condition 1",
+          "description": "growth (increasing)",
+          "expected_trend": "up"
+        },
+        {
+          "curve_label": "Condition 2",
+          "description": "kill (decreasing)",
+          "expected_trend": "down"
+        },
+        {
+          "curve_label": "Condition 3",
+          "description": "kill (decreasing)",
+          "expected_trend": "down"
+        },
+        {
+          "curve_label": "Condition 4",
+          "description": "growth (increasing)",
+          "expected_trend": "up"
+        }
+      ]
+    },
+    "plot_type_facts": {
+      "declared_in_article_info": true,
+      "plot_type": "time-kill plot",
+      "confidence": 1.0,
+      "reason": "The x-axis represents time in hours, and the y-axis represents bacterial count in CFU/mL on a log scale, consistent with a time-kill plot. Multiple curves with distinct markers show bacterial growth or kill trends over time, confirming the visual verification.",
+      "visually_verified": true
+    },
+    "axis_facts": {
+      "x_axis": {
+        "quantity": "Time",
+        "unit": "hours",
+        "discrete": false,
+        "lower_plausible_limit": 0,
+        "upper_plausible_limit": 26,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          24
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "24"
+        ],
+        "breaks": [],
+        "confidence": 1.0
+      },
+      "y_axis": {
+        "quantity": "Bacterial Count",
+        "unit": "log10 CFU/mL",
+        "scale": "log10",
+        "upper_plausible_limit": 10,
+        "lower_plausible_limit": 1,
+        "ticks_verified": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "tick_labels": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "breaks": [],
+        "confidence": 1.0
+      }
+    },
+    "marker_facts": {
+      "markers_detected": true,
+      "curves": [
+        {
+          "curve_label": "Condition 1",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.1,
+              "confidence": 1.0
+            },
+            {
+              "x": 2,
+              "y": 8.0,
+              "confidence": 1.0
+            },
+            {
+              "x": 24,
+              "y": 8.9,
+              "confidence": 1.0
+            }
+          ]
+        },
+        {
+          "curve_label": "Condition 2",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.0,
+              "confidence": 1.0
+            },
+            {
+              "x": 2,
+              "y": 4.8,
+              "confidence": 1.0
+            },
+            {
+              "x": 4,
+              "y": 2.7,
+              "confidence": 1.0
+            },
+            {
+              "x": 6,
+              "y": 2.3,
+              "confidence": 1.0
+            },
+            {
+              "x": 8,
+              "y": 2.1,
+              "confidence": 1.0
+            },
+            {
+              "x": 12,
+              "y": 1.5,
+              "confidence": 1.0
+            },
+            {
+              "x": 24,
+              "y": 1.3,
+              "confidence": 1.0
+            }
+          ]
+        },
+        {
+          "curve_label": "Condition 3",
+          "points": [
+            {
+              "x": 0,
+              "y": 5.8,
+              "confidence": 1.0
+            },
+            {
+              "x": 2,
+              "y": 2.5,
+              "confidence": 1.0
+            },
+            {
+              "x": 4,
+              "y": 2.1,
+              "confidence": 1.0
+            }
+          ]
+        },
+        {
+          "curve_label": "Condition 4",
+          "points": [
+            {
+              "x": 2,
+              "y": 8.5,
+              "confidence": 1.0
+            },
+            {
+              "x": 4,
+              "y": 8.7,
+              "confidence": 1.0
+            },
+            {
+              "x": 6,
+              "y": 8.8,
+              "confidence": 1.0
+            },
+            {
+              "x": 8,
+              "y": 8.9,
+              "confidence": 1.0
+            },
+            {
+              "x": 10,
+              "y": 8.9,
+              "confidence": 1.0
+            },
+            {
+              "x": 24,
+              "y": 8.9,
+              "confidence": 1.0
+            }
+          ]
+        }
+      ],
+      "csv_output": "Time (hours),Bacterial Count (log10 CFU/mL) (Condition 1),Time (hours),Bacterial Count (log10 CFU/mL) (Condition 2),Time (hours),Bacterial Count (log10 CFU/mL) (Condition 3),Time (hours),Bacterial Count (log10 CFU/mL) (Condition 4)\n0,6.1,0,6.0,0,5.8,\n2,8.0,2,4.8,2,2.5,2,8.5\n4,,4,2.7,4,2.1,4,8.7\n6,,6,2.3,,,6,8.8\n8,,8,2.1,,,8,8.9\n10,,,,,10,8.9\n12,,12,1.5,,,\n24,8.9,24,1.3,,24,8.9",
+      "confidence": 1.0
+    },
+    "validation_flags": [
+      {
+        "curve_label": "Condition 1",
+        "issue": "Missing point at x=4 hours. Expected intermediate value between x=2 (8.0) and x=24 (8.9). No impossible jump detected, but interpolation may be needed for full trend analysis."
+      },
+      {
+        "curve_label": "Condition 3",
+        "x": 2,
+        "y": 2.5,
+        "issue": "Impossible jump",
+        "details": "Sudden drop of 3.3 log10 CFU/mL from x=0 (5.8) to x=2 (2.5). This exceeds the 1-2 log10 threshold for consecutive points."
+      },
+      {
+        "curve_label": "Condition 3",
+        "x": 4,
+        "y": 2.1,
+        "issue": "Unexpected monotonicity",
+        "details": "Expected decreasing trend (kill), but the drop from x=2 (2.5) to x=4 (2.1) is consistent. However, the initial drop from x=0 to x=2 is unusually steep."
+      }
+    ]
+  },
+  "stage_duration_ms": 0,
+  "timestamp": 1768532799.3531816,
+  "console_output": "Extraction completed successfully"
+}

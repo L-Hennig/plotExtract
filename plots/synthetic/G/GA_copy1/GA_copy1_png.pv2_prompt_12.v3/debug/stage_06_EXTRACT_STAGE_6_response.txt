@@ -1,0 +1,40 @@
+```json
+{
+  "re_extraction": {
+    "requests": [
+      {
+        "curve_label": "Condition 3",
+        "issue_type": "bad_intercept_time0",
+        "target_times_hours": [0, 2],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 1.0,
+          "baseline_delta_from_median": 4.1,
+          "largest_jump": {"abs_jump": 2.3, "from_time": 0.0, "to_time": 2.0, "delta": -2.3}
+        },
+        "visual_guidance": "Re-check the initial bacterial count at time 0 and 2 hours for Condition 3 (triangle markers) to ensure values align with the steep decline observed."
+      },
+      {
+        "curve_label": "Condition 2",
+        "issue_type": "midcurve_switch_suspicious_unknown_expectation",
+        "target_times_hours": [0, 2, 4, 24],
+        "expected_trend": "unknown",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.5714285714285714,
+          "pct_decreasing": 0.42857142857142855,
+          "baseline_delta_from_median": 0.0,
+          "largest_jump": {"abs_jump": 0.6000000000000005, "from_time": 2.0, "to_time": 4.0, "delta": 0.6000000000000005}
+        },
+        "visual_guidance": "Re-examine the points at 0, 2, 4, and 24 hours for Condition 2 (square markers) to confirm the direction changes, especially around the largest jump."
+      }
+    ]
+  }
+}
+```

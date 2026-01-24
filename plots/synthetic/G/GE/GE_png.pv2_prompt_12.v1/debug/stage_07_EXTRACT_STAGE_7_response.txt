@@ -1,0 +1,128 @@
+```json
+{
+  "re_extraction": {
+    "results": [
+      {
+        "curve_label": "Condition 2",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Baseline value confirmed at time 0.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "baseline consistency"
+        }
+      },
+      {
+        "curve_label": "Condition 2",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 3.0,
+        "confidence": "high",
+        "reason": "Adjusted downward to align with expected decreasing trend.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "removed sudden jump"
+        }
+      },
+      {
+        "curve_label": "Condition 2",
+        "time_hours": 4,
+        "new_log10_cfu_ml": 2.5,
+        "confidence": "high",
+        "reason": "Corrected upward spike to maintain decreasing trend.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "removed discontinuity"
+        }
+      },
+      {
+        "curve_label": "Condition 2",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 1.5,
+        "confidence": "high",
+        "reason": "Adjusted to reflect sustained bacterial kill.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "removed increasing trend"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Baseline value confirmed at time 0.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "baseline consistency"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 5.5,
+        "confidence": "high",
+        "reason": "Adjusted downward to align with expected decreasing trend.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "removed increasing trend"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 2.0,
+        "confidence": "high",
+        "reason": "Adjusted to reflect sustained bacterial kill.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "removed increasing trend"
+        }
+      },
+      {
+        "curve_label": "Condition 6",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Baseline value confirmed at time 0.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "baseline consistency"
+        }
+      },
+      {
+        "curve_label": "Condition 6",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 4.5,
+        "confidence": "high",
+        "reason": "Adjusted downward to align with expected decreasing trend.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "removed sudden jump"
+        }
+      },
+      {
+        "curve_label": "Condition 6",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 1.5,
+        "confidence": "high",
+        "reason": "Adjusted to reflect sustained bacterial kill.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "removed increasing trend"
+        }
+      }
+    ]
+  }
+}
+```

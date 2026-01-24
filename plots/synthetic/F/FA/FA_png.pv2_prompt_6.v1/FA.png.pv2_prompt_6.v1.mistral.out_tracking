@@ -1,0 +1,81 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/F/FA/FA.png",
+  "prompt_name": "prompt_6",
+  "overall_status": "completed",
+  "validation_status": "skipped",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 339,
+      "execution_time_ms": 3222.7299213409424,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-20T14:20:56.696558",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 411,
+      "execution_time_ms": 4054.999589920044,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-20T14:20:59.921909",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 391,
+      "execution_time_ms": 3678.753137588501,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-20T14:21:03.979524",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 49,
+        "columns": [
+          "```json"
+        ],
+        "axis_labels": [
+          "```json"
+        ]
+      },
+      "output_length": 1377,
+      "execution_time_ms": 11765.387535095215,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-20T14:21:07.661719",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_4": {
+      "num_columns": 1,
+      "num_rows": 49,
+      "columns": [
+        "```json"
+      ],
+      "axis_labels": [
+        "```json"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 51.510123,
+  "output_files": {}
+}

@@ -1,0 +1,163 @@
+{
+  "stage6a_ran": true,
+  "requested_by_stage_index": 5,
+  "requested_by_stage_name": "EXTRACT_STAGE_6",
+  "compute_ms": 0,
+  "csv_text_chars": 347,
+  "csv_text_lines": 14,
+  "csv_diagnostics_chars": 2990,
+  "diagnostics": {
+    "assumptions": [
+      "y_values_are_log10_units: true",
+      "time0_tolerance_hours: 0.05",
+      "reference_times_rule: curve_with_most_points"
+    ],
+    "reference_times": [
+      0.0,
+      2.0,
+      4.0,
+      6.0,
+      8.0,
+      10.0,
+      12.0,
+      14.0,
+      16.0,
+      18.0,
+      20.0,
+      22.0,
+      24.0
+    ],
+    "curves": [
+      {
+        "curve_id": "Condition 1",
+        "expected_n_points": 13,
+        "n_points": 8,
+        "times_present": [
+          0.0,
+          2.0,
+          4.0,
+          6.0,
+          8.0,
+          10.0,
+          12.0,
+          24.0
+        ],
+        "times_missing": [
+          14.0,
+          16.0,
+          18.0,
+          20.0,
+          22.0
+        ],
+        "y_at_time0": 6.0,
+        "baseline_delta_from_median": -2.0,
+        "step_directions": [
+          "increase",
+          "increase",
+          "increase",
+          "increase",
+          "increase",
+          "increase",
+          "decrease"
+        ],
+        "pct_increasing": 0.8571428571428571,
+        "pct_decreasing": 0.14285714285714285,
+        "largest_jump": {
+          "abs_jump": 0.7999999999999998,
+          "from_time": 4.0,
+          "to_time": 6.0,
+          "delta": 0.7999999999999998
+        },
+        "first_direction_change_step_index": 6
+      },
+      {
+        "curve_id": "Condition 2",
+        "expected_n_points": 13,
+        "n_points": 13,
+        "times_present": [
+          0.0,
+          2.0,
+          4.0,
+          6.0,
+          8.0,
+          10.0,
+          12.0,
+          14.0,
+          16.0,
+          18.0,
+          20.0,
+          22.0,
+          24.0
+        ],
+        "times_missing": [],
+        "y_at_time0": 5.8,
+        "baseline_delta_from_median": -0.2999999999999998,
+        "step_directions": [
+          "increase",
+          "increase",
+          "increase",
+          "increase",
+          "increase",
+          "flat",
+          "flat",
+          "decrease",
+          "decrease",
+          "decrease",
+          "decrease",
+          "flat"
+        ],
+        "pct_increasing": 0.5555555555555556,
+        "pct_decreasing": 0.4444444444444444,
+        "largest_jump": {
+          "abs_jump": 0.10000000000000053,
+          "from_time": 0.0,
+          "to_time": 2.0,
+          "delta": 0.10000000000000053
+        },
+        "first_direction_change_step_index": 7
+      },
+      {
+        "curve_id": "Condition 3",
+        "expected_n_points": 13,
+        "n_points": 8,
+        "times_present": [
+          0.0,
+          2.0,
+          4.0,
+          6.0,
+          8.0,
+          10.0,
+          12.0,
+          24.0
+        ],
+        "times_missing": [
+          14.0,
+          16.0,
+          18.0,
+          20.0,
+          22.0
+        ],
+        "y_at_time0": 6.0,
+        "baseline_delta_from_median": 3.75,
+        "step_directions": [
+          "decrease",
+          "decrease",
+          "decrease",
+          "decrease",
+          "decrease",
+          "decrease",
+          "decrease"
+        ],
+        "pct_increasing": 0.0,
+        "pct_decreasing": 1.0,
+        "largest_jump": {
+          "abs_jump": 1.5,
+          "from_time": 2.0,
+          "to_time": 4.0,
+          "delta": -1.5
+        },
+        "first_direction_change_step_index": null
+      }
+    ]
+  }
+}

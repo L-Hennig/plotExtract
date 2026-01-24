@@ -1,0 +1,60 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time = {
+    'Condition 1': [0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24],
+    'Condition 2': [0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24],
+    'Condition 3': [0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24],
+    'Condition 4': [0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24],
+    'Condition 5': [0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24],
+    'Condition 6': [0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24]
+}
+
+bacterial_count = {
+    'Condition 1': [6.0, 7.8, 7.9, 8.2, 8.5, 8.6, 8.7, 8.7, 8.7, 8.7, 8.8],
+    'Condition 2': [6.0, 1.0, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.8],
+    'Condition 3': [6.0, 5.8, 5.9, 5.9, 5.9, 2.0, 1.8, 1.7, 1.7, 1.8, 2.0],
+    'Condition 4': [6.0, 7.5, 8.0, 8.6, 9.0, 9.2, 9.2, 9.2, 9.2, 9.3, 9.3],
+    'Condition 5': [6.0, 3.8, 3.0, 2.8, 2.5, 2.7, 3.0, 3.3, 3.6, 4.5, 5.2],
+    'Condition 6': [6.0, 7.0, 7.8, 8.0, 8.7, 8.9, 9.1, 9.1, 9.1, 9.1, 9.2]
+}
+
+# Plot settings
+plt.figure(figsize=(8, 6))
+markers = ['s', '^', 'o', 'D', 'o', 's']
+linestyles = ['-', '--', ':', '-.', '-', '--']
+colors = ['black', 'black', 'black', 'black', 'black', 'black']
+
+# Plot each condition
+for i, condition in enumerate(['Condition 1', 'Condition 2', 'Condition 3', 'Condition 4', 'Condition 5', 'Condition 6']):
+    plt.plot(time[condition], bacterial_count[condition],
+             marker=markers[i],
+             linestyle=linestyles[i],
+             color=colors[i],
+             label=condition)
+
+# Axis labels
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+
+# Axis range
+plt.xlim(0, 26)
+plt.ylim(0, 10)
+
+# Log scale for y-axis
+plt.yscale('log')
+
+# Tick marks
+plt.xticks(np.arange(0, 27, 2))
+plt.yticks([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
+
+# Legend
+plt.legend()
+
+# Save plot
+output_path = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\FP\FP_png.p4.v1\FP_png-replot.p4.v1.png"
+os.makedirs(os.path.dirname(output_path), exist_ok=True)
+plt.savefig(output_path, bbox_inches='tight', dpi=300)
+plt.close()

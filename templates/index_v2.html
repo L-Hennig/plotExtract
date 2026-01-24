@@ -29,6 +29,8 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 20px;
+            flex-wrap: wrap;
+            gap: 6px;
         }
         .navbar-brand {
             color: white;
@@ -49,13 +51,18 @@
             margin: 0;
             padding: 0;
             gap: 5px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
         .nav-link {
             color: rgba(255,255,255,0.85);
             text-decoration: none;
-            padding: 15px 20px;
+            padding: 12px 20px;
             display: block;
             font-weight: 500;
+            font-size: 14px;
+            line-height: 1.1;
+            white-space: nowrap;
             transition: all 0.2s;
             border-bottom: 3px solid transparent;
         }
@@ -67,6 +74,12 @@
             color: white;
             border-bottom-color: #f39c12;
             background: rgba(255,255,255,0.1);
+        }
+
+        @media (max-width: 900px) {
+            .navbar-container { padding: 0 10px; }
+            .navbar-brand { font-size: 20px; padding: 10px 0; }
+            .nav-link { padding: 10px 14px; font-size: 13px; line-height: 1.1; }
         }
         
         .main-content {
@@ -649,11 +662,13 @@
         <div class="navbar-container">
             <a href="/v2" class="navbar-brand">📊 PlotExtract V2</a>
             <ul class="navbar-nav">
-                <li><a href="/" class="nav-link">Extraction (v1)</a></li>
-                <li><a href="/v2" class="nav-link active">Extraction (v2)</a></li>
-                <li><a href="/synthetic" class="nav-link">🧫 Synthetic Generator</a></li>
-                <li><a href="/synthetic/editor" class="nav-link">✏️ Synthetic Editor</a></li>
-                <li><a href="/results" class="nav-link">📈 Results Comparison</a></li>
+                <li><a href="/" class="nav-link">EX 1</a></li>
+                <li><a href="/v2" class="nav-link active">EX 2</a></li>
+                <li><a href="/synthetic" class="nav-link">S Gen 1</a></li>
+                <li><a href="/synthetic_v2" class="nav-link">S Gen 2</a></li>
+                <li><a href="/synthetic/editor" class="nav-link">S Editor</a></li>
+                <li><a href="/results" class="nav-link">Results</a></li>
+                <li><a href="/batch_results" class="nav-link">Batch Results</a></li>
             </ul>
         </div>
     </nav>
@@ -748,6 +763,11 @@
                                 {% endfor %}
                             </select>
                         </div>
+
+                        <div class="form-group">
+                            <label for="batchName">Batch Label (optional):</label>
+                            <input type="text" id="batchName" placeholder="e.g., Supplementary figs, Jan 2026">
+                        </div>
                         
                         <!-- Selected Images Info -->
                         <div id="batchFileInfo" style="display: none;">
@@ -785,6 +805,10 @@
                 <label>
                     <input type="checkbox" id="runPointwise" onchange="toggleAxisInputs()">
                     Run Pointwise Comparison
+                </label>
+                <label title="Writes per-stage prompt/response/timing into the output folder under a debug/ subfolder.">
+                    <input type="checkbox" id="debugMode">
+                    Debug mode (write detailed logs)
                 </label>
             </div>
             
@@ -838,6 +862,9 @@
                 <div style="text-align: center; margin-bottom: 15px;">
                     <button class="btn btn-primary btn-large" onclick="runAll()" id="btnRunAll">
                         🚀 Run Plot Extraction (and Comparison)
+                    </button>
+                    <button class="btn" onclick="cancelCurrentTask()" id="btnCancelSingle" style="display: none;">
+                        ⏹️ Cancel
                     </button>
                     <p style="color: #666; margin-top: 10px;">
                         This will extract data from the image. If checkboxes are enabled, it will also run comparisons.
@@ -964,12 +991,19 @@
             const savedRightX = localStorage.getItem('axisRightX');
             const savedBottomY = localStorage.getItem('axisBottomY');
             const savedTopY = localStorage.getItem('axisTopY');
-            const savedPrompt = localStorage.getItem('lastPrompt');
+            const savedPrompt = localStorage.getItem('lastPrompt_ex2');
+            const savedDebug = localStorage.getItem('plotextract_debug_ex2');
             
             if (savedLeftX !== null) document.getElementById('leftX').value = savedLeftX;
             if (savedRightX !== null) document.getElementById('rightX').value = savedRightX;
             if (savedBottomY !== null) document.getElementById('bottomY').value = savedBottomY;
             if (savedTopY !== null) document.getElementById('topY').value = savedTopY;
+
+            if (savedDebug !== null) {
+                const el = document.getElementById('debugMode');
+                if (el) el.checked = (savedDebug === 'true');
+            }
+
             
             // Restore last used prompt if it exists in the dropdown
             if (savedPrompt !== null) {
@@ -1018,7 +1052,7 @@
         function onPromptSelect() {
             const promptFile = document.getElementById('promptSelect').value;
             // Save prompt selection and sync with batch dropdown
-            localStorage.setItem('lastPrompt', promptFile);
+            localStorage.setItem('lastPrompt_ex2', promptFile);
             document.getElementById('batchPromptSelect').value = promptFile;
             updateCsvInfo();
         }
@@ -1026,7 +1060,7 @@
         function onBatchPromptSelect() {
             const promptFile = document.getElementById('batchPromptSelect').value;
             // Save prompt selection and sync with single mode dropdown
-            localStorage.setItem('lastPrompt', promptFile);
+            localStorage.setItem('lastPrompt_ex2', promptFile);
             document.getElementById('promptSelect').value = promptFile;
         }
         
@@ -1259,8 +1293,13 @@
             }
             
             const btn = document.getElementById('btnRunAll');
+            const btnCancel = document.getElementById('btnCancelSingle');
             btn.disabled = true;
             btn.textContent = '⏳ Starting...';
+
+            btnCancel.disabled = false;
+            btnCancel.textContent = '⏹️ Cancel';
+            btnCancel.style.display = 'inline-block';
             
             // Clear console and results (new run starting)
             const consoleOutput = document.getElementById('consoleOutput');
@@ -1277,7 +1316,8 @@
             localStorage.setItem('axisRightX', rightX);
             localStorage.setItem('axisBottomY', bottomY);
             localStorage.setItem('axisTopY', topY);
-            localStorage.setItem('lastPrompt', promptFile);
+            localStorage.setItem('lastPrompt_ex2', promptFile);
+            localStorage.setItem('plotextract_debug_ex2', document.getElementById('debugMode').checked);
             
             const articleInfo = document.getElementById('articleInfo').value.trim();
             
@@ -1288,6 +1328,7 @@
                     image: imagePath,
                     prompt: promptFile,
                     articleInfo: articleInfo,
+                    debug: document.getElementById('debugMode').checked,
                     runInterpolation: document.getElementById('runInterpolation').checked,
                     runPointwise: document.getElementById('runPointwise').checked,
                     leftX: leftX,
@@ -1303,11 +1344,17 @@
                     localStorage.setItem('currentTaskId', currentTaskId);
                     consoleOutput.textContent = 'Task started. Processing in background...\n';
                     startPolling();
+                } else {
+                    btn.disabled = false;
+                    btn.textContent = '🚀 Run Plot Extraction (and Comparison)';
+                    btnCancel.style.display = 'none';
+                    consoleOutput.textContent += '\n\n[ERROR] Failed to start task.';
                 }
             })
             .catch(err => {
                 btn.disabled = false;
                 btn.textContent = '🚀 Run Plot Extraction (and Comparison)';
+                btnCancel.style.display = 'none';
                 consoleOutput.textContent += '\n\n[ERROR] ' + err;
             });
         }
@@ -1317,8 +1364,9 @@
             if (pollInterval) clearInterval(pollInterval);
             
             const btn = document.getElementById('btnRunAll');
+            const btnCancel = document.getElementById('btnCancelSingle');
             const consoleOutput = document.getElementById('consoleOutput');
-            let startTime = Date.now();
+            const localStartTime = Date.now(); // fallback only
             let lastStageDisplayed = '';
             
             pollInterval = setInterval(() => {
@@ -1337,7 +1385,10 @@
                         if (progressData.status !== 'not_found') {
                             usedV2 = true;
                             // V2 progress data available
-                            const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+                            const elapsedSeconds = (typeof progressData.elapsed === 'number')
+                                ? progressData.elapsed
+                                : ((Date.now() - localStartTime) / 1000);
+                            const elapsed = elapsedSeconds.toFixed(1);
                             const percentage = progressData.percentage || 0;
                             const currentStage = progressData.stage || 'Processing';
                             const stageTimeMs = progressData.stage_duration_ms || 0;
@@ -1391,8 +1442,11 @@
                     .then(res => res ? res.json() : null)
                     .then(data => {
                         if (!data) return; // Already handled by V2 endpoint
-                        
-                        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+
+                        const elapsedSeconds = (typeof data.elapsed === 'number')
+                            ? data.elapsed
+                            : ((Date.now() - localStartTime) / 1000);
+                        const elapsed = elapsedSeconds.toFixed(1);
                         
                         if (data.status === 'running') {
                             // If V2 is providing rich progress, don't overwrite the console with the legacy text.
@@ -1413,6 +1467,7 @@
                             
                             btn.disabled = false;
                             btn.textContent = '🚀 Run Plot Extraction (and Comparison)';
+                            btnCancel.style.display = 'none';
                             
                             // Display results
                             displayResults(data.result);
@@ -1424,6 +1479,7 @@
                             
                             btn.disabled = false;
                             btn.textContent = '🚀 Run Plot Extraction (and Comparison)';
+                            btnCancel.style.display = 'none';
                             consoleOutput.textContent += '\n[WARNING] Task not found. It may have completed while you were away.';
                             
                             // Try to load the last result
@@ -1489,16 +1545,43 @@
         
         // Check for running task or last result on page load
         function checkTaskOnLoad() {
+            // Resume batch task if one is running
+            const savedBatchTaskId = localStorage.getItem('currentBatchTaskId');
+            if (savedBatchTaskId) {
+                setMode('batch');
+                batchTaskId = savedBatchTaskId;
+                batchNumber = localStorage.getItem('currentBatchNumber');
+                document.getElementById('btnRunBatch').disabled = true;
+                document.getElementById('btnRunBatch').textContent = '⏳ Resuming batch...';
+                document.getElementById('btnCancelBatch').style.display = 'inline-block';
+                document.getElementById('batchQueuePanel').style.display = 'block';
+                startBatchPolling();
+                return;
+            }
+
+            // Resume single task if one is running
             const savedTaskId = localStorage.getItem('currentTaskId');
             if (savedTaskId) {
                 currentTaskId = savedTaskId;
                 document.getElementById('btnRunAll').disabled = true;
                 document.getElementById('btnRunAll').textContent = '⏳ Checking task...';
+                document.getElementById('btnCancelSingle').style.display = 'inline-block';
                 startPolling();
             } else {
                 // No running task, try to load last result
                 loadLastResult();
             }
+        }
+
+        function cancelCurrentTask() {
+            if (!currentTaskId) return;
+            if (!confirm('Cancel the current extraction?')) return;
+
+            const btnCancel = document.getElementById('btnCancelSingle');
+            btnCancel.disabled = true;
+            btnCancel.textContent = '⏹️ Cancelling...';
+
+            fetch(`/v2/cancel_task/${currentTaskId}`, { method: 'POST' }).catch(() => {});
         }
         
         function showTab(tabName) {
@@ -1564,6 +1647,7 @@
         let batchPollInterval = null;  // Polling interval
         let batchCancelled = false;    // Cancel flag
         let batchStartTime = null;     // For elapsed time tracking
+        let batchNumber = null;        // Persistent batch number for /batch_results
         
         // =================================================================
         // Batch Mode - Image Selection (from multi-select dropdown)
@@ -1611,6 +1695,7 @@
             }
             
             const promptFile = document.getElementById('batchPromptSelect').value;
+            const batchName = (document.getElementById('batchName')?.value || '').trim();
             const runInterpolation = document.getElementById('runInterpolation').checked;
             const runPointwise = document.getElementById('runPointwise').checked;
             const autoDetectAxis = document.getElementById('autoDetectAxis').checked;
@@ -1624,9 +1709,10 @@
             localStorage.setItem('axisRightX', rightX);
             localStorage.setItem('axisBottomY', bottomY);
             localStorage.setItem('axisTopY', topY);
-            localStorage.setItem('lastPrompt', promptFile);
+            localStorage.setItem('lastPrompt_ex2', promptFile);
+            localStorage.setItem('plotextract_debug_ex2', document.getElementById('debugMode').checked);
             
-            // Initialize batch state
+            // Initialize batch state (UI only)
             batchQueue = batchImages.map(img => ({
                 id: img.id,
                 name: img.name,
@@ -1652,89 +1738,164 @@
             updateBatchProgress();
             
             const consoleOutput = document.getElementById('batchConsoleOutput');
-            consoleOutput.textContent = `Starting batch extraction of ${batchQueue.length} images...\n`;
-            
-            // Start elapsed time updater
-            const elapsedInterval = setInterval(() => {
-                if (batchStartTime) {
-                    const elapsed = ((Date.now() - batchStartTime) / 1000).toFixed(0);
-                    document.getElementById('batchElapsedTime').textContent = elapsed + 's elapsed';
+            consoleOutput.textContent = `Starting server-side batch extraction of ${batchQueue.length} images...\n`;
+
+            // Start the server-side batch job (continues even if page is closed)
+            const response = await fetch('/v2/run_batch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    images: batchQueue.map(i => i.path),
+                    prompt: promptFile,
+                    batch_name: batchName || null,
+                    articleInfo: document.getElementById('articleInfo').value.trim(),
+                    debug: document.getElementById('debugMode').checked,
+                    runInterpolation: runInterpolation,
+                    runPointwise: runPointwise,
+                    leftX: leftX,
+                    rightX: rightX,
+                    bottomY: bottomY,
+                    topY: topY
+                })
+            });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                if (errData && errData.error === 'duplicate batch_name') {
+                    alert('Batch label already exists. Please choose a different label.');
+                } else {
+                    alert('Failed to start batch task. Please try again.');
+                }
+                btnRun.disabled = false;
+                btnRun.textContent = '🚀 Run Batch Extraction';
+                btnCancel.style.display = 'none';
+                return;
+            }
+
+            const data = await response.json();
+            if (!data.task_id) {
+                throw new Error('Failed to start batch task');
+            }
+
+            batchTaskId = data.task_id;
+            localStorage.setItem('currentBatchTaskId', batchTaskId);
+
+            if (data.batch_number) {
+                batchNumber = data.batch_number;
+                localStorage.setItem('currentBatchNumber', String(batchNumber));
+                consoleOutput.textContent += `Batch number: #${batchNumber} (view later at /batch_results)\n`;
+            }
+            const batchNameInput = document.getElementById('batchName');
+            if (batchNameInput) batchNameInput.value = '';
+            startBatchPolling();
+        }
+
+        function startBatchPolling() {
+            if (batchPollInterval) clearInterval(batchPollInterval);
+
+            const btnRun = document.getElementById('btnRunBatch');
+            const btnCancel = document.getElementById('btnCancelBatch');
+            const consoleOutput = document.getElementById('batchConsoleOutput');
+            const localStartTime = Date.now(); // fallback only
+
+            batchPollInterval = setInterval(async () => {
+                if (!batchTaskId) {
+                    clearInterval(batchPollInterval);
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`/v2/batch_progress/${batchTaskId}`, { cache: 'no-store' });
+                    const progress = await res.json();
+
+                    if (progress.status === 'not_found') {
+                        consoleOutput.textContent += `\n[ERROR] Batch task not found on server.\n`;
+                        clearInterval(batchPollInterval);
+                        btnRun.disabled = false;
+                        btnRun.textContent = '🚀 Run Batch Extraction';
+                        btnCancel.style.display = 'none';
+                        localStorage.removeItem('currentBatchTaskId');
+                        localStorage.removeItem('currentBatchNumber');
+                        batchTaskId = null;
+                        return;
+                    }
+
+                    if (!batchNumber && progress.batch_number) {
+                        batchNumber = progress.batch_number;
+                        localStorage.setItem('currentBatchNumber', String(batchNumber));
+                    }
+
+                    const elapsedSeconds = (typeof progress.elapsed === 'number')
+                        ? progress.elapsed
+                        : ((Date.now() - localStartTime) / 1000);
+                    const elapsed = elapsedSeconds.toFixed(1);
+                    const batch = progress.batch || {};
+                    const items = batch.items || [];
+
+                    // Update UI queue from server state
+                    batchQueue = items.map(it => ({
+                        id: 'batch_' + (it.image_path || '').replace(/[^a-zA-Z0-9]/g, '_'),
+                        name: (it.image_path || '').split('/').pop(),
+                        path: it.image_path,
+                        status: it.status || 'pending',
+                        result: it.result || null,
+                        error: it.error || null,
+                        time: it.time_s != null ? String(it.time_s) : null
+                    }));
+
+                    updateBatchQueueDisplay();
+                    updateBatchProgress();
+
+                    const completed = batch.completed || 0;
+                    const total = batch.total || batchQueue.length || 0;
+                    const failed = batch.failed || 0;
+                    const currentImage = batch.current_image || '';
+
+                    document.getElementById('batchElapsedTime').textContent = `${elapsed}s elapsed`;
+                    btnRun.textContent = `⏳ ${completed}/${total} done (${failed} failed)`;
+
+                    // Console summary (short, always overwritten)
+                    consoleOutput.textContent =
+                        `🔄 BATCH IN PROGRESS\n${'='.repeat(60)}\n` +
+                        (batchNumber ? `Batch: #${batchNumber}\n` : '') +
+                        `Task: ${batchTaskId}\n` +
+                        `Completed: ${completed}/${total} (failed: ${failed})\n` +
+                        (currentImage ? `Current: ${currentImage}\n` : '') +
+                        `Elapsed: ${elapsed}s\n${'='.repeat(60)}\n`;
+
+                    if (progress.status === 'completed') {
+                        clearInterval(batchPollInterval);
+                        btnRun.disabled = false;
+                        btnRun.textContent = '🚀 Run Batch Extraction';
+                        btnCancel.style.display = 'none';
+
+                        // Build batchResults for existing rendering functions
+                        batchResults = batchQueue.map(item => {
+                            const ok = !!(item.result && item.result.success);
+                            return {
+                                id: item.id,
+                                name: item.name,
+                                path: item.path,
+                                status: ok ? 'success' : 'failed',
+                                result: item.result,
+                                error: ok ? null : (item.error || (item.result && item.result.error) || 'Failed'),
+                                time: item.time
+                            };
+                        });
+
+                        const okCount = batchResults.filter(r => r.status === 'success').length;
+                        const failCount = batchResults.filter(r => r.status === 'failed').length;
+                        consoleOutput.textContent += `\nBATCH COMPLETE: ${okCount} succeeded, ${failCount} failed\n`;
+
+                        localStorage.removeItem('currentBatchTaskId');
+                        localStorage.removeItem('currentBatchNumber');
+                        batchTaskId = null;
+                        renderBatchResults();
+                    }
+                } catch (e) {
+                    consoleOutput.textContent += `\n[ERROR] ${e.message || e}\n`;
                 }
             }, 1000);
-            
-            // Process images sequentially
-            for (let i = 0; i < batchQueue.length; i++) {
-                if (batchCancelled) {
-                    consoleOutput.textContent += '\n⏹️ Batch cancelled by user.\n';
-                    break;
-                }
-                
-                const item = batchQueue[i];
-                item.status = 'processing';
-                updateBatchQueueDisplay();
-                updateBatchProgress();
-                
-                consoleOutput.textContent += `\n[${i + 1}/${batchQueue.length}] Processing: ${item.name}...\n`;
-                consoleOutput.scrollTop = consoleOutput.scrollHeight;
-                
-                const startTime = Date.now();
-                
-                try {
-                    // Run extraction using the same endpoint as single mode
-                    const result = await processBatchImage(item.path, promptFile, runInterpolation, runPointwise, leftX, rightX, bottomY, topY, autoDetectAxis);
-                    
-                    item.status = 'completed';
-                    item.result = result;
-                    item.time = ((Date.now() - startTime) / 1000).toFixed(1);
-                    
-                    consoleOutput.textContent += `  ✅ Completed in ${item.time}s\n`;
-                    
-                    batchResults.push({
-                        id: item.id,
-                        name: item.name,
-                        path: item.path,
-                        status: 'success',
-                        result: result,
-                        time: item.time
-                    });
-                } catch (error) {
-                    item.status = 'failed';
-                    item.error = error.message || 'Unknown error';
-                    item.time = ((Date.now() - startTime) / 1000).toFixed(1);
-                    
-                    consoleOutput.textContent += `  ❌ Failed: ${item.error}\n`;
-                    
-                    batchResults.push({
-                        id: item.id,
-                        name: item.name,
-                        path: item.path,
-                        status: 'failed',
-                        error: item.error,
-                        time: item.time
-                    });
-                }
-                
-                updateBatchQueueDisplay();
-                updateBatchProgress();
-                consoleOutput.scrollTop = consoleOutput.scrollHeight;
-            }
-            
-            // Cleanup
-            clearInterval(elapsedInterval);
-            btnRun.disabled = false;
-            btnRun.textContent = '🚀 Run Batch Extraction';
-            btnCancel.style.display = 'none';
-            
-            const completed = batchResults.filter(r => r.status === 'success').length;
-            const failed = batchResults.filter(r => r.status === 'failed').length;
-            const totalTime = ((Date.now() - batchStartTime) / 1000).toFixed(1);
-            
-            consoleOutput.textContent += `\n${'='.repeat(50)}\n`;
-            consoleOutput.textContent += `BATCH COMPLETE: ${completed} succeeded, ${failed} failed (${totalTime}s total)\n`;
-            consoleOutput.textContent += `${'='.repeat(50)}\n`;
-            
-            // Update results display
-            renderBatchResults();
         }
         
         async function processBatchImage(imagePath, promptFile, runInterpolation, runPointwise, leftX, rightX, bottomY, topY, autoDetectAxis) {
@@ -1774,6 +1935,7 @@
                     image: imagePath,
                     prompt: promptFile,
                     articleInfo: articleInfo,
+                    debug: document.getElementById('debugMode').checked,
                     runInterpolation: runInterpolation,
                     runPointwise: runPointwise,
                     leftX: leftX,
@@ -1824,8 +1986,17 @@
         }
         
         function cancelBatch() {
+            if (!batchTaskId) {
+                batchCancelled = true;
+                return;
+            }
+
             if (confirm('Cancel the batch extraction? Images already processed will be kept.')) {
                 batchCancelled = true;
+                fetch(`/v2/cancel_task/${batchTaskId}`, { method: 'POST' }).catch(() => {});
+                const btnCancel = document.getElementById('btnCancelBatch');
+                btnCancel.disabled = true;
+                btnCancel.textContent = '⏹️ Cancelling...';
             }
         }
         

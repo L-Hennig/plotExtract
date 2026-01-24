@@ -1,0 +1,91 @@
+import os
+import matplotlib.pyplot as plt
+import numpy as np
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic/G/GG\GG_png.pv2_prompt_12.v2\GG_png-replot.pv2_prompt_12.v2.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data from marker_facts
+data = {
+    "Condition 1": [
+        (0, 6.0), (2, 1.0), (4, 0.8), (6, 0.9), (8, 0.8), (10, 0.9),
+        (12, 0.8), (14, 0.8), (16, 0.8), (18, 0.8), (20, 0.8), (22, 0.8), (24, 0.8)
+    ],
+    "Condition 2": [
+        (0, 6.0), (2, 8.3), (4, 8.4), (6, 8.5), (8, 8.7), (10, 8.6),
+        (12, 8.3), (14, 8.2), (16, 8.2), (18, 8.2), (20, 8.2), (22, 8.2), (24, 8.2)
+    ],
+    "Condition 3": [
+        (0, 6.0), (2, 7.0), (4, 7.2), (6, 7.5), (8, 7.9), (10, 8.1),
+        (12, 8.2), (14, 8.2), (16, 8.2), (18, 8.2), (20, 8.2), (22, 8.2), (24, 8.2)
+    ],
+    "Condition 4": [
+        (0, 6.0), (2, 1.8), (4, 1.5), (6, 2.3), (8, 2.0), (10, 1.8),
+        (12, 1.8), (14, 1.8), (16, 1.8), (20, 2.0), (24, 2.0)
+    ],
+    "Condition 5": [
+        (0, 6.0), (2, 1.5), (4, 1.2), (6, 2.5), (8, 2.2), (10, 1.8),
+        (12, 1.9), (14, 2.0), (16, 2.1), (18, 2.1), (20, 2.1), (22, 2.1), (24, 2.1)
+    ],
+    "Condition 6": [
+        (0, 6.0), (2, 1.0), (4, 0.8), (6, 0.8), (8, 0.8), (10, 0.8),
+        (12, 0.8), (14, 0.8), (16, 0.8), (18, 0.8), (20, 0.8), (22, 0.8), (24, 0.8)
+    ]
+}
+
+# Re-extraction results applied
+data["Condition 2"] = [
+    (0, 6.0), (2, 5.7), (4, 8.4), (6, 8.5), (8, 8.7), (10, 8.6),
+    (12, 8.3), (14, 8.2), (16, 8.2), (18, 8.2), (20, 8.2), (22, 7.8), (24, 7.7)
+]
+data["Condition 3"] = [
+    (0, 6.0), (2, 5.8), (4, 7.2), (6, 7.5), (8, 7.9), (10, 8.1),
+    (12, 8.2), (14, 8.2), (16, 8.2), (18, 8.2), (20, 8.2), (22, 7.5), (24, 7.4)
+]
+data["Condition 4"] = [
+    (0, 6.0), (2, 1.8), (4, 1.5), (6, 2.3), (8, 2.0), (10, 1.8),
+    (12, 1.8), (14, 1.8), (16, 1.8), (18, 1.8), (20, 2.0), (22, 1.8), (24, 2.0)
+]
+
+# Curve styles from curve_style_facts
+curve_styles = {
+    "Condition 1": {"line": "-", "marker": "s", "color": "black"},
+    "Condition 2": {"line": "--", "marker": "^", "color": "black"},
+    "Condition 3": {"line": ":", "marker": "o", "color": "black"},
+    "Condition 4": {"line": "-", "marker": "o", "color": "black", "fillstyle": "full"},
+    "Condition 5": {"line": ":", "marker": "v", "color": "black"},
+    "Condition 6": {"line": "--", "marker": "s", "color": "black"}
+}
+
+# Create the plot
+plt.figure(figsize=(8, 6))
+
+# Plot each condition
+for condition, points in data.items():
+    x_vals, y_vals = zip(*points)
+    plt.plot(x_vals, y_vals,
+             linestyle=curve_styles[condition]["line"],
+             marker=curve_styles[condition]["marker"],
+             color=curve_styles[condition]["color"],
+             fillstyle=curve_styles[condition].get("fillstyle", "none"),
+             label=condition)
+
+# Set axis limits and labels
+plt.xlim(0, 24)
+plt.ylim(0, 10)
+plt.xlabel("Time (hours)")
+plt.ylabel("Bacterial Count (CFU/mL) (log10 scale)")
+
+# Set ticks
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])
+plt.yticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+# Add grid
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+
+# Add legend
+plt.legend()
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)
+plt.close()

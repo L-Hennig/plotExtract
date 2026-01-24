@@ -1,0 +1,37 @@
+import os
+import matplotlib.pyplot as plt
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic/E/ED\ED_png.pv2_prompt_4.v1\ED_png-replot.pv2_prompt_4.v1.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data from marker_facts
+time_points = [0, 2, 4, 6, 8, 10, 12, 24]
+bacterial_counts = [6.0, 5.9, 5.8, 5.75, 5.7, 5.7, 5.65, 5.4]
+
+# Create the plot
+plt.figure(figsize=(6, 4))
+plt.plot(time_points, bacterial_counts, marker='o', linestyle='--', color='black', label='Condition 1')
+
+# Axis labels
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+
+# Axis limits
+plt.xlim(0, 26)
+plt.ylim(0, 10)
+
+# Ticks
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 24])
+plt.yticks([0, 2, 4, 6, 8, 10])
+
+# Axis break indication
+plt.gca().add_patch(plt.Rectangle((12.5, 0), 7, 10, fill=True, edgecolor='none', facecolor='white', zorder=3))
+plt.plot([12, 20], [0, 10], color='black', linewidth=1, clip_on=False, transform=plt.gca().transData)
+plt.plot([12, 20], [10, 0], color='black', linewidth=1, clip_on=False, transform=plt.gca().transData)
+
+# Legend
+plt.legend()
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)
+plt.close()

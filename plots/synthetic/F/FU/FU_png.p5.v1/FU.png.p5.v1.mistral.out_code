@@ -1,0 +1,60 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time_cond1 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu_cond1 = [6.1, 7.3, 8.5, 9.0, 9.3, 9.7, 9.8, 10.0]
+
+time_cond2 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu_cond2 = [6.0, 6.8, 7.5, 8.0, 8.3, 8.2, 8.2, 8.2]
+
+time_cond3 = [0, 2, 24]
+cfu_cond3 = [6.0, 1.0, 2.0]
+
+time_cond4 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu_cond4 = [6.0, 7.0, 7.8, 7.9, 8.1, 8.2, 8.2, 8.2]
+
+time_cond5 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu_cond5 = [6.0, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5]
+
+time_cond6 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu_cond6 = [5.8, 6.5, 7.0, 2.5, 2.5, 2.5, 2.5, 8.2]
+
+# Plot settings
+plt.figure(figsize=(8, 6))
+plt.rcParams['font.family'] = 'Arial'
+plt.rcParams['font.size'] = 12
+
+# Plot each condition
+plt.plot(time_cond1, cfu_cond1, marker='s', linestyle='-', color='black', label='Condition 1')
+plt.plot(time_cond2, cfu_cond2, marker='^', linestyle='--', color='black', label='Condition 2')
+plt.plot(time_cond3, cfu_cond3, marker='o', linestyle=':', color='black', label='Condition 3')
+plt.plot(time_cond4, cfu_cond4, marker='D', linestyle='-.', color='black', label='Condition 4')
+plt.plot(time_cond5, cfu_cond5, marker='o', linestyle='-', color='black', markerfacecolor='none', label='Condition 5')
+plt.plot(time_cond6, cfu_cond6, marker='s', linestyle='--', color='black', markerfacecolor='none', label='Condition 6')
+
+# Axis settings
+plt.xlim(0, 26)
+plt.ylim(0, 10.5)
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+plt.yscale('log')
+plt.yticks([1, 2, 4, 6, 8, 10], ['1', '2', '4', '6', '8', '10'])
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 20, 22, 24])
+
+# Axis break indication
+plt.gca().add_patch(plt.Rectangle((13, -0.5), 6, 11, fill=True, edgecolor='none', facecolor='white'))
+plt.plot([12.5, 20.5], [0, 0], color='black', linewidth=1)
+plt.plot([12.5, 20.5], [10, 10], color='black', linewidth=1)
+d = 0.5
+plt.plot([12.5, 12.5+d], [0, 0+d], color='black', linewidth=1)
+plt.plot([12.5, 12.5+d], [10, 10-d], color='black', linewidth=1)
+plt.plot([20.5-d, 20.5], [0+d, 0], color='black', linewidth=1)
+plt.plot([20.5-d, 20.5], [10-d, 10], color='black', linewidth=1)
+
+# Save the plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\FU\FU_png.p5.v1"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "FU_png-replot.p5.v1.png"), dpi=300, bbox_inches='tight')
+plt.close()

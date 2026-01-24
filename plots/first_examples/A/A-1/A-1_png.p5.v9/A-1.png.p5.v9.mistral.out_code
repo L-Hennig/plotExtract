@@ -1,0 +1,69 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+data = {
+    'Blank': {
+        'time': [0, 2, 4, 6, 8, 26],
+        'cfu': [6.0, 8.5, 9.5, 10.0, 10.0, 9.5]
+    },
+    'COL 0.125µg/mL': {
+        'time': [0, 2, 4, 6, 8, 10, 24, 26],
+        'cfu': [6.0, 7.0, 8.0, 9.0, 9.5, 10.0, 10.0, 10.0]
+    },
+    'MINO 1µg/mL': {
+        'time': [0, 2, 4, 6, 8, 10, 24, 26],
+        'cfu': [6.0, 8.0, 9.0, 9.5, 10.0, 10.0, 9.0, 8.5]
+    },
+    'COL 0.125µg/mL + MEM 4µg/mL': {
+        'time': [0, 2, 4, 6, 8, 10],
+        'cfu': [6.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    },
+    'COL 0.125µg/mL + MINO 1µg/mL': {
+        'time': [0, 2, 4, 6, 8, 10, 24, 26],
+        'cfu': [6.0, 7.5, 8.0, 8.5, 8.5, 8.5, 2.0, 1.0]
+    },
+    'COL 0.125µg/mL + RFP 0.06µg/mL': {
+        'time': [0, 2, 4, 6, 8, 10, 24, 26],
+        'cfu': [6.0, 0.0, 0.0, 1.0, 2.0, 2.0, 1.0, 0.0]
+    },
+    'MEM 4µg/mL': {
+        'time': [0, 2, 4, 6, 8, 10, 24, 26],
+        'cfu': [6.0, 8.0, 9.0, 9.5, 10.0, 10.0, 9.5, 9.0]
+    },
+    'RFP 0.06µg/mL': {
+        'time': [0, 2, 4, 6, 8, 10, 24, 26],
+        'cfu': [6.0, 9.0, 9.5, 10.0, 10.0, 10.0, 9.0, 8.5]
+    }
+}
+
+plt.figure(figsize=(8, 6))
+
+line_styles = {
+    'Blank': {'color': 'black', 'linestyle': '--', 'marker': 'x', 'markersize': 6},
+    'COL 0.125µg/mL': {'color': 'black', 'linestyle': '-', 'marker': 's', 'markersize': 6},
+    'MINO 1µg/mL': {'color': 'black', 'linestyle': '--', 'marker': '^', 'markersize': 6},
+    'COL 0.125µg/mL + MEM 4µg/mL': {'color': 'black', 'linestyle': ':', 'marker': 'o', 'markersize': 6, 'fillstyle': 'none'},
+    'COL 0.125µg/mL + MINO 1µg/mL': {'color': 'black', 'linestyle': '--', 'marker': 'D', 'markersize': 6, 'fillstyle': 'none'},
+    'COL 0.125µg/mL + RFP 0.06µg/mL': {'color': 'black', 'linestyle': '--', 'marker': 'v', 'markersize': 6, 'fillstyle': 'none'},
+    'MEM 4µg/mL': {'color': 'black', 'linestyle': '-.', 'marker': 'o', 'markersize': 6},
+    'RFP 0.06µg/mL': {'color': 'black', 'linestyle': ':', 'marker': '>', 'markersize': 6}
+}
+
+for label, values in data.items():
+    plt.plot(values['time'], values['cfu'],
+             label=label,
+             **line_styles[label])
+
+plt.xlabel('Time (h)')
+plt.ylabel('Log cfu/mL')
+plt.xlim(0, 26)
+plt.ylim(0, 16)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 22, 24, 26])
+plt.yticks([0, 2, 4, 6, 8, 10, 12, 14, 16])
+plt.grid(True, linestyle=':', alpha=0.7)
+
+plt.annotate('', xy=(11, 0), xytext=(21, 0), arrowprops=dict(arrowstyle='<->', color='black', lw=1.5))
+
+plt.tight_layout()
+plt.savefig(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\first_examples\A\A-1\A-1_png.p5.v9\A-1_png-replot.p5.v9.png", dpi=300)
+plt.close()

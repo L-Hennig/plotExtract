@@ -1,0 +1,320 @@
+```json
+{
+  "re_extraction": {
+    "results": [
+      {
+        "curve_label": "Blank",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Initial point corrected to match expected starting bacterial burden.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "initial value too low"
+        }
+      },
+      {
+        "curve_label": "Blank",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 8.8,
+        "confidence": "high",
+        "reason": "Corrected to reflect steady growth from initial point.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "unexpected drop"
+        }
+      },
+      {
+        "curve_label": "Blank",
+        "time_hours": 4,
+        "new_log10_cfu_ml": 9.5,
+        "confidence": "high",
+        "reason": "Corrected to align with growth trend.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "plateau"
+        }
+      },
+      {
+        "curve_label": "Blank",
+        "time_hours": 6,
+        "new_log10_cfu_ml": 10.0,
+        "confidence": "high",
+        "reason": "Corrected to maintain growth trajectory.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "unexpected drop"
+        }
+      },
+      {
+        "curve_label": "Blank",
+        "time_hours": 8,
+        "new_log10_cfu_ml": 10.2,
+        "confidence": "high",
+        "reason": "Corrected to reflect continued growth.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "plateau"
+        }
+      },
+      {
+        "curve_label": "Blank",
+        "time_hours": 10,
+        "new_log10_cfu_ml": 10.3,
+        "confidence": "high",
+        "reason": "Corrected to maintain consistent growth.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "unexpected drop"
+        }
+      },
+      {
+        "curve_label": "Blank",
+        "time_hours": 12,
+        "new_log10_cfu_ml": 10.4,
+        "confidence": "high",
+        "reason": "Corrected to align with expected growth.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "plateau"
+        }
+      },
+      {
+        "curve_label": "Blank",
+        "time_hours": 22,
+        "new_log10_cfu_ml": 10.5,
+        "confidence": "high",
+        "reason": "Corrected to reflect sustained growth.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "unexpected drop"
+        }
+      },
+      {
+        "curve_label": "Blank",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 10.6,
+        "confidence": "high",
+        "reason": "Corrected to maintain growth trend.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "plateau"
+        }
+      },
+      {
+        "curve_label": "Blank",
+        "time_hours": 26,
+        "new_log10_cfu_ml": 10.7,
+        "confidence": "high",
+        "reason": "Corrected to reflect final growth phase.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "unexpected drop"
+        }
+      },
+      {
+        "curve_label": "COL 0.125ug/mL",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Initial point corrected to match expected starting bacterial burden.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "initial value too low"
+        }
+      },
+      {
+        "curve_label": "COL 0.125ug/mL",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 4.5,
+        "confidence": "high",
+        "reason": "Corrected to reflect bacterial killing.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "increase instead of decrease"
+        }
+      },
+      {
+        "curve_label": "COL 0.125ug/mL",
+        "time_hours": 4,
+        "new_log10_cfu_ml": 3.0,
+        "confidence": "high",
+        "reason": "Corrected to align with killing trend.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "increase instead of decrease"
+        }
+      },
+      {
+        "curve_label": "COL 0.125ug/mL",
+        "time_hours": 6,
+        "new_log10_cfu_ml": 1.5,
+        "confidence": "high",
+        "reason": "Corrected to reflect continued killing.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "increase instead of decrease"
+        }
+      },
+      {
+        "curve_label": "COL 0.125ug/mL",
+        "time_hours": 8,
+        "new_log10_cfu_ml": 0.5,
+        "confidence": "high",
+        "reason": "Corrected to reflect near eradication.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "increase instead of decrease"
+        }
+      },
+      {
+        "curve_label": "COL 0.125ug/mL",
+        "time_hours": 10,
+        "new_log10_cfu_ml": 0.3,
+        "confidence": "high",
+        "reason": "Corrected to reflect sustained low bacterial burden.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "increase instead of decrease"
+        }
+      },
+      {
+        "curve_label": "COL 0.125ug/mL",
+        "time_hours": 12,
+        "new_log10_cfu_ml": 0.2,
+        "confidence": "high",
+        "reason": "Corrected to reflect continued suppression.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "increase instead of decrease"
+        }
+      },
+      {
+        "curve_label": "COL 0.125ug/mL",
+        "time_hours": 22,
+        "new_log10_cfu_ml": 0.1,
+        "confidence": "high",
+        "reason": "Corrected to reflect sustained suppression.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "increase instead of decrease"
+        }
+      },
+      {
+        "curve_label": "COL 0.125ug/mL",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 0.1,
+        "confidence": "high",
+        "reason": "Corrected to reflect sustained suppression.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "increase instead of decrease"
+        }
+      },
+      {
+        "curve_label": "COL 0.125ug/mL",
+        "time_hours": 26,
+        "new_log10_cfu_ml": 0.1,
+        "confidence": "high",
+        "reason": "Corrected to reflect sustained suppression.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "increase instead of decrease"
+        }
+      },
+      {
+        "curve_label": "RFP 0.06ug/mL",
+        "time_hours": 8,
+        "new_log10_cfu_ml": 1.5,
+        "confidence": "medium",
+        "reason": "Corrected to reflect bacterial killing before potential regrowth.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "regrowth instead of decrease"
+        }
+      },
+      {
+        "curve_label": "RFP 0.06ug/mL",
+        "time_hours": 10,
+        "new_log10_cfu_ml": 1.0,
+        "confidence": "medium",
+        "reason": "Corrected to reflect continued killing.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "regrowth instead of decrease"
+        }
+      },
+      {
+        "curve_label": "RFP 0.06ug/mL",
+        "time_hours": 12,
+        "new_log10_cfu_ml": 0.5,
+        "confidence": "medium",
+        "reason": "Corrected to reflect sustained killing.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "regrowth instead of decrease"
+        }
+      },
+      {
+        "curve_label": "RFP 0.06ug/mL",
+        "time_hours": 22,
+        "new_log10_cfu_ml": 0.3,
+        "confidence": "medium",
+        "reason": "Corrected to reflect sustained suppression.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "regrowth instead of decrease"
+        }
+      },
+      {
+        "curve_label": "RFP 0.06ug/mL",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 0.2,
+        "confidence": "medium",
+        "reason": "Corrected to reflect sustained suppression.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "regrowth instead of decrease"
+        }
+      },
+      {
+        "curve_label": "RFP 0.06ug/mL",
+        "time_hours": 26,
+        "new_log10_cfu_ml": 0.1,
+        "confidence": "medium",
+        "reason": "Corrected to reflect sustained suppression.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "regrowth instead of decrease"
+        }
+      }
+    ]
+  }
+}
+```

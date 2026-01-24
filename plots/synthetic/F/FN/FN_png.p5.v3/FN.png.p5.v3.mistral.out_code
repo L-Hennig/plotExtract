@@ -1,0 +1,48 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time_cond1 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu_cond1 = [6.0, 5.8, 7.0, 8.3, 8.5, 8.7, 8.8, 9.1]
+
+time_cond2 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu_cond2 = [6.0, 4.0, 1.5, 1.5, 1.5, 1.5, 1.5, 2.5]
+
+time_cond3 = [0, 2, 4, 6, 8, 10, 12]
+cfu_cond3 = [6.0, 2.5, 2.0, 2.0, 2.0, 1.5, 1.5]
+
+time_cond4 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu_cond4 = [6.0, 7.5, 7.8, 7.8, 7.8, 7.8, 7.8, 7.9]
+
+time_cond5 = [0, 2, 24, 24]
+cfu_cond5 = [6.0, 2.8, 0.8, 1.0]
+
+# Plot settings
+plt.figure(figsize=(8, 6))
+plt.rcParams['font.family'] = 'Arial'
+plt.rcParams['font.size'] = 12
+
+# Plot each condition
+plt.plot(time_cond1, cfu_cond1, marker='s', linestyle='-', color='black', label='Condition 1', markersize=8)
+plt.plot(time_cond2, cfu_cond2, marker='^', linestyle='--', color='black', label='Condition 2', markersize=8)
+plt.plot(time_cond3, cfu_cond3, marker='o', linestyle=':', color='black', label='Condition 3', markersize=8)
+plt.plot(time_cond4, cfu_cond4, marker='D', linestyle='-.', color='black', label='Condition 4', markersize=8)
+plt.plot(time_cond5, cfu_cond5, marker='o', linestyle='-', color='black', fillstyle='none', label='Condition 5', markersize=8)
+
+# Axis settings
+plt.xlim(0, 26)
+plt.ylim(0, 10)
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+plt.yscale('log')
+plt.yticks([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
+
+# Legend
+plt.legend(loc='upper left', frameon=False)
+
+# Save plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\FN\FN_png.p5.v3"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "FN_png-replot.p5.v3.png"), dpi=300, bbox_inches='tight')
+plt.close()

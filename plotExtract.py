@@ -1,6 +1,7 @@
 import base64, sys, re, os, requests, json, traceback, cv2
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.figure as mpl_figure
 
 # The below library is required to import the prompts from a separate file
 import importlib.util
@@ -266,18 +267,77 @@ QQ = create_Q_1p([[base64_image, prompts['extract']]])
 print("Extracting data... ", end = '', flush=True)
 QQ, data = prompt_mistral(QQ)
 QQ.append({'role': 'assistant', 'content': data})
+
+def _clean_extracted_csv_text(raw_text: str) -> str:
+  """Keep only CSV-like lines and drop known empty/None-only rows.
+
+  Some extractions include a trailing line like `None,,,,` which previously
+  triggered a false-positive "NO DATA EXTRACTED" check.
+  """
+  if raw_text is None:
+    return ""
+
+  lines = str(raw_text).splitlines()
+  cleaned = []
+  in_code_fence = False
+  for line in lines:
+    s = line.strip()
+    if s.startswith("```"):
+      in_code_fence = not in_code_fence
+      continue
+
+    # Keep only CSV-like lines
+    if ',' not in line:
+      continue
+
+    # Skip rows that are entirely empty or start with a lone 'None'
+    if s == "" or s.lower() == "none" or s.lower().startswith("none,"):
+      continue
+    if s.replace(',', '').strip() == "":
+      continue
+
+    cleaned.append(line)
+
+  return "\n".join(cleaned).strip() + "\n" if cleaned else ""
+
+
+def _has_any_numeric_data(csv_text: str) -> bool:
+  """Return True if CSV text contains at least one numeric value row."""
+  if not csv_text:
+    return False
+  lines = csv_text.splitlines()
+  if len(lines) < 2:
+    return False
+
+  numeric_count = 0
+  for row in lines[1:]:
+    for tok in row.split(','):
+      t = tok.strip()
+      if t == "" or t.lower() in ("none", "nan"):
+        continue
+      try:
+        float(t)
+        numeric_count += 1
+        if numeric_count >= 2:
+          return True
+      except Exception:
+        continue
+  return False
+
+
+cleaned_data = _clean_extracted_csv_text(data)
 with open(output_out+'_data', 'w', encoding='utf-8') as file:
-  file.write(data)
+  file.write(cleaned_data if cleaned_data else (data or ""))
 print(f"FINISHED")
 
 # Loads code prompt from prompt file
 code_prompt = prompts['code_plot'].format(replot_plot=replot_plot, data=data)
 
-if 'none' in data.lower():
+if not _has_any_numeric_data(cleaned_data):
   print(f"NO DATA EXTRACTED")
   # Still print VERSION_DIR so app.py knows where files are
   print(f"VERSION_DIR:{version_dir}")
-  exit()
+  sys.exit(2)
 
 print("Generating replot code... ", end = '', flush=True)
 QQ.append({'role': 'user', 'content': code_prompt})
@@ -286,6 +346,47 @@ print(f"FINISHED")
 
 error_output = None
 print("Replotting with extracted data... ", end = '', flush=True)
+
+# Force consistent axis starts at save-time (applies even if the LLM code sets limits).
+_orig_plt_savefig = plt.savefig
+_orig_fig_savefig = mpl_figure.Figure.savefig
+
+def _apply_replot_axis_policy(fig):
+  try:
+    axes = getattr(fig, 'axes', []) or []
+    for ax in axes:
+      try:
+        # Y: always start at 0.001 (works for log plots too)
+        yscale = ax.get_yscale()
+        if yscale == 'log':
+          cur_bottom, cur_top = ax.get_ylim()
+          top = cur_top if (cur_top is not None and cur_top > 0.001) else 0.01
+          ax.set_ylim(0.001, top)
+        else:
+          ax.set_ylim(bottom=0.001)
+
+        # X: start at 0 only for linear axes
+        if ax.get_xscale() == 'linear':
+          ax.set_xlim(left=0.0)
+      except Exception:
+        continue
+  except Exception:
+    pass
+
+def _patched_plt_savefig(*args, **kwargs):
+  try:
+    _apply_replot_axis_policy(plt.gcf())
+  except Exception:
+    pass
+  return _orig_plt_savefig(*args, **kwargs)
+
+def _patched_fig_savefig(self, *args, **kwargs):
+  _apply_replot_axis_policy(self)
+  return _orig_fig_savefig(self, *args, **kwargs)
+
+plt.savefig = _patched_plt_savefig
+mpl_figure.Figure.savefig = _patched_fig_savefig
+
 try:
   exec(code)
   print(f"FINISHED")

@@ -1,0 +1,100 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/G/GC/GC.png",
+  "prompt_name": "prompt_9",
+  "overall_status": "completed",
+  "validation_status": "no",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 393,
+      "execution_time_ms": 3614.8574352264404,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T13:01:37.735031",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 404,
+      "execution_time_ms": 3751.636028289795,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T13:01:41.351844",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 689,
+      "execution_time_ms": 4826.887607574463,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T13:01:45.105390",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 2808,
+      "execution_time_ms": 10226.128816604614,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T13:01:49.934104",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 292,
+        "columns": [
+          "Here is the extraction following the strict rules:"
+        ],
+        "axis_labels": [
+          "Here is the extraction following the strict rules:"
+        ]
+      },
+      "output_length": 8602,
+      "execution_time_ms": 42363.34180831909,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T13:02:00.163875",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_5": {
+      "num_columns": 1,
+      "num_rows": 292,
+      "columns": [
+        "Here is the extraction following the strict rules:"
+      ],
+      "axis_labels": [
+        "Here is the extraction following the strict rules:"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 93.771653,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "Yes",
+      "num_points": "No",
+      "trend": "Yes"
+    }
+  }
+}

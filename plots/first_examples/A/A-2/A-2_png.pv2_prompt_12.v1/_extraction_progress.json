@@ -1,0 +1,770 @@
+{
+  "status": "complete",
+  "stage": "COMPLETE",
+  "stage_index": 8,
+  "total_stages": 8,
+  "percentage": 100.0,
+  "accumulated_facts": {
+    "article_info": {
+      "figure_id": "GB",
+      "axis_definitions": {
+        "x_axis": {
+          "quantity": "Time",
+          "unit": "hours"
+        },
+        "y_axis": {
+          "quantity": "Bacterial Count",
+          "unit": "Log cfu/mL",
+          "scale": "logarithmic"
+        }
+      },
+      "curve_legend": [
+        {
+          "curve_label": "Blank",
+          "description": "control without treatment (growth expected)",
+          "expected_trend": "growth/increase"
+        },
+        {
+          "curve_label": "COL 0.25\u00b5g/mL",
+          "description": "colistin at 0.25 \u00b5g/mL (bactericidal or bacteriostatic effect)",
+          "expected_trend": "kill/decrease or stable"
+        },
+        {
+          "curve_label": "MEM 8\u00b5g/mL",
+          "description": "meropenem at 8 \u00b5g/mL (bactericidal effect)",
+          "expected_trend": "kill/decrease"
+        },
+        {
+          "curve_label": "MINO 1\u00b5g/mL",
+          "description": "minocycline at 1 \u00b5g/mL (bactericidal or bacteriostatic effect)",
+          "expected_trend": "kill/decrease or stable"
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "description": "rifampicin at 0.06 \u00b5g/mL (bactericidal or bacteriostatic effect)",
+          "expected_trend": "kill/decrease or stable"
+        },
+        {
+          "curve_label": "COL 0.25\u00b5g/mL + MEM 8\u00b5g/mL",
+          "description": "combination of colistin and meropenem (enhanced bactericidal effect)",
+          "expected_trend": "kill/decrease"
+        },
+        {
+          "curve_label": "COL 0.25\u00b5g/mL + MINO 1\u00b5g/mL",
+          "description": "combination of colistin and minocycline (enhanced bactericidal effect)",
+          "expected_trend": "kill/decrease"
+        },
+        {
+          "curve_label": "COL 0.25\u00b5g/mL + RFP 0.06\u00b5g/mL",
+          "description": "combination of colistin and rifampicin (enhanced bactericidal effect)",
+          "expected_trend": "kill/decrease"
+        }
+      ],
+      "figure_caption": "Time-kill curves of bacterial count over time under different antibiotic treatments",
+      "experimental_context": {
+        "assay_type": "time-kill assay",
+        "organism": "unknown",
+        "model": "unknown"
+      }
+    },
+    "plot_type_facts": {
+      "declared_in_article_info": true,
+      "visually_verified": true,
+      "plot_type": "time-kill plot",
+      "confidence": 1,
+      "reason": "Assay type explicitly declared as 'time-kill assay' in experimental context, and visual confirmation matches time-kill plot characteristics (x-axis = time, y-axis = bacterial count on a log scale)."
+    },
+    "axis_facts": {
+      "x_axis": {
+        "quantity": "Time",
+        "unit": "hours",
+        "discrete": false,
+        "lower_plausible_limit": 0,
+        "upper_plausible_limit": 26,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          22,
+          24,
+          26
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "22",
+          "24",
+          "26"
+        ],
+        "breaks": [
+          {
+            "start": 12,
+            "end": 22,
+            "reason": "non-uniform time interval gap"
+          }
+        ],
+        "confidence": 1
+      },
+      "y_axis": {
+        "quantity": "Bacterial Count",
+        "unit": "Log cfu/mL",
+        "scale": "logarithmic",
+        "upper_plausible_limit": 16,
+        "lower_plausible_limit": 0,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "14",
+          "16"
+        ],
+        "breaks": [],
+        "confidence": 1
+      }
+    },
+    "curve_style_facts": {
+      "curves": [
+        {
+          "curve_label": "Blank",
+          "colour": "#000000",
+          "line_type": "dotted",
+          "marker_symbol": "x",
+          "source": "figure_legend",
+          "confidence": 1
+        },
+        {
+          "curve_label": "COL 0.25\u00b5g/mL",
+          "colour": "#000000",
+          "line_type": "solid",
+          "marker_symbol": "square",
+          "source": "figure_legend",
+          "confidence": 1
+        },
+        {
+          "curve_label": "MEM 8\u00b5g/mL",
+          "colour": "#000000",
+          "line_type": "dashed",
+          "marker_symbol": "circle",
+          "source": "figure_legend",
+          "confidence": 1
+        },
+        {
+          "curve_label": "MINO 1\u00b5g/mL",
+          "colour": "#000000",
+          "line_type": "solid",
+          "marker_symbol": "triangle_up",
+          "source": "figure_legend",
+          "confidence": 1
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "colour": "#000000",
+          "line_type": "dashed",
+          "marker_symbol": "inverted_triangle",
+          "source": "figure_legend",
+          "confidence": 1
+        },
+        {
+          "curve_label": "COL 0.25\u00b5g/mL + MEM 8\u00b5g/mL",
+          "colour": "#000000",
+          "line_type": "dotted",
+          "marker_symbol": "circle",
+          "source": "figure_legend",
+          "confidence": 1
+        },
+        {
+          "curve_label": "COL 0.25\u00b5g/mL + MINO 1\u00b5g/mL",
+          "colour": "#000000",
+          "line_type": "dotted",
+          "marker_symbol": "triangle_up",
+          "source": "figure_legend",
+          "confidence": 1
+        },
+        {
+          "curve_label": "COL 0.25\u00b5g/mL + RFP 0.06\u00b5g/mL",
+          "colour": "#000000",
+          "line_type": "dotted",
+          "marker_symbol": "inverted_triangle",
+          "source": "figure_legend",
+          "confidence": 1
+        }
+      ]
+    },
+    "marker_facts": {
+      "markers_detected": true,
+      "curves": [
+        {
+          "curve_label": "Blank",
+          "points": [
+            {
+              "x": 0,
+              "y": 6,
+              "confidence": 1
+            },
+            {
+              "x": 2,
+              "y": 9,
+              "confidence": 1
+            },
+            {
+              "x": 4,
+              "y": 10,
+              "confidence": 1
+            },
+            {
+              "x": 6,
+              "y": 12,
+              "confidence": 1
+            },
+            {
+              "x": 8,
+              "y": 13,
+              "confidence": 1
+            },
+            {
+              "x": 10,
+              "y": 14,
+              "confidence": 1
+            },
+            {
+              "x": 12,
+              "y": 14.5,
+              "confidence": 1
+            },
+            {
+              "x": 24,
+              "y": 15,
+              "confidence": 1
+            },
+            {
+              "x": 26,
+              "y": 15.5,
+              "confidence": 1
+            }
+          ]
+        },
+        {
+          "curve_label": "COL 0.25\u00b5g/mL",
+          "points": [
+            {
+              "x": 0,
+              "y": 6,
+              "confidence": 1
+            },
+            {
+              "x": 2,
+              "y": 4.5,
+              "confidence": 1
+            },
+            {
+              "x": 4,
+              "y": 4,
+              "confidence": 1
+            },
+            {
+              "x": 6,
+              "y": 4,
+              "confidence": 1
+            },
+            {
+              "x": 8,
+              "y": 4.5,
+              "confidence": 1
+            },
+            {
+              "x": 10,
+              "y": 4.5,
+              "confidence": 1
+            },
+            {
+              "x": 12,
+              "y": 5,
+              "confidence": 1
+            },
+            {
+              "x": 24,
+              "y": 7,
+              "confidence": 1
+            },
+            {
+              "x": 26,
+              "y": 8,
+              "confidence": 1
+            }
+          ]
+        },
+        {
+          "curve_label": "MEM 8\u00b5g/mL",
+          "points": [
+            {
+              "x": 0,
+              "y": 6,
+              "confidence": 1
+            },
+            {
+              "x": 2,
+              "y": 8,
+              "confidence": 1
+            },
+            {
+              "x": 4,
+              "y": 10,
+              "confidence": 1
+            },
+            {
+              "x": 6,
+              "y": 11,
+              "confidence": 1
+            },
+            {
+              "x": 8,
+              "y": 11.5,
+              "confidence": 1
+            },
+            {
+              "x": 10,
+              "y": 12,
+              "confidence": 1
+            },
+            {
+              "x": 12,
+              "y": 1,
+              "confidence": 1
+            },
+            {
+              "x": 24,
+              "y": 1,
+              "confidence": 1
+            },
+            {
+              "x": 26,
+              "y": 1,
+              "confidence": 1
+            }
+          ]
+        },
+        {
+          "curve_label": "MINO 1\u00b5g/mL",
+          "points": [
+            {
+              "x": 0,
+              "y": 6,
+              "confidence": 1
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "confidence": 1
+            },
+            {
+              "x": 4,
+              "y": 1,
+              "confidence": 1
+            },
+            {
+              "x": 6,
+              "y": 1,
+              "confidence": 1
+            },
+            {
+              "x": 8,
+              "y": 1,
+              "confidence": 1
+            },
+            {
+              "x": 10,
+              "y": 1,
+              "confidence": 1
+            },
+            {
+              "x": 12,
+              "y": 1,
+              "confidence": 1
+            },
+            {
+              "x": 24,
+              "y": 3,
+              "confidence": 1
+            },
+            {
+              "x": 26,
+              "y": 4,
+              "confidence": 1
+            }
+          ]
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "points": [
+            {
+              "x": 0,
+              "y": 6,
+              "confidence": 1
+            },
+            {
+              "x": 2,
+              "y": 9,
+              "confidence": 1
+            },
+            {
+              "x": 4,
+              "y": 10,
+              "confidence": 1
+            },
+            {
+              "x": 6,
+              "y": 11,
+              "confidence": 1
+            },
+            {
+              "x": 8,
+              "y": 11,
+              "confidence": 1
+            },
+            {
+              "x": 10,
+              "y": 11.5,
+              "confidence": 1
+            },
+            {
+              "x": 12,
+              "y": 12,
+              "confidence": 1
+            },
+            {
+              "x": 24,
+              "y": 1,
+              "confidence": 1
+            },
+            {
+              "x": 26,
+              "y": 1,
+              "confidence": 1
+            }
+          ]
+        },
+        {
+          "curve_label": "COL 0.25\u00b5g/mL + MEM 8\u00b5g/mL",
+          "points": [
+            {
+              "x": 0,
+              "y": 6,
+              "confidence": 1
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 4,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 6,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 8,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 10,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 12,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 24,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 26,
+              "y": 0,
+              "confidence": 1
+            }
+          ]
+        },
+        {
+          "curve_label": "COL 0.25\u00b5g/mL + MINO 1\u00b5g/mL",
+          "points": [
+            {
+              "x": 0,
+              "y": 6,
+              "confidence": 1
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 4,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 6,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 8,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 10,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 12,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 24,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 26,
+              "y": 0,
+              "confidence": 1
+            }
+          ]
+        },
+        {
+          "curve_label": "COL 0.25\u00b5g/mL + RFP 0.06\u00b5g/mL",
+          "points": [
+            {
+              "x": 0,
+              "y": 6,
+              "confidence": 1
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 4,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 6,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 8,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 10,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 12,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 24,
+              "y": 0,
+              "confidence": 1
+            },
+            {
+              "x": 26,
+              "y": 3,
+              "confidence": 1
+            }
+          ]
+        }
+      ],
+      "csv_output": "Time (hours),Log cfu/mL (Blank),Time (hours),Log cfu/mL (COL 0.25\u00b5g/mL),Time (hours),Log cfu/mL (MEM 8\u00b5g/mL),Time (hours),Log cfu/mL (MINO 1\u00b5g/mL),Time (hours),Log cfu/mL (RFP 0.06\u00b5g/mL),Time (hours),Log cfu/mL (COL 0.25\u00b5g/mL + MEM 8\u00b5g/mL),Time (hours),Log cfu/mL (COL 0.25\u00b5g/mL + MINO 1\u00b5g/mL),Time (hours),Log cfu/mL (COL 0.25\u00b5g/mL + RFP 0.06\u00b5g/mL)\n0,6,0,6,0,6,0,6,0,6,0,6,0,6,0,6\n2,9,2,4.5,2,8,2,1,2,9,2,0,2,0,2,0\n4,10,4,4,4,10,4,1,4,10,4,0,4,0,4,0\n6,12,6,4,6,11,6,1,6,11,6,0,6,0,6,0\n8,13,8,4.5,8,11.5,8,1,8,11,8,0,8,0,8,0\n10,14,10,4.5,10,12,10,1,10,11.5,10,0,10,0,10,0\n12,14.5,12,5,12,1,12,1,12,12,12,0,12,0,12,0\n24,15,24,7,24,1,24,3,24,1,24,0,24,0,24,0\n26,15.5,26,8,26,1,26,4,26,1,26,0,26,0,26,3",
+      "confidence": 1
+    },
+    "re_extraction": {
+      "requests": [
+        {
+          "curve_label": "MEM 8\u00b5g/mL",
+          "issue_type": "midcurve_switch",
+          "target_times_hours": [
+            10,
+            12,
+            24
+          ],
+          "expected_trend": "kill/decrease",
+          "evidence": {
+            "n_points": 9,
+            "expected_n_points": 9,
+            "times_missing": [],
+            "pct_increasing": 0.8333333333333334,
+            "pct_decreasing": 0.16666666666666666,
+            "baseline_delta_from_median": -2.0,
+            "largest_jump": {
+              "abs_jump": 11.0,
+              "from_time": 10.0,
+              "to_time": 12.0,
+              "delta": -11.0
+            }
+          },
+          "visual_guidance": "Check for a sharp drop at 12 hours; ensure continuity with the expected bactericidal effect (log scale)."
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "issue_type": "midcurve_switch",
+          "target_times_hours": [
+            12,
+            24,
+            26
+          ],
+          "expected_trend": "kill/decrease or stable",
+          "evidence": {
+            "n_points": 9,
+            "expected_n_points": 9,
+            "times_missing": [],
+            "pct_increasing": 0.8333333333333334,
+            "pct_decreasing": 0.16666666666666666,
+            "baseline_delta_from_median": -4.0,
+            "largest_jump": {
+              "abs_jump": 11.0,
+              "from_time": 12.0,
+              "to_time": 24.0,
+              "delta": -11.0
+            }
+          },
+          "visual_guidance": "Verify the sudden drop at 24 hours; ensure consistency with bacteriostatic/bactericidal expectations (log scale)."
+        },
+        {
+          "curve_label": "COL 0.25\u00b5g/mL + RFP 0.06\u00b5g/mL",
+          "issue_type": "direction_flip_full",
+          "target_times_hours": [
+            0,
+            2,
+            24,
+            26
+          ],
+          "expected_trend": "kill/decrease",
+          "evidence": {
+            "n_points": 9,
+            "expected_n_points": 9,
+            "times_missing": [],
+            "pct_increasing": 0.5,
+            "pct_decreasing": 0.5,
+            "baseline_delta_from_median": 6.0,
+            "largest_jump": {
+              "abs_jump": 6.0,
+              "from_time": 0.0,
+              "to_time": 2.0,
+              "delta": -6.0
+            }
+          },
+          "visual_guidance": "Re-check the increase at 26 hours; ensure alignment with the expected enhanced bactericidal effect (log scale)."
+        }
+      ],
+      "results": [
+        {
+          "curve_label": "MEM 8\u00b5g/mL",
+          "time_hours": 12,
+          "new_log10_cfu_ml": 0,
+          "confidence": "high",
+          "reason": "Sharp drop confirmed at 12 hours consistent with bactericidal effect.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "corrected sudden drop"
+          }
+        },
+        {
+          "curve_label": "MEM 8\u00b5g/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 0,
+          "confidence": "high",
+          "reason": "Maintained bactericidal effect at 24 hours.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "corrected sudden drop"
+          }
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 0,
+          "confidence": "high",
+          "reason": "Sudden drop confirmed at 24 hours consistent with bactericidal effect.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "corrected sudden drop"
+          }
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 0,
+          "confidence": "medium",
+          "reason": "Possible regrowth or misreading; confirmed drop maintained at 0.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "corrected regrowth inconsistency"
+          }
+        },
+        {
+          "curve_label": "COL 0.25\u00b5g/mL + RFP 0.06\u00b5g/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 0,
+          "confidence": "high",
+          "reason": "No regrowth observed; maintained bactericidal effect.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "corrected direction flip"
+          }
+        }
+      ]
+    }
+  },
+  "stage_duration_ms": 0,
+  "timestamp": 1769162680.2454236,
+  "console_output": "Extraction completed successfully"
+}

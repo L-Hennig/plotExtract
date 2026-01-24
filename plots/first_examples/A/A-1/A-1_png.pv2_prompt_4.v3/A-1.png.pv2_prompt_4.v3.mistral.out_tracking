@@ -1,0 +1,119 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\first_examples/A/A-1/A-1.png",
+  "prompt_name": "prompt_4",
+  "overall_status": "completed",
+  "validation_status": "no",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 438,
+      "execution_time_ms": 6379.26721572876,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-16T15:43:45.156777",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1348,
+      "execution_time_ms": 6884.176254272461,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-16T15:43:51.538440",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1666,
+      "execution_time_ms": 8192.688941955566,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-16T15:43:58.425293",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 171,
+        "columns": [
+          "Here is the extracted data in the requested CSV and JSON formats:"
+        ],
+        "axis_labels": [
+          "Here is the extracted data in the requested CSV and JSON formats:"
+        ]
+      },
+      "output_length": 6185,
+      "execution_time_ms": 37625.57673454285,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-16T15:44:06.620371",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 341,
+        "columns": [
+          "Here is the complete output JSON with validation flags based on the sanity checks:"
+        ],
+        "axis_labels": [
+          "Here is the complete output JSON with validation flags based on the sanity checks:"
+        ]
+      },
+      "output_length": 7500,
+      "execution_time_ms": 35938.62867355347,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-16T15:44:44.254750",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_4": {
+      "num_columns": 1,
+      "num_rows": 171,
+      "columns": [
+        "Here is the extracted data in the requested CSV and JSON formats:"
+      ],
+      "axis_labels": [
+        "Here is the extracted data in the requested CSV and JSON formats:"
+      ]
+    },
+    "EXTRACT_STAGE_5": {
+      "num_columns": 1,
+      "num_rows": 341,
+      "columns": [
+        "Here is the complete output JSON with validation flags based on the sanity checks:"
+      ],
+      "axis_labels": [
+        "Here is the complete output JSON with validation flags based on the sanity checks:"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 139.931717,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "No",
+      "num_points": "Yes",
+      "trend": "Yes"
+    }
+  }
+}

@@ -26,6 +26,8 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 20px;
+            flex-wrap: wrap;
+            gap: 6px;
         }
         .navbar-brand {
             color: white;
@@ -44,13 +46,18 @@
             margin: 0;
             padding: 0;
             gap: 5px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
         .nav-link {
             color: rgba(255,255,255,0.85);
             text-decoration: none;
-            padding: 15px 20px;
+            padding: 12px 20px;
             display: block;
             font-weight: 500;
+            font-size: 14px;
+            line-height: 1.1;
+            white-space: nowrap;
             transition: all 0.2s;
             border-bottom: 3px solid transparent;
         }
@@ -62,6 +69,12 @@
             color: white;
             border-bottom-color: #f39c12;
             background: rgba(255,255,255,0.1);
+        }
+
+        @media (max-width: 900px) {
+            .navbar-container { padding: 0 10px; }
+            .navbar-brand { font-size: 20px; padding: 10px 0; }
+            .nav-link { padding: 10px 14px; font-size: 13px; line-height: 1.1; }
         }
 
         .main-content { padding: 20px; }
@@ -381,10 +394,12 @@
         <div class="navbar-container">
             <a href="/" class="navbar-brand">📊 PlotExtract</a>
             <ul class="navbar-nav">
-                <li><a href="/" class="nav-link">🔬 Extraction</a></li>
-                <li><a href="/synthetic" class="nav-link">🧫 Synthetic Generator</a></li>
-                <li><a href="/synthetic/editor" class="nav-link">✏️ Synthetic Editor</a></li>
-                <li><a href="/results" class="nav-link active">📈 Results Comparison</a></li>
+                <li><a href="/" class="nav-link">EX 1</a></li>
+                <li><a href="/v2" class="nav-link">EX 2</a></li>
+                <li><a href="/synthetic" class="nav-link">S Gen 1</a></li>
+                <li><a href="/synthetic_v2" class="nav-link">S Gen 2</a></li>
+                <li><a href="/synthetic/editor" class="nav-link">S Editor</a></li>
+                <li><a href="/results" class="nav-link active">Results</a></li>
             </ul>
         </div>
     </nav>
@@ -707,6 +722,7 @@
                     html += `
                         <div class="stats-section">
                             <div class="stats-section-title">📊 Pointwise Stats</div>
+                            ${renderPointwiseOverallStats(data.pointwise_stats)}
                             ${renderPointwiseStats(data.pointwise_stats)}
                         </div>
                     `;
@@ -717,6 +733,7 @@
                     html += `
                         <div class="stats-section">
                             <div class="stats-section-title">📈 Interpolation Stats</div>
+                            ${renderInterpolationOverallStats(data.interpolation_stats)}
                             ${renderInterpolationStats(data.interpolation_stats)}
                         </div>
                     `;
@@ -768,6 +785,53 @@
             
             return html;
         }
+
+        function renderPointwiseOverallStats(stats) {
+            const curvesCount = (stats.curves && Array.isArray(stats.curves)) ? stats.curves.length : 0;
+            const overall = stats.overall || {};
+
+            const meanMaeX = overall['mean_mae_x_(percent)'] ?? overall.mean_mae_x_percent ?? overall.mean_mae_x ?? overall.avg_mae_x;
+            const meanMaeY = overall['mean_mae_y_(percent)'] ?? overall.mean_mae_y_percent ?? overall.mean_mae_y ?? overall.avg_mae_y;
+            const meanPrecisionRaw = overall.mean_precision ?? overall.avg_precision;
+            const meanRecallRaw = overall.mean_recall ?? overall.avg_recall;
+
+            const meanPrecision = (typeof meanPrecisionRaw === 'number')
+                ? (meanPrecisionRaw <= 1 ? meanPrecisionRaw * 100 : meanPrecisionRaw)
+                : null;
+            const meanRecall = (typeof meanRecallRaw === 'number')
+                ? (meanRecallRaw <= 1 ? meanRecallRaw * 100 : meanRecallRaw)
+                : null;
+
+            const maeXClass = getStatClass(meanMaeX, 5, 15);
+            const maeYClass = getStatClass(meanMaeY, 5, 15);
+            const precisionClass = getStatClass(meanPrecision, 80, 60, true);
+            const recallClass = getStatClass(meanRecall, 80, 60, true);
+
+            return `
+                <div class="stats-grid" style="margin-bottom:10px;">
+                    <div class="stat-item">
+                        <div class="stat-label">Curves</div>
+                        <div class="stat-value">${curvesCount}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Mean MAE X%</div>
+                        <div class="stat-value ${maeXClass}">${(typeof meanMaeX === 'number') ? meanMaeX.toFixed(2) + '%' : 'N/A'}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Mean MAE Y%</div>
+                        <div class="stat-value ${maeYClass}">${(typeof meanMaeY === 'number') ? meanMaeY.toFixed(2) + '%' : 'N/A'}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Mean Precision</div>
+                        <div class="stat-value ${precisionClass}">${(typeof meanPrecision === 'number') ? meanPrecision.toFixed(1) + '%' : 'N/A'}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Mean Recall</div>
+                        <div class="stat-value ${recallClass}">${(typeof meanRecall === 'number') ? meanRecall.toFixed(1) + '%' : 'N/A'}</div>
+                    </div>
+                </div>
+            `;
+        }
         
         function renderInterpolationStats(stats) {
             if (!stats.curves || stats.curves.length === 0) {
@@ -802,6 +866,25 @@
             });
             
             return html;
+        }
+
+        function renderInterpolationOverallStats(stats) {
+            const curvesCount = (stats.curves && Array.isArray(stats.curves)) ? stats.curves.length : 0;
+            const meanMae = (typeof stats.mean_mae === 'number') ? stats.mean_mae : null;
+            const maeClass = getStatClass(meanMae, 0.1, 0.5);
+
+            return `
+                <div class="stats-grid" style="margin-bottom:10px;">
+                    <div class="stat-item">
+                        <div class="stat-label">Curves</div>
+                        <div class="stat-value">${curvesCount}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Mean MAE</div>
+                        <div class="stat-value ${maeClass}">${(typeof meanMae === 'number') ? meanMae.toFixed(4) : 'N/A'}</div>
+                    </div>
+                </div>
+            `;
         }
         
         function getStatClass(value, goodThreshold, badThreshold, higherIsBetter = false) {

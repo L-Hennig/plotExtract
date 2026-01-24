@@ -1,0 +1,177 @@
+```json
+{
+  "plot_type_facts": {
+    "declared_in_article_info": "unknown",
+    "visually_verified": true,
+    "plot_type": "time-kill plot",
+    "confidence": 0.9,
+    "reason": "The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, which aligns with typical time-kill kinetics."
+  },
+  "axis_facts": {
+    "x_axis": {
+      "quantity": "time",
+      "unit": "hours",
+      "discrete": false,
+      "lower_plausible_limit": 0,
+      "upper_plausible_limit": 26,
+      "ticks_verified": [
+        0,
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        22,
+        24,
+        26
+      ],
+      "tick_labels": [
+        "0",
+        "2",
+        "4",
+        "6",
+        "8",
+        "10",
+        "12",
+        "22",
+        "24",
+        "26"
+      ],
+      "breaks": [
+        {
+          "start": 12,
+          "end": 22,
+          "reason": "Non-uniform spacing between 12 and 22 hours to highlight extended observation period"
+        }
+      ],
+      "confidence": 0.98
+    },
+    "y_axis": {
+      "quantity": "bacterial burden",
+      "unit": "log10 CFU/mL",
+      "scale": "log10",
+      "upper_plausible_limit": 16,
+      "lower_plausible_limit": 0,
+      "ticks_verified": [
+        0,
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        14,
+        16
+      ],
+      "tick_labels": [
+        "0",
+        "2",
+        "4",
+        "6",
+        "8",
+        "10",
+        "12",
+        "14",
+        "16"
+      ],
+      "breaks": [],
+      "grid": {
+        "present": true,
+        "aligned_y_ticks": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16
+        ],
+        "aligned_x_ticks": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          22,
+          24,
+          26
+        ]
+      },
+      "confidence": 0.95
+    }
+  },
+  "curve_style_facts": {
+    "curves": [
+      {
+        "curve_label": "Blank",
+        "colour": "black",
+        "line_type": "dotted",
+        "marker_symbol": "x",
+        "source": "figure_legend",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "COL 0.125ug/mL",
+        "colour": "black",
+        "line_type": "solid",
+        "marker_symbol": "square",
+        "source": "figure_legend",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "MINO 1ug/mL",
+        "colour": "black",
+        "line_type": "dashed",
+        "marker_symbol": "triangle",
+        "source": "figure_legend",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "MEM 4ug/mL",
+        "colour": "black",
+        "line_type": "dash-dot",
+        "marker_symbol": "circle",
+        "source": "figure_legend",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "RFP 0.06ug/mL",
+        "colour": "black",
+        "line_type": "dotted",
+        "marker_symbol": "inverted_triangle",
+        "source": "figure_legend",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "COL 0.125ug/mL + MEM 4ug/mL",
+        "colour": "black",
+        "line_type": "dash-dot-dot",
+        "marker_symbol": "none",
+        "source": "direct_visual",
+        "confidence": 0.9
+      },
+      {
+        "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+        "colour": "black",
+        "line_type": "dash-dot",
+        "marker_symbol": "open_triangle",
+        "source": "direct_visual",
+        "confidence": 0.9
+      },
+      {
+        "curve_label": "COL 0.125ug/mL + RFP 0.06ug/mL",
+        "colour": "black",
+        "line_type": "dotted",
+        "marker_symbol": "inverted_open_triangle",
+        "source": "direct_visual",
+        "confidence": 0.9
+      }
+    ]
+  }
+}
+```

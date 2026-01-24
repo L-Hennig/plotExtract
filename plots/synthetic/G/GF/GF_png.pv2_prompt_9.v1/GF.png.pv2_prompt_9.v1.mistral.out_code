@@ -1,0 +1,89 @@
+import os
+import matplotlib.pyplot as plt
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic/G/GF\GF_png.pv2_prompt_9.v1\GF_png-replot.pv2_prompt_9.v1.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data points extracted from the plot
+marker_facts = {
+    "curves": [
+        {
+            "curve_label": "Condition 1",
+            "points": [
+                (0, 6.0), (2, 7.0), (4, 7.5), (6, 7.6), (8, 7.8),
+                (10, 7.9), (12, 7.8), (24, 7.9)
+            ]
+        },
+        {
+            "curve_label": "Condition 2",
+            "points": [
+                (0, 6.0), (2, 7.8), (4, 7.5), (6, 7.3), (8, 7.2),
+                (10, 7.4), (12, 7.3), (24, 7.5)
+            ]
+        },
+        {
+            "curve_label": "Condition 3",
+            "points": [
+                (0, 6.0), (2, 6.2), (4, 6.5), (6, 6.7), (8, 6.8),
+                (10, 7.0), (12, 7.2), (24, 8.3)
+            ]
+        },
+        {
+            "curve_label": "Condition 4",
+            "points": [
+                (0, 6.0), (2, 1.5), (4, 1.3), (6, 1.6), (8, 1.8),
+                (10, 1.9), (12, 2.0), (24, 2.8)
+            ]
+        },
+        {
+            "curve_label": "Condition 5",
+            "points": [
+                (0, 6.0), (2, 2.0), (4, 1.5), (6, 1.0), (8, 0.8),
+                (10, 0.7), (12, 0.6), (24, 0.5)
+            ]
+        },
+        {
+            "curve_label": "Condition 6",
+            "points": [
+                (0, 6.0), (2, 1.0), (4, 0.8), (6, 1.2), (8, 1.5),
+                (10, 1.6), (12, 1.4), (24, 1.8)
+            ]
+        }
+    ]
+}
+
+# Plot settings
+plt.figure(figsize=(8, 6))
+
+# Plot each curve with specified style
+for curve in marker_facts["curves"]:
+    x_vals, y_vals = zip(*curve["points"])
+    if curve["curve_label"] == "Condition 1":
+        plt.plot(x_vals, y_vals, color='black', linestyle='-', marker='s', label=curve["curve_label"])
+    elif curve["curve_label"] == "Condition 2":
+        plt.plot(x_vals, y_vals, color='black', linestyle='--', marker='^', label=curve["curve_label"])
+    elif curve["curve_label"] == "Condition 3":
+        plt.plot(x_vals, y_vals, color='black', linestyle=':', marker='o', label=curve["curve_label"])
+    elif curve["curve_label"] == "Condition 4":
+        plt.plot(x_vals, y_vals, color='black', linestyle='-', marker='o', markerfacecolor='black', label=curve["curve_label"])
+    elif curve["curve_label"] == "Condition 5":
+        plt.plot(x_vals, y_vals, color='black', linestyle=':', marker='v', label=curve["curve_label"])
+    elif curve["curve_label"] == "Condition 6":
+        plt.plot(x_vals, y_vals, color='black', linestyle='--', marker='s', markerfacecolor='black', label=curve["curve_label"])
+
+# Axis settings
+plt.xlim(0, 26)
+plt.ylim(0, 10)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])
+plt.yticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+# Labels and legend
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+plt.legend()
+
+# Grid
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)

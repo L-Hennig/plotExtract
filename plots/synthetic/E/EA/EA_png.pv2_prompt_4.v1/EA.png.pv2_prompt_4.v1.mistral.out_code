@@ -1,0 +1,41 @@
+import os
+import matplotlib.pyplot as plt
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic/E/EA\EA_png.pv2_prompt_4.v1\EA_png-replot.pv2_prompt_4.v1.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data from marker_facts
+time_points = [0, 2, 4, 6, 8, 10, 12, 24]
+bacterial_counts = [6, 5.8, 6.3, 6.7, 6.7, 7.1, 7.8, 8.4]
+
+# Create the plot
+plt.figure(figsize=(6, 4))
+plt.plot(time_points, bacterial_counts,
+         marker='o',
+         markersize=6,
+         linestyle='--',
+         color='black',
+         label='Condition 1')
+
+# Axis settings
+plt.xlim(0, 26)
+plt.ylim(0, 10)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 20, 24], ['0', '2', '4', '6', '8', '10', '12', '', '24'])
+plt.yticks([0, 2, 4, 6, 8, 10], ['0', '2', '4', '6', '8', '10'])
+
+# Add axis break indication on x-axis
+plt.annotate('', xy=(13, 0), xytext=(19, 0),
+             arrowprops=dict(arrowstyle='-', linestyle='--', color='black'))
+plt.annotate('', xy=(13, 10), xytext=(19, 10),
+             arrowprops=dict(arrowstyle='-', linestyle='--', color='black'))
+
+# Labels
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+
+# Legend
+plt.legend()
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)
+plt.close()

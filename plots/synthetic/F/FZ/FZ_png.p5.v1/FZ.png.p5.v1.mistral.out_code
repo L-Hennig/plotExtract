@@ -1,0 +1,53 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time_cond1 = [0, 2, 4, 6, 8, 10, 24]
+cfu_cond1 = [6.0, 7.2, 8.0, 8.1, 8.3, 8.4, 8.5]
+
+time_cond2 = [0, 2, 4, 6, 8, 10, 24]
+cfu_cond2 = [6.0, 6.2, 8.2, 8.5, 8.8, 9.0, 1.2]
+
+time_cond3 = [0, 2, 4, 24]
+cfu_cond3 = [6.0, 1.8, 1.0, 1.0]
+
+time_cond4 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu_cond4 = [6.0, 6.3, 6.8, 8.0, 8.6, 8.8, 8.9, 8.9]
+
+time_cond5 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu_cond5 = [6.0, 3.0, 2.5, 2.3, 2.5, 2.6, 1.0, 1.0]
+
+# Create plot
+plt.figure(figsize=(8, 6))
+plt.plot(time_cond1, cfu_cond1, 's-', color='black', label='Condition 1', markersize=8, linewidth=1.5)
+plt.plot(time_cond2, cfu_cond2, '^--', color='black', label='Condition 2', markersize=8, linewidth=1.5)
+plt.plot(time_cond3, cfu_cond3, ':', color='black', marker='o', label='Condition 3', markersize=8, linewidth=1.5, markerfacecolor='none')
+plt.plot(time_cond4, cfu_cond4, 'D-.', color='black', label='Condition 4', markersize=8, linewidth=1.5)
+plt.plot(time_cond5, cfu_cond5, 'o-', color='black', label='Condition 5', markersize=8, linewidth=1.5, markerfacecolor='none')
+
+# Axis settings
+plt.xlim(0, 26)
+plt.ylim(0, 10)
+plt.xlabel('Time (hours)', fontsize=12)
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)', fontsize=12)
+plt.yscale('log')
+plt.yticks([1, 2, 4, 6, 8, 10], ['1', '2', '4', '6', '8', '10'])
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 20, 24])
+
+# Axis break indication
+plt.gca().add_patch(plt.Rectangle((18, 0), 2, 10, color='white', zorder=3))
+plt.gca().plot([18, 20], [0, 10], 'k-', lw=1)
+plt.gca().plot([18, 20], [10, 0], 'k-', lw=1)
+
+# LOD line
+plt.axhline(y=1, color='black', linestyle='--', linewidth=1)
+
+# Legend
+plt.legend(loc='upper right', fontsize=10)
+
+# Save plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\FZ\FZ_png.p5.v1"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "FZ_png-replot.p5.v1.png"), dpi=300, bbox_inches='tight')
+plt.close()

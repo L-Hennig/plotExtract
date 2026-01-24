@@ -1,0 +1,316 @@
+{
+  "status": "complete",
+  "stage": "COMPLETE",
+  "stage_index": 5,
+  "total_stages": 5,
+  "percentage": 100.0,
+  "accumulated_facts": {
+    "plot_type_facts": {
+      "declared_in_article_info": "unknown",
+      "visually_verified": true,
+      "plot_type": "time-kill plot",
+      "confidence": 0.9,
+      "reason": "The x-axis represents time in hours, and the y-axis represents bacterial count (CFU/mL) on a log10 scale, which are typical characteristics of a time-kill plot. Multiple curves with distinct markers indicate different experimental conditions, consistent with time-kill assay visualization."
+    },
+    "axis_facts": {
+      "x_axis": {
+        "quantity": "time",
+        "unit": "hours",
+        "discrete": true,
+        "lower_plausible_limit": 0,
+        "upper_plausible_limit": 24,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20,
+          22,
+          24
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "14",
+          "16",
+          "18",
+          "20",
+          "22",
+          "24"
+        ],
+        "breaks": [],
+        "confidence": 0.95
+      },
+      "y_axis": {
+        "quantity": "bacterial count",
+        "unit": "CFU/mL",
+        "scale": "log10",
+        "upper_plausible_limit": 10,
+        "lower_plausible_limit": 0,
+        "ticks_verified": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "tick_labels": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "breaks": [],
+        "confidence": 0.95
+      }
+    },
+    "marker_facts": {
+      "markers_detected": true,
+      "curves": [
+        {
+          "curve_label": "Condition 1",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.0
+            },
+            {
+              "x": 2,
+              "y": 5.8
+            },
+            {
+              "x": 4,
+              "y": 6.5
+            },
+            {
+              "x": 6,
+              "y": 8.3
+            },
+            {
+              "x": 8,
+              "y": 8.4
+            },
+            {
+              "x": 10,
+              "y": 8.5
+            },
+            {
+              "x": 12,
+              "y": 8.6
+            },
+            {
+              "x": 24,
+              "y": 8.9
+            }
+          ]
+        },
+        {
+          "curve_label": "Condition 2",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.0
+            },
+            {
+              "x": 2,
+              "y": 8.0
+            },
+            {
+              "x": 4,
+              "y": 8.5
+            },
+            {
+              "x": 6,
+              "y": 2.5
+            },
+            {
+              "x": 8,
+              "y": 2.7
+            },
+            {
+              "x": 10,
+              "y": 1.0
+            },
+            {
+              "x": 12,
+              "y": 1.2
+            },
+            {
+              "x": 14,
+              "y": 1.5
+            },
+            {
+              "x": 16,
+              "y": 1.8
+            },
+            {
+              "x": 18,
+              "y": 2.2
+            },
+            {
+              "x": 20,
+              "y": 2.7
+            },
+            {
+              "x": 22,
+              "y": 3.2
+            },
+            {
+              "x": 24,
+              "y": 3.7
+            }
+          ]
+        },
+        {
+          "curve_label": "Condition 3",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.0
+            },
+            {
+              "x": 2,
+              "y": 1.0
+            },
+            {
+              "x": 4,
+              "y": 0.7
+            },
+            {
+              "x": 6,
+              "y": 0.7
+            },
+            {
+              "x": 8,
+              "y": 0.7
+            },
+            {
+              "x": 10,
+              "y": 0.7
+            },
+            {
+              "x": 12,
+              "y": 0.7
+            },
+            {
+              "x": 14,
+              "y": 0.7
+            },
+            {
+              "x": 16,
+              "y": 0.7
+            },
+            {
+              "x": 18,
+              "y": 0.7
+            },
+            {
+              "x": 20,
+              "y": 0.7
+            },
+            {
+              "x": 22,
+              "y": 0.7
+            },
+            {
+              "x": 24,
+              "y": 0.7
+            }
+          ]
+        },
+        {
+          "curve_label": "Condition 4",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.0
+            },
+            {
+              "x": 2,
+              "y": 5.8
+            },
+            {
+              "x": 4,
+              "y": 8.7
+            },
+            {
+              "x": 6,
+              "y": 8.8
+            },
+            {
+              "x": 8,
+              "y": 8.8
+            },
+            {
+              "x": 10,
+              "y": 8.8
+            },
+            {
+              "x": 12,
+              "y": 8.8
+            },
+            {
+              "x": 24,
+              "y": 9.0
+            }
+          ]
+        }
+      ],
+      "csv_output": "Time (hours),Bacterial Count (log10 CFU/mL) (Condition 1),Time (hours),Bacterial Count (log10 CFU/mL) (Condition 2),Time (hours),Bacterial Count (log10 CFU/mL) (Condition 3),Time (hours),Bacterial Count (log10 CFU/mL) (Condition 4)\n0,6.0,0,6.0,0,6.0,0,6.0\n2,5.8,2,8.0,2,1.0,2,5.8\n4,6.5,4,8.5,4,0.7,4,8.7\n6,8.3,6,2.5,6,0.7,6,8.8\n8,8.4,8,2.7,8,0.7,8,8.8\n10,8.5,10,1.0,10,0.7,10,8.8\n12,8.6,12,1.2,12,0.7,12,8.8\n14,,14,1.5,14,0.7,14,\n16,,16,1.8,16,0.7,16,\n18,,18,2.2,18,0.7,18,\n20,,20,2.7,20,0.7,20,\n22,,22,3.2,22,0.7,22,\n24,8.9,24,3.7,24,0.7,24,9.0",
+      "confidence": 0.95
+    },
+    "validation_flags": [
+      {
+        "curve_label": "Condition 1",
+        "x": 6,
+        "y": 8.3,
+        "issue": "Impossible jump (2-log increase from x=4 to x=6)"
+      },
+      {
+        "curve_label": "Condition 2",
+        "x": 6,
+        "y": 2.5,
+        "issue": "Impossible jump (6-log decrease from x=4 to x=6)"
+      },
+      {
+        "curve_label": "Condition 3",
+        "x": 2,
+        "y": 1.0,
+        "issue": "Impossible jump (5-log decrease from x=0 to x=2)"
+      },
+      {
+        "curve_label": "Condition 4",
+        "x": 4,
+        "y": 8.7,
+        "issue": "Impossible jump (3-log increase from x=2 to x=4)"
+      }
+    ]
+  },
+  "stage_duration_ms": 0,
+  "timestamp": 1768810669.5930672,
+  "console_output": "Extraction completed successfully"
+}

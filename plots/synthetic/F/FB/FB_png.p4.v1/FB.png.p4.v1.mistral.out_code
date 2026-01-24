@@ -1,0 +1,36 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Data
+time_cond1 = [0, 2, 4, 6, 8, 10, 12, 14, 24]
+count_cond1 = [6.5, 6.7, 6.9, 7.5, 7.8, 8.3, 8.5, 8.6, 8.6]
+
+time_cond2 = [0, 2, 4, 6, 8, 10, 12, 14, 24]
+count_cond2 = [6.0, 6.1, 6.0, 5.9, 6.0, 6.0, 6.0, 6.0, 6.1]
+
+time_cond3 = [0, 2, 4, 6, 8, 10, 12, 14, 24]
+count_cond3 = [5.5, 1.0, 0.7, 0.7, 2.2, 1.7, 1.0, 0.7, 2.0]
+
+# Create the plot
+plt.figure(figsize=(6, 5))
+plt.plot(time_cond1, count_cond1, 's-', color='black', label='Condition 1', markersize=8, linewidth=1.5)
+plt.plot(time_cond2, count_cond2, '^--', color='black', label='Condition 2', markersize=8, linewidth=1.5)
+plt.plot(time_cond3, count_cond3, 'o:', color='black', label='Condition 3', markersize=8, linewidth=1.5)
+
+# Set axis labels and limits
+plt.xlabel('Time (hours)', fontsize=12)
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)', fontsize=12)
+plt.yscale('log')
+plt.ylim(1, 10)
+plt.xlim(0, 26)
+
+# Set ticks
+plt.xticks(np.arange(0, 27, 2))
+plt.yticks([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
+
+# Add legend
+plt.legend(loc='upper right', fontsize=10)
+
+# Save the plot
+plt.savefig(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\FB\FB_png.p4.v1\FB_png-replot.p4.v1.png", bbox_inches='tight', dpi=300)
+plt.close()

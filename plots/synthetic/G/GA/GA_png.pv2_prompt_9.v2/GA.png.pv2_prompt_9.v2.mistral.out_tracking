@@ -1,0 +1,104 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/G/GA/GA.png",
+  "prompt_name": "prompt_9",
+  "overall_status": "completed",
+  "validation_status": "no",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 383,
+      "execution_time_ms": 3601.091146469116,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T12:49:55.584653",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 404,
+      "execution_time_ms": 3722.12553024292,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T12:49:59.189444",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 441,
+      "execution_time_ms": 3826.857566833496,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T12:50:02.914368",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 3006,
+      "execution_time_ms": 11414.830207824707,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T12:50:06.744653",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 2,
+        "num_rows": 215,
+        "columns": [
+          "Given the strict preconditions and rules",
+          " here is the data extraction output:"
+        ],
+        "axis_labels": [
+          "Given the strict preconditions and rules",
+          " here is the data extraction output:"
+        ]
+      },
+      "output_length": 5625,
+      "execution_time_ms": 27932.286977767944,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T12:50:18.164724",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_5": {
+      "num_columns": 2,
+      "num_rows": 215,
+      "columns": [
+        "Given the strict preconditions and rules",
+        " here is the data extraction output:"
+      ],
+      "axis_labels": [
+        "Given the strict preconditions and rules",
+        " here is the data extraction output:"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 73.997852,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "No",
+      "num_points": "yes",
+      "trend": "Yes"
+    }
+  }
+}

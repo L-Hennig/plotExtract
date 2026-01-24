@@ -1,0 +1,233 @@
+```json
+{
+  "article_info": {
+    "figure_id": "GA",
+    "axis_definitions": {
+      "x_axis": {
+        "quantity": "Time",
+        "unit": "hours"
+      },
+      "y_axis": {
+        "quantity": "Bacterial Count",
+        "unit": "Log CFU/mL",
+        "scale": "logarithmic"
+      }
+    },
+    "curve_legend": [
+      {
+        "curve_label": "Blank",
+        "description": "control without treatment",
+        "expected_trend": "growth/increase"
+      },
+      {
+        "curve_label": "COL 0.125µg/mL",
+        "description": "colistin at 0.125 µg/mL",
+        "expected_trend": "variable"
+      },
+      {
+        "curve_label": "MINO 1µg/mL",
+        "description": "minocycline at 1 µg/mL",
+        "expected_trend": "variable"
+      },
+      {
+        "curve_label": "MEM 4µg/mL",
+        "description": "meropenem at 4 µg/mL",
+        "expected_trend": "variable"
+      },
+      {
+        "curve_label": "RFP 0.06µg/mL",
+        "description": "rifampicin at 0.06 µg/mL",
+        "expected_trend": "variable"
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + MEM 4µg/mL",
+        "description": "combination of colistin and meropenem",
+        "expected_trend": "kill/decrease"
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + MINO 1µg/mL",
+        "description": "combination of colistin and minocycline",
+        "expected_trend": "kill/decrease"
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + RFP 0.06µg/mL",
+        "description": "combination of colistin and rifampicin",
+        "expected_trend": "kill/decrease"
+      }
+    ],
+    "figure_caption": "Time-kill curves of bacterial growth and antibiotic effect over time",
+    "experimental_context": {
+      "assay_type": "time-kill assay",
+      "organism": "unknown",
+      "model": "unknown"
+    }
+  },
+  "plot_type_facts": {
+    "declared_in_article_info": true,
+    "plot_type": "time-kill plot",
+    "confidence": 1,
+    "reason": "Assay type explicitly stated as time-kill assay in experimental context, and visual confirmation of time on x-axis and bacterial count (log CFU/mL) on y-axis with multiple treatment curves.",
+    "visually_verified": true
+  },
+  "axis_facts": {
+    "x_axis": {
+      "quantity": "Time",
+      "unit": "hours",
+      "discrete": false,
+      "lower_plausible_limit": 0,
+      "upper_plausible_limit": 26,
+      "ticks_verified": [
+        0,
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        22,
+        24,
+        26
+      ],
+      "tick_labels": [
+        "0",
+        "2",
+        "4",
+        "6",
+        "8",
+        "10",
+        "12",
+        "22",
+        "24",
+        "26"
+      ],
+      "breaks": [],
+      "confidence": 1
+    },
+    "y_axis": {
+      "quantity": "bacterial burden",
+      "unit": "Log CFU/mL",
+      "scale": "log10",
+      "upper_plausible_limit": 16,
+      "lower_plausible_limit": 0,
+      "ticks_verified": [
+        0,
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        14,
+        16
+      ],
+      "tick_labels": [
+        "0",
+        "2",
+        "4",
+        "6",
+        "8",
+        "10",
+        "12",
+        "14",
+        "16"
+      ],
+      "breaks": [],
+      "grid": {
+        "present": true,
+        "aligned_y_ticks": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16
+        ],
+        "aligned_x_ticks": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          22,
+          24,
+          26
+        ]
+      },
+      "confidence": 1
+    }
+  },
+  "curve_style_facts": {
+    "curves": [
+      {
+        "curve_label": "Blank",
+        "colour": "#000000",
+        "line_type": "dotted",
+        "marker_symbol": "x",
+        "source": "figure_legend",
+        "confidence": 1
+      },
+      {
+        "curve_label": "COL 0.125µg/mL",
+        "colour": "#000000",
+        "line_type": "solid",
+        "marker_symbol": "square",
+        "source": "figure_legend",
+        "confidence": 1
+      },
+      {
+        "curve_label": "MINO 1µg/mL",
+        "colour": "#000000",
+        "line_type": "dashed",
+        "marker_symbol": "triangle",
+        "source": "figure_legend",
+        "confidence": 1
+      },
+      {
+        "curve_label": "MEM 4µg/mL",
+        "colour": "#000000",
+        "line_type": "dotted",
+        "marker_symbol": "diamond",
+        "source": "figure_legend",
+        "confidence": 1
+      },
+      {
+        "curve_label": "RFP 0.06µg/mL",
+        "colour": "#000000",
+        "line_type": "dotted",
+        "marker_symbol": "inverted_triangle",
+        "source": "figure_legend",
+        "confidence": 1
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + MEM 4µg/mL",
+        "colour": "#000000",
+        "line_type": "dotted",
+        "marker_symbol": "circle",
+        "source": "figure_legend",
+        "confidence": 1
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + MINO 1µg/mL",
+        "colour": "#000000",
+        "line_type": "dashed",
+        "marker_symbol": "triangle",
+        "source": "figure_legend",
+        "confidence": 1
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + RFP 0.06µg/mL",
+        "colour": "#000000",
+        "line_type": "dotted",
+        "marker_symbol": "inverted_triangle_filled",
+        "source": "figure_legend",
+        "confidence": 1
+      }
+    ]
+  }
+}
+```

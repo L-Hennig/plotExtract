@@ -1,0 +1,354 @@
+{
+  "status": "complete",
+  "stage": "COMPLETE",
+  "stage_index": 5,
+  "total_stages": 5,
+  "percentage": 100.0,
+  "accumulated_facts": {
+    "plot_type_facts": {
+      "declared_in_article_info": "unknown",
+      "visually_verified": true,
+      "plot_type": "time-kill plot",
+      "confidence": 0.9,
+      "reason": "The x-axis represents time in hours, and the y-axis represents bacterial count (CFU/mL) on a log10 scale, which are characteristic of a time-kill plot. Multiple curves with distinct markers indicate different experimental conditions, consistent with time-kill assay visualization."
+    },
+    "axis_facts": {
+      "x_axis": {
+        "quantity": "Time",
+        "unit": "hours",
+        "discrete": false,
+        "lower_plausible_limit": 0,
+        "upper_plausible_limit": 26,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          24
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "24"
+        ],
+        "breaks": [
+          {
+            "start": 12,
+            "end": 20,
+            "reason": "Non-uniform tick spacing; likely omitted intermediate timepoints for clarity or experimental gap."
+          }
+        ],
+        "confidence": 0.95
+      },
+      "y_axis": {
+        "quantity": "Bacterial Count",
+        "unit": "CFU/mL",
+        "scale": "log10",
+        "upper_plausible_limit": 10,
+        "lower_plausible_limit": 0,
+        "ticks_verified": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "tick_labels": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "breaks": [],
+        "confidence": 0.98
+      }
+    },
+    "article_info": {
+      "figure_id": "unknown",
+      "figure_caption": "unknown",
+      "experimental_context": {
+        "assay_type": "time-kill assay",
+        "organism": "unknown",
+        "model": "unknown"
+      },
+      "axis_definitions": {
+        "x_axis": {
+          "quantity": "Time",
+          "unit": "hours"
+        },
+        "y_axis": {
+          "quantity": "Bacterial Count",
+          "unit": "CFU/mL",
+          "scale": "log10"
+        }
+      },
+      "curve_legend": [
+        {
+          "curve_label": "Condition 1",
+          "description": "unknown",
+          "expected_trend": "unknown"
+        },
+        {
+          "curve_label": "Condition 2",
+          "description": "unknown",
+          "expected_trend": "unknown"
+        },
+        {
+          "curve_label": "Condition 3",
+          "description": "unknown",
+          "expected_trend": "unknown"
+        },
+        {
+          "curve_label": "Condition 4",
+          "description": "unknown",
+          "expected_trend": "unknown"
+        },
+        {
+          "curve_label": "Condition 5",
+          "description": "unknown",
+          "expected_trend": "unknown"
+        },
+        {
+          "curve_label": "Condition 6",
+          "description": "unknown",
+          "expected_trend": "unknown"
+        }
+      ]
+    },
+    "marker_facts": {
+      "markers_detected": true,
+      "curves": [
+        {
+          "curve_label": "Condition 1",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.1
+            },
+            {
+              "x": 8,
+              "y": 8.0
+            },
+            {
+              "x": 10,
+              "y": 8.0
+            },
+            {
+              "x": 12,
+              "y": 8.0
+            },
+            {
+              "x": 24,
+              "y": 8.0
+            }
+          ]
+        },
+        {
+          "curve_label": "Condition 2",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.1
+            },
+            {
+              "x": 2,
+              "y": 5.3
+            },
+            {
+              "x": 4,
+              "y": 5.4
+            },
+            {
+              "x": 6,
+              "y": 5.4
+            },
+            {
+              "x": 8,
+              "y": 5.4
+            },
+            {
+              "x": 10,
+              "y": 5.4
+            },
+            {
+              "x": 12,
+              "y": 5.4
+            },
+            {
+              "x": 24,
+              "y": 5.4
+            }
+          ]
+        },
+        {
+          "curve_label": "Condition 3",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.1
+            },
+            {
+              "x": 2,
+              "y": 3.0
+            },
+            {
+              "x": 4,
+              "y": 3.0
+            },
+            {
+              "x": 6,
+              "y": 8.8
+            },
+            {
+              "x": 8,
+              "y": 8.9
+            },
+            {
+              "x": 10,
+              "y": 9.0
+            },
+            {
+              "x": 12,
+              "y": 9.1
+            },
+            {
+              "x": 24,
+              "y": 9.2
+            }
+          ]
+        },
+        {
+          "curve_label": "Condition 4",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.1
+            },
+            {
+              "x": 2,
+              "y": 2.0
+            },
+            {
+              "x": 4,
+              "y": 2.0
+            },
+            {
+              "x": 6,
+              "y": 2.1
+            }
+          ]
+        },
+        {
+          "curve_label": "Condition 5",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.1
+            },
+            {
+              "x": 2,
+              "y": 1.5
+            },
+            {
+              "x": 4,
+              "y": 1.3
+            },
+            {
+              "x": 6,
+              "y": 2.5
+            },
+            {
+              "x": 8,
+              "y": 3.0
+            },
+            {
+              "x": 10,
+              "y": 3.0
+            },
+            {
+              "x": 12,
+              "y": 1.0
+            },
+            {
+              "x": 24,
+              "y": 2.7
+            }
+          ]
+        },
+        {
+          "curve_label": "Condition 6",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.1
+            },
+            {
+              "x": 2,
+              "y": 4.0
+            },
+            {
+              "x": 24,
+              "y": 7.0
+            }
+          ]
+        }
+      ],
+      "csv_output": "Time (hours),log10 CFU/mL (Condition 1),Time (hours),log10 CFU/mL (Condition 2),Time (hours),log10 CFU/mL (Condition 3),Time (hours),log10 CFU/mL (Condition 4),Time (hours),log10 CFU/mL (Condition 5),Time (hours),log10 CFU/mL (Condition 6)\n0,6.1,0,6.1,0,6.1,0,6.1,0,6.1,0,6.1\n2,,2,5.3,2,3.0,2,2.0,2,1.5,2,4.0\n4,,4,5.4,4,3.0,,4,2.0,4,1.3,\n6,,6,5.4,6,8.8,,6,2.1,6,2.5,\n8,8.0,8,5.4,8,8.9,8,,8,3.0,\n10,8.0,10,5.4,10,9.0,10,,10,3.0,\n12,8.0,12,5.4,12,9.1,12,,12,1.0,\n24,8.0,24,5.4,24,9.2,24,,24,2.7,24,7.0",
+      "confidence": 0.95
+    },
+    "validation_flags": [
+      {
+        "curve_label": "Condition 3",
+        "x": 6,
+        "y": 8.8,
+        "issue": "Impossible jump",
+        "details": "Sudden increase of 5.8 log10 CFU/mL from previous point (3.0 at x=4)."
+      },
+      {
+        "curve_label": "Condition 5",
+        "x": 12,
+        "y": 1.0,
+        "issue": "Impossible jump",
+        "details": "Sudden decrease of 2.0 log10 CFU/mL from previous point (3.0 at x=10)."
+      },
+      {
+        "curve_label": "Condition 3",
+        "x": 6,
+        "y": 8.8,
+        "issue": "Out-of-trend behavior",
+        "details": "Sharp increase contradicts expected bacterial kill trend in time-kill assays."
+      },
+      {
+        "curve_label": "Condition 5",
+        "x": 12,
+        "y": 1.0,
+        "issue": "Out-of-trend behavior",
+        "details": "Sudden drop followed by recovery at 24 hours (2.7) is biologically unlikely."
+      }
+    ]
+  },
+  "stage_duration_ms": 0,
+  "timestamp": 1768549612.8658278,
+  "console_output": "Extraction completed successfully"
+}

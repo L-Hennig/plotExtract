@@ -1,0 +1,53 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time = [0, 2, 4, 6, 8, 10, 12, 24, 26]
+
+data = {
+    'Blank': [6.2, 8.5, 9.5, 9.8, 10.0, 10.0, 10.0, 10.0, 9.5],
+    'COL 0.125µg/mL': [6.2, 7.0, 9.0, 9.5, 10.0, 10.0, 10.0, 10.0, 9.5],
+    'MINO 1µg/mL': [6.2, 8.0, 8.5, 9.0, 9.5, 9.8, 9.8, 9.0, 8.5],
+    'MEM 4µg/mL': [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'RFP 0.06µg/mL': [6.2, 8.5, 9.0, 9.5, 10.0, 10.0, 10.0, 1.0, 0.0],
+    'COL 0.125µg/mL + MEM 4µg/mL': [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'COL 0.125µg/mL + MINO 1µg/mL': [6.2, 0.0, 0.0, 1.0, 1.5, 2.0, 2.0, 2.0, 1.0],
+    'COL 0.125µg/mL + RFP 0.06µg/mL': [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+}
+
+# Plot styling
+plt.figure(figsize=(8, 6))
+linestyles = ['-.', '-', '--', ':', '-.', '--', '--', ':']
+markers = ['x', 's', '^', 'o', 'v', 'o', '^', 'v']
+colors = ['k', 'k', 'k', 'k', 'k', 'gray', 'gray', 'gray']
+
+# Plot each curve
+for i, (label, values) in enumerate(data.items()):
+    plt.plot(time, values,
+             label=label,
+             linestyle=linestyles[i],
+             marker=markers[i],
+             color=colors[i],
+             markersize=6,
+             linewidth=1.5)
+
+# Axis labels and title
+plt.xlabel('Time (h)')
+plt.ylabel('Log cfu/mL')
+plt.ylim(0, 16)
+plt.xlim(0, 26)
+
+# Custom x-ticks and y-ticks
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 22, 24, 26])
+plt.yticks([0, 2, 4, 6, 8, 10, 12, 14, 16])
+
+# Add legend
+plt.legend(loc='upper right', frameon=False)
+
+# Save plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\first_examples\A\A-1_png.p4.v1"
+os.makedirs(output_dir, exist_ok=True)
+output_path = os.path.join(output_dir, "A-1_png-replot.p4.v1.png")
+plt.savefig(output_path, bbox_inches='tight', dpi=300)
+plt.close()

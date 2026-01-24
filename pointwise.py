@@ -18,7 +18,7 @@ from mistralai import Mistral
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
-MAX_NORM_DIST = 0.2  # Example value; adjust as needed
+MAX_NORM_DIST = 0.1  # Example value; adjust as needed
 
 # Loads API key from .env file
 api_key = os.getenv("API_KEY_1")
@@ -34,6 +34,44 @@ def prompt_mistral(prompt_text):
     )
     return response.choices[0].message.content
 
+
+def _read_csv_tolerant(filepath: str, encoding: str) -> pd.DataFrame:
+    """Read CSVs that may contain ragged rows (extra commas / missing fields).
+
+    Extraction outputs sometimes contain rows with an extra empty field (e.g.
+    `,,,,`) which makes pandas raise a ParserError. We normalize each row to the
+    header's column count by removing empty tokens first, then truncating/padding.
+
+    Note: This assumes no embedded commas inside quoted fields (true for our
+    generated numeric CSVs).
+    """
+    with open(filepath, 'r', encoding=encoding, errors='replace') as f:
+        lines = f.read().splitlines()
+
+    if not lines:
+        return pd.DataFrame()
+
+    header = lines[0]
+    expected_cols = len(header.split(','))
+    if expected_cols <= 0:
+        return pd.DataFrame()
+
+    out_lines = [header]
+    for raw in lines[1:]:
+        if raw.strip() == '':
+            continue
+        fields = raw.split(',')
+        if len(fields) > expected_cols:
+            while len(fields) > expected_cols and '' in fields:
+                fields.remove('')
+        if len(fields) > expected_cols:
+            fields = fields[:expected_cols]
+        elif len(fields) < expected_cols:
+            fields = fields + [''] * (expected_cols - len(fields))
+        out_lines.append(','.join(fields))
+
+    return pd.read_csv(io.StringIO('\n'.join(out_lines)), encoding=encoding)
+
 def load_multi_curve_csv(filepath):
     """
     Load a CSV with multiple curves (pairs of x,y columns).
@@ -41,9 +79,15 @@ def load_multi_curve_csv(filepath):
     """
     # Try UTF-8 first (for extracted CSVs), fall back to latin1 if needed
     try:
-        df = pd.read_csv(filepath, encoding='utf-8')
+        try:
+            df = pd.read_csv(filepath, encoding='utf-8')
+        except pd.errors.ParserError:
+            df = _read_csv_tolerant(filepath, encoding='utf-8')
     except UnicodeDecodeError:
-        df = pd.read_csv(filepath, encoding='latin1')
+        try:
+            df = pd.read_csv(filepath, encoding='latin1')
+        except pd.errors.ParserError:
+            df = _read_csv_tolerant(filepath, encoding='latin1')
     headers = df.columns.tolist()
     
     curves = {}
@@ -71,6 +115,74 @@ def load_multi_curve_csv(filepath):
         }
     
     return curves
+
+
+def _expand_limits(lo, hi, pad_ratio=0.05):
+    """Expand [lo, hi] by a fraction for nicer plotting."""
+    if lo is None or hi is None:
+        return lo, hi
+    if not np.isfinite(lo) or not np.isfinite(hi):
+        return lo, hi
+    if lo == hi:
+        pad = (abs(lo) * pad_ratio) if lo != 0 else 1.0
+        return lo - pad, hi + pad
+    span = hi - lo
+    pad = span * pad_ratio
+    return lo - pad, hi + pad
+
+
+def _nice_upper_bound(v: float) -> float:
+    """Return a 'nice' upper axis bound >= v.
+
+    Uses 1/2/5/10 * 10^k rounding. If v is exactly a power of 10 (e.g. 1e9),
+    returns the next decade (1e10).
+    """
+    if v is None:
+        return 1.0
+    try:
+        v = float(v)
+    except Exception:
+        return 1.0
+
+    if not np.isfinite(v) or v <= 0:
+        return 1.0
+
+    exp = int(np.floor(np.log10(v)))
+    base = 10.0 ** exp
+    frac = v / base
+
+    # Exact power-of-ten: only bump to next decade for large ranges.
+    if np.isclose(frac, 1.0, rtol=1e-12, atol=0.0):
+        return (10.0 * base) if v >= 1e3 else (2.0 * base)
+    if frac <= 2.0:
+        return 2.0 * base
+    if frac <= 5.0:
+        return 5.0 * base
+    return 10.0 * base
+
+
+def _compute_data_bounds(*curves_dicts):
+    """Return (min_x, max_x, min_y, max_y) across all curves in dicts."""
+    min_x = min_y = np.inf
+    max_x = max_y = -np.inf
+
+    for curves in curves_dicts:
+        for curve_info in curves.values():
+            df = curve_info.get('data')
+            if df is None or df.empty:
+                continue
+            xs = pd.to_numeric(df['x'], errors='coerce').dropna()
+            ys = pd.to_numeric(df['y'], errors='coerce').dropna()
+            if xs.empty or ys.empty:
+                continue
+            min_x = min(min_x, float(xs.min()))
+            max_x = max(max_x, float(xs.max()))
+            min_y = min(min_y, float(ys.min()))
+            max_y = max(max_y, float(ys.max()))
+
+    if min_x == np.inf:
+        return None, None, None, None
+    return min_x, max_x, min_y, max_y
 
 def match_curves_with_llm(original_curves, extracted_curves):
     """
@@ -144,7 +256,7 @@ Do not add extra explanations or text—only output the dictionary."""
     except Exception as e:
         print(f"Warning: Could not parse LLM response: {e}")
         print(f"Response was: {response}")
-        # Fallback: try to match by order
+        # Fallback: match by order
         original_labels = list(original_curves.keys())
         extracted_labels = list(extracted_curves.keys())
         mapping = {}
@@ -153,10 +265,17 @@ Do not add extra explanations or text—only output the dictionary."""
                 mapping[orig_label] = extracted_labels[i]
         return mapping
 
+
 def normalize_point(x, y, leftX, rightX, bottomY, topY):
-    denom_x = rightX - leftX
-    denom_y = topY - bottomY
-    # Avoid zero division
+    """Normalize a point into [0,1]x[0,1] using provided axis ranges."""
+    try:
+        x = float(x)
+        y = float(y)
+    except Exception:
+        return 0.0, 0.0
+
+    denom_x = (rightX - leftX)
+    denom_y = (topY - bottomY)
     if denom_x == 0:
         denom_x = 1e-12
     if denom_y == 0:
@@ -304,13 +423,30 @@ def plot_curve_comparison(ax, curve_label, df_extracted, df_original,
         bbox=dict(boxstyle='round', facecolor='white', alpha=0.7)
     )
 
-    # Set plot limits - ensure axes start at origin (0,0)
-    ax.set_xlim(max(0, leftX), rightX)
-    ax.set_ylim(max(0, bottomY), topY)
-    
-    # Make axes meet at origin
-    ax.spines['left'].set_position(('data', max(0, leftX)))
-    ax.spines['bottom'].set_position(('data', max(0, bottomY)))
+    # Axes:
+    # - Always start at origin.
+    # - Treat caller-provided rightX/topY (> 0) as hard caps.
+    # - If caps aren't provided, auto-expand to data maxima with "nice" rounding.
+    if rightX > 0:
+        eff_rightX = rightX
+    else:
+        x_max_data = max(
+            float(pd.to_numeric(df_extracted['x'], errors='coerce').max()),
+            float(pd.to_numeric(df_original['x'], errors='coerce').max()),
+        )
+        eff_rightX = _nice_upper_bound(x_max_data)
+
+    if topY > 0:
+        eff_topY = topY
+    else:
+        y_max_data = max(
+            float(pd.to_numeric(df_extracted['y'], errors='coerce').max()),
+            float(pd.to_numeric(df_original['y'], errors='coerce').max()),
+        )
+        eff_topY = _nice_upper_bound(y_max_data)
+
+    ax.set_xlim(0.0, eff_rightX)
+    ax.set_ylim(0.0, eff_topY)
 
     ax.set_title(curve_label, fontsize=10)
     ax.set_xlabel("X", fontsize=8)
@@ -345,6 +481,13 @@ def main():
     print(f"Loading original CSV: {file_original}")
     original_curves = load_multi_curve_csv(file_original)
     print(f"  Found {len(original_curves)} curve(s): {list(original_curves.keys())}")
+
+    # Keep user-provided axis limits as-is. We used to expand them to include all points,
+    # but that breaks "hard cap" expectations in the UI.
+    # We still force the plotting origin to (0,0) in plot_curve_comparison.
+
+    # For visibility in logs/debugging, print the effective caps we're using.
+    print(f"Effective plot bounds (caps): X=[0, {rightX}], Y=[0, {topY}]")
 
     # 2. Match curves using LLM
     curve_mapping = match_curves_with_llm(original_curves, extracted_curves)

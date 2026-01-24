@@ -1,5 +1,4 @@
-# Copy of prompt 2
-# Fixed spelling mistakes "monotonius to monotonous" and "pointis to points"
+# ChatGPT prompt
 prompts = {'extract': """ The image shows a time-kill plot from a research paper. Before extracting any numeric data, determine whether the figure is structurally suitable for time-kill data extraction.
 
 Carefully examine the axes and confirm that:

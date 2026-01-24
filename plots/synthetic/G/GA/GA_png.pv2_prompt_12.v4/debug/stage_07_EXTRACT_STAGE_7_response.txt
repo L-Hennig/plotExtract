@@ -1,0 +1,128 @@
+```json
+{
+  "re_extraction": {
+    "results": [
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 14,
+        "new_log10_cfu_ml": 8.4,
+        "confidence": "high",
+        "reason": "Added missing time point following the increasing trend of the solid black line with square markers.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation"
+        }
+      },
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 16,
+        "new_log10_cfu_ml": 8.4,
+        "confidence": "high",
+        "reason": "Added missing time point following the stable trend of the solid black line with square markers.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation"
+        }
+      },
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 18,
+        "new_log10_cfu_ml": 8.4,
+        "confidence": "high",
+        "reason": "Added missing time point following the stable trend of the solid black line with square markers.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation"
+        }
+      },
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 20,
+        "new_log10_cfu_ml": 8.4,
+        "confidence": "high",
+        "reason": "Added missing time point following the stable trend of the solid black line with square markers.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation"
+        }
+      },
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 22,
+        "new_log10_cfu_ml": 8.4,
+        "confidence": "high",
+        "reason": "Added missing time point following the stable trend of the solid black line with square markers.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 14,
+        "new_log10_cfu_ml": 1.1,
+        "confidence": "high",
+        "reason": "Added missing time point following the decreasing trend of the dotted black line with circle markers.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 16,
+        "new_log10_cfu_ml": 1.0,
+        "confidence": "high",
+        "reason": "Added missing time point following the decreasing trend of the dotted black line with circle markers.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 18,
+        "new_log10_cfu_ml": 0.9,
+        "confidence": "high",
+        "reason": "Added missing time point following the decreasing trend of the dotted black line with circle markers.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 20,
+        "new_log10_cfu_ml": 0.8,
+        "confidence": "high",
+        "reason": "Added missing time point following the decreasing trend of the dotted black line with circle markers.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 22,
+        "new_log10_cfu_ml": 0.75,
+        "confidence": "high",
+        "reason": "Added missing time point following the decreasing trend of the dotted black line with circle markers.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation"
+        }
+      }
+    ]
+  }
+}
+```

@@ -1,0 +1,118 @@
+```json
+{
+  "plot_type_facts": {
+    "declared_in_article_info": "unknown",
+    "visually_verified": true,
+    "plot_type": "time-kill plot",
+    "confidence": 0.9,
+    "reason": "X-axis represents time in hours, y-axis represents bacterial count on a log10 scale, and multiple curves with distinct markers indicate different experimental conditions, consistent with a time-kill assay."
+  },
+  "axis_facts": {
+    "x_axis": {
+      "quantity": "time",
+      "unit": "hours",
+      "discrete": false,
+      "lower_plausible_limit": 0,
+      "upper_plausible_limit": 24,
+      "ticks_verified": [
+        0,
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        14,
+        16,
+        18,
+        20,
+        22,
+        24
+      ],
+      "tick_labels": [
+        "0",
+        "2",
+        "4",
+        "6",
+        "8",
+        "10",
+        "12",
+        "14",
+        "16",
+        "18",
+        "20",
+        "22",
+        "24"
+      ],
+      "breaks": [],
+      "confidence": 0.98
+    },
+    "y_axis": {
+      "quantity": "bacterial count",
+      "unit": "CFU/mL",
+      "scale": "log10",
+      "upper_plausible_limit": 10,
+      "lower_plausible_limit": 0,
+      "ticks_verified": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "tick_labels": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10"
+      ],
+      "breaks": [],
+      "grid": {
+        "present": false
+      },
+      "confidence": 0.95
+    }
+  },
+  "curve_style_facts": {
+    "curves": [
+      {
+        "curve_label": "Condition 1",
+        "colour": "black",
+        "line_type": "solid",
+        "marker_symbol": "circle",
+        "source": "direct_visual",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "Condition 2",
+        "colour": "black",
+        "line_type": "solid",
+        "marker_symbol": "square",
+        "source": "direct_visual",
+        "confidence": 0.95
+      },
+      {
+        "curve_label": "Condition 3",
+        "colour": "black",
+        "line_type": "solid",
+        "marker_symbol": "triangle",
+        "source": "direct_visual",
+        "confidence": 0.95
+      }
+    ]
+  }
+}
+```

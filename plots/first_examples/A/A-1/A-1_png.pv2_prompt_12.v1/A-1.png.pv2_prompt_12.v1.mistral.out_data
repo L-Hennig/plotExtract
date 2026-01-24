@@ -1,0 +1,8 @@
+"curve_label","new_log10_cfu_ml" (TRUE)
+"Blank",10.7
+"COL 0.125µg/mL",10.3
+"MEM 4µg/mL",0.0
+"RFP 0.06µg/mL",0.0
+"COL 0.125µg/mL + MEM 4µg/mL",0.0
+"COL 0.125µg/mL + MINO 1µg/mL",0.0
+"COL 0.125µg/mL + RFP 0.06µg/mL",0.0

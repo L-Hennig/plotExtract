@@ -1,0 +1,56 @@
+```json
+{
+  "re_extraction": {
+    "requests": [
+      {
+        "curve_label": "Condition 1",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [0, 2, 4, 24],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 1.0,
+          "pct_decreasing": 0.0,
+          "baseline_delta_from_median": -2.75,
+          "largest_jump": {"abs_jump": 1.2999999999999998, "from_time": 2.0, "to_time": 4.0, "delta": 1.2999999999999998}
+        },
+        "visual_guidance": "Re-extract points for Condition 1 (black solid line, square markers) ensuring bacterial count decreases over time, not increases."
+      },
+      {
+        "curve_label": "Condition 3",
+        "issue_type": "midcurve_switch",
+        "target_times_hours": [0, 2, 4, 6, 8],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.5714285714285714,
+          "pct_decreasing": 0.42857142857142855,
+          "baseline_delta_from_median": 4.75,
+          "largest_jump": {"abs_jump": 4.5, "from_time": 0.0, "to_time": 2.0, "delta": -4.5}
+        },
+        "visual_guidance": "Re-extract points for Condition 3 (black dotted line, circle markers) ensuring consistent decrease after initial drop, avoiding upward reversals."
+      },
+      {
+        "curve_label": "Condition 4",
+        "issue_type": "bad_intercept_time0",
+        "target_times_hours": [0, 2],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 1.0,
+          "baseline_delta_from_median": 5.5,
+          "largest_jump": {"abs_jump": 5.0, "from_time": 0.0, "to_time": 2.0, "delta": -5.0}
+        },
+        "visual_guidance": "Re-extract time 0 and 2h points for Condition 4 (black solid line, circle markers) to verify initial bacterial count aligns with other curves."
+      }
+    ]
+  }
+}
+```

@@ -1,0 +1,56 @@
+```json
+{
+  "re_extraction": {
+    "requests": [
+      {
+        "curve_label": "Blank",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+        "expected_trend": "growth/increase",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.6,
+          "pct_decreasing": 0.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 2.8, "from_time": 0, "to_time": 2, "delta": 2.8}
+        },
+        "visual_guidance": "Verify the bacterial burden increases steadily over time for the untreated control, ensuring no unexpected drops or plateaus."
+      },
+      {
+        "curve_label": "COL 0.125ug/mL",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 1.0,
+          "pct_decreasing": 0.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 1.5, "from_time": 2, "to_time": 4, "delta": 1.5}
+        },
+        "visual_guidance": "Re-extract points to reflect bacterial killing over time, ensuring values decrease or stabilize at low levels."
+      },
+      {
+        "curve_label": "RFP 0.06ug/mL",
+        "issue_type": "midcurve_switch",
+        "target_times_hours": [8, 10, 12, 22, 24, 26],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.2,
+          "pct_decreasing": 0.6,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 2.0, "from_time": 12, "to_time": 22, "delta": 2.0}
+        },
+        "visual_guidance": "Check for regrowth after 12 hours; ensure values continue decreasing or remain low, not increasing."
+      }
+    ]
+  }
+}
+```

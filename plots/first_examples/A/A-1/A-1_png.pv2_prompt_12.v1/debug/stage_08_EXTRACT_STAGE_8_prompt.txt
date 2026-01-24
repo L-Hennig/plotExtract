@@ -1,0 +1,501 @@
+
+You have access to:
+- Original CSV (wide format)
+- Stage 7 output JSON (re-extraction results)
+
+ORIGINAL CSV:
+"curve_label": "Blank",
+"time_hours": 22,
+"new_log10_cfu_ml": 10.5,
+"confidence": "high",
+"reason": "Extended growth trend plateau after 12 hours confirmed.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "Blank",
+"time_hours": 24,
+"new_log10_cfu_ml": 10.6,
+"confidence": "high",
+"reason": "Maintained growth plateau consistent with earlier trend.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "Blank",
+"time_hours": 26,
+"new_log10_cfu_ml": 10.7,
+"confidence": "high",
+"reason": "Slight increase consistent with late-phase growth.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "COL 0.125µg/mL",
+"time_hours": 22,
+"new_log10_cfu_ml": 10.1,
+"confidence": "high",
+"reason": "Stabilized growth after 12 hours confirmed.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "COL 0.125µg/mL",
+"time_hours": 24,
+"new_log10_cfu_ml": 10.2,
+"confidence": "high",
+"reason": "Continued stabilization consistent with earlier points.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "COL 0.125µg/mL",
+"time_hours": 26,
+"new_log10_cfu_ml": 10.3,
+"confidence": "high",
+"reason": "Slight increase aligned with expected variability.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "MEM 4µg/mL",
+"time_hours": 2,
+"new_log10_cfu_ml": 0.5,
+"confidence": "medium",
+"reason": "Sharp drop confirmed but potential overlap with other curves.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "MEM 4µg/mL",
+"time_hours": 4,
+"new_log10_cfu_ml": 0.0,
+"confidence": "high",
+"reason": "Complete kill confirmed at 4 hours.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "MEM 4µg/mL",
+"time_hours": 22,
+"new_log10_cfu_ml": 0.0,
+"confidence": "high",
+"reason": "No regrowth after 12 hours confirmed.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "MEM 4µg/mL",
+"time_hours": 24,
+"new_log10_cfu_ml": 0.0,
+"confidence": "high",
+"reason": "Sustained kill confirmed.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "MEM 4µg/mL",
+"time_hours": 26,
+"new_log10_cfu_ml": 0.0,
+"confidence": "high",
+"reason": "No regrowth detected.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "RFP 0.06µg/mL",
+"time_hours": 22,
+"new_log10_cfu_ml": 0.0,
+"confidence": "high",
+"reason": "No regrowth after 12 hours confirmed.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "RFP 0.06µg/mL",
+"time_hours": 24,
+"new_log10_cfu_ml": 0.0,
+"confidence": "high",
+"reason": "Sustained kill confirmed.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "RFP 0.06µg/mL",
+"time_hours": 26,
+"new_log10_cfu_ml": 0.0,
+"confidence": "high",
+"reason": "No regrowth detected.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "COL 0.125µg/mL + MEM 4µg/mL",
+"time_hours": 22,
+"new_log10_cfu_ml": 0.0,
+"confidence": "high",
+"reason": "No regrowth after 12 hours confirmed.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "COL 0.125µg/mL + MEM 4µg/mL",
+"time_hours": 24,
+"new_log10_cfu_ml": 0.0,
+"confidence": "high",
+"reason": "Sustained kill confirmed.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "COL 0.125µg/mL + MEM 4µg/mL",
+"time_hours": 26,
+"new_log10_cfu_ml": 0.0,
+"confidence": "high",
+"reason": "No regrowth detected.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "COL 0.125µg/mL + MINO 1µg/mL",
+"time_hours": 22,
+"new_log10_cfu_ml": 0.0,
+"confidence": "high",
+"reason": "No regrowth after 12 hours confirmed.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "COL 0.125µg/mL + MINO 1µg/mL",
+"time_hours": 24,
+"new_log10_cfu_ml": 0.0,
+"confidence": "high",
+"reason": "Sustained kill confirmed.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "COL 0.125µg/mL + MINO 1µg/mL",
+"time_hours": 26,
+"new_log10_cfu_ml": 0.0,
+"confidence": "high",
+"reason": "No regrowth detected.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "COL 0.125µg/mL + RFP 0.06µg/mL",
+"time_hours": 22,
+"new_log10_cfu_ml": 0.0,
+"confidence": "high",
+"reason": "No regrowth after 12 hours confirmed.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "COL 0.125µg/mL + RFP 0.06µg/mL",
+"time_hours": 24,
+"new_log10_cfu_ml": 0.0,
+"confidence": "high",
+"reason": "Sustained kill confirmed.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+},
+"curve_label": "COL 0.125µg/mL + RFP 0.06µg/mL",
+"time_hours": 26,
+"new_log10_cfu_ml": 0.0,
+"confidence": "high",
+"reason": "No regrowth detected.",
+"used_curve_definition": true,
+"matches_expected_trend_if_known": true,
+
+STAGE 7 OUTPUT (RE-EXTRACTION RESULTS):
+```json
+{
+  "re_extraction": {
+    "results": [
+      {
+        "curve_label": "Blank",
+        "time_hours": 22,
+        "new_log10_cfu_ml": 10.5,
+        "confidence": "high",
+        "reason": "Extended growth trend plateau after 12 hours confirmed.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "Blank",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 10.6,
+        "confidence": "high",
+        "reason": "Maintained growth plateau consistent with earlier trend.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "Blank",
+        "time_hours": 26,
+        "new_log10_cfu_ml": 10.7,
+        "confidence": "high",
+        "reason": "Slight increase consistent with late-phase growth.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "COL 0.125µg/mL",
+        "time_hours": 22,
+        "new_log10_cfu_ml": 10.1,
+        "confidence": "high",
+        "reason": "Stabilized growth after 12 hours confirmed.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "COL 0.125µg/mL",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 10.2,
+        "confidence": "high",
+        "reason": "Continued stabilization consistent with earlier points.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "COL 0.125µg/mL",
+        "time_hours": 26,
+        "new_log10_cfu_ml": 10.3,
+        "confidence": "high",
+        "reason": "Slight increase aligned with expected variability.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "MEM 4µg/mL",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 0.5,
+        "confidence": "medium",
+        "reason": "Sharp drop confirmed but potential overlap with other curves.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "midcurve switch verified"
+        }
+      },
+      {
+        "curve_label": "MEM 4µg/mL",
+        "time_hours": 4,
+        "new_log10_cfu_ml": 0.0,
+        "confidence": "high",
+        "reason": "Complete kill confirmed at 4 hours.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "midcurve switch verified"
+        }
+      },
+      {
+        "curve_label": "MEM 4µg/mL",
+        "time_hours": 22,
+        "new_log10_cfu_ml": 0.0,
+        "confidence": "high",
+        "reason": "No regrowth after 12 hours confirmed.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "MEM 4µg/mL",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 0.0,
+        "confidence": "high",
+        "reason": "Sustained kill confirmed.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "MEM 4µg/mL",
+        "time_hours": 26,
+        "new_log10_cfu_ml": 0.0,
+        "confidence": "high",
+        "reason": "No regrowth detected.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "RFP 0.06µg/mL",
+        "time_hours": 22,
+        "new_log10_cfu_ml": 0.0,
+        "confidence": "high",
+        "reason": "No regrowth after 12 hours confirmed.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "RFP 0.06µg/mL",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 0.0,
+        "confidence": "high",
+        "reason": "Sustained kill confirmed.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "RFP 0.06µg/mL",
+        "time_hours": 26,
+        "new_log10_cfu_ml": 0.0,
+        "confidence": "high",
+        "reason": "No regrowth detected.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + MEM 4µg/mL",
+        "time_hours": 22,
+        "new_log10_cfu_ml": 0.0,
+        "confidence": "high",
+        "reason": "No regrowth after 12 hours confirmed.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + MEM 4µg/mL",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 0.0,
+        "confidence": "high",
+        "reason": "Sustained kill confirmed.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + MEM 4µg/mL",
+        "time_hours": 26,
+        "new_log10_cfu_ml": 0.0,
+        "confidence": "high",
+        "reason": "No regrowth detected.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + MINO 1µg/mL",
+        "time_hours": 22,
+        "new_log10_cfu_ml": 0.0,
+        "confidence": "high",
+        "reason": "No regrowth after 12 hours confirmed.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + MINO 1µg/mL",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 0.0,
+        "confidence": "high",
+        "reason": "Sustained kill confirmed.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + MINO 1µg/mL",
+        "time_hours": 26,
+        "new_log10_cfu_ml": 0.0,
+        "confidence": "high",
+        "reason": "No regrowth detected.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + RFP 0.06µg/mL",
+        "time_hours": 22,
+        "new_log10_cfu_ml": 0.0,
+        "confidence": "high",
+        "reason": "No regrowth after 12 hours confirmed.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + RFP 0.06µg/mL",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 0.0,
+        "confidence": "high",
+        "reason": "Sustained kill confirmed.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + RFP 0.06µg/mL",
+        "time_hours": 26,
+        "new_log10_cfu_ml": 0.0,
+        "confidence": "high",
+        "reason": "No regrowth detected.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      }
+    ]
+  }
+}
+```
+
+---
+
+STAGE 8 — COMPILE NEW CSV (MERGE FIXES)
+
+GOAL:
+Produce a NEW CSV with corrected values applied.
+
+HARD RULES:
+- Keep the exact same CSV structure and column ordering.
+- Replace ONLY the y-value cell(s) for the specified curve_id at the specified time_hours.
+- Do NOT add or remove rows.
+- Do NOT add new columns.
+- Do NOT modify other values.
+- Output MUST be the full updated CSV text only (no JSON, no commentary, no backticks).
+
+NOTES:
+- Match time_hours exactly against the Time (hours) column for that curve.
+- Match curve_label to the correct y-column by its header label (text in parentheses).
+- Read re-extraction results from stage7_output_json.re_extraction.results.
+- If a requested (curve_id, time_hours) cannot be found, leave the CSV unchanged for that entry.
+
+---
+
+OUTPUT:
+Return only the updated CSV text.

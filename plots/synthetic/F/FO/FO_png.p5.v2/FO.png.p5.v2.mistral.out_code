@@ -1,0 +1,48 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Data preparation
+data = {
+    'Time_1': [0, 2],
+    'CFU_1': [6.1, 8.4],
+    'Time_2': [0, 2, 4, 6, 8, 10, 12, 24],
+    'CFU_2': [8.0, 8.6, 8.7, 8.7, 8.6, 8.6, 8.5, 8.5],
+    'Time_3': [0, 2, 4, 6, 8, 10, 12, 24],
+    'CFU_3': [6.0, 0.7, 0.5, 0.5, 0.7, 0.8, 0.7, 0.7],
+    'Time_4': [0, 2, 4, 6, 8, 10, 12, 24],
+    'CFU_4': [8.3, 8.5, 8.6, 8.6, 8.5, 8.6, 8.6, 8.2],
+    'Time_5': [0, 2, 4, 6, 8, 10, 12, 24],
+    'CFU_5': [5.8, 2.5, 2.3, 2.2, 2.1, 2.0, 1.8, 0.8],
+    'Time_6': [0, 2, 4, 6, 8, 10, 24],
+    'CFU_6': [6.2, 0.8, 1.0, 2.5, 2.0, 1.0, 3.0]
+}
+
+# Plot setup
+plt.figure(figsize=(8, 6))
+plt.rcParams['font.family'] = 'Arial'
+plt.rcParams['font.size'] = 12
+
+# Plot each condition with specific line and marker styles
+plt.plot(data['Time_1'], data['CFU_1'], color='#000000', linestyle='-', marker='s', markersize=8, label='Condition 1')
+plt.plot(data['Time_2'], data['CFU_2'], color='#000000', linestyle='--', marker='^', markersize=8, label='Condition 2')
+plt.plot(data['Time_3'], data['CFU_3'], color='#000000', linestyle=':', marker='o', markersize=8, label='Condition 3')
+plt.plot(data['Time_4'], data['CFU_4'], color='#000000', linestyle='-.', marker='D', markersize=8, label='Condition 4')
+plt.plot(data['Time_5'], data['CFU_5'], color='#000000', linestyle='-', marker='o', markersize=8, label='Condition 5')
+plt.plot(data['Time_6'], data['CFU_6'], color='#000000', linestyle='--', marker='s', markersize=8, fillstyle='none', label='Condition 6')
+
+# Axis configuration
+plt.xlim(0, 26)
+plt.ylim(0.1, 10)
+plt.xlabel('Time (hours)', fontsize=12)
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)', fontsize=12)
+plt.yscale('log')
+plt.yticks([0.1, 1, 2, 4, 6, 8, 10], ['', '1', '2', '4', '6', '8', '10'], fontsize=12)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 24], fontsize=12)
+
+# Horizontal dashed line at y=6 (approximate LOD)
+plt.axhline(y=6, color='gray', linestyle='--', linewidth=1)
+
+# Save the plot
+plt.tight_layout()
+plt.savefig(r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\FO\FO_png.p5.v2\FO_png-replot.p5.v2.png", dpi=300, bbox_inches='tight')
+plt.close()

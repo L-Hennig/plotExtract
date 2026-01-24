@@ -1,0 +1,60 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time_cond1 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu_cond1 = [6.0, 7.0, 7.0, 8.0, 8.2, 8.2, 8.2, 8.3]
+
+time_cond2 = [0, 2, 4, 6, 8, 10]
+cfu_cond2 = [6.0, 3.0, 2.5, 2.5, 3.0, 3.0]
+
+time_cond3 = [0, 2, 4, 6, 8]
+cfu_cond3 = [6.0, 2.0, 1.0, 1.5, 1.5]
+
+time_cond4 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu_cond4 = [6.0, 7.5, 7.8, 7.8, 7.8, 7.8, 7.8, 7.8]
+
+time_cond5 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu_cond5 = [6.0, 8.5, 9.0, 9.0, 9.2, 9.2, 9.2, 9.2]
+
+time_cond6 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu_cond6 = [6.0, 3.0, 2.5, 2.5, 4.5, 6.5, 7.0, 7.8]
+
+# Plot setup
+plt.figure(figsize=(8, 6))
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['font.size'] = 12
+
+# Plot each condition
+plt.plot(time_cond1, cfu_cond1, 's-', color='black', markersize=8, label='Condition 1', linewidth=1.5)
+plt.plot(time_cond2, cfu_cond2, '^--', color='black', markersize=8, label='Condition 2', linewidth=1.5)
+plt.plot(time_cond3, cfu_cond3, ':', color='black', marker='o', markersize=8, label='Condition 3', linewidth=1.5, markerfacecolor='none')
+plt.plot(time_cond4, cfu_cond4, 'd-.', color='black', markersize=8, label='Condition 4', linewidth=1.5)
+plt.plot(time_cond5, cfu_cond5, 'o-', color='black', markersize=8, label='Condition 5', linewidth=1.5, markerfacecolor='none')
+plt.plot(time_cond6, cfu_cond6, 'v--', color='black', markersize=8, label='Condition 6', linewidth=1.5)
+
+# Axis setup
+plt.xlim(0, 26)
+plt.ylim(0, 10)
+plt.xlabel('Time (hours)', fontsize=12)
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)', fontsize=12)
+plt.yscale('log')
+plt.yticks([1, 2, 4, 6, 8, 10], ['1', '2', '4', '6', '8', '10'])
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 20, 22, 24])
+
+# Axis break indication
+plt.gca().spines['bottom'].set_bounds(0, 12)
+plt.gca().spines['bottom'].set_position(('outward', 0))
+break_x = [20, 22]
+break_y = [0.5, 0.5]
+plt.plot(break_x, break_y, 'k', lw=1.5)
+plt.plot([break_x[0], break_x[0]], [break_y[0], break_y[0]+0.2], 'k', lw=1.5)
+plt.plot([break_x[1], break_x[1]], [break_y[1], break_y[1]+0.2], 'k', lw=1.5)
+
+# Save plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\FY\FY_png.p5.v1"
+os.makedirs(output_dir, exist_ok=True)
+output_path = os.path.join(output_dir, "FY_png-replot.p5.v1.png")
+plt.savefig(output_path, dpi=300, bbox_inches='tight')
+plt.close()

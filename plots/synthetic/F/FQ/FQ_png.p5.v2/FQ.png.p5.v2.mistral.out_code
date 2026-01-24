@@ -1,0 +1,51 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time_cond1 = [0, 2]
+log_cond1 = [6.0, 9.0]
+
+time_cond2 = [0, 2, 4, 6, 8, 10, 24]
+log_cond2 = [6.0, 1.5, 1.0, 1.0, 1.0, 1.0, 5.8]
+
+time_cond3 = [0, 2, 4, 6, 8, 10, 12, 14, 24]
+log_cond3 = [6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 5.8]
+
+time_cond4 = [0, 2, 4, 6, 8, 10, 12, 24]
+log_cond4 = [6.0, 1.0, 1.0, 1.0, 8.9, 8.9, 8.9, 9.0]
+
+time_cond5 = [0, 2, 4, 6, 8, 10, 24]
+log_cond5 = [6.0, 3.0, 2.5, 2.3, 2.2, 2.0, 1.0]
+
+time_cond6 = [0, 2, 4, 6, 8, 10, 12, 14, 24]
+log_cond6 = [6.0, 7.0, 7.0, 8.9, 8.9, 8.9, 8.9, 8.9, 9.1]
+
+# Plot setup
+plt.figure(figsize=(8, 6))
+plt.yscale('log')
+plt.ylim(0.5, 10.5)
+plt.xlim(-1, 25)
+plt.xticks(np.arange(0, 26, 2))
+plt.yticks([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
+
+# Plot each condition
+plt.plot(time_cond1, log_cond1, 'k-s', label='Condition 1', markersize=8, linestyle='-')
+plt.plot(time_cond2, log_cond2, 'k^', label='Condition 2', markersize=8, linestyle='--', markerfacecolor='none')
+plt.plot(time_cond3, log_cond3, 'k:', label='Condition 3', markersize=8, marker='o', markerfacecolor='none')
+plt.plot(time_cond4, log_cond4, 'k-', label='Condition 4', marker='D', markersize=8, markerfacecolor='none')
+plt.plot(time_cond5, log_cond5, 'k--o', label='Condition 5', markersize=8)
+plt.plot(time_cond6, log_cond6, 'k--', label='Condition 6', marker='>', markersize=8, markerfacecolor='none')
+
+# Axis labels
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+
+# Legend
+plt.legend(loc='upper left', handlelength=3)
+
+# Save plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\FQ\FQ_png.p5.v2"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "FQ_png-replot.p5.v2.png"), dpi=300, bbox_inches='tight')
+plt.close()

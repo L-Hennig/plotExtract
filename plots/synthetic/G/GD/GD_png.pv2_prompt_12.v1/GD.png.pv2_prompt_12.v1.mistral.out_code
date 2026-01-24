@@ -1,0 +1,75 @@
+import os
+import matplotlib.pyplot as plt
+import numpy as np
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic/G/GD\GD_png.pv2_prompt_12.v1\GD_png-replot.pv2_prompt_12.v1.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data from marker_facts
+data = {
+    "Condition 1": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.0, 7.8, 6.0, 8.8, 9.1, 9.1, 9.1, 9.2]
+    },
+    "Condition 2": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.0, 5.8, 6.2, 6.3, 6.1, 6.2, 6.3, 6.8]
+    },
+    "Condition 3": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.0, 3.8, 3.3, 3.5, 3.5, 0.5, 0.5, 0.5]
+    },
+    "Condition 4": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [8.5, 8.4, 8.5, 8.6, 8.6, 8.6, 8.6, 8.6]
+    },
+    "Condition 5": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.0, 6.1, 6.1, 6.1, 6.1, 6.1, 6.1, 6.1]
+    },
+    "Condition 6": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 24],
+        "y": [6.0, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.2]
+    }
+}
+
+# Curve styles from curve_style_facts
+curve_styles = {
+    "Condition 1": {"color": "black", "linestyle": "-", "marker": "s"},
+    "Condition 2": {"color": "black", "linestyle": "--", "marker": "^"},
+    "Condition 3": {"color": "black", "linestyle": ":", "marker": "o"},
+    "Condition 4": {"color": "black", "linestyle": "-", "marker": "v"},
+    "Condition 5": {"color": "black", "linestyle": ":", "marker": "v"},
+    "Condition 6": {"color": "black", "linestyle": ":", "marker": "s"}
+}
+
+# Create the plot
+plt.figure(figsize=(8, 6))
+
+# Plot each condition
+for condition, style in curve_styles.items():
+    plt.plot(data[condition]["x"], data[condition]["y"],
+             linestyle=style["linestyle"],
+             marker=style["marker"],
+             color=style["color"],
+             label=condition)
+
+# Set axis limits and ticks
+plt.xlim(0, 24)
+plt.ylim(0, 10)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])
+plt.yticks([0, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+# Axis labels
+plt.xlabel("Time (hours)")
+plt.ylabel("Bacterial Count (CFU/mL) (log10 scale)")
+
+# Grid
+plt.grid(True, which='both', linestyle='-', linewidth=0.5)
+
+# Legend
+plt.legend()
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)
+plt.close()

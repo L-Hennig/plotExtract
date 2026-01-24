@@ -1,0 +1,61 @@
+import os
+import matplotlib.pyplot as plt
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic/G/GC\GC_png.pv2_prompt_12.v1\GC_png-replot.pv2_prompt_12.v1.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data from marker_facts
+data = {
+    "Condition 1": [
+        (0, 6.0), (2, 5.5), (4, 6.5), (6, 6.7), (8, 6.8), (10, 6.5), (12, 6.3), (24, 5.5)
+    ],
+    "Condition 2": [
+        (0, 6.0), (2, 6.2), (4, 6.3), (6, 6.1), (8, 6.4), (10, 6.5), (12, 6.5), (24, 6.5)
+    ],
+    "Condition 3": [
+        (0, 6.0), (2, 0.5), (4, 1.5), (6, 1.0), (8, 1.0), (10, 1.0), (12, 1.0), (24, 1.0)
+    ],
+    "Condition 4": [
+        (0, 6.0), (2, 3.5), (4, 3.5), (6, 3.2), (8, 3.5), (10, 3.8), (12, 4.5), (24, 6.0)
+    ],
+    "Condition 5": [
+        (0, 6.0), (2, 2.0), (4, 2.5), (6, 2.5), (8, 2.5), (10, 2.5), (12, 2.5), (24, 1.0)
+    ]
+}
+
+# Curve styles from curve_style_facts
+curve_styles = {
+    "Condition 1": {"color": "black", "linestyle": "-", "marker": "s"},
+    "Condition 2": {"color": "black", "linestyle": "--", "marker": "^"},
+    "Condition 3": {"color": "black", "linestyle": ":", "marker": "o"},
+    "Condition 4": {"color": "black", "linestyle": "-", "marker": "o"},
+    "Condition 5": {"color": "black", "linestyle": "--", "marker": "v"}
+}
+
+# Create the plot
+plt.figure(figsize=(8, 6))
+
+for condition, points in data.items():
+    x_vals, y_vals = zip(*points)
+    plt.plot(x_vals, y_vals,
+             color=curve_styles[condition]["color"],
+             linestyle=curve_styles[condition]["linestyle"],
+             marker=curve_styles[condition]["marker"],
+             label=condition)
+
+# Set axis limits and labels
+plt.xlim(0, 24)
+plt.ylim(0, 10)
+plt.xlabel("Time (hours)")
+plt.ylabel("Bacterial Count (CFU/mL) (log10 scale)")
+
+# Set ticks
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])
+plt.yticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+# Add legend
+plt.legend()
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)
+plt.close()

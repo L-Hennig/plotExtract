@@ -1,0 +1,595 @@
+{
+  "status": "running",
+  "stage": "EXTRACT_STAGE_8",
+  "stage_index": 8,
+  "total_stages": 8,
+  "percentage": 100.0,
+  "accumulated_facts": {
+    "plot_type_facts": {
+      "declared_in_article_info": "unknown",
+      "visually_verified": true,
+      "plot_type": "time-kill plot",
+      "confidence": 0.9,
+      "reason": "The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, which aligns with typical time-kill kinetics."
+    },
+    "axis_facts": {
+      "x_axis": {
+        "quantity": "time",
+        "unit": "hours",
+        "discrete": false,
+        "lower_plausible_limit": 0,
+        "upper_plausible_limit": 26,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          22,
+          24,
+          26
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "22",
+          "24",
+          "26"
+        ],
+        "breaks": [
+          {
+            "start": 12,
+            "end": 22,
+            "reason": "Non-uniform spacing between 12 and 22 hours to highlight extended observation period"
+          }
+        ],
+        "confidence": 0.98
+      },
+      "y_axis": {
+        "quantity": "bacterial burden",
+        "unit": "log10 CFU/mL",
+        "scale": "log10",
+        "upper_plausible_limit": 16,
+        "lower_plausible_limit": 0,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "14",
+          "16"
+        ],
+        "breaks": [],
+        "grid": {
+          "present": true,
+          "aligned_y_ticks": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            14,
+            16
+          ],
+          "aligned_x_ticks": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            22,
+            24,
+            26
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    "curve_style_facts": {
+      "curves": [
+        {
+          "curve_label": "Blank",
+          "colour": "black",
+          "line_type": "dotted",
+          "marker_symbol": "x",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "COL 0.125ug/mL",
+          "colour": "black",
+          "line_type": "solid",
+          "marker_symbol": "square",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "MINO 1ug/mL",
+          "colour": "black",
+          "line_type": "dashed",
+          "marker_symbol": "triangle",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "MEM 4ug/mL",
+          "colour": "black",
+          "line_type": "dash-dot",
+          "marker_symbol": "circle",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "RFP 0.06ug/mL",
+          "colour": "black",
+          "line_type": "dotted",
+          "marker_symbol": "inverted_triangle",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MEM 4ug/mL",
+          "colour": "black",
+          "line_type": "dash-dot-dot",
+          "marker_symbol": "none",
+          "source": "direct_visual",
+          "confidence": 0.9
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+          "colour": "black",
+          "line_type": "dash-dot",
+          "marker_symbol": "open_triangle",
+          "source": "direct_visual",
+          "confidence": 0.9
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + RFP 0.06ug/mL",
+          "colour": "black",
+          "line_type": "dotted",
+          "marker_symbol": "inverted_open_triangle",
+          "source": "direct_visual",
+          "confidence": 0.9
+        }
+      ]
+    },
+    "re_extraction": {
+      "requests": [
+        {
+          "curve_label": "Blank",
+          "issue_type": "direction_flip_full",
+          "target_times_hours": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "growth/increase",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.6,
+            "pct_decreasing": 0.0,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 2.8,
+              "from_time": 0,
+              "to_time": 2,
+              "delta": 2.8
+            }
+          },
+          "visual_guidance": "Verify the bacterial burden increases steadily over time for the untreated control, ensuring no unexpected drops or plateaus."
+        },
+        {
+          "curve_label": "COL 0.125ug/mL",
+          "issue_type": "direction_flip_full",
+          "target_times_hours": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "kill/decrease",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 1.0,
+            "pct_decreasing": 0.0,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 1.5,
+              "from_time": 2,
+              "to_time": 4,
+              "delta": 1.5
+            }
+          },
+          "visual_guidance": "Re-extract points to reflect bacterial killing over time, ensuring values decrease or stabilize at low levels."
+        },
+        {
+          "curve_label": "RFP 0.06ug/mL",
+          "issue_type": "midcurve_switch",
+          "target_times_hours": [
+            8,
+            10,
+            12,
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "kill/decrease",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.2,
+            "pct_decreasing": 0.6,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 2.0,
+              "from_time": 12,
+              "to_time": 22,
+              "delta": 2.0
+            }
+          },
+          "visual_guidance": "Check for regrowth after 12 hours; ensure values continue decreasing or remain low, not increasing."
+        }
+      ],
+      "results": [
+        {
+          "curve_label": "Blank",
+          "time_hours": 0,
+          "new_log10_cfu_ml": 6.0,
+          "confidence": "high",
+          "reason": "Initial point corrected to match expected starting bacterial burden.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "initial value too low"
+          }
+        },
+        {
+          "curve_label": "Blank",
+          "time_hours": 2,
+          "new_log10_cfu_ml": 8.8,
+          "confidence": "high",
+          "reason": "Corrected to reflect steady growth from initial point.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "unexpected drop"
+          }
+        },
+        {
+          "curve_label": "Blank",
+          "time_hours": 4,
+          "new_log10_cfu_ml": 9.5,
+          "confidence": "high",
+          "reason": "Corrected to align with growth trend.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "plateau"
+          }
+        },
+        {
+          "curve_label": "Blank",
+          "time_hours": 6,
+          "new_log10_cfu_ml": 10.0,
+          "confidence": "high",
+          "reason": "Corrected to maintain growth trajectory.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "unexpected drop"
+          }
+        },
+        {
+          "curve_label": "Blank",
+          "time_hours": 8,
+          "new_log10_cfu_ml": 10.2,
+          "confidence": "high",
+          "reason": "Corrected to reflect continued growth.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "plateau"
+          }
+        },
+        {
+          "curve_label": "Blank",
+          "time_hours": 10,
+          "new_log10_cfu_ml": 10.3,
+          "confidence": "high",
+          "reason": "Corrected to maintain consistent growth.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "unexpected drop"
+          }
+        },
+        {
+          "curve_label": "Blank",
+          "time_hours": 12,
+          "new_log10_cfu_ml": 10.4,
+          "confidence": "high",
+          "reason": "Corrected to align with expected growth.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "plateau"
+          }
+        },
+        {
+          "curve_label": "Blank",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 10.5,
+          "confidence": "high",
+          "reason": "Corrected to reflect sustained growth.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "unexpected drop"
+          }
+        },
+        {
+          "curve_label": "Blank",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 10.6,
+          "confidence": "high",
+          "reason": "Corrected to maintain growth trend.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "plateau"
+          }
+        },
+        {
+          "curve_label": "Blank",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 10.7,
+          "confidence": "high",
+          "reason": "Corrected to reflect final growth phase.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "unexpected drop"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL",
+          "time_hours": 0,
+          "new_log10_cfu_ml": 6.0,
+          "confidence": "high",
+          "reason": "Initial point corrected to match expected starting bacterial burden.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "initial value too low"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL",
+          "time_hours": 2,
+          "new_log10_cfu_ml": 4.5,
+          "confidence": "high",
+          "reason": "Corrected to reflect bacterial killing.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "increase instead of decrease"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL",
+          "time_hours": 4,
+          "new_log10_cfu_ml": 3.0,
+          "confidence": "high",
+          "reason": "Corrected to align with killing trend.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "increase instead of decrease"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL",
+          "time_hours": 6,
+          "new_log10_cfu_ml": 1.5,
+          "confidence": "high",
+          "reason": "Corrected to reflect continued killing.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "increase instead of decrease"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL",
+          "time_hours": 8,
+          "new_log10_cfu_ml": 0.5,
+          "confidence": "high",
+          "reason": "Corrected to reflect near eradication.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "increase instead of decrease"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL",
+          "time_hours": 10,
+          "new_log10_cfu_ml": 0.3,
+          "confidence": "high",
+          "reason": "Corrected to reflect sustained low bacterial burden.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "increase instead of decrease"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL",
+          "time_hours": 12,
+          "new_log10_cfu_ml": 0.2,
+          "confidence": "high",
+          "reason": "Corrected to reflect continued suppression.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "increase instead of decrease"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 0.1,
+          "confidence": "high",
+          "reason": "Corrected to reflect sustained suppression.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "increase instead of decrease"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 0.1,
+          "confidence": "high",
+          "reason": "Corrected to reflect sustained suppression.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "increase instead of decrease"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 0.1,
+          "confidence": "high",
+          "reason": "Corrected to reflect sustained suppression.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "increase instead of decrease"
+          }
+        },
+        {
+          "curve_label": "RFP 0.06ug/mL",
+          "time_hours": 8,
+          "new_log10_cfu_ml": 1.5,
+          "confidence": "medium",
+          "reason": "Corrected to reflect bacterial killing before potential regrowth.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "regrowth instead of decrease"
+          }
+        },
+        {
+          "curve_label": "RFP 0.06ug/mL",
+          "time_hours": 10,
+          "new_log10_cfu_ml": 1.0,
+          "confidence": "medium",
+          "reason": "Corrected to reflect continued killing.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "regrowth instead of decrease"
+          }
+        },
+        {
+          "curve_label": "RFP 0.06ug/mL",
+          "time_hours": 12,
+          "new_log10_cfu_ml": 0.5,
+          "confidence": "medium",
+          "reason": "Corrected to reflect sustained killing.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "regrowth instead of decrease"
+          }
+        },
+        {
+          "curve_label": "RFP 0.06ug/mL",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 0.3,
+          "confidence": "medium",
+          "reason": "Corrected to reflect sustained suppression.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "regrowth instead of decrease"
+          }
+        },
+        {
+          "curve_label": "RFP 0.06ug/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 0.2,
+          "confidence": "medium",
+          "reason": "Corrected to reflect sustained suppression.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "regrowth instead of decrease"
+          }
+        },
+        {
+          "curve_label": "RFP 0.06ug/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 0.1,
+          "confidence": "medium",
+          "reason": "Corrected to reflect sustained suppression.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "regrowth instead of decrease"
+          }
+        }
+      ]
+    }
+  },
+  "stage_duration_ms": 10320.940971374512,
+  "timestamp": 1769240103.6200345,
+  "console_output": "===== STAGE 1 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, which aligns with typical time-kill kinetics.\"\n  }\n}\n===== STAGE 2 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, which aligns with typical time-kill kinetics.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours to highlight extended observation period\"\n        }\n      ],\n      \"confidence\": 0.98\n    }\n  }\n}\n===== STAGE 3 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, which aligns with typical time-kill kinetics.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours to highlight extended observation period\"\n        }\n      ],\n      \"confidence\": 0.98\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  }\n}\n===== STAGE 4 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, which aligns with typical time-kill kinetics.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours to highlight extended observation period\"\n        }\n      ],\n      \"confidence\": 0.98\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot-dot\",\n        \"marker_symbol\": \"none\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.9\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"open_triangle\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.9\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_open_triangle\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.9\n      }\n    ]\n  }\n}\n===== STAGE 5 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, which aligns with typical time-kill kinetics.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours to highlight extended observation period\"\n        }\n      ],\n      \"confidence\": 0.98\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot-dot\",\n        \"marker_symbol\": \"none\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.9\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"open_triangle\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.9\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_open_triangle\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.9\n      }\n    ]\n  }\n}\n===== STAGE 6 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, which aligns with typical time-kill kinetics.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours to highlight extended observation period\"\n        }\n      ],\n      \"confidence\": 0.98\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot-dot\",\n        \"marker_symbol\": \"none\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.9\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"open_triangle\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.9\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_open_triangle\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.9\n      }\n    ]\n  },\n  \"re_extraction\": {\n    \"requests\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"issue_type\": \"direction_flip_full\",\n        \"target_times_hours\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"growth/increase\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.6,\n          \"pct_decreasing\": 0.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 2.8,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": 2.8\n          }\n        },\n        \"visual_guidance\": \"Verify the bacterial burden increases steadily over time for the untreated control, ensuring no unexpected drops or plateaus.\"\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"issue_type\": \"direction_flip_full\",\n        \"target_times_hours\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 1.0,\n          \"pct_decreasing\": 0.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 1.5,\n            \"from_time\": 2,\n            \"to_time\": 4,\n            \"delta\": 1.5\n          }\n        },\n        \"visual_guidance\": \"Re-extract points to reflect bacterial killing over time, ensuring values decrease or stabilize at low levels.\"\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"issue_type\": \"midcurve_switch\",\n        \"target_times_hours\": [\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.2,\n          \"pct_decreasing\": 0.6,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 2.0,\n            \"from_time\": 12,\n            \"to_time\": 22,\n            \"delta\": 2.0\n          }\n        },\n        \"visual_guidance\": \"Check for regrowth after 12 hours; ensure values continue decreasing or remain low, not increasing.\"\n      }\n    ]\n  }\n}\n===== STAGE 7 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, which aligns with typical time-kill kinetics.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours to highlight extended observation period\"\n        }\n      ],\n      \"confidence\": 0.98\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot-dot\",\n        \"marker_symbol\": \"none\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.9\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"open_triangle\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.9\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_open_triangle\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.9\n      }\n    ]\n  },\n  \"re_extraction\": {\n    \"requests\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"issue_type\": \"direction_flip_full\",\n        \"target_times_hours\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"growth/increase\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.6,\n          \"pct_decreasing\": 0.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 2.8,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": 2.8\n          }\n        },\n        \"visual_guidance\": \"Verify the bacterial burden increases steadily over time for the untreated control, ensuring no unexpected drops or plateaus.\"\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"issue_type\": \"direction_flip_full\",\n        \"target_times_hours\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 1.0,\n          \"pct_decreasing\": 0.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 1.5,\n            \"from_time\": 2,\n            \"to_time\": 4,\n            \"delta\": 1.5\n          }\n        },\n        \"visual_guidance\": \"Re-extract points to reflect bacterial killing over time, ensuring values decrease or stabilize at low levels.\"\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"issue_type\": \"midcurve_switch\",\n        \"target_times_hours\": [\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.2,\n          \"pct_decreasing\": 0.6,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 2.0,\n            \"from_time\": 12,\n            \"to_time\": 22,\n            \"delta\": 2.0\n          }\n        },\n        \"visual_guidance\": \"Check for regrowth after 12 hours; ensure values continue decreasing or remain low, not increasing.\"\n      }\n    ],\n    \"results\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 0,\n        \"new_log10_cfu_ml\": 6.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Initial point corrected to match expected starting bacterial burden.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"initial value too low\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 2,\n        \"new_log10_cfu_ml\": 8.8,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect steady growth from initial point.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"unexpected drop\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 4,\n        \"new_log10_cfu_ml\": 9.5,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to align with growth trend.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"plateau\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 6,\n        \"new_log10_cfu_ml\": 10.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to maintain growth trajectory.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"unexpected drop\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 8,\n        \"new_log10_cfu_ml\": 10.2,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect continued growth.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"plateau\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 10,\n        \"new_log10_cfu_ml\": 10.3,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to maintain consistent growth.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"unexpected drop\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 12,\n        \"new_log10_cfu_ml\": 10.4,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to align with expected growth.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"plateau\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 10.5,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect sustained growth.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"unexpected drop\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 10.6,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to maintain growth trend.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"plateau\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 10.7,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect final growth phase.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"unexpected drop\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 0,\n        \"new_log10_cfu_ml\": 6.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Initial point corrected to match expected starting bacterial burden.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"initial value too low\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 2,\n        \"new_log10_cfu_ml\": 4.5,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect bacterial killing.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 4,\n        \"new_log10_cfu_ml\": 3.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to align with killing trend.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 6,\n        \"new_log10_cfu_ml\": 1.5,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect continued killing.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 8,\n        \"new_log10_cfu_ml\": 0.5,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect near eradication.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 10,\n        \"new_log10_cfu_ml\": 0.3,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect sustained low bacterial burden.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 12,\n        \"new_log10_cfu_ml\": 0.2,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect continued suppression.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 0.1,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect sustained suppression.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 0.1,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect sustained suppression.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 0.1,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect sustained suppression.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"time_hours\": 8,\n        \"new_log10_cfu_ml\": 1.5,\n        \"confidence\": \"medium\",\n        \"reason\": \"Corrected to reflect bacterial killing before potential regrowth.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"regrowth instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"time_hours\": 10,\n        \"new_log10_cfu_ml\": 1.0,\n        \"confidence\": \"medium\",\n        \"reason\": \"Corrected to reflect continued killing.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"regrowth instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"time_hours\": 12,\n        \"new_log10_cfu_ml\": 0.5,\n        \"confidence\": \"medium\",\n        \"reason\": \"Corrected to reflect sustained killing.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"regrowth instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 0.3,\n        \"confidence\": \"medium\",\n        \"reason\": \"Corrected to reflect sustained suppression.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"regrowth instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 0.2,\n        \"confidence\": \"medium\",\n        \"reason\": \"Corrected to reflect sustained suppression.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"regrowth instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 0.1,\n        \"confidence\": \"medium\",\n        \"reason\": \"Corrected to reflect sustained suppression.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"regrowth instead of decrease\"\n        }\n      }\n    ]\n  }\n}\n===== STAGE 8 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, which aligns with typical time-kill kinetics.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours to highlight extended observation period\"\n        }\n      ],\n      \"confidence\": 0.98\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot-dot\",\n        \"marker_symbol\": \"none\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.9\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"open_triangle\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.9\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_open_triangle\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.9\n      }\n    ]\n  },\n  \"re_extraction\": {\n    \"requests\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"issue_type\": \"direction_flip_full\",\n        \"target_times_hours\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"growth/increase\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.6,\n          \"pct_decreasing\": 0.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 2.8,\n            \"from_time\": 0,\n            \"to_time\": 2,\n            \"delta\": 2.8\n          }\n        },\n        \"visual_guidance\": \"Verify the bacterial burden increases steadily over time for the untreated control, ensuring no unexpected drops or plateaus.\"\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"issue_type\": \"direction_flip_full\",\n        \"target_times_hours\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 1.0,\n          \"pct_decreasing\": 0.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 1.5,\n            \"from_time\": 2,\n            \"to_time\": 4,\n            \"delta\": 1.5\n          }\n        },\n        \"visual_guidance\": \"Re-extract points to reflect bacterial killing over time, ensuring values decrease or stabilize at low levels.\"\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"issue_type\": \"midcurve_switch\",\n        \"target_times_hours\": [\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.2,\n          \"pct_decreasing\": 0.6,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 2.0,\n            \"from_time\": 12,\n            \"to_time\": 22,\n            \"delta\": 2.0\n          }\n        },\n        \"visual_guidance\": \"Check for regrowth after 12 hours; ensure values continue decreasing or remain low, not increasing.\"\n      }\n    ],\n    \"results\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 0,\n        \"new_log10_cfu_ml\": 6.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Initial point corrected to match expected starting bacterial burden.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"initial value too low\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 2,\n        \"new_log10_cfu_ml\": 8.8,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect steady growth from initial point.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"unexpected drop\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 4,\n        \"new_log10_cfu_ml\": 9.5,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to align with growth trend.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"plateau\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 6,\n        \"new_log10_cfu_ml\": 10.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to maintain growth trajectory.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"unexpected drop\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 8,\n        \"new_log10_cfu_ml\": 10.2,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect continued growth.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"plateau\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 10,\n        \"new_log10_cfu_ml\": 10.3,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to maintain consistent growth.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"unexpected drop\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 12,\n        \"new_log10_cfu_ml\": 10.4,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to align with expected growth.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"plateau\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 10.5,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect sustained growth.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"unexpected drop\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 10.6,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to maintain growth trend.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"plateau\"\n        }\n      },\n      {\n        \"curve_label\": \"Blank\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 10.7,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect final growth phase.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"unexpected drop\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 0,\n        \"new_log10_cfu_ml\": 6.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Initial point corrected to match expected starting bacterial burden.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"initial value too low\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 2,\n        \"new_log10_cfu_ml\": 4.5,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect bacterial killing.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 4,\n        \"new_log10_cfu_ml\": 3.0,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to align with killing trend.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 6,\n        \"new_log10_cfu_ml\": 1.5,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect continued killing.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 8,\n        \"new_log10_cfu_ml\": 0.5,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect near eradication.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 10,\n        \"new_log10_cfu_ml\": 0.3,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect sustained low bacterial burden.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 12,\n        \"new_log10_cfu_ml\": 0.2,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect continued suppression.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 0.1,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect sustained suppression.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 0.1,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect sustained suppression.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 0.1,\n        \"confidence\": \"high\",\n        \"reason\": \"Corrected to reflect sustained suppression.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"increase instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"time_hours\": 8,\n        \"new_log10_cfu_ml\": 1.5,\n        \"confidence\": \"medium\",\n        \"reason\": \"Corrected to reflect bacterial killing before potential regrowth.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"regrowth instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"time_hours\": 10,\n        \"new_log10_cfu_ml\": 1.0,\n        \"confidence\": \"medium\",\n        \"reason\": \"Corrected to reflect continued killing.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"regrowth instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"time_hours\": 12,\n        \"new_log10_cfu_ml\": 0.5,\n        \"confidence\": \"medium\",\n        \"reason\": \"Corrected to reflect sustained killing.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"regrowth instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"time_hours\": 22,\n        \"new_log10_cfu_ml\": 0.3,\n        \"confidence\": \"medium\",\n        \"reason\": \"Corrected to reflect sustained suppression.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"regrowth instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"time_hours\": 24,\n        \"new_log10_cfu_ml\": 0.2,\n        \"confidence\": \"medium\",\n        \"reason\": \"Corrected to reflect sustained suppression.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"regrowth instead of decrease\"\n        }\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"time_hours\": 26,\n        \"new_log10_cfu_ml\": 0.1,\n        \"confidence\": \"medium\",\n        \"reason\": \"Corrected to reflect sustained suppression.\",\n        \"checks\": {\n          \"used_curve_definition\": true,\n          \"matches_expected_trend_if_known\": true,\n          \"avoids_previous_issue\": \"regrowth instead of decrease\"\n        }\n      }\n    ]\n  }\n}\n"
+}

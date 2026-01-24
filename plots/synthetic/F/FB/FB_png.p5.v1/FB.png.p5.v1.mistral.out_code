@@ -1,0 +1,38 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time1 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu1 = [6.5, 6.7, 6.8, 7.8, 8.2, 8.4, 8.5, 8.6]
+
+time2 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu2 = [6.0, 6.1, 6.0, 6.0, 6.0, 6.0, 6.0, 6.1]
+
+time3 = [0, 2, 4, 6, 8, 10, 12, 24]
+cfu3 = [5.0, 0.7, 0.7, 2.3, 1.7, 1.0, 0.7, 2.0]
+
+# Create plot
+plt.figure(figsize=(6, 5))
+plt.plot(time1, cfu1, 's-', color='black', label='Condition 1', markersize=8, linewidth=1.5)
+plt.plot(time2, cfu2, '^--', color='black', label='Condition 2', markersize=8, linewidth=1.5)
+plt.plot(time3, cfu3, 'o:', color='black', label='Condition 3', markersize=8, linewidth=1.5)
+
+# Axis settings
+plt.xlim(0, 26)
+plt.ylim(1, 10)
+plt.xlabel('Time (hours)', fontsize=12)
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)', fontsize=12)
+plt.yscale('log')
+plt.yticks([1, 2, 4, 6, 8, 10], ['1', '2', '4', '6', '8', '10'], fontsize=10)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24], fontsize=10)
+
+# Grid and layout
+plt.grid(False)
+plt.tight_layout()
+
+# Save plot
+output_dir = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic\F\FB\FB_png.p5.v1"
+os.makedirs(output_dir, exist_ok=True)
+plt.savefig(os.path.join(output_dir, "FB_png-replot.p5.v1.png"), dpi=300, bbox_inches='tight')
+plt.close()

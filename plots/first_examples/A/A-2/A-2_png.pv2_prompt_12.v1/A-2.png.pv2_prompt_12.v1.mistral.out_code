@@ -1,0 +1,82 @@
+import matplotlib.pyplot as plt
+import os
+import numpy as np
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\first_examples/A/A-2\A-2_png.pv2_prompt_12.v1\A-2_png-replot.pv2_prompt_12.v1.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data from marker_facts
+curves_data = [
+    {
+        "label": "Blank",
+        "points": [(0, 6), (2, 9), (4, 10), (6, 12), (8, 13), (10, 14), (12, 14.5), (24, 15), (26, 15.5)],
+        "style": {"color": "#000000", "linestyle": ":", "marker": "x"}
+    },
+    {
+        "label": "COL 0.25µg/mL",
+        "points": [(0, 6), (2, 4.5), (4, 4), (6, 4), (8, 4.5), (10, 4.5), (12, 5), (24, 7), (26, 8)],
+        "style": {"color": "#000000", "linestyle": "-", "marker": "s"}
+    },
+    {
+        "label": "MEM 8µg/mL",
+        "points": [(0, 6), (2, 8), (4, 10), (6, 11), (8, 11.5), (10, 12), (12, 0), (24, 0), (26, 0)],
+        "style": {"color": "#000000", "linestyle": "--", "marker": "o"}
+    },
+    {
+        "label": "MINO 1µg/mL",
+        "points": [(0, 6), (2, 1), (4, 1), (6, 1), (8, 1), (10, 1), (12, 1), (24, 3), (26, 4)],
+        "style": {"color": "#000000", "linestyle": "-", "marker": "^"}
+    },
+    {
+        "label": "RFP 0.06µg/mL",
+        "points": [(0, 6), (2, 9), (4, 10), (6, 11), (8, 11), (10, 11.5), (12, 12), (24, 0), (26, 0)],
+        "style": {"color": "#000000", "linestyle": "--", "marker": "v"}
+    },
+    {
+        "label": "COL 0.25µg/mL + MEM 8µg/mL",
+        "points": [(0, 6), (2, 0), (4, 0), (6, 0), (8, 0), (10, 0), (12, 0), (24, 0), (26, 0)],
+        "style": {"color": "#000000", "linestyle": ":", "marker": "o"}
+    },
+    {
+        "label": "COL 0.25µg/mL + MINO 1µg/mL",
+        "points": [(0, 6), (2, 0), (4, 0), (6, 0), (8, 0), (10, 0), (12, 0), (24, 0), (26, 0)],
+        "style": {"color": "#000000", "linestyle": ":", "marker": "^"}
+    },
+    {
+        "label": "COL 0.25µg/mL + RFP 0.06µg/mL",
+        "points": [(0, 6), (2, 0), (4, 0), (6, 0), (8, 0), (10, 0), (12, 0), (24, 0), (26, 0)],
+        "style": {"color": "#000000", "linestyle": ":", "marker": "v"}
+    }
+]
+
+# Create the plot
+plt.figure(figsize=(8, 6))
+
+# Plot each curve
+for curve in curves_data:
+    x, y = zip(*curve["points"])
+    plt.plot(x, y,
+             color=curve["style"]["color"],
+             linestyle=curve["style"]["linestyle"],
+             marker=curve["style"]["marker"],
+             label=curve["label"])
+
+# Axis labels
+plt.xlabel("Time (h)", fontsize=12)
+plt.ylabel("Log cfu/mL", fontsize=12)
+
+# Axis limits and ticks
+plt.xlim(0, 26)
+plt.ylim(0, 16)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 22, 24, 26])
+plt.yticks([0, 2, 4, 6, 8, 10, 12, 14, 16])
+
+# Axis break indication
+plt.plot([12, 12.5], [16, 15.5], color='black', linewidth=1)
+plt.plot([12, 12.5], [0, 0.5], color='black', linewidth=1)
+
+# Legend
+plt.legend(loc='upper left', fontsize=9)
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)

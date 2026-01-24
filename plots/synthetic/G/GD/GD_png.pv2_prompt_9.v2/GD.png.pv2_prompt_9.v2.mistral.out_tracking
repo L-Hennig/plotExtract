@@ -1,0 +1,100 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/G/GD/GD.png",
+  "prompt_name": "prompt_9",
+  "overall_status": "completed",
+  "validation_status": "yes",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 377,
+      "execution_time_ms": 5274.622440338135,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T14:32:57.642258",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 404,
+      "execution_time_ms": 4234.673261642456,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T14:33:02.919043",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 988,
+      "execution_time_ms": 6181.785106658936,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T14:33:07.155683",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 3312,
+      "execution_time_ms": 13047.6233959198,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T14:33:13.340104",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 417,
+        "columns": [
+          "I will now proceed with the data point extraction following the strict rules provided."
+        ],
+        "axis_labels": [
+          "I will now proceed with the data point extraction following the strict rules provided."
+        ]
+      },
+      "output_length": 9932,
+      "execution_time_ms": 48818.18461418152,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-22T14:33:26.391046",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_5": {
+      "num_columns": 1,
+      "num_rows": 417,
+      "columns": [
+        "I will now proceed with the data point extraction following the strict rules provided."
+      ],
+      "axis_labels": [
+        "I will now proceed with the data point extraction following the strict rules provided."
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 123.007889,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "Yes",
+      "num_points": "Yes",
+      "trend": "Yes"
+    }
+  }
+}

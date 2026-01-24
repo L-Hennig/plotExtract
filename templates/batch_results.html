@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Batch Results</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+    }
+
+    /* Navbar (match other pages) */
+    .navbar {
+      background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+      padding: 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .navbar-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .navbar-brand {
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      text-decoration: none;
+      padding: 15px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .navbar-brand:hover { color: #ecf0f1; }
+    .navbar-nav {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: 5px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .nav-link {
+      color: rgba(255,255,255,0.85);
+      text-decoration: none;
+      padding: 12px 20px;
+      display: block;
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 1.1;
+      white-space: nowrap;
+      transition: all 0.2s;
+      border-bottom: 3px solid transparent;
+    }
+    .nav-link:hover { background: rgba(255,255,255,0.1); color: white; }
+    .nav-link.active {
+      color: white;
+      border-bottom-color: #f39c12;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .main-content { padding: 20px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 { color: #333; }
+
+    .panel {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .panel h2 {
+      margin-top: 0;
+      color: #444;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 10px;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 900px) {
+      .meta-grid { grid-template-columns: 1fr; }
+    }
+
+    .kv {
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 12px;
+    }
+    .kv .k { color: #555; font-weight: bold; margin-bottom: 6px; }
+    .kv .v { color: #222; font-family: Consolas, monospace; font-size: 13px; white-space: pre-wrap; }
+
+    .summary-stats {
+      background: #f0f7ff;
+      border: 1px solid #b3d4fc;
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    .summary-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .summary-row:last-child { margin-bottom: 0; }
+    .summary-label {
+      font-weight: bold;
+      color: #333;
+      min-width: 220px;
+    }
+    .summary-value { color: #0066cc; font-weight: 500; }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: #eef2f7;
+      border: 1px solid #d9e1ea;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      vertical-align: top;
+      font-size: 13px;
+    }
+    /* Sticky header should stick within the scroll container, not under the navbar */
+    th {
+      background: #f8f9fa;
+      color: #333;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    .status-success { color: #28a745; font-weight: bold; }
+    .status-failed { color: #dc3545; font-weight: bold; }
+
+    .muted { color: #666; }
+
+    /* Batch Details cards (match extraction pages) */
+    .result-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin: 10px 0;
+      overflow: hidden;
+      background: #fff;
+    }
+    .result-card-header {
+      padding: 10px 12px;
+      background: #f8f9fa;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .result-card-header h4 {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #333;
+      flex-wrap: wrap;
+    }
+    .result-card-toggle { color: #555; }
+    .result-card-body { padding: 12px; }
+    .result-card.collapsed .result-card-body { display: none; }
+    .result-card.collapsed .result-card-toggle { transform: rotate(-90deg); display: inline-block; }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid #ddd;
+    }
+    .status-badge.success { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
+    .status-badge.failed { background: #ffebee; color: #c62828; border-color: #ffcdd2; }
+
+    .result-card-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 900px) {
+      .result-card-stats { grid-template-columns: repeat(2, minmax(140px, 1fr)); }
+    }
+    .result-stat {
+      background: #f8f9fa;
+      border: 1px solid #eee;
+      border-radius: 6px;
+      padding: 10px;
+    }
+    .result-stat-label { color: #555; font-size: 12px; margin-bottom: 4px; }
+    .result-stat-value { color: #111; font-weight: 600; }
+
+    .validation-reason-section {
+      background: #fff7e6;
+      border: 1px solid #ffe2b3;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .validation-reason-label { font-weight: bold; color: #7a4b00; margin-bottom: 4px; }
+    .validation-reason-text { color: #333; white-space: pre-wrap; }
+
+    /* Make the 3 comparison images fill the available width on one row */
+    .result-images-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 10px 0;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .result-images-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 520px) {
+      .result-images-grid { grid-template-columns: 1fr; }
+    }
+    .image-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 100%;
+    }
+    .image-card img {
+      width: 100%;
+      max-height: 520px;
+      object-fit: contain;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #fff;
+    }
+    .image-card img:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.18); }
+    .image-label {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #666;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      background: #e9ecef;
+      color: #222;
+    }
+    .btn:hover { opacity: 0.92; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-small { font-size: 12px; padding: 6px 10px; }
+    .batch-console-output {
+      margin-top: 10px;
+      background: #0b1020;
+      color: #e6edf3;
+      border-radius: 6px;
+      padding: 10px;
+      overflow: auto;
+      max-height: 220px;
+      white-space: pre-wrap;
+    }
+
+    /* Modal (match extraction pages) */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal.active { display: flex; }
+    .modal img {
+      max-width: 95vw;
+      max-height: 95vh;
+      border-radius: 6px;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/batch_results" class="navbar-brand">📚 Batch Results</a>
+      <ul class="navbar-nav">
+        <li><a href="/" class="nav-link">EX 1</a></li>
+        <li><a href="/v2" class="nav-link">EX 2</a></li>
+        <li><a href="/synthetic" class="nav-link">S Gen 1</a></li>
+        <li><a href="/synthetic_v2" class="nav-link">S Gen 2</a></li>
+        <li><a href="/synthetic/editor" class="nav-link">S Editor</a></li>
+        <li><a href="/results" class="nav-link">Results</a></li>
+        <li><a href="/batch_results" class="nav-link active">Batch Results</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="container">
+      <h1>📚 Batch Results</h1>
+
+      <div class="panel">
+        <h2>1. Select Batch</h2>
+        <select id="batchSelect"></select>
+        <div class="muted" style="margin-top: 8px;">Shows historical batches persisted in <span class="pill">batch_runs.json</span>.</div>
+      </div>
+
+      <div class="panel" id="batchMetaPanel" style="display:none;">
+        <h2>2. Batch Metadata</h2>
+        <div class="meta-grid">
+          <div class="kv"><div class="k">Batch</div><div class="v" id="metaBatch"></div></div>
+          <div class="kv"><div class="k">Label</div><div class="v" id="metaName"></div></div>
+          <div class="kv"><div class="k">Status</div><div class="v" id="metaStatus"></div></div>
+          <div class="kv"><div class="k">Extraction Version</div><div class="v" id="metaVersion"></div></div>
+          <div class="kv"><div class="k">Prompt</div><div class="v" id="metaPrompt"></div></div>
+          <div class="kv"><div class="k">Task ID</div><div class="v" id="metaTaskId"></div></div>
+          <div class="kv"><div class="k">Created</div><div class="v" id="metaCreated"></div></div>
+        </div>
+      </div>
+
+      <div class="panel" id="batchAggPanel" style="display:none;">
+        <h2>3. Aggregates</h2>
+        <div class="summary-stats" id="aggStats"></div>
+      </div>
+
+      <div class="panel" id="batchItemsPanel" style="display:none;">
+        <h2>4. Per-Plot Results</h2>
+        <div class="muted">Matches the batch summary fields used in the extraction pages.</div>
+        <div style="overflow:auto; max-height: 70vh; border:1px solid #eee; border-radius:6px;">
+          <table>
+            <thead>
+              <tr>
+                <th>Plot</th>
+                <th>Status</th>
+                <th>Validation</th>
+                <th>Reasons</th>
+                <th>Precision</th>
+                <th>Recall</th>
+                <th>Interp MAE</th>
+                <th>Pointwise MAE X</th>
+                <th>Pointwise MAE Y</th>
+                <th>Time (s)</th>
+              </tr>
+            </thead>
+            <tbody id="itemsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel" id="batchDetailsPanel" style="display:none;">
+        <h2>5. Details</h2>
+        <div class="muted">Same layout as the batch <span class="pill">Details</span> tab in the extraction pages.</div>
+        <div style="margin-top: 10px;">
+          <button class="btn" onclick="expandAllCards()">Expand All</button>
+          <button class="btn" onclick="collapseAllCards()">Collapse All</button>
+        </div>
+        <div id="batchResultCards" style="margin-top: 10px;"><p class="muted">Select a batch to load details.</p></div>
+      </div>
+
+      <div class="panel" id="errorPanel" style="display:none;">
+        <h2>Error</h2>
+        <pre id="errorText" style="white-space: pre-wrap;"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Modal -->
+  <div id="imageModal" class="modal" onclick="closeModal()">
+    <img id="modalImg" src="" alt="" />
+  </div>
+
+  <script>
+    function fmtTs(ts) {
+      if (!ts) return '';
+      try {
+        const d = new Date(ts * 1000);
+        return d.toLocaleString();
+      } catch {
+        return String(ts);
+      }
+    }
+
+    function fmtNum(val, digits = 2) {
+      if (val === null || val === undefined || Number.isNaN(val)) return '';
+      const n = Number(val);
+      if (!Number.isFinite(n)) return '';
+      return n.toFixed(digits);
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    }
+
+    async function loadBatchList() {
+      const select = document.getElementById('batchSelect');
+      select.innerHTML = '<option value="">Loading batches...</option>';
+
+      const res = await fetch('/api/batch_runs', { cache: 'no-store' });
+      const data = await res.json();
+      const batches = data.batches || [];
+
+      if (!batches.length) {
+        select.innerHTML = '<option value="">No batch runs found</option>';
+        return;
+      }
+
+      select.innerHTML = '<option value="">-- Choose a batch --</option>';
+      for (const b of batches) {
+        const nm = String(b.batch_name || '').trim();
+        const label = nm
+          ? `#${b.batch_number} · ${nm} · ${b.extraction_version || ''} · ${b.prompt || ''} · ${b.status || ''} · ${b.num_images || 0} plots`
+          : `#${b.batch_number} · ${b.extraction_version || ''} · ${b.prompt || ''} · ${b.status || ''} · ${b.num_images || 0} plots`;
+        const opt = document.createElement('option');
+        opt.value = String(b.batch_number);
+        opt.textContent = label;
+        select.appendChild(opt);
+      }
+    }
+
+    function showError(err) {
+      document.getElementById('errorPanel').style.display = 'block';
+      document.getElementById('errorText').textContent = (err && err.stack) ? err.stack : String(err);
+    }
+
+    function clearPanels() {
+      document.getElementById('errorPanel').style.display = 'none';
+      document.getElementById('batchMetaPanel').style.display = 'none';
+      document.getElementById('batchAggPanel').style.display = 'none';
+      document.getElementById('batchItemsPanel').style.display = 'none';
+      document.getElementById('itemsTbody').innerHTML = '';
+      document.getElementById('aggStats').innerHTML = '';
+    }
+
+    function renderAggregates(aggregates) {
+      const agg = aggregates || {};
+      const mean = agg.mean || {};
+      const vf = agg.validation_fraction || {};
+      const reasons = agg.validation_reason_counts || {};
+
+      const reasonsText = Object.keys(reasons).length
+        ? Object.entries(reasons).map(([k,v]) => `${k}: ${v}`).join(' · ')
+        : '';
+
+      const rows = [
+        { k: 'Plots', v: `${agg.count_total ?? ''}` },
+        { k: 'Failed', v: `${agg.count_failed ?? ''}` },
+        { k: 'Validation Success', v: `${vf.successful ?? ''}/${vf.total ?? ''}` },
+        { k: 'Mean Precision', v: mean.precision_percent != null ? `${fmtNum(mean.precision_percent, 2)}%` : '' },
+        { k: 'Mean Recall', v: mean.recall_percent != null ? `${fmtNum(mean.recall_percent, 2)}%` : '' },
+        { k: 'Mean Interp MAE', v: mean.interpolation_mae != null ? fmtNum(mean.interpolation_mae, 4) : '' },
+        { k: 'Mean Pointwise MAE X', v: mean.pointwise_mae_x_percent != null ? `${fmtNum(mean.pointwise_mae_x_percent, 2)}%` : '' },
+        { k: 'Mean Pointwise MAE Y', v: mean.pointwise_mae_y_percent != null ? `${fmtNum(mean.pointwise_mae_y_percent, 2)}%` : '' },
+        { k: 'Validation Reasons', v: reasonsText },
+      ];
+
+      const stats = document.getElementById('aggStats');
+      stats.innerHTML = rows.map(r => `
+        <div class="summary-row">
+          <div class="summary-label">${escapeHtml(r.k)}:</div>
+          <div class="summary-value">${escapeHtml(r.v)}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderItems(record) {
+      const tbody = document.getElementById('itemsTbody');
+      tbody.innerHTML = '';
+
+      const items = (record && record.items) ? record.items : [];
+      for (const it of items) {
+        const s = (it.outputs && it.outputs.summary) ? it.outputs.summary : (it.summary || {});
+        const status = it.status || 'pending';
+        const cls = status === 'failed' ? 'status-failed' : (status === 'success' || status === 'completed' ? 'status-success' : '');
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(it.name || it.image_path || '')}<div class="muted">${escapeHtml(it.image_path || '')}</div></td>
+          <td class="${cls}">${escapeHtml(status)}</td>
+          <td>${escapeHtml(s.validation_result || '')}</td>
+          <td>${escapeHtml(s.validation_reason || '')}</td>
+          <td>${escapeHtml(s.precision || '')}</td>
+          <td>${escapeHtml(s.recall || '')}</td>
+          <td>${escapeHtml(s.interpolation_mae ?? '')}</td>
+          <td>${escapeHtml(s.pointwise_mae_x || '')}</td>
+          <td>${escapeHtml(s.pointwise_mae_y || '')}</td>
+          <td>${escapeHtml(it.time_s ?? '')}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function toggleCard(id) {
+      const card = document.getElementById('card-' + id);
+      if (card) card.classList.toggle('collapsed');
+    }
+
+    function expandAllCards() {
+      document.querySelectorAll('.result-card').forEach(card => card.classList.remove('collapsed'));
+    }
+
+    function collapseAllCards() {
+      document.querySelectorAll('.result-card').forEach(card => card.classList.add('collapsed'));
+    }
+
+    function toggleBatchConsole(id) {
+      const consoleEl = document.getElementById('console-' + id);
+      if (!consoleEl) return;
+      const btn = consoleEl.previousElementSibling;
+      if (consoleEl.style.display === 'none') {
+        consoleEl.style.display = 'block';
+        if (btn) btn.textContent = '📋 Hide Console Output';
+      } else {
+        consoleEl.style.display = 'none';
+        if (btn) btn.textContent = '📋 Show Console Output';
+      }
+    }
+
+    function openModal(src) {
+      const modal = document.getElementById('imageModal');
+      const img = document.getElementById('modalImg');
+      img.src = src;
+      modal.classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('imageModal').classList.remove('active');
+    }
+
+    function renderBatchResultCards(record) {
+      const container = document.getElementById('batchResultCards');
+      const items = (record && record.items) ? record.items : [];
+
+      if (!items.length) {
+        container.innerHTML = '<p class="muted">No results yet.</p>';
+        return;
+      }
+
+      container.innerHTML = items.map((it, idx) => {
+        const id = String(it.task_id || it.image_path || idx).replace(/[^a-zA-Z0-9]/g, '_');
+        const status = it.status || 'pending';
+
+        const consoleText = it.console || '';
+        const outputs = it.outputs || {};
+        const summary = outputs.summary || it.summary || {};
+
+        if (status === 'failed') {
+          return `
+            <div class="result-card" id="card-${id}">
+              <div class="result-card-header" onclick="toggleCard('${id}')">
+                <h4>
+                  <span>#${idx + 1}</span>
+                  <span>${escapeHtml(it.name || it.image_path || '')}</span>
+                  <span class="status-badge failed">Failed</span>
+                </h4>
+                <span class="result-card-toggle">▼</span>
+              </div>
+              <div class="result-card-body">
+                <div class="validation-reason-section" style="background:#ffebee; border-color:#ffcdd2;">
+                  <div class="validation-reason-label" style="color:#c62828;">Error</div>
+                  <div class="validation-reason-text">${escapeHtml(it.error || 'Unknown error')}</div>
+                </div>
+                ${consoleText ? `
+                  <div class="batch-console-section">
+                    <button class="btn btn-small" onclick="event.stopPropagation(); toggleBatchConsole('${id}')">📋 Show Console Output</button>
+                    <pre class="batch-console-output" id="console-${id}" style="display:none;">${escapeHtml(consoleText)}</pre>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }
+
+        let statsHtml = '<div class="result-card-stats">';
+
+        if (summary.validation_result) {
+          statsHtml += `
+            <div class="result-stat">
+              <div class="result-stat-label">Validation</div>
+              <div class="result-stat-value" style="color: ${summary.validation_result === 'Yes' ? '#28a745' : '#dc3545'}">${escapeHtml(summary.validation_result)}</div>
+            </div>
+          `;
+        }
+
+        if (summary.interpolation_mae != null) {
+          const v = (typeof summary.interpolation_mae === 'number') ? summary.interpolation_mae.toFixed(4) : String(summary.interpolation_mae);
+          statsHtml += `
+            <div class="result-stat">
+              <div class="result-stat-label">Interp. MAE</div>
+              <div class="result-stat-value">${escapeHtml(v)}</div>
+            </div>
+          `;
+        }
+
+        if (summary.precision) {
+          statsHtml += `
+            <div class="result-stat">
+              <div class="result-stat-label">Precision</div>
+              <div class="result-stat-value">${escapeHtml(summary.precision)}</div>
+            </div>
+            <div class="result-stat">
+              <div class="result-stat-label">Recall</div>
+              <div class="result-stat-value">${escapeHtml(summary.recall)}</div>
+            </div>
+          `;
+        }
+
+        if (summary.pointwise_mae_x) {
+          statsHtml += `
+            <div class="result-stat">
+              <div class="result-stat-label">MAE X</div>
+              <div class="result-stat-value">${escapeHtml(summary.pointwise_mae_x)}</div>
+            </div>
+            <div class="result-stat">
+              <div class="result-stat-label">MAE Y</div>
+              <div class="result-stat-value">${escapeHtml(summary.pointwise_mae_y)}</div>
+            </div>
+          `;
+        }
+
+        statsHtml += '</div>';
+
+        let validationReasonHtml = '';
+        if (summary.validation_reason) {
+          validationReasonHtml = `
+            <div class="validation-reason-section">
+              <div class="validation-reason-label">Validation Reason:</div>
+              <div class="validation-reason-text">${escapeHtml(summary.validation_reason)}</div>
+            </div>
+          `;
+        }
+
+        let imagesHtml = '';
+        const images = outputs.images || [];
+        const filteredImages = images.filter(img =>
+          (img.filename || '').startsWith('comparison_') ||
+          (img.filename || '').startsWith('interpolated_') ||
+          (img.filename || '').startsWith('pointwise_')
+        );
+
+        if (filteredImages.length > 0) {
+          imagesHtml = '<div class="result-images-grid">' + filteredImages.map(img => `
+            <div class="image-card">
+              <img src="/plots/${img.path}" onclick="openModal('/plots/${img.path}')" title="${escapeHtml(img.filename || '')}">
+              <div class="image-label">${escapeHtml(img.label || '')}</div>
+            </div>
+          `).join('') + '</div>';
+        }
+
+        let consoleHtml = '';
+        if (consoleText) {
+          consoleHtml = `
+            <div class="batch-console-section">
+              <button class="btn btn-small" onclick="event.stopPropagation(); toggleBatchConsole('${id}')">📋 Show Console Output</button>
+              <pre class="batch-console-output" id="console-${id}" style="display:none;">${escapeHtml(consoleText)}</pre>
+            </div>
+          `;
+        }
+
+        const timeText = (it.time_s != null && it.time_s !== '') ? `(${escapeHtml(String(it.time_s))}s)` : '';
+
+        return `
+          <div class="result-card" id="card-${id}">
+            <div class="result-card-header" onclick="toggleCard('${id}')">
+              <h4>
+                <span>#${idx + 1}</span>
+                <span>${escapeHtml(it.name || it.image_path || '')}</span>
+                <span class="status-badge success">Success</span>
+                <span style="color:#666; font-weight: normal;">${timeText}</span>
+              </h4>
+              <span class="result-card-toggle">▼</span>
+            </div>
+            <div class="result-card-body">
+              ${statsHtml}
+              ${validationReasonHtml}
+              ${imagesHtml}
+              ${consoleHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function loadBatchDetail(batchNumber) {
+      clearPanels();
+      if (!batchNumber) return;
+
+      const res = await fetch(`/api/batch_runs/${batchNumber}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`Failed to load batch #${batchNumber} (${res.status})`);
+      const data = await res.json();
+
+      const record = data.record;
+      const aggregates = data.aggregates;
+
+      document.getElementById('batchMetaPanel').style.display = 'block';
+      document.getElementById('batchAggPanel').style.display = 'block';
+      document.getElementById('batchItemsPanel').style.display = 'block';
+      document.getElementById('batchDetailsPanel').style.display = 'block';
+
+      document.getElementById('metaBatch').textContent = `#${record.batch_number}`;
+      document.getElementById('metaName').textContent = (record.batch_name && String(record.batch_name).trim()) ? String(record.batch_name).trim() : '';
+      document.getElementById('metaStatus').textContent = record.status || '';
+      document.getElementById('metaVersion').textContent = record.extraction_version || '';
+      document.getElementById('metaPrompt').textContent = record.prompt || '';
+      document.getElementById('metaTaskId').textContent = record.task_id || '';
+      document.getElementById('metaCreated').textContent = fmtTs(record.created_at);
+
+      renderAggregates(aggregates);
+      renderItems(record);
+      renderBatchResultCards(record);
+    }
+
+    (async () => {
+      try {
+        await loadBatchList();
+        document.getElementById('batchSelect').addEventListener('change', async (e) => {
+          try {
+            await loadBatchDetail(e.target.value);
+          } catch (err) {
+            showError(err);
+          }
+        });
+      } catch (err) {
+        showError(err);
+      }
+    })();
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModal();
+    });
+  </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Synthetic Time-Kill Plot Generator</title>
+    <title>{{ page_title or 'Synthetic Time-Kill Plot Generator' }}</title>
     <style>
         /* =================================================================
            Base Styles
@@ -34,6 +34,8 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 20px;
+            flex-wrap: wrap;
+            gap: 6px;
         }
         .navbar-brand {
             color: white;
@@ -54,13 +56,18 @@
             margin: 0;
             padding: 0;
             gap: 5px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
         .nav-link {
             color: rgba(255,255,255,0.85);
             text-decoration: none;
-            padding: 15px 20px;
+            padding: 12px 20px;
             display: block;
             font-weight: 500;
+            font-size: 14px;
+            line-height: 1.1;
+            white-space: nowrap;
             transition: all 0.2s;
             border-bottom: 3px solid transparent;
         }
@@ -72,6 +79,12 @@
             color: white;
             border-bottom-color: #f39c12;
             background: rgba(255,255,255,0.1);
+        }
+
+        @media (max-width: 900px) {
+            .navbar-container { padding: 0 10px; }
+            .navbar-brand { font-size: 20px; padding: 10px 0; }
+            .nav-link { padding: 10px 14px; font-size: 13px; line-height: 1.1; }
         }
         
         .main-content {
@@ -482,16 +495,18 @@
         <div class="navbar-container">
             <a href="/" class="navbar-brand">📊 PlotExtract</a>
             <ul class="navbar-nav">
-                <li><a href="/" class="nav-link">🔬 Extraction</a></li>
-                <li><a href="/synthetic" class="nav-link active">🧫 Synthetic Generator</a></li>
-                <li><a href="/synthetic/editor" class="nav-link">✏️ Synthetic Editor</a></li>
-                <li><a href="/results" class="nav-link">📈 Results Comparison</a></li>
+                <li><a href="/" class="nav-link">EX 1</a></li>
+                <li><a href="/v2" class="nav-link">EX 2</a></li>
+                <li><a href="/synthetic" class="nav-link {% if active_tab == 'synthetic' %}active{% endif %}">S Gen 1</a></li>
+                <li><a href="/synthetic_v2" class="nav-link {% if active_tab == 'synthetic_v2' %}active{% endif %}">S Gen 2</a></li>
+                <li><a href="/synthetic/editor" class="nav-link">S Editor</a></li>
+                <li><a href="/results" class="nav-link">Results</a></li>
             </ul>
         </div>
     </nav>
     
     <div class="main-content">
-    <h1>🧫 Synthetic Time-Kill Plot Generator</h1>
+    <h1>{{ page_title or '🧫 Synthetic Time-Kill Plot Generator' }}</h1>
     
     <div class="container">
         <!-- =================================================================
@@ -745,7 +760,8 @@
         let currentCurves = [];
         let currentPreviewData = null;
         
-        const SAVE_HISTORY_KEY = 'syntheticGeneratorSaveHistory';
+        const API_PREFIX = '{{ api_prefix or "/synthetic" }}';
+        const SAVE_HISTORY_KEY = '{{ save_history_key or "syntheticGeneratorSaveHistory" }}';
         const MAX_HISTORY_ITEMS = 5;
         
         // =================================================================
@@ -801,7 +817,7 @@
         }
         
         function loadSettings() {
-            fetch('/synthetic/get_settings')
+            fetch(`${API_PREFIX}/get_settings`)
                 .then(res => res.json())
                 .then(settings => {
                     applySettings(settings);
@@ -904,7 +920,7 @@
         function updateCurveCount() {
             const numCurves = parseInt(document.getElementById('numCurves').value);
             
-            fetch('/synthetic/update_curves', {
+            fetch(`${API_PREFIX}/update_curves`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ num_curves: numCurves })
@@ -1183,7 +1199,7 @@
             console.log('axis_break_end:', settings.axis_break_end);
             console.log('Full settings:', settings);
             
-            fetch('/synthetic/preview', {
+            fetch(`${API_PREFIX}/preview`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(settings)
@@ -1209,7 +1225,7 @@
             
             const settings = gatherSettings();
             
-            fetch('/synthetic/regenerate', {
+            fetch(`${API_PREFIX}/regenerate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(settings)
@@ -1243,7 +1259,7 @@
             
             const settings = gatherSettings();
             
-            fetch('/synthetic/save', {
+            fetch(`${API_PREFIX}/save`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(settings)
@@ -1281,7 +1297,7 @@
         function resetSettings() {
             if (!confirm('Reset all settings to defaults?')) return;
             
-            fetch('/synthetic/reset', {
+            fetch(`${API_PREFIX}/reset`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
             })

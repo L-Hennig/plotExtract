@@ -1,0 +1,63 @@
+# Per-curve statistics
+
+Curve 'Condition 1' -> 'log10 CFU/mL (Condition 1)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 2.54
+  Precision: 0.8889
+  Recall: 1.0000
+  MatchedPairs: 8
+  Extra extracted (unmatched): 1
+  Missed original (not found): 0
+
+Curve 'Condition 2' -> 'log10 CFU/mL (Condition 5)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 2.72
+  Precision: 0.1429
+  Recall: 0.1250
+  MatchedPairs: 1
+  Extra extracted (unmatched): 6
+  Missed original (not found): 7
+
+Curve 'Condition 3' -> 'log10 CFU/mL (Condition 3)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 1.97
+  Precision: 0.8000
+  Recall: 0.5000
+  MatchedPairs: 4
+  Extra extracted (unmatched): 1
+  Missed original (not found): 4
+
+Curve 'Condition 4' -> 'log10 CFU/mL (Condition 4)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 1.48
+  Precision: 0.6154
+  Recall: 1.0000
+  MatchedPairs: 8
+  Extra extracted (unmatched): 5
+  Missed original (not found): 0
+
+Curve 'Condition 5' -> 'log10 CFU/mL (Condition 2)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 0.03
+  Precision: 0.0769
+  Recall: 0.1250
+  MatchedPairs: 1
+  Extra extracted (unmatched): 12
+  Missed original (not found): 7
+
+Curve 'Condition 6' -> 'log10 CFU/mL (Condition 6)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 1.53
+  Precision: 0.1538
+  Recall: 0.2500
+  MatchedPairs: 2
+  Extra extracted (unmatched): 11
+  Missed original (not found): 6
+
+# Summary
+Number of curves: 6
+Mean MAE X (percent): 0.00
+Mean MAE Y (percent): 1.71
+Mean Precision: 0.4463
+Mean Recall: 0.5000
+Threshold (MAX_NORM_DIST): 0.1

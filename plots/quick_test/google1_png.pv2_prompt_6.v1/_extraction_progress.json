@@ -1,0 +1,259 @@
+{
+  "status": "complete",
+  "stage": "COMPLETE",
+  "stage_index": 4,
+  "total_stages": 4,
+  "percentage": 100.0,
+  "accumulated_facts": {
+    "article_info": {
+      "experimental_context": {
+        "assay_type": "time-kill assay"
+      },
+      "axis_definitions": {
+        "x_axis": {
+          "quantity": "time",
+          "unit": "hours"
+        },
+        "y_axis": {
+          "quantity": "CFU/mL",
+          "scale": "log"
+        }
+      },
+      "curve_legend": [
+        {
+          "curve_label": "red"
+        },
+        {
+          "curve_label": "green"
+        },
+        {
+          "curve_label": "purple"
+        },
+        {
+          "curve_label": "yellow"
+        },
+        {
+          "curve_label": "blue"
+        }
+      ]
+    },
+    "plot_type_facts": {
+      "declared_in_article_info": true,
+      "visually_verified": true,
+      "plot_type": "time-kill plot",
+      "confidence": 0.9,
+      "reason": "Assay type declared as 'time-kill assay' in article info, and visual verification confirms x-axis as time and y-axis as bacterial counts with multiple curves."
+    },
+    "axis_facts": {
+      "x_axis": {
+        "quantity": "time",
+        "unit": "hours",
+        "discrete": false,
+        "lower_plausible_limit": 0,
+        "upper_plausible_limit": 24,
+        "ticks_verified": [
+          0,
+          4,
+          8,
+          12,
+          16,
+          20,
+          24
+        ],
+        "tick_labels": [
+          "0",
+          "4",
+          "8",
+          "12",
+          "16",
+          "20",
+          "24"
+        ],
+        "breaks": [],
+        "confidence": 0.95
+      },
+      "y_axis": {
+        "quantity": "bacterial burden",
+        "unit": "log10 CFU/mL",
+        "scale": "log10",
+        "upper_plausible_limit": 10,
+        "lower_plausible_limit": 0,
+        "ticks_verified": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "tick_labels": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "breaks": [],
+        "confidence": 0.95
+      }
+    },
+    "marker_facts": {
+      "markers_detected": true,
+      "curves": [
+        {
+          "curve_label": "red",
+          "points": [
+            {
+              "x": 0,
+              "y": 6
+            },
+            {
+              "x": 4,
+              "y": 7
+            },
+            {
+              "x": 8,
+              "y": 8
+            },
+            {
+              "x": 12,
+              "y": 9
+            },
+            {
+              "x": 16,
+              "y": 9
+            },
+            {
+              "x": 20,
+              "y": 9
+            },
+            {
+              "x": 24,
+              "y": 9
+            }
+          ]
+        },
+        {
+          "curve_label": "green",
+          "points": [
+            {
+              "x": 0,
+              "y": 5
+            },
+            {
+              "x": 4,
+              "y": 4
+            },
+            {
+              "x": 8,
+              "y": 5
+            },
+            {
+              "x": 12,
+              "y": 5
+            },
+            {
+              "x": 16,
+              "y": 4
+            },
+            {
+              "x": 20,
+              "y": 3
+            },
+            {
+              "x": 24,
+              "y": 2
+            }
+          ]
+        },
+        {
+          "curve_label": "purple",
+          "points": [
+            {
+              "x": 0,
+              "y": 5
+            },
+            {
+              "x": 4,
+              "y": 2
+            },
+            {
+              "x": 8,
+              "y": 2
+            },
+            {
+              "x": 12,
+              "y": 1
+            },
+            {
+              "x": 16,
+              "y": 1
+            },
+            {
+              "x": 20,
+              "y": 0
+            },
+            {
+              "x": 24,
+              "y": 0
+            }
+          ]
+        },
+        {
+          "curve_label": "yellow",
+          "points": [
+            {
+              "x": 0,
+              "y": 5
+            },
+            {
+              "x": 4,
+              "y": 3
+            },
+            {
+              "x": 8,
+              "y": 2
+            },
+            {
+              "x": 12,
+              "y": 1
+            },
+            {
+              "x": 16,
+              "y": 1
+            }
+          ]
+        },
+        {
+          "curve_label": "blue",
+          "points": [
+            {
+              "x": 0,
+              "y": 5
+            },
+            {
+              "x": 4,
+              "y": 0
+            }
+          ]
+        }
+      ],
+      "csv_output": "time (hours),CFU/mL (red),time (hours),CFU/mL (green),time (hours),CFU/mL (purple),time (hours),CFU/mL (yellow),time (hours),CFU/mL (blue)\n0,6,0,5,0,5,0,5,0,5\n4,7,4,4,4,2,4,3,4,0\n8,8,8,5,8,2,8,2,,\n12,9,12,5,12,1,12,1,,\n16,9,16,4,16,1,16,1,,\n20,9,20,3,20,0,20,,\n24,9,24,2,24,0,,,",
+      "confidence": 0.95
+    }
+  },
+  "stage_duration_ms": 0,
+  "timestamp": 1768966640.5784688,
+  "console_output": "Extraction completed successfully"
+}

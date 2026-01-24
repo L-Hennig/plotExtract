@@ -1,0 +1,200 @@
+```json
+{
+  "re_extraction": {
+    "results": [
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 14,
+        "new_log10_cfu_ml": 8.3,
+        "confidence": "high",
+        "reason": "Truncation at 14 hours corrected by ensuring continuity with the increasing trend.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "Condition 2",
+        "time_hours": 14,
+        "new_log10_cfu_ml": 8.4,
+        "confidence": "high",
+        "reason": "Truncation at 14 hours corrected by ensuring flat trend continuity.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "Condition 4",
+        "time_hours": 14,
+        "new_log10_cfu_ml": 1.6,
+        "confidence": "high",
+        "reason": "Truncation at 14 hours corrected by ensuring continuity with observed pattern.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "Condition 6",
+        "time_hours": 14,
+        "new_log10_cfu_ml": 0.7,
+        "confidence": "high",
+        "reason": "Truncation at 14 hours corrected by ensuring flat trend continuity.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "truncation resolved"
+        }
+      },
+      {
+        "curve_label": "Condition 4",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Re-checked initial point to confirm accurate intercept.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "bad intercept corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 4",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 1.0,
+        "confidence": "high",
+        "reason": "Re-checked initial drop to confirm accurate intercept.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "bad intercept corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 5",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Re-checked initial point to confirm accurate intercept.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "bad intercept corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 5",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 1.5,
+        "confidence": "high",
+        "reason": "Re-checked initial drop to confirm accurate intercept.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "bad intercept corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 6",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Re-checked initial point to confirm accurate intercept.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "bad intercept corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 6",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 1.0,
+        "confidence": "high",
+        "reason": "Re-checked initial drop to confirm accurate intercept.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "bad intercept corrected"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Re-checked initial point to confirm expected kill trend.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": false,
+          "avoids_previous_issue": "direction flip addressed"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 6.8,
+        "confidence": "medium",
+        "reason": "Re-checked point to align with expected kill trend but observed slight increase.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": false,
+          "avoids_previous_issue": "direction ambiguity noted"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 10,
+        "new_log10_cfu_ml": 7.9,
+        "confidence": "medium",
+        "reason": "Re-checked point to align with expected kill trend but observed slight inconsistency.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": false,
+          "avoids_previous_issue": "direction ambiguity noted"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 12,
+        "new_log10_cfu_ml": 7.7,
+        "confidence": "medium",
+        "reason": "Re-checked point to align with expected kill trend but observed slight inconsistency.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": false,
+          "avoids_previous_issue": "direction ambiguity noted"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 14,
+        "new_log10_cfu_ml": 7.6,
+        "confidence": "medium",
+        "reason": "Re-checked point to align with expected kill trend but observed slight inconsistency.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": false,
+          "avoids_previous_issue": "direction ambiguity noted"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 7.8,
+        "confidence": "medium",
+        "reason": "Re-checked point to align with expected kill trend but observed slight inconsistency.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": false,
+          "avoids_previous_issue": "direction ambiguity noted"
+        }
+      }
+    ]
+  }
+}
+```

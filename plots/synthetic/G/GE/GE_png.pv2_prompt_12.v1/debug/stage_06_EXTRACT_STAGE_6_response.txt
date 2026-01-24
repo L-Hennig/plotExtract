@@ -1,0 +1,56 @@
+```json
+{
+  "re_extraction": {
+    "requests": [
+      {
+        "curve_label": "Condition 2",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [0, 2, 4, 24],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.75,
+          "pct_decreasing": 0.25,
+          "baseline_delta_from_median": -2.0,
+          "largest_jump": {"abs_jump": 3.9000000000000004, "from_time": 2.0, "to_time": 4.0, "delta": 3.9000000000000004}
+        },
+        "visual_guidance": "Re-extract points for Condition 2 (black dashed line with triangle markers) ensuring continuity with the expected decreasing trend, avoiding sudden jumps to higher CFU/mL values."
+      },
+      {
+        "curve_label": "Condition 3",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [0, 2, 24],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 1.0,
+          "pct_decreasing": 0.0,
+          "baseline_delta_from_median": -1.6500000000000004,
+          "largest_jump": {"abs_jump": 0.7999999999999998, "from_time": 0.0, "to_time": 2.0, "delta": 0.7999999999999998}
+        },
+        "visual_guidance": "Re-extract points for Condition 3 (black dotted line with circle markers) ensuring the curve follows a decreasing trend, not increasing."
+      },
+      {
+        "curve_label": "Condition 6",
+        "issue_type": "direction_flip_full",
+        "target_times_hours": [0, 2, 24],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 8,
+          "expected_n_points": 8,
+          "times_missing": [],
+          "pct_increasing": 0.8,
+          "pct_decreasing": 0.2,
+          "baseline_delta_from_median": -2.8500000000000014,
+          "largest_jump": {"abs_jump": 2.5, "from_time": 0.0, "to_time": 2.0, "delta": 2.5}
+        },
+        "visual_guidance": "Re-extract points for Condition 6 (black dashed line with square markers) ensuring the curve follows a decreasing trend, not increasing."
+      }
+    ]
+  }
+}
+```

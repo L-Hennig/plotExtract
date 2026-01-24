@@ -1,0 +1,21 @@
+{
+  "axis_facts": {
+    "x_axis": {
+      "quantity": "time",
+      "unit": "hours",
+      "discrete": false,
+      "lower_plausible_limit": 0,
+      "upper_plausible_limit": 26,
+      "ticks_verified": [0, 2, 4, 6, 8, 10, 12, 24],
+      "tick_labels": ["0", "2", "4", "6", "8", "10", "12", "24"],
+      "breaks": [
+        {
+          "start": 12,
+          "end": 24,
+          "reason": "Non-uniform tick spacing observed visually between 12 and 24 hours"
+        }
+      ],
+      "confidence": 0.95
+    }
+  }
+}

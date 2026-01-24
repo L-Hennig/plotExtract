@@ -1,0 +1,199 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\PlotExtract\\plots\\synthetic/G/GE/GE.png",
+  "prompt_name": "prompt_12",
+  "overall_status": "completed",
+  "validation_status": "yes",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 390,
+      "execution_time_ms": 4029.5135974884033,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T19:47:03.352787",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 514,
+      "execution_time_ms": 4716.241836547852,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T19:47:07.389571",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 627,
+      "execution_time_ms": 4340.754985809326,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T19:47:12.108155",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 4179,
+      "execution_time_ms": 16238.491535186768,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T19:47:16.450829",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 86,
+        "columns": [
+          "{"
+        ],
+        "axis_labels": [
+          "{"
+        ]
+      },
+      "output_length": 3601,
+      "execution_time_ms": 22000.15950202942,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T19:47:32.692422",
+      "notes": []
+    },
+    "EXTRACT_STAGE_6": {
+      "stage_name": "EXTRACT_STAGE_6",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 2234,
+      "execution_time_ms": 9684.635162353516,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T19:47:54.709778",
+      "notes": []
+    },
+    "EXTRACT_STAGE_7": {
+      "stage_name": "EXTRACT_STAGE_7",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 3996,
+      "execution_time_ms": 15007.60269165039,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T19:48:04.400356",
+      "notes": []
+    },
+    "EXTRACT_STAGE_8": {
+      "stage_name": "EXTRACT_STAGE_8",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 12,
+        "num_rows": 8,
+        "columns": [
+          "Time (hours)",
+          "log10 CFU/mL (Condition 1)",
+          "Time (hours)",
+          "log10 CFU/mL (Condition 2)",
+          "Time (hours)",
+          "log10 CFU/mL (Condition 3)",
+          "Time (hours)",
+          "log10 CFU/mL (Condition 4)",
+          "Time (hours)",
+          "log10 CFU/mL (Condition 5)",
+          "Time (hours)",
+          "log10 CFU/mL (Condition 6)"
+        ],
+        "axis_labels": [
+          "Time (hours)",
+          "log10 CFU/mL (Condition 1)",
+          "Time (hours)",
+          "log10 CFU/mL (Condition 2)",
+          "Time (hours)",
+          "log10 CFU/mL (Condition 3)",
+          "Time (hours)",
+          "log10 CFU/mL (Condition 4)",
+          "Time (hours)",
+          "log10 CFU/mL (Condition 5)",
+          "Time (hours)",
+          "log10 CFU/mL (Condition 6)"
+        ]
+      },
+      "output_length": 545,
+      "execution_time_ms": 5458.513021469116,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T19:48:19.414441",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_5": {
+      "num_columns": 1,
+      "num_rows": 86,
+      "columns": [
+        "{"
+      ],
+      "axis_labels": [
+        "{"
+      ]
+    },
+    "EXTRACT_STAGE_8": {
+      "num_columns": 12,
+      "num_rows": 8,
+      "columns": [
+        "Time (hours)",
+        "log10 CFU/mL (Condition 1)",
+        "Time (hours)",
+        "log10 CFU/mL (Condition 2)",
+        "Time (hours)",
+        "log10 CFU/mL (Condition 3)",
+        "Time (hours)",
+        "log10 CFU/mL (Condition 4)",
+        "Time (hours)",
+        "log10 CFU/mL (Condition 5)",
+        "Time (hours)",
+        "log10 CFU/mL (Condition 6)"
+      ],
+      "axis_labels": [
+        "Time (hours)",
+        "log10 CFU/mL (Condition 1)",
+        "Time (hours)",
+        "log10 CFU/mL (Condition 2)",
+        "Time (hours)",
+        "log10 CFU/mL (Condition 3)",
+        "Time (hours)",
+        "log10 CFU/mL (Condition 4)",
+        "Time (hours)",
+        "log10 CFU/mL (Condition 5)",
+        "Time (hours)",
+        "log10 CFU/mL (Condition 6)"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 125.113325,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "Yes",
+      "num_points": "Yes",
+      "trend": "Yes"
+    }
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "status": "running",
+  "stage": "EXTRACT_STAGE_5",
+  "stage_index": 4,
+  "total_stages": 5,
+  "percentage": 80.0,
+  "accumulated_facts": {
+    "plot_type_facts": {
+      "declared_in_article_info": "unknown",
+      "visually_verified": true,
+      "plot_type": "time-kill plot",
+      "confidence": 0.9,
+      "reason": "X-axis represents time in hours, Y-axis represents bacterial count (CFU/mL) on a log10 scale, and multiple curves with distinct markers indicate different experimental conditions, consistent with a time-kill assay."
+    },
+    "axis_facts": {
+      "x_axis": {
+        "quantity": "time",
+        "unit": "hours",
+        "discrete": false,
+        "lower_plausible_limit": 0,
+        "upper_plausible_limit": 24,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20,
+          22,
+          24
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "14",
+          "16",
+          "18",
+          "20",
+          "22",
+          "24"
+        ],
+        "breaks": [],
+        "confidence": 0.98
+      },
+      "y_axis": {
+        "quantity": "bacterial count",
+        "unit": "log10 CFU/mL",
+        "scale": "log10",
+        "upper_plausible_limit": 10,
+        "lower_plausible_limit": 0,
+        "ticks_verified": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "tick_labels": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "breaks": [],
+        "grid": {
+          "present": false
+        },
+        "confidence": 0.95
+      }
+    },
+    "curve_style_facts": {
+      "curves": [
+        {
+          "curve_label": "Condition 1",
+          "colour": "black",
+          "line_type": "solid",
+          "marker_symbol": "square",
+          "source": "direct_visual",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "Condition 2",
+          "colour": "black",
+          "line_type": "dashed",
+          "marker_symbol": "triangle",
+          "source": "direct_visual",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "Condition 3",
+          "colour": "black",
+          "line_type": "dotted",
+          "marker_symbol": "circle",
+          "source": "direct_visual",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "Condition 4",
+          "colour": "black",
+          "line_type": "solid",
+          "marker_symbol": "circle",
+          "source": "direct_visual",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "Condition 5",
+          "colour": "black",
+          "line_type": "dotted",
+          "marker_symbol": "inverted_triangle",
+          "source": "direct_visual",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "Condition 6",
+          "colour": "black",
+          "line_type": "dashed",
+          "marker_symbol": "square",
+          "source": "direct_visual",
+          "confidence": 0.95
+        }
+      ]
+    }
+  },
+  "stage_duration_ms": 0,
+  "timestamp": 1769056723.7213378,
+  "console_output": "===== STAGE 1 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"X-axis represents time in hours, Y-axis represents bacterial count (CFU/mL) on a log10 scale, and multiple curves with distinct markers indicate different experimental conditions, consistent with a time-kill assay.\"\n  }\n}\n===== STAGE 2 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"X-axis represents time in hours, Y-axis represents bacterial count (CFU/mL) on a log10 scale, and multiple curves with distinct markers indicate different experimental conditions, consistent with a time-kill assay.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 24,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16,\n        18,\n        20,\n        22,\n        24\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\",\n        \"18\",\n        \"20\",\n        \"22\",\n        \"24\"\n      ],\n      \"breaks\": [],\n      \"confidence\": 0.98\n    }\n  }\n}\n===== STAGE 3 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"X-axis represents time in hours, Y-axis represents bacterial count (CFU/mL) on a log10 scale, and multiple curves with distinct markers indicate different experimental conditions, consistent with a time-kill assay.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 24,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16,\n        18,\n        20,\n        22,\n        24\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\",\n        \"18\",\n        \"20\",\n        \"22\",\n        \"24\"\n      ],\n      \"breaks\": [],\n      \"confidence\": 0.98\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial count\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 10,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        1,\n        2,\n        3,\n        4,\n        5,\n        6,\n        7,\n        8,\n        9,\n        10\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"1\",\n        \"2\",\n        \"3\",\n        \"4\",\n        \"5\",\n        \"6\",\n        \"7\",\n        \"8\",\n        \"9\",\n        \"10\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": false\n      },\n      \"confidence\": 0.95\n    }\n  }\n}\n===== STAGE 4 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"X-axis represents time in hours, Y-axis represents bacterial count (CFU/mL) on a log10 scale, and multiple curves with distinct markers indicate different experimental conditions, consistent with a time-kill assay.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 24,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16,\n        18,\n        20,\n        22,\n        24\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\",\n        \"18\",\n        \"20\",\n        \"22\",\n        \"24\"\n      ],\n      \"breaks\": [],\n      \"confidence\": 0.98\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial count\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 10,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        1,\n        2,\n        3,\n        4,\n        5,\n        6,\n        7,\n        8,\n        9,\n        10\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"1\",\n        \"2\",\n        \"3\",\n        \"4\",\n        \"5\",\n        \"6\",\n        \"7\",\n        \"8\",\n        \"9\",\n        \"10\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": false\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Condition 1\",\n        \"colour\": \"black\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"Condition 2\",\n        \"colour\": \"black\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"Condition 3\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"Condition 4\",\n        \"colour\": \"black\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"Condition 5\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"Condition 6\",\n        \"colour\": \"black\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"direct_visual\",\n        \"confidence\": 0.95\n      }\n    ]\n  }\n}\n"
+}

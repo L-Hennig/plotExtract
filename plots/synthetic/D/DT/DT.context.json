@@ -1,0 +1,85 @@
+{
+  "plot_type": "time-kill plot",
+  "source": "synthetic_generator",
+  "name": "DT",
+  "legend": {
+    "total_curves": 5,
+    "curves": [
+      {
+        "id": "Condition 1",
+        "color": "#000000",
+        "marker": "circle",
+        "line_type": "solid"
+      },
+      {
+        "id": "Condition 2",
+        "color": "#000000",
+        "marker": "square",
+        "line_type": "solid"
+      },
+      {
+        "id": "Condition 3",
+        "color": "#000000",
+        "marker": "triangle_up",
+        "line_type": "solid"
+      },
+      {
+        "id": "Condition 4",
+        "color": "#000000",
+        "marker": "triangle_down",
+        "line_type": "solid"
+      },
+      {
+        "id": "Condition 5",
+        "color": "#000000",
+        "marker": "diamond",
+        "line_type": "solid"
+      }
+    ]
+  },
+  "axes": {
+    "x": {
+      "label": "Time",
+      "units": "hours",
+      "range": {
+        "min": 0.0,
+        "max": 21.0
+      }
+    },
+    "y": {
+      "label": "Bacterial Count",
+      "units": "CFU/mL",
+      "range": {
+        "min": 0.1,
+        "max": 10.0
+      }
+    }
+  },
+  "curves_trends": [
+    {
+      "id": "Condition 1",
+      "trend": "stable",
+      "description": "stable (flat)"
+    },
+    {
+      "id": "Condition 2",
+      "trend": "down",
+      "description": "kill (decreasing)"
+    },
+    {
+      "id": "Condition 3",
+      "trend": "down",
+      "description": "kill (decreasing)"
+    },
+    {
+      "id": "Condition 4",
+      "trend": "kill_regrowth",
+      "description": "kill + regrowth"
+    },
+    {
+      "id": "Condition 5",
+      "trend": "mixed",
+      "description": "mixed"
+    }
+  ]
+}

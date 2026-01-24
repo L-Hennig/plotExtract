@@ -1,0 +1,175 @@
+{
+  "image_path": "C:/Users/Lucas/OneDrive/UCL Internship/PlotExtract/plots/synthetic/G/GA_copy1/GA_copy1.png",
+  "prompt_name": "prompt_12",
+  "overall_status": "completed",
+  "validation_status": "yes",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 384,
+      "execution_time_ms": 4816.305637359619,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T18:14:42.635453",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 404,
+      "execution_time_ms": 3831.4051628112793,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T18:14:47.454450",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 627,
+      "execution_time_ms": 3916.531562805176,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T18:14:51.289533",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 2305,
+      "execution_time_ms": 10348.510265350342,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T18:14:55.209722",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 145,
+        "columns": [
+          "```json"
+        ],
+        "axis_labels": [
+          "```json"
+        ]
+      },
+      "output_length": 3031,
+      "execution_time_ms": 14561.85793876648,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T18:15:05.561840",
+      "notes": []
+    },
+    "EXTRACT_STAGE_6": {
+      "stage_name": "EXTRACT_STAGE_6",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1519,
+      "execution_time_ms": 7303.820610046387,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T18:15:20.131708",
+      "notes": []
+    },
+    "EXTRACT_STAGE_7": {
+      "stage_name": "EXTRACT_STAGE_7",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 2571,
+      "execution_time_ms": 10800.997257232666,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T18:15:27.442204",
+      "notes": []
+    },
+    "EXTRACT_STAGE_8": {
+      "stage_name": "EXTRACT_STAGE_8",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 6,
+        "num_rows": 8,
+        "columns": [
+          "Time (hours)",
+          "log10 CFU/mL (Condition 1)",
+          "Time (hours)",
+          "log10 CFU/mL (Condition 2)",
+          "Time (hours)",
+          "log10 CFU/mL (Condition 3)"
+        ],
+        "axis_labels": [
+          "Time (hours)",
+          "log10 CFU/mL (Condition 1)",
+          "Time (hours)",
+          "log10 CFU/mL (Condition 2)",
+          "Time (hours)",
+          "log10 CFU/mL (Condition 3)"
+        ]
+      },
+      "output_length": 272,
+      "execution_time_ms": 3652.194023132324,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-01-23T18:15:38.250749",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_5": {
+      "num_columns": 1,
+      "num_rows": 145,
+      "columns": [
+        "```json"
+      ],
+      "axis_labels": [
+        "```json"
+      ]
+    },
+    "EXTRACT_STAGE_8": {
+      "num_columns": 6,
+      "num_rows": 8,
+      "columns": [
+        "Time (hours)",
+        "log10 CFU/mL (Condition 1)",
+        "Time (hours)",
+        "log10 CFU/mL (Condition 2)",
+        "Time (hours)",
+        "log10 CFU/mL (Condition 3)"
+      ],
+      "axis_labels": [
+        "Time (hours)",
+        "log10 CFU/mL (Condition 1)",
+        "Time (hours)",
+        "log10 CFU/mL (Condition 2)",
+        "Time (hours)",
+        "log10 CFU/mL (Condition 3)"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 84.438641,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "Yes",
+      "num_points": "Yes",
+      "trend": "Yes"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+Time (hours),log10 CFU/mL (red),Time (hours),log10 CFU/mL (green),Time (hours),log10 CFU/mL (purple),Time (hours),log10 CFU/mL (yellow),Time (hours),log10 CFU/mL (blue)
+0,6,0,5,0,5,0,5,0,5
+4,7,4,4,4,2,4,3,4,0
+8,8,8,5,8,2,8,2,8,
+12,9,12,5,12,1,12,1,12,
+16,9,16,4,16,1,16,1,16,
+20,9,20,3,20,0,20,,20,
+24,9,24,2,24,0,24,,24,

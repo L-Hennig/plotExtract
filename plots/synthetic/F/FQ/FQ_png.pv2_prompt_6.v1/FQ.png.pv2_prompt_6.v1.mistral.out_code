@@ -1,0 +1,79 @@
+import os
+import matplotlib.pyplot as plt
+import numpy as np
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\synthetic/F/FQ\FQ_png.pv2_prompt_6.v1\FQ_png-replot.pv2_prompt_6.v1.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data from marker_facts
+curves_data = [
+    {
+        "label": "Condition 1",
+        "points": [(0, 6.0)],
+        "marker": 's',
+        "linestyle": '-',
+        "color": 'black'
+    },
+    {
+        "label": "Condition 2",
+        "points": [(0, 6.0), (2, 5.8), (4, 8.9), (6, 8.9), (8, 8.9), (10, 8.9), (12, 8.9), (24, 9.2)],
+        "marker": '^',
+        "linestyle": '--',
+        "color": 'black'
+    },
+    {
+        "label": "Condition 3",
+        "points": [(0, 6.0), (2, 2.5), (4, 1.0), (6, 1.0), (8, 1.0), (10, 1.0), (12, 1.0), (24, 1.0)],
+        "marker": 'o',
+        "linestyle": ':',
+        "color": 'black'
+    },
+    {
+        "label": "Condition 4",
+        "points": [(0, 6.0), (2, 1.5), (4, 1.0), (6, 1.0), (8, 1.0), (10, 1.0), (12, 1.0), (24, 1.0)],
+        "marker": 'D',
+        "linestyle": '-',
+        "color": 'black'
+    },
+    {
+        "label": "Condition 5",
+        "points": [(0, 6.0), (2, 3.0), (4, 3.0), (6, 2.8), (8, 2.5), (10, 2.3), (12, 2.2), (14, 2.0), (16, 2.0), (18, 2.0)],
+        "marker": 'o',
+        "linestyle": '-',
+        "color": 'black'
+    },
+    {
+        "label": "Condition 6",
+        "points": [(0, 6.0), (2, 7.0), (4, 9.0), (6, 9.0), (8, 9.0), (10, 9.0), (12, 9.0), (24, 9.0)],
+        "marker": 's',
+        "linestyle": '--',
+        "color": 'black'
+    }
+]
+
+# Create the plot
+plt.figure(figsize=(8, 6))
+
+for curve in curves_data:
+    x_vals, y_vals = zip(*curve["points"])
+    plt.plot(x_vals, y_vals,
+             marker=curve["marker"],
+             linestyle=curve["linestyle"],
+             color=curve["color"],
+             label=curve["label"])
+
+# Set axis labels and limits
+plt.xlabel('Time (hours)')
+plt.ylabel('Bacterial Count (CFU/mL) (log10 scale)')
+plt.xlim(0, 24)
+plt.ylim(0, 10)
+
+# Set ticks
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])
+plt.yticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+# Add legend
+plt.legend()
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)

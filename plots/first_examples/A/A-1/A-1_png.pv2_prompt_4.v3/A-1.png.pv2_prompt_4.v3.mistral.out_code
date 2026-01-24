@@ -1,0 +1,116 @@
+import os
+import matplotlib.pyplot as plt
+import numpy as np
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\PlotExtract\plots\first_examples/A/A-1\A-1_png.pv2_prompt_4.v3\A-1_png-replot.pv2_prompt_4.v3.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data from marker_facts
+curves_data = [
+    {
+        "label": "Blank",
+        "points": [
+            {"x": 0, "y": 6.2}, {"x": 2, "y": 8.5}, {"x": 4, "y": 9.5},
+            {"x": 6, "y": 10.0}, {"x": 8, "y": 10.0}, {"x": 10, "y": 10.5},
+            {"x": 24, "y": 9.5}
+        ],
+        "style": {"color": "#000000", "marker": "x", "linestyle": ":", "linewidth": 1}
+    },
+    {
+        "label": "COL 0.125µg/mL",
+        "points": [
+            {"x": 0, "y": 6.2}, {"x": 2, "y": 7.0}, {"x": 4, "y": 8.0},
+            {"x": 6, "y": 9.0}, {"x": 8, "y": 9.5}, {"x": 10, "y": 10.0},
+            {"x": 12, "y": 10.0}, {"x": 22, "y": 10.0}, {"x": 24, "y": 10.0},
+            {"x": 26, "y": 10.5}
+        ],
+        "style": {"color": "#000000", "marker": "s", "linestyle": "-", "linewidth": 1}
+    },
+    {
+        "label": "MINO 1µg/mL",
+        "points": [
+            {"x": 0, "y": 6.2}, {"x": 2, "y": 7.5}, {"x": 4, "y": 8.5},
+            {"x": 6, "y": 9.0}, {"x": 8, "y": 9.5}, {"x": 10, "y": 9.5},
+            {"x": 12, "y": 9.5}, {"x": 22, "y": 9.0}, {"x": 24, "y": 9.0}
+        ],
+        "style": {"color": "#000000", "marker": "^", "linestyle": "--", "linewidth": 1}
+    },
+    {
+        "label": "MEM 4µg/mL",
+        "points": [
+            {"x": 0, "y": 6.2}, {"x": 2, "y": 8.0}, {"x": 6, "y": 9.5},
+            {"x": 8, "y": 10.0}, {"x": 10, "y": 10.0}, {"x": 12, "y": 10.0},
+            {"x": 22, "y": 10.0}, {"x": 24, "y": 10.0}
+        ],
+        "style": {"color": "#000000", "marker": "o", "linestyle": "-.", "linewidth": 1}
+    },
+    {
+        "label": "RFP 0.06µg/mL",
+        "points": [
+            {"x": 0, "y": 6.2}, {"x": 4, "y": 9.0}, {"x": 6, "y": 9.0}
+        ],
+        "style": {"color": "#000000", "marker": "v", "linestyle": ":", "linewidth": 1}
+    },
+    {
+        "label": "COL 0.125µg/mL + MEM 4µg/mL",
+        "points": [
+            {"x": 0, "y": 6.2}, {"x": 2, "y": 0.5}, {"x": 4, "y": 0.0},
+            {"x": 6, "y": 0.0}, {"x": 8, "y": 0.0}, {"x": 10, "y": 0.0},
+            {"x": 12, "y": 0.0}, {"x": 22, "y": 0.0}, {"x": 24, "y": 0.0}
+        ],
+        "style": {"color": "#000000", "marker": "o", "linestyle": "--", "linewidth": 1}
+    },
+    {
+        "label": "COL 0.125µg/mL + MINO 1µg/mL",
+        "points": [
+            {"x": 0, "y": 6.2}, {"x": 2, "y": 0.5}, {"x": 4, "y": 0.0},
+            {"x": 6, "y": 0.0}, {"x": 8, "y": 0.0}, {"x": 10, "y": 0.0},
+            {"x": 12, "y": 0.0}, {"x": 22, "y": 0.0}, {"x": 24, "y": 0.0}
+        ],
+        "style": {"color": "#000000", "marker": "^", "linestyle": "-.", "linewidth": 1}
+    },
+    {
+        "label": "COL 0.125µg/mL + RFP 0.06µg/mL",
+        "points": [
+            {"x": 0, "y": 6.2}, {"x": 2, "y": 0.5}, {"x": 4, "y": 0.0},
+            {"x": 6, "y": 1.0}, {"x": 8, "y": 2.0}, {"x": 10, "y": 2.0},
+            {"x": 12, "y": 1.0}, {"x": 22, "y": 2.0}, {"x": 24, "y": 2.0}
+        ],
+        "style": {"color": "#000000", "marker": "v", "linestyle": "--", "linewidth": 1}
+    }
+]
+
+# Create the plot
+plt.figure(figsize=(8, 6))
+
+# Plot each curve
+for curve in curves_data:
+    x_vals = [p["x"] for p in curve["points"]]
+    y_vals = [p["y"] for p in curve["points"]]
+    plt.plot(x_vals, y_vals,
+             marker=curve["style"]["marker"],
+             linestyle=curve["style"]["linestyle"],
+             color=curve["style"]["color"],
+             linewidth=curve["style"]["linewidth"],
+             label=curve["label"])
+
+# Axis labels and title
+plt.xlabel("Time (h)", fontsize=12)
+plt.ylabel("Log cfu/mL", fontsize=12)
+plt.title("A", loc="left", fontsize=14, fontweight="bold")
+
+# Axis limits and ticks
+plt.xlim(0, 26)
+plt.ylim(0, 16)
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 22, 24, 26])
+plt.yticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
+
+# Axis break indication
+plt.plot([11.5, 12.5], [16, 16], color='black', linewidth=1)
+plt.plot([11.5, 12.5], [0, 0], color='black', linewidth=1)
+
+# Legend
+plt.legend(loc="upper left", fontsize=9, frameon=False)
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)

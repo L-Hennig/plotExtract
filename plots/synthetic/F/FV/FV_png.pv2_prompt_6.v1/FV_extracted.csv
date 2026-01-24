@@ -1,0 +1,8 @@
+Time (hours),log10 CFU/mL (Condition 1),Time (hours),log10 CFU/mL (Condition 2),Time (hours),log10 CFU/mL (Condition 3),Time (hours),log10 CFU/mL (Condition 4),Time (hours),log10 CFU/mL (Condition 5),Time (hours),log10 CFU/mL (Condition 6)
+0,6.1,0,6.1,0,6.1,0,6.1,0,6.1,0,6.1
+2,8.3,2,7.8,2,1.2,2,8.1,2,3.5,2,3.0
+4,8.5,4,8.0,4,1.0,4,8.2,4,3.8,4,
+6,8.7,6,8.1,6,1.0,6,8.1,6,3.2,6,1.8
+8,9.0,8,8.0,8,1.5,8,8.0,8,3.0,8,
+10,9.0,10,8.0,10,1.5,10,8.0,10,3.0,10,
+24,9.2,24,7.9,24,2.0,24,8.0,24,4.5,24,2.0

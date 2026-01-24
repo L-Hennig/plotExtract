@@ -1,0 +1,12 @@
+Time (hours),Bacterial Count (CFU/mL) (log10 scale) (Condition 1),Time (hours),Bacterial Count (CFU/mL) (log10 scale) (Condition 2),Time (hours),Bacterial Count (CFU/mL) (log10 scale) (Condition 3),Time (hours),Bacterial Count (CFU/mL) (log10 scale) (Condition 4),Time (hours),Bacterial Count (CFU/mL) (log10 scale) (Condition 5)
+0,6.0,0,6.0,0,6.0,0,6.0,0,6.0
+2,7.8,2,6.8,2,1.0,2,6.8,2,3.0
+4,8.3,4,7.2,4,0.8,4,7.3,4,2.8
+6,8.3,6,7.9,6,0.9,6,7.8,6,2.5
+8,8.4,8,8.2,8,0.8,8,8.1,8,2.3
+10,8.3,10,8.1,10,0.9,10,8.0,10,2.2
+12,8.3,12,1.8,12,0.8,12,8.0,12,2.1
+14,8.2,,14,1.6,,14,1.7,,14,2.0
+16,8.2,,16,1.5,,16,1.6,,16,1.5
+20,8.2,,20,1.5,,20,1.5,,20,1.2
+24,8.2,,24,1.6,,24,1.6,,24,1.0

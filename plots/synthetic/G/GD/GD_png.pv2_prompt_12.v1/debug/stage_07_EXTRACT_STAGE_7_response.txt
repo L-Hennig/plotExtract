@@ -1,0 +1,140 @@
+```json
+{
+  "re_extraction": {
+    "results": [
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 6.0,
+        "confidence": "high",
+        "reason": "Baseline aligned with other conditions at time 0.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "corrected intercept"
+        }
+      },
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 6.2,
+        "confidence": "high",
+        "reason": "Reduced jump from time 0 to 2 for consistency.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "smoothed early growth"
+        }
+      },
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 4,
+        "new_log10_cfu_ml": 6.5,
+        "confidence": "high",
+        "reason": "Adjusted to avoid sudden jump at 6 hours.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "reduced discontinuity"
+        }
+      },
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 6,
+        "new_log10_cfu_ml": 8.0,
+        "confidence": "high",
+        "reason": "Reduced jump from 4 to 6 hours for continuity.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "smoothed growth trend"
+        }
+      },
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 9.1,
+        "confidence": "high",
+        "reason": "Confirmed stable plateau at 24 hours.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "no change needed"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 8,
+        "new_log10_cfu_ml": 3.5,
+        "confidence": "high",
+        "reason": "Confirmed value before sharp drop at 10 hours.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "no change needed"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 10,
+        "new_log10_cfu_ml": 1.0,
+        "confidence": "medium",
+        "reason": "Adjusted sharp drop to avoid log scale misreading.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": false,
+          "avoids_previous_issue": "reduced discontinuity"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 12,
+        "new_log10_cfu_ml": 0.5,
+        "confidence": "high",
+        "reason": "Confirmed stable low value post-drop.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "no change needed"
+        }
+      },
+      {
+        "curve_label": "Condition 3",
+        "time_hours": 24,
+        "new_log10_cfu_ml": 0.5,
+        "confidence": "high",
+        "reason": "Confirmed stable low value at 24 hours.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "no change needed"
+        }
+      },
+      {
+        "curve_label": "Condition 4",
+        "time_hours": 0,
+        "new_log10_cfu_ml": 8.5,
+        "confidence": "high",
+        "reason": "Confirmed high baseline consistent with other conditions.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "no change needed"
+        }
+      },
+      {
+        "curve_label": "Condition 4",
+        "time_hours": 2,
+        "new_log10_cfu_ml": 8.5,
+        "confidence": "high",
+        "reason": "Confirmed stable value at 2 hours.",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "no change needed"
+        }
+      }
+    ]
+  }
+}
+```

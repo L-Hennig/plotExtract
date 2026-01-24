@@ -1,0 +1,93 @@
+{
+  "article_info": {
+    "figure_id": "GB",
+    "figure_caption": "Time-kill curves of bacterial count over time under different antibiotic treatments",
+    "experimental_context": {
+      "assay_type": "time-kill assay",
+      "organism": "unknown",
+      "model": "unknown"
+    },
+    "axis_definitions": {
+      "x_axis": {
+        "quantity": "Time",
+        "unit": "hours"
+      },
+      "y_axis": {
+        "quantity": "Bacterial Count",
+        "unit": "Log cfu/mL",
+        "scale": "logarithmic"
+      }
+    },
+    "curve_legend": [
+      {
+        "curve_label": "Blank",
+        "description": "control without treatment (growth expected)",
+        "expected_trend": "growth/increase"
+      },
+      {
+        "curve_label": "COL 0.25µg/mL",
+        "description": "colistin at 0.25 µg/mL (bactericidal or bacteriostatic effect)",
+        "expected_trend": "kill/decrease or stable"
+      },
+      {
+        "curve_label": "MEM 8µg/mL",
+        "description": "meropenem at 8 µg/mL (bactericidal effect)",
+        "expected_trend": "kill/decrease"
+      },
+      {
+        "curve_label": "MINO 1µg/mL",
+        "description": "minocycline at 1 µg/mL (bactericidal or bacteriostatic effect)",
+        "expected_trend": "kill/decrease or stable"
+      },
+      {
+        "curve_label": "RFP 0.06µg/mL",
+        "description": "rifampicin at 0.06 µg/mL (bactericidal or bacteriostatic effect)",
+        "expected_trend": "kill/decrease or stable"
+      },
+      {
+        "curve_label": "COL 0.25µg/mL + MEM 8µg/mL",
+        "description": "combination of colistin and meropenem (enhanced bactericidal effect)",
+        "expected_trend": "kill/decrease"
+      },
+      {
+        "curve_label": "COL 0.25µg/mL + MINO 1µg/mL",
+        "description": "combination of colistin and minocycline (enhanced bactericidal effect)",
+        "expected_trend": "kill/decrease"
+      },
+      {
+        "curve_label": "COL 0.25µg/mL + RFP 0.06µg/mL",
+        "description": "combination of colistin and rifampicin (enhanced bactericidal effect)",
+        "expected_trend": "kill/decrease"
+      }
+    ]
+  },
+  "plot_type_facts": {
+    "declared_in_article_info": true,
+    "visually_verified": true,
+    "plot_type": "time-kill plot",
+    "confidence": 1,
+    "reason": "Assay type explicitly declared as 'time-kill assay' in experimental context, and visual confirmation matches time-kill plot characteristics (x-axis = time, y-axis = bacterial count on a log scale)."
+  },
+  "axis_facts": {
+    "x_axis": {
+      "quantity": "Time",
+      "unit": "hours",
+      "discrete": false,
+      "ticks_verified": [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+      "tick_labels": ["0", "2", "4", "6", "8", "10", "12", "22", "24", "26"],
+      "breaks": [],
+      "confidence": 1
+    },
+    "y_axis": {
+      "quantity": "Bacterial Count",
+      "unit": "Log cfu/mL",
+      "scale": "logarithmic",
+      "upper_plausible_limit": 16,
+      "lower_plausible_limit": 0,
+      "ticks_verified": [0, 2, 4, 6, 8, 10, 12, 14, 16],
+      "tick_labels": ["0", "2", "4", "6", "8", "10", "12", "14", "16"],
+      "breaks": [],
+      "confidence": 1
+    }
+  }
+}

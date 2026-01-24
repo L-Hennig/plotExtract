@@ -1,0 +1,17 @@
+# Curve-by-curve statistics
+Curve 'Condition 1' -> 'Bacterial Count (CFU/mL) (Condition 1)':
+  MAE: 0.004341
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+Curve 'Condition 2' -> 'Bacterial Count (CFU/mL) (Condition 2)':
+  MAE: 0.005891
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+Curve 'Condition 3' -> 'Bacterial Count (CFU/mL) (Condition 3)':
+  MAE: 0.011052
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+
+# Summary
+Number of curves: 3
+Mean MAE: 0.007095

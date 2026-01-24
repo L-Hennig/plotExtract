@@ -1,0 +1,25 @@
+# Curve-by-curve statistics
+Curve 'Condition 1' -> 'Bacterial Count (CFU/mL) (log10 scale) (Condition 1)':
+  MAE: 0.005719
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+Curve 'Condition 2' -> 'Bacterial Count (CFU/mL) (log10 scale) (Condition 2)':
+  MAE: 0.037094
+  LeftMissed: 0.000000
+  RightMissed: 0.583333
+Curve 'Condition 3' -> 'Bacterial Count (CFU/mL) (log10 scale) (Condition 3)':
+  MAE: 0.010415
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+Curve 'Condition 4' -> 'Bacterial Count (CFU/mL) (log10 scale) (Condition 4)':
+  MAE: 0.015215
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+Curve 'Condition 5' -> 'Bacterial Count (CFU/mL) (log10 scale) (Condition 5)':
+  MAE: 0.014352
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+
+# Summary
+Number of curves: 5
+Mean MAE: 0.016559

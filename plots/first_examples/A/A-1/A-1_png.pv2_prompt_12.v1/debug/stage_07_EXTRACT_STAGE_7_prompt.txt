@@ -1,0 +1,581 @@
+
+You have access to:
+- Plot image
+- Accumulated facts (curve definitions, colours/line/marker, expected trends when available)
+- Stage 6 output JSON containing re-extraction requests
+
+ACCUMULATED FACTS:
+{
+  "article_info": {
+    "figure_id": "GA",
+    "axis_definitions": {
+      "x_axis": {
+        "quantity": "Time",
+        "unit": "hours"
+      },
+      "y_axis": {
+        "quantity": "Bacterial Count",
+        "unit": "Log CFU/mL",
+        "scale": "logarithmic"
+      }
+    },
+    "curve_legend": [
+      {
+        "curve_label": "Blank",
+        "description": "control without treatment",
+        "expected_trend": "growth/increase"
+      },
+      {
+        "curve_label": "COL 0.125\u00b5g/mL",
+        "description": "colistin at 0.125 \u00b5g/mL",
+        "expected_trend": "variable"
+      },
+      {
+        "curve_label": "MINO 1\u00b5g/mL",
+        "description": "minocycline at 1 \u00b5g/mL",
+        "expected_trend": "variable"
+      },
+      {
+        "curve_label": "MEM 4\u00b5g/mL",
+        "description": "meropenem at 4 \u00b5g/mL",
+        "expected_trend": "variable"
+      },
+      {
+        "curve_label": "RFP 0.06\u00b5g/mL",
+        "description": "rifampicin at 0.06 \u00b5g/mL",
+        "expected_trend": "variable"
+      },
+      {
+        "curve_label": "COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL",
+        "description": "combination of colistin and meropenem",
+        "expected_trend": "kill/decrease"
+      },
+      {
+        "curve_label": "COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL",
+        "description": "combination of colistin and minocycline",
+        "expected_trend": "kill/decrease"
+      },
+      {
+        "curve_label": "COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL",
+        "description": "combination of colistin and rifampicin",
+        "expected_trend": "kill/decrease"
+      }
+    ],
+    "figure_caption": "Time-kill curves of bacterial growth and antibiotic effect over time",
+    "experimental_context": {
+      "assay_type": "time-kill assay",
+      "organism": "unknown",
+      "model": "unknown"
+    }
+  },
+  "plot_type_facts": {
+    "declared_in_article_info": true,
+    "plot_type": "time-kill plot",
+    "confidence": 1,
+    "reason": "Assay type explicitly stated as time-kill assay in experimental context, and visual confirmation of time on x-axis and bacterial count (log CFU/mL) on y-axis with multiple treatment curves.",
+    "visually_verified": true
+  },
+  "axis_facts": {
+    "x_axis": {
+      "quantity": "Time",
+      "unit": "hours",
+      "discrete": false,
+      "lower_plausible_limit": 0,
+      "upper_plausible_limit": 26,
+      "ticks_verified": [
+        0,
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        22,
+        24,
+        26
+      ],
+      "tick_labels": [
+        "0",
+        "2",
+        "4",
+        "6",
+        "8",
+        "10",
+        "12",
+        "22",
+        "24",
+        "26"
+      ],
+      "breaks": [],
+      "confidence": 1
+    },
+    "y_axis": {
+      "quantity": "bacterial burden",
+      "unit": "Log CFU/mL",
+      "scale": "log10",
+      "upper_plausible_limit": 16,
+      "lower_plausible_limit": 0,
+      "ticks_verified": [
+        0,
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        14,
+        16
+      ],
+      "tick_labels": [
+        "0",
+        "2",
+        "4",
+        "6",
+        "8",
+        "10",
+        "12",
+        "14",
+        "16"
+      ],
+      "breaks": [],
+      "grid": {
+        "present": true,
+        "aligned_y_ticks": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16
+        ],
+        "aligned_x_ticks": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          22,
+          24,
+          26
+        ]
+      },
+      "confidence": 1
+    }
+  },
+  "curve_style_facts": {
+    "curves": [
+      {
+        "curve_label": "Blank",
+        "colour": "#000000",
+        "line_type": "dotted",
+        "marker_symbol": "x",
+        "source": "figure_legend",
+        "confidence": 1
+      },
+      {
+        "curve_label": "COL 0.125\u00b5g/mL",
+        "colour": "#000000",
+        "line_type": "solid",
+        "marker_symbol": "square",
+        "source": "figure_legend",
+        "confidence": 1
+      },
+      {
+        "curve_label": "MINO 1\u00b5g/mL",
+        "colour": "#000000",
+        "line_type": "dashed",
+        "marker_symbol": "triangle",
+        "source": "figure_legend",
+        "confidence": 1
+      },
+      {
+        "curve_label": "MEM 4\u00b5g/mL",
+        "colour": "#000000",
+        "line_type": "dotted",
+        "marker_symbol": "diamond",
+        "source": "figure_legend",
+        "confidence": 1
+      },
+      {
+        "curve_label": "RFP 0.06\u00b5g/mL",
+        "colour": "#000000",
+        "line_type": "dotted",
+        "marker_symbol": "inverted_triangle",
+        "source": "figure_legend",
+        "confidence": 1
+      },
+      {
+        "curve_label": "COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL",
+        "colour": "#000000",
+        "line_type": "dotted",
+        "marker_symbol": "circle",
+        "source": "figure_legend",
+        "confidence": 1
+      },
+      {
+        "curve_label": "COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL",
+        "colour": "#000000",
+        "line_type": "dashed",
+        "marker_symbol": "triangle",
+        "source": "figure_legend",
+        "confidence": 1
+      },
+      {
+        "curve_label": "COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL",
+        "colour": "#000000",
+        "line_type": "dotted",
+        "marker_symbol": "inverted_triangle_filled",
+        "source": "figure_legend",
+        "confidence": 1
+      }
+    ]
+  },
+  "re_extraction": {
+    "requests": [
+      {
+        "curve_label": "Blank",
+        "issue_type": "truncation",
+        "target_times_hours": [
+          22,
+          24,
+          26
+        ],
+        "expected_trend": "growth/increase",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 1.0,
+          "pct_decreasing": 0.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {
+            "abs_jump": 2.5,
+            "from_time": 0,
+            "to_time": 2,
+            "delta": 2.5
+          }
+        },
+        "visual_guidance": "Verify if the curve plateaus after 12 hours; ensure continuity with earlier growth trend."
+      },
+      {
+        "curve_label": "COL 0.125\u00b5g/mL",
+        "issue_type": "truncation",
+        "target_times_hours": [
+          22,
+          24,
+          26
+        ],
+        "expected_trend": "variable",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 1.0,
+          "pct_decreasing": 0.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {
+            "abs_jump": 1.0,
+            "from_time": 0,
+            "to_time": 2,
+            "delta": 1.0
+          }
+        },
+        "visual_guidance": "Check if the curve stabilizes or continues to rise after 12 hours; maintain consistency with earlier data points."
+      },
+      {
+        "curve_label": "MEM 4\u00b5g/mL",
+        "issue_type": "midcurve_switch",
+        "target_times_hours": [
+          2,
+          4,
+          22,
+          24,
+          26
+        ],
+        "expected_trend": "variable",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.11,
+          "pct_decreasing": 0.67,
+          "baseline_delta_from_median": null,
+          "largest_jump": {
+            "abs_jump": 6.0,
+            "from_time": 0,
+            "to_time": 2,
+            "delta": -6.0
+          }
+        },
+        "visual_guidance": "Re-examine the sharp drop at 2 hours; ensure the curve does not re-grow prematurely after 12 hours."
+      },
+      {
+        "curve_label": "RFP 0.06\u00b5g/mL",
+        "issue_type": "truncation",
+        "target_times_hours": [
+          22,
+          24,
+          26
+        ],
+        "expected_trend": "variable",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 0.89,
+          "baseline_delta_from_median": null,
+          "largest_jump": {
+            "abs_jump": 4.0,
+            "from_time": 0,
+            "to_time": 2,
+            "delta": -4.0
+          }
+        },
+        "visual_guidance": "Confirm if the curve remains at 0 or shows regrowth after 12 hours; avoid misreading grid lines."
+      },
+      {
+        "curve_label": "COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL",
+        "issue_type": "truncation",
+        "target_times_hours": [
+          22,
+          24,
+          26
+        ],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 1.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {
+            "abs_jump": 6.0,
+            "from_time": 0,
+            "to_time": 2,
+            "delta": -6.0
+          }
+        },
+        "visual_guidance": "Check for any regrowth after 12 hours; ensure the curve stays at 0 if no regrowth is expected."
+      },
+      {
+        "curve_label": "COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL",
+        "issue_type": "truncation",
+        "target_times_hours": [
+          22,
+          24,
+          26
+        ],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 1.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {
+            "abs_jump": 6.0,
+            "from_time": 0,
+            "to_time": 2,
+            "delta": -6.0
+          }
+        },
+        "visual_guidance": "Verify if the curve remains at 0 or shows regrowth after 12 hours; avoid misinterpreting grid lines."
+      },
+      {
+        "curve_label": "COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL",
+        "issue_type": "truncation",
+        "target_times_hours": [
+          22,
+          24,
+          26
+        ],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 1.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {
+            "abs_jump": 6.0,
+            "from_time": 0,
+            "to_time": 2,
+            "delta": -6.0
+          }
+        },
+        "visual_guidance": "Ensure the curve stays at 0 after 12 hours; check for any unexpected regrowth."
+      }
+    ]
+  }
+}
+
+STAGE 6 OUTPUT (RE-EXTRACTION REQUESTS):
+```json
+{
+  "re_extraction": {
+    "requests": [
+      {
+        "curve_label": "Blank",
+        "issue_type": "truncation",
+        "target_times_hours": [22, 24, 26],
+        "expected_trend": "growth/increase",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 1.0,
+          "pct_decreasing": 0.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 2.5, "from_time": 0, "to_time": 2, "delta": 2.5}
+        },
+        "visual_guidance": "Verify if the curve plateaus after 12 hours; ensure continuity with earlier growth trend."
+      },
+      {
+        "curve_label": "COL 0.125µg/mL",
+        "issue_type": "truncation",
+        "target_times_hours": [22, 24, 26],
+        "expected_trend": "variable",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 1.0,
+          "pct_decreasing": 0.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 1.0, "from_time": 0, "to_time": 2, "delta": 1.0}
+        },
+        "visual_guidance": "Check if the curve stabilizes or continues to rise after 12 hours; maintain consistency with earlier data points."
+      },
+      {
+        "curve_label": "MEM 4µg/mL",
+        "issue_type": "midcurve_switch",
+        "target_times_hours": [2, 4, 22, 24, 26],
+        "expected_trend": "variable",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.11,
+          "pct_decreasing": 0.67,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 6.0, "from_time": 0, "to_time": 2, "delta": -6.0}
+        },
+        "visual_guidance": "Re-examine the sharp drop at 2 hours; ensure the curve does not re-grow prematurely after 12 hours."
+      },
+      {
+        "curve_label": "RFP 0.06µg/mL",
+        "issue_type": "truncation",
+        "target_times_hours": [22, 24, 26],
+        "expected_trend": "variable",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 0.89,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 4.0, "from_time": 0, "to_time": 2, "delta": -4.0}
+        },
+        "visual_guidance": "Confirm if the curve remains at 0 or shows regrowth after 12 hours; avoid misreading grid lines."
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + MEM 4µg/mL",
+        "issue_type": "truncation",
+        "target_times_hours": [22, 24, 26],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 1.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 6.0, "from_time": 0, "to_time": 2, "delta": -6.0}
+        },
+        "visual_guidance": "Check for any regrowth after 12 hours; ensure the curve stays at 0 if no regrowth is expected."
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + MINO 1µg/mL",
+        "issue_type": "truncation",
+        "target_times_hours": [22, 24, 26],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 1.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 6.0, "from_time": 0, "to_time": 2, "delta": -6.0}
+        },
+        "visual_guidance": "Verify if the curve remains at 0 or shows regrowth after 12 hours; avoid misinterpreting grid lines."
+      },
+      {
+        "curve_label": "COL 0.125µg/mL + RFP 0.06µg/mL",
+        "issue_type": "truncation",
+        "target_times_hours": [22, 24, 26],
+        "expected_trend": "kill/decrease",
+        "evidence": {
+          "n_points": 10,
+          "expected_n_points": 10,
+          "times_missing": [],
+          "pct_increasing": 0.0,
+          "pct_decreasing": 1.0,
+          "baseline_delta_from_median": null,
+          "largest_jump": {"abs_jump": 6.0, "from_time": 0, "to_time": 2, "delta": -6.0}
+        },
+        "visual_guidance": "Ensure the curve stays at 0 after 12 hours; check for any unexpected regrowth."
+      }
+    ]
+  }
+}
+```
+
+---
+
+STAGE 7 — RE-EXTRACTION (TARGETED POINTS ONLY)
+
+GOAL:
+Re-extract ONLY the specified (curve_id, time_hours) points.
+
+HARD RULES:
+- Do NOT add new time points.
+- Do NOT add points for curves not requested.
+- Use curve definitions (colour/line/marker) from accumulated facts to select the correct curve.
+- If a curve is ambiguous (overlap/crossing), lower confidence and explain why in ONE short note.
+- Output JSON only. No extra text. No backticks.
+
+METHOD (for each request):
+1) Locate the curve (use colour/line/marker) and ensure continuity from nearby points.
+2) Locate the specified x-value (time in hours) and read the y-value precisely.
+3) Sanity check: compare against adjacent extracted points from the original CSV and/or expected trend.
+4) Record only the corrected value.
+
+OUTPUT JSON SCHEMA (MERGE INTO ACCUMULATED FACTS):
+{
+  "re_extraction": {
+    "results": [
+      {
+        "curve_label": "Condition 1",
+        "time_hours": 6,
+        "new_log10_cfu_ml": 5.2,
+        "confidence": "high | medium | low",
+        "reason": "One short sentence: what was fixed (e.g., wrong curve / wrong decade / truncation).",
+        "checks": {
+          "used_curve_definition": true,
+          "matches_expected_trend_if_known": true,
+          "avoids_previous_issue": "short phrase"
+        }
+      }
+    ]
+  }
+}
