@@ -1,9 +1,0 @@
-{
-  "stage_index": 5,
-  "stage_name": "EXTRACT_STAGE_6",
-  "no_image_stage": true,
-  "prompt_chars": 13635,
-  "accumulated_facts_chars": 6567,
-  "csv_text_chars": 347,
-  "csv_diagnostics_chars": 3029
-}

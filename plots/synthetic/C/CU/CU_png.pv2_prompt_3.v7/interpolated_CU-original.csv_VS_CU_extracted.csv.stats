@@ -1,9 +1,0 @@
-# Curve-by-curve statistics
-Curve 'Condition 1' -> 'Time (hours) (4.3)':
-  MAE: 0.028689
-  LeftMissed: 0.153846
-  RightMissed: 0.769231
-
-# Summary
-Number of curves: 1
-Mean MAE: 0.028689

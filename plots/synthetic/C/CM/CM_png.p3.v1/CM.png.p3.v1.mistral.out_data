@@ -1,8 +1,0 @@
-Time (hours),Bacteria Count (CFU/mL) (Condition 1),Time (hours),Bacteria Count (CFU/mL) (Condition 2),Time (hours),Bacteria Count (CFU/mL) (Condition 3)
-0,4,0,6,0,6.5
-3,5,3,6.5,3,7
-6,6,6,6,6,7.5
-9,5.5,9,5,9,7.5
-12,4.5,12,4,12,7.5
-15,3,15,4,15,7.8
-21,3.2,21,3,21,8.2

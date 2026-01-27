@@ -1,9 +1,0 @@
-{
-  "plot_type_facts": {
-    "declared_in_article_info": "unknown",
-    "visually_verified": true,
-    "plot_type": "time-kill plot",
-    "confidence": 0.8,
-    "reason": "Visual verification confirms x-axis as time (hours) and y-axis as bacterial count (CFU/mL) on a log10 scale, with multiple curves representing different conditions."
-  }
-}

@@ -1,8 +1,0 @@
-time,bacterial_count (Condition 1),time,bacterial_count (Condition 2),time,bacterial_count (Condition 3)
-0,5.0,0,6.2,0,6.2
-2,3.8,2,4.0,2,7.0
-4,2.5,4,0.0,4,7.5
-6,2.7,,,6,7.8
-8,3.0,,,8,8.0
-10,3.2,,,10,8.2
-24,3.8,,,24,8.9
