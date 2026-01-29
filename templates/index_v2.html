@@ -97,7 +97,7 @@
         .panel h2 { margin-top: 0; color: #444; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-        select, input[type="number"] {
+        select, input[type="number"], input[type="text"] {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
@@ -825,6 +825,22 @@
                     Debug mode (write detailed logs)
                 </label>
             </div>
+
+            <!-- LLM Selection (v2 pipeline) -->
+            <div class="row" style="margin-top: 10px;">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="llmKey"><strong>LLM Key (v2):</strong></label>
+                        <select id="llmKey" onchange="onLlmKeyChange()">
+                            <option value="1">Key 1 (API_KEY_1 — Mistral)</option>
+                            <option value="2">Key 2 (API_KEY_2 — Google / Gemma)</option>
+                        </select>
+                    </div>
+                    <small style="display: block; margin-top: 4px; color: #666;">
+                        Key 2 defaults to Gemma 3 27B Vision. Google mode requires <code>google-generativeai</code>.
+                    </small>
+                </div>
+            </div>
             
             <!-- Article Information (optional) -->
             <div class="form-group" style="margin-top: 20px;">
@@ -1018,6 +1034,18 @@
                 if (el) el.checked = (savedDebug === 'true');
             }
 
+            // Restore LLM key selection
+            try {
+                const savedKey = localStorage.getItem('plotextract_llm_key_ex2');
+                if (savedKey && document.getElementById('llmKey')) {
+                    document.getElementById('llmKey').value = savedKey;
+                }
+            } catch (_) {}
+
+            if (typeof onLlmKeyChange === 'function') {
+                onLlmKeyChange();
+            }
+
             
             // Restore last used prompt if it exists in the dropdown
             if (savedPrompt !== null) {
@@ -1042,6 +1070,31 @@
             // Check for running task or load last results
             checkTaskOnLoad();
         });
+
+        function onLlmKeyChange() {
+            const keyEl = document.getElementById('llmKey');
+            if (!keyEl) return;
+            const key = (keyEl.value || '1').trim();
+            try {
+                localStorage.setItem('plotextract_llm_key_ex2', key);
+            } catch (_) {}
+        }
+
+        function getLlmSelection() {
+            const keyEl = document.getElementById('llmKey');
+            const key = ((keyEl && keyEl.value) ? keyEl.value : '1').trim();
+            try {
+                localStorage.setItem('plotextract_llm_key_ex2', key);
+            } catch (_) {}
+
+            if (key === '2') {
+                // Key 2 => Google/Gemma, default model (overrideable server-side via env vars).
+                return { llm_provider: 'google', llm_model: 'gemma-3-27b-it' };
+            }
+
+            // Key 1 => Mistral
+            return { llm_provider: 'mistral', llm_model: 'mistral-large-2512' };
+        }
         
         function onImageSelect() {
             const imagePath = document.getElementById('imageSelect').value;
@@ -1488,6 +1541,7 @@
                     image: imagePath,
                     prompt: promptFile,
                     articleInfo: articleInfo,
+                    ...getLlmSelection(),
                     debug: document.getElementById('debugMode').checked,
                     runInterpolation: document.getElementById('runInterpolation').checked,
                     runPointwise: document.getElementById('runPointwise').checked,
@@ -1909,6 +1963,7 @@
                     prompt: promptFile,
                     batch_name: batchName || null,
                     articleInfo: document.getElementById('articleInfo').value.trim(),
+                    ...getLlmSelection(),
                     debug: document.getElementById('debugMode').checked,
                     runInterpolation: runInterpolation,
                     runPointwise: runPointwise,
@@ -2095,6 +2150,7 @@
                     image: imagePath,
                     prompt: promptFile,
                     articleInfo: articleInfo,
+                    ...getLlmSelection(),
                     debug: document.getElementById('debugMode').checked,
                     runInterpolation: runInterpolation,
                     runPointwise: runPointwise,

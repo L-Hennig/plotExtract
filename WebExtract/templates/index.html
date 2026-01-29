@@ -105,6 +105,18 @@
             <div class="muted" style="flex: 2;">Runs multiple independent extractions on the same plot.</div>
           </div>
 
+          <div id="llmControls" style="display:none; margin: 8px 0 12px;">
+            <label class="label" for="llmProvider" style="margin-top: 2px;">LLM (EX 2)</label>
+            <div class="row">
+              <select id="llmProvider" class="select" aria-label="LLM provider">
+                <option value="mistral">Key1 — Mistral</option>
+                <option value="google">Key2 — Google</option>
+              </select>
+              <select id="llmModel" class="select" aria-label="LLM model"></select>
+            </div>
+            <div class="muted" style="margin-top: 6px;">Only applies to EX 2 prompts.</div>
+          </div>
+
           <div class="row">
             <button id="btnExtract" class="btn btn-primary" type="button">Run extraction</button>
             <button id="btnCancel" class="btn" type="button" style="display:none">Cancel</button>
@@ -236,6 +248,10 @@
   const btnCancel = document.getElementById('btnCancel');
 
   const trialCount = document.getElementById('trialCount');
+
+  const llmControls = document.getElementById('llmControls');
+  const llmProvider = document.getElementById('llmProvider');
+  const llmModel = document.getElementById('llmModel');
 
   const chkTestResults = document.getElementById('chkTestResults');
 
@@ -503,6 +519,58 @@
   function onPromptChanged() {
     const { pipeline } = getPipelineAndPrompt();
     articleInfoWrap.style.display = (pipeline === 'ex2') ? 'block' : 'none';
+    if (llmControls) {
+      llmControls.style.display = (pipeline === 'ex2') ? 'block' : 'none';
+    }
+  }
+
+  const LLM_MODELS = {
+    mistral: [
+      { id: 'mistral-large-2512', label: 'mistral-large-2512' },
+      { id: 'pixtral-large-latest', label: 'pixtral-large-latest' }
+    ],
+    google: [
+      { id: 'gemma-3-27b-it', label: 'gemma-3-27b-it' },
+      { id: 'gemini-2.0-flash', label: 'gemini-2.0-flash' }
+    ]
+  };
+
+  function _refreshModelOptions(preferModelId) {
+    if (!llmModel || !llmProvider) return;
+    const provider = (llmProvider.value || 'mistral');
+    const models = LLM_MODELS[provider] || [];
+
+    while (llmModel.firstChild) llmModel.removeChild(llmModel.firstChild);
+    for (const m of models) {
+      const opt = document.createElement('option');
+      opt.value = m.id;
+      opt.textContent = m.label;
+      llmModel.appendChild(opt);
+    }
+
+    let selected = preferModelId;
+    if (!selected || !models.some(x => x.id === selected)) {
+      selected = (models[0] && models[0].id) ? models[0].id : '';
+    }
+    if (selected) llmModel.value = selected;
+
+    localStorage.setItem('plotextract_llm_provider_web', provider);
+    localStorage.setItem('plotextract_llm_model_web', llmModel.value || '');
+  }
+
+  function _loadSavedLlmSelection() {
+    if (!llmProvider || !llmModel) return;
+    const savedProvider = localStorage.getItem('plotextract_llm_provider_web') || 'mistral';
+    const savedModel = localStorage.getItem('plotextract_llm_model_web') || '';
+    llmProvider.value = savedProvider;
+    _refreshModelOptions(savedModel);
+  }
+
+  function getLlmSelection() {
+    const provider = llmProvider ? (llmProvider.value || '') : '';
+    const model = llmModel ? (llmModel.value || '') : '';
+    if (!provider) return { llm_provider: null, llm_model: null };
+    return { llm_provider: provider, llm_model: model || null };
   }
 
   async function uploadFile(file) {
@@ -2193,6 +2261,9 @@
       url = '/v2/run_all';
       payload.articleInfo = (articleInfo.value || '').trim();
       payload.debug = false;
+      const { llm_provider, llm_model } = getLlmSelection();
+      if (llm_provider) payload.llm_provider = llm_provider;
+      if (llm_model) payload.llm_model = llm_model;
     }
 
     const nTrials = _getTrialCount();
@@ -2907,6 +2978,15 @@
 
   // Wire up events
   promptSelect.addEventListener('change', onPromptChanged);
+  if (llmProvider) {
+    llmProvider.addEventListener('change', () => _refreshModelOptions(null));
+  }
+  if (llmModel) {
+    llmModel.addEventListener('change', () => {
+      localStorage.setItem('plotextract_llm_provider_web', llmProvider ? (llmProvider.value || '') : '');
+      localStorage.setItem('plotextract_llm_model_web', llmModel.value || '');
+    });
+  }
   onPromptChanged();
 
   dropzone.addEventListener('click', () => {
@@ -2952,6 +3032,7 @@
   btnCancel.addEventListener('click', cancelTask);
 
   refreshExamples();
+  _loadSavedLlmSelection();
 })();
 </script>
 </body>

@@ -2,37 +2,81 @@ import sys
 import os
 import math
 import ast
+import io
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-import io
 
 # Configure stdout/stderr to use UTF-8 encoding on Windows
 if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
-# Import Mistral for LLM-based curve matching
-from mistralai import Mistral
 from dotenv import load_dotenv
+
 load_dotenv(override=True)
 
-MAX_NORM_DIST = 0.1  # Example value; adjust as needed
+MAX_NORM_DIST = float(os.getenv("PLOTEXTRACT_POINTWISE_MAX_NORM_DIST", "0.1"))
 
-# Loads API key from .env file
-api_key = os.getenv("API_KEY_1")
-client = Mistral(api_key=api_key)
 
-def prompt_mistral(prompt_text):
-    """Send a prompt to Mistral and return the response."""
-    response = client.chat.complete(
-        model="mistral-large-2512",
-        messages=[{"role": "user", "content": prompt_text}],
-        max_tokens=4096,
-        temperature=0,
-    )
-    return response.choices[0].message.content
+def _env_bool(name: str, default: bool = False) -> bool:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+def _get_curve_matcher() -> str:
+    # heuristic (default) | llm
+    return os.getenv("PLOTEXTRACT_POINTWISE_CURVE_MATCHER", "heuristic").strip().lower()
+
+
+def _get_llm_timeout_s() -> float:
+    try:
+        return float(os.getenv("PLOTEXTRACT_POINTWISE_LLM_TIMEOUT_S", "20"))
+    except Exception:
+        return 20.0
+
+
+def _try_init_mistral_client():
+    """Optional Mistral client. Pointwise should still work without it."""
+    try:
+        from mistralai import Mistral  # type: ignore
+    except Exception:
+        return None
+
+    api_key = os.getenv("API_KEY_1")
+    if not api_key:
+        return None
+    try:
+        return Mistral(api_key=api_key)
+    except Exception:
+        return None
+
+def prompt_mistral(prompt_text: str, timeout_s: float = 20.0) -> str:
+    """Send a prompt to Mistral and return the response.
+
+    Runs in a thread with a hard timeout so pointwise never hangs indefinitely.
+    """
+    client = _try_init_mistral_client()
+    if client is None:
+        raise RuntimeError("Mistral client unavailable (missing package or API_KEY_1)")
+
+    def _call() -> str:
+        response = client.chat.complete(
+            model=os.getenv("PLOTEXTRACT_POINTWISE_MISTRAL_MODEL", "mistral-large-2512"),
+            messages=[{"role": "user", "content": prompt_text}],
+            max_tokens=4096,
+            temperature=0,
+        )
+        return response.choices[0].message.content
+
+    with ThreadPoolExecutor(max_workers=1) as ex:
+        future = ex.submit(_call)
+        return future.result(timeout=timeout_s)
 
 
 def _read_csv_tolerant(filepath: str, encoding: str) -> pd.DataFrame:
@@ -185,36 +229,38 @@ def _compute_data_bounds(*curves_dicts):
     return min_x, max_x, min_y, max_y
 
 def match_curves_with_llm(original_curves, extracted_curves):
-    """
-    Use LLM to match curves between original and extracted CSVs.
+    """Use LLM to match curves between original and extracted CSVs.
+
     Returns a dict mapping original curve labels to extracted curve labels.
+    This is optional and should not be relied on for runtime stability.
     """
-    # Build a summary of both CSVs for the LLM
     original_summary = "Original CSV curves:\n"
     for label, curve_info in original_curves.items():
         data = curve_info['data']
-        original_summary += f"  - '{label}': x_label='{curve_info['x_label']}', "
-        original_summary += f"x_range=[{data['x'].min():.4f}, {data['x'].max():.4f}], "
-        original_summary += f"y_range=[{data['y'].min():.4f}, {data['y'].max():.4f}], "
-        original_summary += f"num_points={len(data)}\n"
-        # Add sample points
+        original_summary += (
+            f"  - '{label}': x_label='{curve_info['x_label']}', "
+            f"x_range=[{data['x'].min():.4f}, {data['x'].max():.4f}], "
+            f"y_range=[{data['y'].min():.4f}, {data['y'].max():.4f}], "
+            f"num_points={len(data)}\n"
+        )
         sample = data.head(3)
         original_summary += f"    Sample points: {list(zip(sample['x'], sample['y']))}\n"
-    
+
     extracted_summary = "Extracted CSV curves:\n"
     for label, curve_info in extracted_curves.items():
         data = curve_info['data']
-        extracted_summary += f"  - '{label}': x_label='{curve_info['x_label']}', "
-        extracted_summary += f"x_range=[{data['x'].min():.4f}, {data['x'].max():.4f}], "
-        extracted_summary += f"y_range=[{data['y'].min():.4f}, {data['y'].max():.4f}], "
-        extracted_summary += f"num_points={len(data)}\n"
-        # Add sample points
+        extracted_summary += (
+            f"  - '{label}': x_label='{curve_info['x_label']}', "
+            f"x_range=[{data['x'].min():.4f}, {data['x'].max():.4f}], "
+            f"y_range=[{data['y'].min():.4f}, {data['y'].max():.4f}], "
+            f"num_points={len(data)}\n"
+        )
         sample = data.head(3)
         extracted_summary += f"    Sample points: {list(zip(sample['x'], sample['y']))}\n"
-    
-    prompt = f"""You are given two CSV files: the first is the original data and the second is extracted data. 
-Each CSV may contain multiple curves. The curves in the extracted file may appear in a different order 
-or have slightly different y-axis labels compared to the original file. 
+
+    prompt = f"""You are given two CSV files: the first is the original data and the second is extracted data.
+Each CSV may contain multiple curves. The curves in the extracted file may appear in a different order
+or have slightly different y-axis labels compared to the original file.
 
 Your task is to identify which curve in the extracted CSV corresponds to which curve in the original CSV.
 
@@ -224,39 +270,29 @@ Your task is to identify which curve in the extracted CSV corresponds to which c
 
 Instructions:
 - Use the column headers and sample data points to match curves between the two files.
-- Output the mapping as a Python dictionary where the keys are the original curve labels and the values 
+- Output the mapping as a Python dictionary where the keys are the original curve labels and the values
   are the corresponding extracted curve labels.
-- The output must be valid Python syntax, parseable directly with `eval()` or `ast.literal_eval()`.
+- The output must be valid Python syntax, parseable directly with `ast.literal_eval()`.
 
-Example output format:
-{{
-    "Original Curve 1": "Extracted Curve B",
-    "Original Curve 2": "Extracted Curve A",
-}}
+Only output the dictionary."""
 
-Make sure to match all curves accurately, even if the names or order differ slightly.
-Do not add extra explanations or text—only output the dictionary."""
-
-    print("Matching curves using LLM... ", end='', flush=True)
-    response = prompt_mistral(prompt)
+    timeout_s = _get_llm_timeout_s()
+    print(f"Matching curves using LLM (timeout={timeout_s:.0f}s)... ", end='', flush=True)
+    response = prompt_mistral(prompt, timeout_s=timeout_s)
     print("DONE")
-    
-    # Parse the response
+
+    # Parse response
     try:
-        # Clean up response - remove markdown code blocks if present
         response = response.strip()
         if response.startswith("```"):
             response = response.split("```")[1]
             if response.startswith("python"):
                 response = response[6:]
         response = response.strip()
-        
-        mapping = ast.literal_eval(response)
-        return mapping
+        return ast.literal_eval(response)
     except Exception as e:
         print(f"Warning: Could not parse LLM response: {e}")
         print(f"Response was: {response}")
-        # Fallback: match by order
         original_labels = list(original_curves.keys())
         extracted_labels = list(extracted_curves.keys())
         mapping = {}
@@ -264,6 +300,34 @@ Do not add extra explanations or text—only output the dictionary."""
             if i < len(extracted_labels):
                 mapping[orig_label] = extracted_labels[i]
         return mapping
+
+
+def match_curves_heuristic(original_curves, extracted_curves):
+    """Fast, deterministic curve mapping.
+
+    Strategy:
+    - If labels overlap, match by exact label.
+    - Otherwise match by order.
+    """
+    original_labels = list(original_curves.keys())
+    extracted_labels = list(extracted_curves.keys())
+
+    mapping = {}
+
+    extracted_set = set(extracted_labels)
+    for orig_label in original_labels:
+        if orig_label in extracted_set:
+            mapping[orig_label] = orig_label
+
+    used = set(mapping.values())
+    remaining_extracted = [lab for lab in extracted_labels if lab not in used]
+    for orig_label in original_labels:
+        if orig_label in mapping:
+            continue
+        if remaining_extracted:
+            mapping[orig_label] = remaining_extracted.pop(0)
+
+    return mapping
 
 
 def normalize_point(x, y, leftX, rightX, bottomY, topY):
@@ -290,45 +354,75 @@ def normalized_distance(p1, p2, leftX, rightX, bottomY, topY):
     x2n, y2n = normalize_point(p2[0], p2[1], leftX, rightX, bottomY, topY)
     return math.sqrt((x1n - x2n)**2 + (y1n - y2n)**2)
 
-def find_and_match_closest_pairs(coords_extracted, coords_original, 
+def find_and_match_closest_pairs(coords_extracted, coords_original,
                                  leftX, rightX, bottomY, topY):
-    matched_pairs = []
+    """Efficient greedy matching in normalized space.
 
-    data_extracted = coords_extracted[:]
-    data_original = coords_original[:]
+    The previous implementation did repeated global min searches with nested loops,
+    which can be extremely slow for large point sets.
 
-    while data_extracted and data_original:
-        min_dist = float('inf')
-        best_pair = (None, None)
+    This uses a uniform grid in normalized space with cell size ~= MAX_NORM_DIST.
+    For each original point, we search only nearby grid buckets.
+    """
+    if not coords_extracted or not coords_original:
+        return [], list(coords_extracted), list(coords_original)
 
-        # Find the closest pair in normalized space
-        for i, p_ex in enumerate(data_extracted):
-            for j, p_or in enumerate(data_original):
-                dist = normalized_distance(p_ex, p_or, leftX, rightX, bottomY, topY)
-                if dist < min_dist:
-                    min_dist = dist
-                    best_pair = (i, j)
+    cell = MAX_NORM_DIST
+    if cell <= 0:
+        cell = 0.1
 
-        # If the best pair is still too far, stop matching
-        if min_dist > MAX_NORM_DIST:
-            break
+    def cell_key(xn: float, yn: float) -> tuple[int, int]:
+        return (int(math.floor(xn / cell)), int(math.floor(yn / cell)))
 
-        # Otherwise, match them
-        i, j = best_pair
-        p_ex = data_extracted[i]
-        p_or = data_original[j]
-        matched_pairs.append((p_ex, p_or))
+    # Build grid for extracted points
+    grid: dict[tuple[int, int], list[tuple[float, float, tuple[float, float]]]] = {}
+    for p_ex in coords_extracted:
+        xn, yn = normalize_point(p_ex[0], p_ex[1], leftX, rightX, bottomY, topY)
+        key = cell_key(xn, yn)
+        grid.setdefault(key, []).append((xn, yn, p_ex))
 
-        # Remove matched points
-        if i > j:
-            data_extracted.pop(i)
-            data_original.pop(j)
+    matched_pairs: list[tuple[tuple[float, float], tuple[float, float]]] = []
+    leftover_original: list[tuple[float, float]] = []
+
+    for p_or in coords_original:
+        xon, yon = normalize_point(p_or[0], p_or[1], leftX, rightX, bottomY, topY)
+        base_key = cell_key(xon, yon)
+
+        best_dist = float('inf')
+        best_bucket_key = None
+        best_bucket_idx = None
+        best_p_ex = None
+
+        # Search neighbor cells
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                k = (base_key[0] + dx, base_key[1] + dy)
+                bucket = grid.get(k)
+                if not bucket:
+                    continue
+                for idx, (xen, yen, p_ex) in enumerate(bucket):
+                    dist = math.hypot(xon - xen, yon - yen)
+                    if dist < best_dist:
+                        best_dist = dist
+                        best_bucket_key = k
+                        best_bucket_idx = idx
+                        best_p_ex = p_ex
+
+        if best_p_ex is not None and best_dist <= MAX_NORM_DIST:
+            matched_pairs.append((best_p_ex, p_or))
+            bucket = grid.get(best_bucket_key)
+            if bucket is not None:
+                del bucket[best_bucket_idx]
+                if not bucket:
+                    del grid[best_bucket_key]
         else:
-            data_original.pop(j)
-            data_extracted.pop(i)
+            leftover_original.append(p_or)
 
-    leftover_extracted = data_extracted
-    leftover_original  = data_original
+    # Remaining extracted points are leftovers
+    leftover_extracted: list[tuple[float, float]] = []
+    for bucket in grid.values():
+        leftover_extracted.extend([p_ex for (_xn, _yn, p_ex) in bucket])
+
     return matched_pairs, leftover_extracted, leftover_original
 
 def compute_mae(matched_pairs, leftX, rightX, bottomY, topY):
@@ -489,8 +583,16 @@ def main():
     # For visibility in logs/debugging, print the effective caps we're using.
     print(f"Effective plot bounds (caps): X=[0, {rightX}], Y=[0, {topY}]")
 
-    # 2. Match curves using LLM
-    curve_mapping = match_curves_with_llm(original_curves, extracted_curves)
+    # 2. Match curves (fast heuristic by default; optional LLM)
+    matcher = _get_curve_matcher()
+    if matcher == "llm":
+        try:
+            curve_mapping = match_curves_with_llm(original_curves, extracted_curves)
+        except Exception as e:
+            print(f"[WARN] LLM curve matching failed ({e}); falling back to heuristic.")
+            curve_mapping = match_curves_heuristic(original_curves, extracted_curves)
+    else:
+        curve_mapping = match_curves_heuristic(original_curves, extracted_curves)
     print(f"Curve mapping: {curve_mapping}")
 
     # 3. Process each matched curve

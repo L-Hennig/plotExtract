@@ -56,7 +56,17 @@ UI_EXAMPLES_DIR = os.path.join(UI_DIR, 'examples')
 
 ALLOWED_IMAGE_EXTS = {'.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff', '.webp'}
 
-PYTHON_EXE = sys.executable or 'python'
+def _pick_python_exe() -> str:
+    # Prefer repo-root venv so subprocesses see the same installed packages
+    # (e.g. google-generativeai) even if the UI server was started with a
+    # different global Python.
+    venv_py = os.path.join(REPO_ROOT, '.venv', 'Scripts', 'python.exe')
+    if os.name == 'nt' and os.path.exists(venv_py):
+        return venv_py
+    return sys.executable or 'python'
+
+
+PYTHON_EXE = _pick_python_exe()
 
 
 def _safe_abs_under_plots(rel_path: str) -> str | None:
@@ -93,8 +103,8 @@ def _list_v2_version_dirs(image_path: str, prompt_name: str) -> list[tuple[int, 
     name_for_folder = image_name.replace('.', '_')
     full_prompt_name = f"pv2_{prompt_name}"
 
-    pat_new = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(full_prompt_name)}\.v(\d+)$')
-    pat_old = re.compile(rf'^{re.escape(base_name)}\.{re.escape(full_prompt_name)}\.v(\d+)$')
+    pat_new = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(full_prompt_name)}\.v(\d+)(?:\.key\d+)?(?:\.web)?$')
+    pat_old = re.compile(rf'^{re.escape(base_name)}\.{re.escape(full_prompt_name)}\.v(\d+)(?:\.key\d+)?(?:\.web)?$')
 
     out: list[tuple[int, str]] = []
     if not os.path.isdir(image_dir):
@@ -2180,8 +2190,8 @@ def find_extracted_csv(image_path, prompt_file):
     
     # Look for version folders matching this image+prompt (new format with extension underscore)
     # Also check old format (without extension) for backwards compatibility
-    version_pattern_new = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(prompt_name)}\.v(\d+)$')
-    version_pattern_old = re.compile(rf'^{re.escape(base_name)}\.{re.escape(prompt_name)}\.v(\d+)$')
+    version_pattern_new = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(prompt_name)}\.v(\d+)(?:\.(web))?$')
+    version_pattern_old = re.compile(rf'^{re.escape(base_name)}\.{re.escape(prompt_name)}\.v(\d+)(?:\.(web))?$')
     
     latest_version = 0
     latest_file = None
@@ -2200,7 +2210,8 @@ def find_extracted_csv(image_path, prompt_file):
                 version_num = int(match.group(1))
                 version_dir = os.path.join(image_dir, item)
                 # Filename still includes version: {image}.{prompt}.v{n}.mistral.out_data
-                extracted_file = os.path.join(version_dir, f"{image_name}.{prompt_name}.v{version_num}.mistral.out_data")
+                tag_suffix = f".{match.group(2)}" if match.lastindex and match.lastindex >= 2 and match.group(2) else ""
+                extracted_file = os.path.join(version_dir, f"{image_name}.{prompt_name}.v{version_num}{tag_suffix}.mistral.out_data")
                 
                 if os.path.exists(extracted_file) and version_num > latest_version:
                     latest_version = version_num
@@ -2225,8 +2236,8 @@ def find_extracted_csv_v2(image_path, prompt_name):
     name_for_folder = image_name.replace('.', '_')
     full_prompt_name = f"pv2_{prompt_name}"
 
-    version_pattern_new = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(full_prompt_name)}\.v(\d+)$')
-    version_pattern_old = re.compile(rf'^{re.escape(base_name)}\.{re.escape(full_prompt_name)}\.v(\d+)$')
+    version_pattern_new = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(full_prompt_name)}\.v(\d+)(?:\.key(\d+))?(?:\.(web))?$')
+    version_pattern_old = re.compile(rf'^{re.escape(base_name)}\.{re.escape(full_prompt_name)}\.v(\d+)(?:\.key(\d+))?(?:\.(web))?$')
 
     latest_version = 0
     latest_file = None
@@ -2236,8 +2247,12 @@ def find_extracted_csv_v2(image_path, prompt_name):
             match = version_pattern_new.match(item) or version_pattern_old.match(item)
             if match:
                 version_num = int(match.group(1))
+                key_idx = match.group(2) if match.lastindex and match.lastindex >= 2 else None
+                web_tag = match.group(3) if match.lastindex and match.lastindex >= 3 else None
                 version_dir = os.path.join(image_dir, item)
-                extracted_file = os.path.join(version_dir, f"{image_name}.{full_prompt_name}.v{version_num}.mistral.out_data")
+                key_suffix = f".key{key_idx}" if key_idx else ""
+                web_suffix = f".{web_tag}" if web_tag else ""
+                extracted_file = os.path.join(version_dir, f"{image_name}.{full_prompt_name}.v{version_num}{key_suffix}{web_suffix}.mistral.out_data")
                 if os.path.exists(extracted_file) and version_num > latest_version:
                     latest_version = version_num
                     latest_file = extracted_file
@@ -2290,8 +2305,8 @@ def get_output_files_v2(image_path, prompt_name=None, version_dir=None):
         import re
         name_for_folder = image_name.replace('.', '_')
         if full_prompt_name:
-            version_pattern_new = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(full_prompt_name)}\.v\d+$')
-            version_pattern_old = re.compile(rf'^{re.escape(base_name)}\.{re.escape(full_prompt_name)}\.v\d+$')
+            version_pattern_new = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(full_prompt_name)}\.v\d+(?:\.key\d+)?(?:\.web)?$')
+            version_pattern_old = re.compile(rf'^{re.escape(base_name)}\.{re.escape(full_prompt_name)}\.v\d+(?:\.key\d+)?(?:\.web)?$')
         else:
             version_pattern_new = re.compile(r'^$a')
             version_pattern_old = re.compile(r'^$a')
@@ -2351,8 +2366,8 @@ def get_output_files(image_path, prompt_file=None, version_dir=None):
         # name_for_folder uses underscore instead of dot for extension (A-1_png)
         import re
         name_for_folder = image_name.replace('.', '_')
-        version_pattern_new = re.compile(rf'^{re.escape(name_for_folder)}\.p\d+\.v\d+$')
-        version_pattern_old = re.compile(rf'^{re.escape(base_name)}\.p\d+\.v\d+$')
+        version_pattern_new = re.compile(rf'^{re.escape(name_for_folder)}\.p\d+\.v\d+(?:\.web)?$')
+        version_pattern_old = re.compile(rf'^{re.escape(base_name)}\.p\d+\.v\d+(?:\.web)?$')
         
         for item in os.listdir(image_dir):
             item_path = os.path.join(image_dir, item)
@@ -2829,8 +2844,8 @@ def get_outputs_v2():
         name_for_folder = image_name.replace('.', '_')
         full_prompt_name = f"pv2_{prompt_name}"
 
-        version_pattern_new = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(full_prompt_name)}\.v(\d+)$')
-        version_pattern_old = re.compile(rf'^{re.escape(base_name)}\.{re.escape(full_prompt_name)}\.v(\d+)$')
+        version_pattern_new = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(full_prompt_name)}\.v(\d+)(?:\.key\d+)?(?:\.web)?$')
+        version_pattern_old = re.compile(rf'^{re.escape(base_name)}\.{re.escape(full_prompt_name)}\.v(\d+)(?:\.key\d+)?(?:\.web)?$')
         latest_version = 0
         latest_dir = None
 
@@ -2992,6 +3007,16 @@ def run_all_v2():
     image_path = data.get('image')
     prompt_name = data.get('prompt') or data.get('prompt_name')
     article_info = data.get('articleInfo', '').strip()
+    llm_key = str(data.get('llmKey') or data.get('llm_key') or '').strip()
+    llm_provider = (data.get('llm_provider') or data.get('llmProvider') or '').strip() or None
+    llm_model = (data.get('llm_model') or data.get('llmModel') or '').strip() or None
+    if (not llm_provider) and llm_key in ('1', '2'):
+        if llm_key == '2':
+            llm_provider = 'google'
+            llm_model = llm_model or 'gemma-3-27b-it'
+        else:
+            llm_provider = 'mistral'
+            llm_model = llm_model or 'mistral-large-2512'
     debug_mode = bool(data.get('debug', False))
     run_interpolation = data.get('runInterpolation', False)
     run_pointwise = data.get('runPointwise', False)
@@ -3017,8 +3042,8 @@ def run_all_v2():
 
     thread = threading.Thread(
         target=run_extraction_task_v2,
-        args=(task_id, image_path, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
-              left_x, right_x, bottom_y, top_y)
+          args=(task_id, image_path, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
+              left_x, right_x, bottom_y, top_y, llm_provider, llm_model)
     )
     thread.daemon = True
     thread.start()
@@ -3117,6 +3142,16 @@ def run_batch_v2():
     prompt_file = data.get('prompt', 'prompt_1.py')
     batch_name = data.get('batch_name')
     article_info = data.get('articleInfo', '')
+    llm_key = str(data.get('llmKey') or data.get('llm_key') or '').strip()
+    llm_provider = (data.get('llm_provider') or data.get('llmProvider') or '').strip() or None
+    llm_model = (data.get('llm_model') or data.get('llmModel') or '').strip() or None
+    if (not llm_provider) and llm_key in ('1', '2'):
+        if llm_key == '2':
+            llm_provider = 'google'
+            llm_model = llm_model or 'gemma-3-27b-it'
+        else:
+            llm_provider = 'mistral'
+            llm_model = llm_model or 'mistral-large-2512'
     debug_mode = bool(data.get('debug', False))
     run_interpolation = bool(data.get('runInterpolation', False))
     run_pointwise = bool(data.get('runPointwise', False))
@@ -3181,7 +3216,7 @@ def run_batch_v2():
     thread = threading.Thread(
         target=run_batch_task_v2,
         args=(task_id, images, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
-              left_x, right_x, bottom_y, top_y),
+              left_x, right_x, bottom_y, top_y, llm_provider, llm_model),
     )
     thread.daemon = True
     thread.start()
@@ -3241,7 +3276,7 @@ def cancel_task_v1(task_id):
 
 
 def run_batch_task_v2(task_id, images, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
-                      left_x, right_x, bottom_y, top_y):
+                      left_x, right_x, bottom_y, top_y, llm_provider=None, llm_model=None):
     """Background batch runner.
 
     This orchestrates multiple single-image v2 tasks sequentially on the server,
@@ -3316,6 +3351,8 @@ def run_batch_task_v2(task_id, images, prompt_name, article_info, debug_mode, ru
                 right_x,
                 bottom_y,
                 top_y,
+                llm_provider,
+                llm_model,
             )
             with extraction_tasks_lock:
                 child = extraction_tasks.get(child_task_id, {})
@@ -3440,10 +3477,10 @@ def get_extraction_console(image_name, prompt_name):
                 progress_data = json.load(f)
         
         # Read other output files
-        tracking_file = os.path.join(version_dir, f"{image_name}.pv2_{prompt_name}.*.mistral.out_tracking")
+        tracking_file = os.path.join(version_dir, f"{image_name}.pv2_{prompt_name}.*.out_tracking")
         tracking_content = ""
         for f in os.listdir(version_dir):
-            if 'mistral.out_tracking' in f:
+            if f.endswith('.out_tracking'):
                 with open(os.path.join(version_dir, f), 'r', encoding='utf-8') as tf:
                     tracking_content = tf.read()
                 break
@@ -3553,11 +3590,17 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
     
     step1_start = time.time()
     try:
+        env_overrides = {'PLOTEXTRACT_OUTPUT_TAG': 'web'}
+        try:
+            extraction_timeout_s = int(os.getenv('PLOTEXTRACT_EXTRACTION_TIMEOUT_S', '500'))
+        except Exception:
+            extraction_timeout_s = 500
         result = _run_subprocess_with_cancel(
             task_id,
             [PYTHON_EXE, 'plotExtract.py', full_image_path, full_prompt_path],
             cwd=BASE_DIR,
-            timeout_s=300,
+            timeout_s=extraction_timeout_s,
+            env_overrides=env_overrides,
         )
         
         if result.get('stdout'):
@@ -3586,7 +3629,7 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
     except subprocess.TimeoutExpired:
         success = False
         step_status['extraction'] = 'failed (timeout)'
-        console_output.append("[ERROR] Extraction timed out after 5 minutes")
+        console_output.append(f"[ERROR] Extraction timed out after {extraction_timeout_s} seconds")
     except Exception as e:
         success = False
         step_status['extraction'] = 'failed (exception)'
@@ -3599,14 +3642,16 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
     # Determine extracted CSV path
     version_num = 1
     if version_dir:
-        version_match = re.search(r'\.v(\d+)$', os.path.basename(version_dir))
+        base_vdir = os.path.basename(version_dir)
+        version_match = re.search(r'\.v(\d+)(?:\.key\d+)?(?:\.web)?$', base_vdir)
         if version_match:
             version_num = int(version_match.group(1))
-        extracted_csv = os.path.join(version_dir, f"{image_name}.{prompt_name}.v{version_num}.mistral.out_data")
+        tag_suffix = '.web' if base_vdir.endswith('.web') else ''
+        extracted_csv = os.path.join(version_dir, f"{image_name}.{prompt_name}.v{version_num}{tag_suffix}.mistral.out_data")
     else:
         name_for_folder = image_name.replace('.', '_')
-        fallback_dir = os.path.join(image_dir, f"{name_for_folder}.{prompt_name}.v{version_num}")
-        extracted_csv = os.path.join(fallback_dir, f"{image_name}.{prompt_name}.v{version_num}.mistral.out_data")
+        fallback_dir = os.path.join(image_dir, f"{name_for_folder}.{prompt_name}.v{version_num}.web")
+        extracted_csv = os.path.join(fallback_dir, f"{image_name}.{prompt_name}.v{version_num}.web.mistral.out_data")
     
     # Step 2: Run interpolation if requested
     if run_interpolation and success:
@@ -3711,12 +3756,17 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
                        left_x, right_x, bottom_y, top_y]
                 if version_dir:
                     cmd.append(version_dir)
+
+                try:
+                    pointwise_timeout_s = int(os.getenv('PLOTEXTRACT_POINTWISE_TIMEOUT_S', '200'))
+                except Exception:
+                    pointwise_timeout_s = 200
                 
                 result = _run_subprocess_with_cancel(
                     task_id,
                     cmd,
                     cwd=BASE_DIR,
-                    timeout_s=300,
+                    timeout_s=pointwise_timeout_s,
                 )
                 
                 if result.get('stdout'):
@@ -3822,7 +3872,7 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
     save_extraction_state(final_result)
 
 def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
-                           left_x, right_x, bottom_y, top_y):
+                           left_x, right_x, bottom_y, top_y, llm_provider=None, llm_model=None):
     """Background task for PlotExtractV2 pipeline."""
     import re
 
@@ -3866,12 +3916,38 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug
 
     step1_start = time.time()
     try:
-        env_overrides = {'PLOTEXTRACT_DEBUG': '1'} if debug_mode else None
+        env_overrides = {}
+        env_overrides['PLOTEXTRACT_OUTPUT_TAG'] = 'web'
+        if debug_mode:
+            env_overrides['PLOTEXTRACT_DEBUG'] = '1'
+        provider_norm = (str(llm_provider) if llm_provider is not None else '').strip().lower()
+        if llm_provider:
+            env_overrides['PLOTEXTRACT_LLM_PROVIDER'] = str(llm_provider)
+        # Record which API key slot is being used (requested: key1/key2)
+        if provider_norm == 'google':
+            env_overrides['PLOTEXTRACT_LLM_KEY'] = '2'
+        elif provider_norm == 'mistral':
+            env_overrides['PLOTEXTRACT_LLM_KEY'] = '1'
+        if llm_model:
+            env_overrides['PLOTEXTRACT_LLM_MODEL'] = str(llm_model)
+            # Back-compat: existing Mistral path reads PLOTEXTRACT_MISTRAL_MODEL
+            if provider_norm == 'mistral':
+                env_overrides['PLOTEXTRACT_MISTRAL_MODEL'] = str(llm_model)
+            if provider_norm == 'google':
+                env_overrides['PLOTEXTRACT_GOOGLE_MODEL'] = str(llm_model)
+
+        try:
+            extraction_timeout_s = int(os.getenv('PLOTEXTRACT_EXTRACTION_TIMEOUT_S', '500'))
+        except Exception:
+            extraction_timeout_s = 500
+
+        if not env_overrides:
+            env_overrides = None
         result = _run_subprocess_with_cancel(
             task_id,
             [PYTHON_EXE, os.path.join('plot_extract_v2', 'runner.py'), full_image_path, prompt_name, article_info],
             cwd=BASE_DIR,
-            timeout_s=300,
+            timeout_s=extraction_timeout_s,
             env_overrides=env_overrides,
         )
 
@@ -3900,7 +3976,7 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug
     except subprocess.TimeoutExpired:
         success = False
         step_status['extraction'] = 'failed (timeout)'
-        console_output.append("[ERROR] Extraction timed out after 5 minutes")
+        console_output.append(f"[ERROR] Extraction timed out after {extraction_timeout_s} seconds")
     except Exception as e:
         success = False
         step_status['extraction'] = 'failed (exception)'
@@ -3914,14 +3990,14 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug
     full_prompt_name = f"pv2_{prompt_name}"
     version_num = 1
     if version_dir:
-        version_match = re.search(r'\.v(\d+)$', os.path.basename(version_dir))
+        version_match = re.search(r'\.v(\d+)(?:\.key\d+)?(?:\.web)?$', os.path.basename(version_dir))
         if version_match:
             version_num = int(version_match.group(1))
         # V2 runner saves the clean CSV as {base_name}_extracted.csv (Stage 4 backup)
         extracted_csv = os.path.join(version_dir, f"{base_name}_extracted.csv")
     else:
         name_for_folder = image_name.replace('.', '_')
-        fallback_dir = os.path.join(image_dir, f"{name_for_folder}.{full_prompt_name}.v{version_num}")
+        fallback_dir = os.path.join(image_dir, f"{name_for_folder}.{full_prompt_name}.v{version_num}.web")
         extracted_csv = os.path.join(fallback_dir, f"{base_name}_extracted.csv")
 
     if run_interpolation and success:
@@ -4212,12 +4288,16 @@ def run_batch_single():
         
         step1_start = time.time()
         try:
+            try:
+                extraction_timeout_s = int(os.getenv('PLOTEXTRACT_EXTRACTION_TIMEOUT_S', '500'))
+            except Exception:
+                extraction_timeout_s = 500
             result = subprocess.run(
                 extraction_cmd,
                 cwd=BASE_DIR,
                 capture_output=True,
                 text=True,
-                timeout=300
+                timeout=extraction_timeout_s
             )
             
             if result.stdout:
@@ -4238,7 +4318,7 @@ def run_batch_single():
                 
         except subprocess.TimeoutExpired:
             success = False
-            console_output.append("[ERROR] Extraction timed out after 5 minutes")
+            console_output.append(f"[ERROR] Extraction timed out after {extraction_timeout_s} seconds")
         except Exception as e:
             success = False
             console_output.append(f"[ERROR] {str(e)}")

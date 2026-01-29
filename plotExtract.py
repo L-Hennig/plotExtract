@@ -35,7 +35,7 @@ prompts = prompts_module.prompts
 # Changed from anthropic.Anthropic to Mistral
 client = Mistral(api_key=api_key)
 
-def stack_images_vertically(image1_path, image2_path, border_color, output_dir, prompt_name, version_num, border_size=30):
+def stack_images_vertically(image1_path, image2_path, border_color, output_dir, prompt_name, version_num, tag_suffix: str = "", border_size=30):
     """Stack original and replot images vertically with labels."""
     
     img1 = cv2.imread(image1_path)
@@ -92,7 +92,7 @@ def stack_images_vertically(image1_path, image2_path, border_color, output_dir, 
     original_filename = os.path.basename(image1_path)
     # Remove extension and use underscores
     base_name = original_filename.rsplit('.', 1)[0] if '.' in original_filename else original_filename
-    output_filename = os.path.join(output_dir, f"comparison_{base_name}.{prompt_name}.v{version_num}.png")
+    output_filename = os.path.join(output_dir, f"comparison_{base_name}.{prompt_name}.v{version_num}{tag_suffix}.png")
 
     # Save the combined image with border
     cv2.imwrite(output_filename, combined_image_with_border)
@@ -284,25 +284,52 @@ ext = os.path.splitext(image_filename)[1]  # e.g., '.png' or '.svg'
 # Use full filename (with extension) for folder naming to differentiate .png from .svg
 name_for_folder = image_filename.replace('.', '_')  # e.g., 'A-1_png' or 'A-1_svg'
 
+# Optional output tag (e.g. WebExtract runs append ".web" to folder + filenames)
+output_tag = str(os.getenv('PLOTEXTRACT_OUTPUT_TAG', '') or '').strip()
+if output_tag.startswith('.'):
+  output_tag = output_tag[1:]
+if output_tag and output_tag.lower() != 'web':
+  output_tag = ''
+tag_suffix = f".{output_tag}" if output_tag else ""
+
 # Find next version number - uses name_for_folder to include extension
 def get_next_version(parent_dir, name_for_folder, prompt_name):
-    """Find the next available version number for this image+prompt combination.
-    Uses the full filename (with extension converted to underscore) for uniqueness."""
-    version = 1
-    while True:
-        folder_name = f"{name_for_folder}.{prompt_name}.v{version}"
-        folder_path = os.path.join(parent_dir, folder_name)
-        if not os.path.exists(folder_path):
-            return version, folder_path
-        version += 1
+  """Find the next available version number for this image+prompt combination.
+
+  Version numbers are monotonic across output tags (e.g. .web), so WebExtract
+  runs and regular runs share the same counter.
+  """
+  import re
+
+  max_version = 0
+  try:
+    pat = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(prompt_name)}\.v(\d+)(?:\.web)?$')
+    if os.path.isdir(parent_dir):
+      for item in os.listdir(parent_dir):
+        m = pat.match(item)
+        if not m:
+          continue
+        try:
+          v = int(m.group(1))
+        except Exception:
+          continue
+        if v > max_version:
+          max_version = v
+  except Exception:
+    max_version = 0
+
+  version = max_version + 1
+  folder_name = f"{name_for_folder}.{prompt_name}.v{version}{tag_suffix}"
+  folder_path = os.path.join(parent_dir, folder_name)
+  return version, folder_path
 
 version_num, version_dir = get_next_version(input_dir, name_for_folder, prompt_name)
 os.makedirs(version_dir, exist_ok=True)
 
 # Set output paths inside the version folder - include version in filenames
-output_out = os.path.join(version_dir, f"{image_filename}.{prompt_name}.v{version_num}.mistral.out")
+output_out = os.path.join(version_dir, f"{image_filename}.{prompt_name}.v{version_num}{tag_suffix}.mistral.out")
 # Replot is always PNG (matplotlib output)
-replot_plot = os.path.join(version_dir, f"{name_for_folder}-replot.{prompt_name}.v{version_num}.png")
+replot_plot = os.path.join(version_dir, f"{name_for_folder}-replot.{prompt_name}.v{version_num}{tag_suffix}.png")
 
 print(f"Input plot: {input_plot}")
 print(f"Using prompt: {prompt_name}")
@@ -476,7 +503,7 @@ with open(output_out+'_conversation', 'a', encoding='utf-8') as file:
 
 # For comparison, use the converted PNG if original was SVG (cv2 can't read SVG)
 comparison_original = api_image_path if original_ext == '.svg' else input_plot
-stacked = stack_images_vertically(comparison_original, replot_plot, "yes", version_dir, prompt_name, version_num)
+stacked = stack_images_vertically(comparison_original, replot_plot, "yes", version_dir, prompt_name, version_num, tag_suffix=tag_suffix)
 
 # Only run validation comparisons if we have a stacked comparison image
 if stacked:
@@ -537,7 +564,7 @@ if stacked:
     print(f"\nFINISHED (result: {validate})")
 
     print("Stacking original and replotted images for comparison... ", end = '', flush=True)
-    stack_images_vertically(comparison_original, replot_plot, validate, version_dir, prompt_name, version_num)
+    stack_images_vertically(comparison_original, replot_plot, validate, version_dir, prompt_name, version_num, tag_suffix=tag_suffix)
     print(f"FINISHED")
 else:
     # Could not create comparison image

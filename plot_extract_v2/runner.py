@@ -10,9 +10,13 @@ import time
 import cv2
 import numpy as np
 from dotenv import load_dotenv
-from mistralai import Mistral
 import tempfile
 from typing import Optional
+
+try:
+    from mistralai import Mistral  # type: ignore
+except Exception:
+    Mistral = None  # type: ignore
 
 # -----------------------------------------------------------------------------
 # Paths and imports that require sys.path adjustments
@@ -40,7 +44,40 @@ from extraction_tracker import ExtractionTracker
 
 # Load env for API key
 load_dotenv(override=True)
-API_KEY = os.getenv("API_KEY_1")
+API_KEY_MISTRAL = os.getenv("API_KEY_1")
+API_KEY_GOOGLE = os.getenv("API_KEY_2")
+
+LLM_PROVIDER = (os.getenv("PLOTEXTRACT_LLM_PROVIDER") or "mistral").strip().lower()
+LLM_MODEL = (os.getenv("PLOTEXTRACT_LLM_MODEL") or "").strip()
+LLM_KEY = (os.getenv("PLOTEXTRACT_LLM_KEY") or "").strip()
+
+
+def _effective_model_for_provider(provider: str) -> str:
+    provider = (provider or "").strip().lower()
+    if provider == "google":
+        return (
+            os.getenv("PLOTEXTRACT_GOOGLE_MODEL")
+            or (LLM_MODEL if LLM_MODEL else None)
+            or "gemma-3-27b-it"
+        )
+    # mistral (default)
+    return (
+        os.getenv("PLOTEXTRACT_MISTRAL_MODEL")
+        or (LLM_MODEL if LLM_MODEL else None)
+        or "mistral-large-2512"
+    )
+
+
+def _effective_key_for_provider(provider: str, key: str) -> str:
+    key = (key or "").strip()
+    if key:
+        return key
+    provider = (provider or "").strip().lower()
+    if provider == "google":
+        return "2"
+    if provider == "mistral":
+        return "1"
+    return ""
 
 # Debug mode (writes per-stage prompts/outputs to disk)
 DEBUG_VERBOSE = str(os.getenv("PLOTEXTRACT_DEBUG", "")).strip().lower() in {"1", "true", "yes", "on"}
@@ -296,7 +333,11 @@ def prompt_mistral(client, messages):
 
     # Allow overriding model via env var.
     # Default remains the legacy value to avoid breaking existing pipelines.
-    model = os.getenv("PLOTEXTRACT_MISTRAL_MODEL") or "mistral-large-2512"
+    model = (
+        os.getenv("PLOTEXTRACT_MISTRAL_MODEL")
+        or (LLM_MODEL if LLM_MODEL else None)
+        or "mistral-large-2512"
+    )
 
     def _is_rate_limit_error(err: Exception) -> bool:
         msg = str(err).lower()
@@ -350,6 +391,171 @@ def prompt_mistral(client, messages):
     if last_err is not None:
         raise last_err
     raise RuntimeError("prompt_mistral failed without an exception")
+
+
+def prompt_google(messages):
+    """Send a prompt to Google GenAI (Gemini/Gemma via API key).
+
+    This is a best-effort adapter that accepts the same `messages` structure used
+    by the Mistral path: a list of {role, content}, where content can be a string
+    or a list of typed parts (text + image_url data URIs).
+    """
+    if not API_KEY_GOOGLE:
+        raise RuntimeError("Missing API_KEY_2 for Google provider")
+
+    try:
+        import google.generativeai as genai  # type: ignore
+        from google.generativeai import types as genai_types  # type: ignore
+    except Exception as e:
+        raise RuntimeError(
+            "Google provider requested but 'google-generativeai' is not installed. "
+            "Install it with: pip install google-generativeai"
+        ) from e
+
+    genai.configure(api_key=API_KEY_GOOGLE)
+
+    model_name = (
+        os.getenv("PLOTEXTRACT_GOOGLE_MODEL")
+        or (LLM_MODEL if LLM_MODEL else None)
+        # Default requested by user. If your Google endpoint expects a different
+        # model id for "Gemma 3 27B Vision", set PLOTEXTRACT_GOOGLE_MODEL in .env.
+        or "gemma-3-27b-it"
+    )
+
+    def _is_rate_limit_error(err: Exception) -> bool:
+        msg = str(err).lower()
+        return (
+            "429" in msg
+            or "rate limit" in msg
+            or "too many requests" in msg
+            or "resource exhausted" in msg
+        )
+
+    try:
+        max_retries = int(os.getenv("PLOTEXTRACT_GOOGLE_MAX_RETRIES") or "6")
+    except Exception:
+        max_retries = 6
+    try:
+        base_sleep_s = float(os.getenv("PLOTEXTRACT_GOOGLE_RETRY_BASE_S") or "1.0")
+    except Exception:
+        base_sleep_s = 1.0
+    try:
+        max_sleep_s = float(os.getenv("PLOTEXTRACT_GOOGLE_RETRY_MAX_S") or "20.0")
+    except Exception:
+        max_sleep_s = 20.0
+
+    # Flatten messages into a single prompt string plus binary image parts.
+    prompt_lines = []
+    parts = []
+
+    def _add_text(t: str):
+        if t is None:
+            return
+        t = str(t)
+        if not t.strip():
+            return
+        prompt_lines.append(t)
+
+    for m in messages or []:
+        role = (m.get("role") or "user").upper()
+        content = m.get("content")
+        if isinstance(content, str):
+            _add_text(f"{role}: {content}")
+            continue
+
+        # Typed parts (text + image_url)
+        if isinstance(content, list):
+            # Collect any text first
+            text_chunks = []
+            for p in content:
+                if isinstance(p, dict) and p.get("type") == "text":
+                    text_chunks.append(p.get("text") or "")
+            if text_chunks:
+                _add_text(f"{role}: " + "\n".join([t for t in text_chunks if str(t).strip()]))
+
+            # Then images
+            for p in content:
+                if not isinstance(p, dict) or p.get("type") != "image_url":
+                    continue
+                url = (((p.get("image_url") or {}) if isinstance(p.get("image_url"), dict) else {}) or {}).get("url")
+                if not url or not isinstance(url, str):
+                    continue
+                if url.startswith("data:") and ";base64," in url:
+                    header, b64 = url.split(",", 1)
+                    mime = header.split(";", 1)[0].replace("data:", "") or "image/png"
+                    try:
+                        img_bytes = base64.b64decode(b64)
+                    except Exception:
+                        continue
+
+                    # Prefer official Blob type when available.
+                    try:
+                        parts.append(genai_types.Blob(mime_type=mime, data=img_bytes))
+                    except Exception:
+                        parts.append({"mime_type": mime, "data": img_bytes})
+                else:
+                    # Non-data URI not supported in this adapter
+                    continue
+
+            continue
+
+        # Unknown content type
+        _add_text(f"{role}: {str(content)}")
+
+    prompt_text = "\n\n".join(prompt_lines).strip()
+    if prompt_text:
+        parts.insert(0, prompt_text)
+
+    model = genai.GenerativeModel(model_name=model_name)
+
+    last_err: Optional[Exception] = None
+    for attempt in range(max_retries + 1):
+        try:
+            resp = model.generate_content(
+                parts,
+                generation_config={
+                    "temperature": 0,
+                    "max_output_tokens": 4096,
+                },
+            )
+            text = getattr(resp, "text", None)
+            if not text:
+                # Try to extract from candidates/parts
+                try:
+                    c0 = resp.candidates[0]
+                    text = c0.content.parts[0].text
+                except Exception:
+                    text = ""
+            return messages, str(text)
+        except Exception as e:
+            last_err = e
+            if _is_rate_limit_error(e) and attempt < max_retries:
+                sleep_s = min(max_sleep_s, base_sleep_s * (2 ** attempt))
+                print(
+                    f"[WARN] Google rate limit (429). Retrying in {sleep_s:.1f}s (attempt {attempt + 1}/{max_retries})",
+                    file=sys.stderr,
+                )
+                time.sleep(sleep_s)
+                continue
+            raise
+
+    if last_err is not None:
+        raise last_err
+    raise RuntimeError("prompt_google failed without an exception")
+
+
+def prompt_llm(mistral_client, messages):
+    """Provider switch for LLM prompting."""
+    provider = (LLM_PROVIDER or "mistral").strip().lower()
+    if provider == "google":
+        return prompt_google(messages)
+
+    if provider != "mistral":
+        print(f"[WARN] Unknown LLM provider '{provider}', falling back to mistral", file=sys.stderr)
+
+    if mistral_client is None:
+        raise RuntimeError("Mistral provider requested but client is not available")
+    return prompt_mistral(mistral_client, messages)
 
 
 def clean_code_response(code_text):
@@ -625,17 +831,58 @@ def normalize_csv_to_wide(csv_text: str) -> str:
     return "\n".join(wide_lines)
 
 
-def get_next_version(parent_dir, name_for_folder, prompt_name):
-    version = 1
-    while True:
-        folder_name = f"{name_for_folder}.{prompt_name}.v{version}"
-        folder_path = os.path.join(parent_dir, folder_name)
-        if not os.path.exists(folder_path):
-            return version, folder_path
-        version += 1
+def _suffix_from_tags(*tags: str | None) -> str:
+    parts: list[str] = []
+    for t in tags:
+        if not t:
+            continue
+        t = str(t).strip()
+        if not t:
+            continue
+        if t.startswith('.'):
+            t = t[1:]
+        if not t:
+            continue
+        parts.append(t)
+    return ''.join(f".{p}" for p in parts)
 
 
-def stack_images_vertically(image1_path, image2_path, border_color, output_dir, prompt_name, version_num, border_size=30):
+def get_next_version(parent_dir, name_for_folder, prompt_name, key_tag: str | None = None, output_tag: str | None = None):
+    """Return the next version number and folder path.
+
+    Important: version numbers are monotonic across keys.
+    i.e. if v4 exists (with or without .keyN), next will be v5.<key_tag>.
+    """
+    import re
+
+    suffix = _suffix_from_tags(key_tag, output_tag)
+
+    max_version = 0
+    try:
+        pat = re.compile(
+            rf'^{re.escape(name_for_folder)}\.{re.escape(prompt_name)}\.v(\d+)(?:\.key\d+)?(?:\.web)?$'
+        )
+        if os.path.isdir(parent_dir):
+            for item in os.listdir(parent_dir):
+                m = pat.match(item)
+                if not m:
+                    continue
+                try:
+                    v = int(m.group(1))
+                except Exception:
+                    continue
+                if v > max_version:
+                    max_version = v
+    except Exception:
+        max_version = 0
+
+    version = max_version + 1
+    folder_name = f"{name_for_folder}.{prompt_name}.v{version}{suffix}"
+    folder_path = os.path.join(parent_dir, folder_name)
+    return version, folder_path
+
+
+def stack_images_vertically(image1_path, image2_path, border_color, output_dir, prompt_name, version_num, key_tag: str | None = None, output_tag: str | None = None, border_size=30):
     img1 = cv2.imread(image1_path)
     img2 = cv2.imread(image2_path)
     if img1 is None or img2 is None:
@@ -691,7 +938,8 @@ def stack_images_vertically(image1_path, image2_path, border_color, output_dir, 
 
     original_filename = os.path.basename(image1_path)
     base_name = original_filename.rsplit(".", 1)[0] if "." in original_filename else original_filename
-    output_filename = os.path.join(output_dir, f"comparison_{base_name}.{prompt_name}.v{version_num}.png")
+    suffix = _suffix_from_tags(key_tag, output_tag)
+    output_filename = os.path.join(output_dir, f"comparison_{base_name}.{prompt_name}.v{version_num}{suffix}.png")
     cv2.imwrite(output_filename, combined_image_with_border)
     return output_filename
 
@@ -795,8 +1043,14 @@ img {{ width: 100%; height: 100%; object-fit: contain; }}
 
 base64_image = encode_image(api_image_path)
 
-# Initialize Mistral client
-client = Mistral(api_key=API_KEY)
+# Initialize provider client(s)
+client = None
+if LLM_PROVIDER == "mistral":
+    if not API_KEY_MISTRAL:
+        raise RuntimeError("Missing API_KEY_1 for Mistral provider")
+    if Mistral is None:
+        raise RuntimeError("Mistral provider requested but 'mistralai' is not installed")
+    client = Mistral(api_key=API_KEY_MISTRAL)
 
 # -----------------------------------------------------------------------------
 # Preprocessing: Convert article info to structured JSON (if provided)
@@ -835,7 +1089,7 @@ if article_info_text:
         article_text=article_info_text
     )
     messages = [{"role": "user", "content": article_prompt}]
-    _, article_response = prompt_mistral(client, messages)
+    _, article_response = prompt_llm(client, messages)
     
     # Clean response and validate JSON
     article_response = article_response.strip()
@@ -861,19 +1115,59 @@ image_filename = os.path.basename(input_plot)
 base_name = os.path.splitext(image_filename)[0]
 name_for_folder = image_filename.replace(".", "_")
 full_prompt_name = f"pv2_{prompt_name}"
-version_num, version_dir = get_next_version(os.path.dirname(input_plot), name_for_folder, full_prompt_name)
+llm_provider_used = (LLM_PROVIDER or "mistral").strip().lower()
+llm_key_used = _effective_key_for_provider(llm_provider_used, LLM_KEY)
+key_tag = f"key{llm_key_used}" if llm_key_used else None
+try:
+    output_tag = str(os.getenv("PLOTEXTRACT_OUTPUT_TAG", "")).strip()
+except Exception:
+    output_tag = ""
+if output_tag.startswith('.'):
+    output_tag = output_tag[1:]
+if output_tag.lower() == '':
+    output_tag = ""
+if output_tag and output_tag.lower() != 'web':
+    # For now we only support a single known tag to avoid creating accidental new naming schemes.
+    output_tag = ""
+
+version_num, version_dir = get_next_version(
+    os.path.dirname(input_plot),
+    name_for_folder,
+    full_prompt_name,
+    key_tag=key_tag,
+    output_tag=(output_tag or None),
+)
 os.makedirs(version_dir, exist_ok=True)
 
 debug_dir = os.path.join(version_dir, "debug")
 if DEBUG_VERBOSE:
     os.makedirs(debug_dir, exist_ok=True)
 
-output_out = os.path.join(version_dir, f"{image_filename}.{full_prompt_name}.v{version_num}.mistral.out")
-replot_plot = os.path.join(version_dir, f"{name_for_folder}-replot.{full_prompt_name}.v{version_num}.png")
+run_suffix = _suffix_from_tags(key_tag, output_tag)
+output_out = os.path.join(version_dir, f"{image_filename}.{full_prompt_name}.v{version_num}{run_suffix}.mistral.out")
+replot_plot = os.path.join(version_dir, f"{name_for_folder}-replot.{full_prompt_name}.v{version_num}{run_suffix}.png")
 
 print(f"Input plot: {input_plot}")
 print(f"Using prompt set: {prompt_name}")
 print(f"Output folder: {version_dir} (version {version_num})")
+
+# Record which LLM/key/model were used for this run.
+try:
+    llm_model_used = _effective_model_for_provider(llm_provider_used)
+    llm_info = {
+        "llm_provider": llm_provider_used,
+        "llm_model": llm_model_used,
+        "llm_key": (f"key{llm_key_used}" if llm_key_used else ""),
+        "llm_key_index": llm_key_used,
+    }
+    with open(os.path.join(version_dir, "llm_info.json"), "w", encoding="utf-8") as f:
+        json.dump(llm_info, f, indent=2)
+    print(
+        f"LLM: provider={llm_provider_used} model={llm_model_used} key={llm_info['llm_key']}",
+        file=sys.stderr,
+    )
+except Exception:
+    pass
 
 stage_context = {}
 conversation_log = []
@@ -1065,7 +1359,7 @@ for stage_index, stage_name in enumerate(EXTRACT_STAGES):
 
     # Model call (add timing + persist raw response in debug mode)
     call_start = time.time()
-    messages, result_text = prompt_mistral(client, messages)
+    messages, result_text = prompt_llm(client, messages)
     call_ms = (time.time() - call_start) * 1000
     if DEBUG_VERBOSE:
         try:
@@ -1268,7 +1562,7 @@ if hasattr(prompts_module, "CODE_PLOT"):
     
     messages = create_Q_1p([[base64_image, code_prompt]])
     conversation_log.extend(messages)
-    messages, code = prompt_mistral(client, messages)
+    messages, code = prompt_llm(client, messages)
     code = clean_code_response(code)
     conversation_log.append({"role": "assistant", "content": code})
 
@@ -1403,7 +1697,7 @@ if error_output and error_output != "SKIP_REPLOT":
         + "Use os.makedirs(os.path.dirname(replot_path), exist_ok=True) and plt.savefig(replot_path, ...)."
     )
     repair_messages = conversation_log + [{"role": "user", "content": error_output + fix_prompt}]
-    _, code = prompt_mistral(client, repair_messages)
+    _, code = prompt_llm(client, repair_messages)
     code = clean_code_response(code)
     try:
         exec(code)
@@ -1429,7 +1723,7 @@ if code:
 # Only validate if we successfully generated a replot
 if code and error_output != "SKIP_REPLOT" and not error_output:
     comparison_original = api_image_path if original_ext == ".svg" else input_plot
-    stacked = stack_images_vertically(comparison_original, replot_plot, "yes", version_dir, prompt_name, version_num)
+    stacked = stack_images_vertically(comparison_original, replot_plot, "yes", version_dir, prompt_name, version_num, key_tag=key_tag, output_tag=(output_tag or None))
 else:
     stacked = None
     print("Skipping validation (no replot generated)")
@@ -1451,7 +1745,7 @@ if stacked:
                 {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{stacked_b64}"}},
             ],
         }]
-        _, validate_resp = prompt_mistral(client, msg)
+        _, validate_resp = prompt_llm(client, msg)
         return validate_resp
 
     # Get comparison prompts from the loaded prompts module
@@ -1503,7 +1797,7 @@ if stacked:
     print(f"\nFINISHED (result: {result_flag})")
 
     print("Stacking original and replotted images for comparison... ", end="", flush=True)
-    stack_images_vertically(comparison_original, replot_plot, "no" if wrong else "yes", version_dir, prompt_name, version_num)
+    stack_images_vertically(comparison_original, replot_plot, "no" if wrong else "yes", version_dir, prompt_name, version_num, key_tag=key_tag, output_tag=(output_tag or None))
     print("FINISHED")
 else:
     print("Skipping visual validation (comparison image could not be generated)")
