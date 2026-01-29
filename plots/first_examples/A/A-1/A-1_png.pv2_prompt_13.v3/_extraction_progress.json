@@ -1,0 +1,267 @@
+{
+  "status": "running",
+  "stage": "EXTRACT_STAGE_5",
+  "stage_index": 5,
+  "total_stages": 9,
+  "percentage": 55.6,
+  "accumulated_facts": {
+    "plot_type_facts": {
+      "declared_in_article_info": "unknown",
+      "visually_verified": true,
+      "plot_type": "time-kill plot",
+      "confidence": 0.9,
+      "reason": "The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions over time."
+    },
+    "axis_facts": {
+      "x_axis": {
+        "quantity": "time",
+        "unit": "hours",
+        "discrete": false,
+        "lower_plausible_limit": 0,
+        "upper_plausible_limit": 26,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          22,
+          24,
+          26
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "22",
+          "24",
+          "26"
+        ],
+        "breaks": [
+          {
+            "start": 12,
+            "end": 22,
+            "reason": "Non-uniform tick spacing indicating a break in time progression"
+          }
+        ],
+        "confidence": 0.95
+      },
+      "y_axis": {
+        "quantity": "bacterial burden",
+        "unit": "log10 CFU/mL",
+        "scale": "log10",
+        "upper_plausible_limit": 16,
+        "lower_plausible_limit": 0,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "14",
+          "16"
+        ],
+        "breaks": [],
+        "grid": {
+          "present": true,
+          "aligned_y_ticks": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            14,
+            16
+          ],
+          "aligned_x_ticks": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            22,
+            24,
+            26
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    "geometry_facts": {
+      "plot_box_px": {
+        "left": 70,
+        "top": 40,
+        "right": 630,
+        "bottom": 400
+      },
+      "x_axis_geometry": {
+        "scale": "linear",
+        "anchors": [
+          {
+            "x_value_hours": 0,
+            "x_px": 70
+          },
+          {
+            "x_value_hours": 6,
+            "x_px": 210
+          },
+          {
+            "x_value_hours": 12,
+            "x_px": 350
+          },
+          {
+            "x_value_hours": 26,
+            "x_px": 630
+          }
+        ],
+        "x_break": {
+          "present": true,
+          "break_px_start": 350,
+          "break_px_end": 450,
+          "left_end_value_hours": 12,
+          "right_start_value_hours": 22,
+          "left_segment_anchors": [
+            {
+              "x_value_hours": 0,
+              "x_px": 70
+            },
+            {
+              "x_value_hours": 6,
+              "x_px": 210
+            }
+          ],
+          "right_segment_anchors": [
+            {
+              "x_value_hours": 22,
+              "x_px": 450
+            },
+            {
+              "x_value_hours": 26,
+              "x_px": 630
+            }
+          ]
+        }
+      },
+      "y_axis_geometry": {
+        "scale": "log10",
+        "decade_anchors": [
+          {
+            "log10_value": 0,
+            "y_px": 400
+          },
+          {
+            "log10_value": 4,
+            "y_px": 280
+          },
+          {
+            "log10_value": 8,
+            "y_px": 160
+          },
+          {
+            "log10_value": 12,
+            "y_px": 40
+          }
+        ],
+        "y0_tick": {
+          "present": true,
+          "y_px": 400
+        }
+      },
+      "confidence": 0.95
+    },
+    "curve_style_facts": {
+      "curves": [
+        {
+          "curve_label": "Blank",
+          "colour": "black",
+          "line_type": "dotted",
+          "marker_symbol": "x",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "COL 0.125ug/mL",
+          "colour": "black",
+          "line_type": "solid",
+          "marker_symbol": "square",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "MINO 1ug/mL",
+          "colour": "black",
+          "line_type": "dashed",
+          "marker_symbol": "triangle",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "MEM 4ug/mL",
+          "colour": "black",
+          "line_type": "dash-dot",
+          "marker_symbol": "circle",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "RFP 0.06ug/mL",
+          "colour": "black",
+          "line_type": "dotted",
+          "marker_symbol": "inverted_triangle",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MEM 4ug/mL",
+          "colour": "black",
+          "line_type": "dash-dot-dot",
+          "marker_symbol": "circle",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+          "colour": "black",
+          "line_type": "dash-dot-dot",
+          "marker_symbol": "triangle",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + RFP 0.06ug/mL",
+          "colour": "black",
+          "line_type": "dotted",
+          "marker_symbol": "diamond",
+          "source": "figure_legend",
+          "confidence": 0.95
+        }
+      ]
+    }
+  },
+  "stage_duration_ms": 0,
+  "timestamp": 1769650599.0550935,
+  "console_output": "===== STAGE 1 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions over time.\"\n  }\n}\n===== STAGE 2 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions over time.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform tick spacing indicating a break in time progression\"\n        }\n      ],\n      \"confidence\": 0.95\n    }\n  }\n}\n===== STAGE 3 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions over time.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform tick spacing indicating a break in time progression\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  }\n}\n===== STAGE 4 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions over time.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform tick spacing indicating a break in time progression\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"geometry_facts\": {\n    \"plot_box_px\": {\n      \"left\": 70,\n      \"top\": 40,\n      \"right\": 630,\n      \"bottom\": 400\n    },\n    \"x_axis_geometry\": {\n      \"scale\": \"linear\",\n      \"anchors\": [\n        {\n          \"x_value_hours\": 0,\n          \"x_px\": 70\n        },\n        {\n          \"x_value_hours\": 6,\n          \"x_px\": 210\n        },\n        {\n          \"x_value_hours\": 12,\n          \"x_px\": 350\n        },\n        {\n          \"x_value_hours\": 26,\n          \"x_px\": 630\n        }\n      ],\n      \"x_break\": {\n        \"present\": true,\n        \"break_px_start\": 350,\n        \"break_px_end\": 450,\n        \"left_end_value_hours\": 12,\n        \"right_start_value_hours\": 22,\n        \"left_segment_anchors\": [\n          {\n            \"x_value_hours\": 0,\n            \"x_px\": 70\n          },\n          {\n            \"x_value_hours\": 6,\n            \"x_px\": 210\n          }\n        ],\n        \"right_segment_anchors\": [\n          {\n            \"x_value_hours\": 22,\n            \"x_px\": 450\n          },\n          {\n            \"x_value_hours\": 26,\n            \"x_px\": 630\n          }\n        ]\n      }\n    },\n    \"y_axis_geometry\": {\n      \"scale\": \"log10\",\n      \"decade_anchors\": [\n        {\n          \"log10_value\": 0,\n          \"y_px\": 400\n        },\n        {\n          \"log10_value\": 4,\n          \"y_px\": 280\n        },\n        {\n          \"log10_value\": 8,\n          \"y_px\": 160\n        },\n        {\n          \"log10_value\": 12,\n          \"y_px\": 40\n        }\n      ],\n      \"y0_tick\": {\n        \"present\": true,\n        \"y_px\": 400\n      }\n    },\n    \"confidence\": 0.95\n  }\n}\n===== STAGE 5 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions over time.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform tick spacing indicating a break in time progression\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"geometry_facts\": {\n    \"plot_box_px\": {\n      \"left\": 70,\n      \"top\": 40,\n      \"right\": 630,\n      \"bottom\": 400\n    },\n    \"x_axis_geometry\": {\n      \"scale\": \"linear\",\n      \"anchors\": [\n        {\n          \"x_value_hours\": 0,\n          \"x_px\": 70\n        },\n        {\n          \"x_value_hours\": 6,\n          \"x_px\": 210\n        },\n        {\n          \"x_value_hours\": 12,\n          \"x_px\": 350\n        },\n        {\n          \"x_value_hours\": 26,\n          \"x_px\": 630\n        }\n      ],\n      \"x_break\": {\n        \"present\": true,\n        \"break_px_start\": 350,\n        \"break_px_end\": 450,\n        \"left_end_value_hours\": 12,\n        \"right_start_value_hours\": 22,\n        \"left_segment_anchors\": [\n          {\n            \"x_value_hours\": 0,\n            \"x_px\": 70\n          },\n          {\n            \"x_value_hours\": 6,\n            \"x_px\": 210\n          }\n        ],\n        \"right_segment_anchors\": [\n          {\n            \"x_value_hours\": 22,\n            \"x_px\": 450\n          },\n          {\n            \"x_value_hours\": 26,\n            \"x_px\": 630\n          }\n        ]\n      }\n    },\n    \"y_axis_geometry\": {\n      \"scale\": \"log10\",\n      \"decade_anchors\": [\n        {\n          \"log10_value\": 0,\n          \"y_px\": 400\n        },\n        {\n          \"log10_value\": 4,\n          \"y_px\": 280\n        },\n        {\n          \"log10_value\": 8,\n          \"y_px\": 160\n        },\n        {\n          \"log10_value\": 12,\n          \"y_px\": 40\n        }\n      ],\n      \"y0_tick\": {\n        \"present\": true,\n        \"y_px\": 400\n      }\n    },\n    \"confidence\": 0.95\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot-dot\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot-dot\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"diamond\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      }\n    ]\n  }\n}\n"
+}

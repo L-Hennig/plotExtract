@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Smaller">
+  <defs>
+    <style>
+      .a{fill:#111;}
+    </style>
+  </defs>
+  <!-- Four inward arrows (compress) -->
+  <path class="a" d="M28 12v6H18v10h-6V16c0-2.2 1.8-4 4-4h12z"/>
+  <path class="a" d="M36 12h12c2.2 0 4 1.8 4 4v12h-6V18H36v-6z"/>
+  <path class="a" d="M28 52H16c-2.2 0-4-1.8-4-4V36h6v10h10v6z"/>
+  <path class="a" d="M48 52H36v-6h10V36h6v12c0 2.2-1.8 4-4 4z"/>
+  <!-- Inner corners pointing inward -->
+  <path class="a" d="M26 26h12v12H26z" opacity="0"/>
+  <path class="a" d="M22 22h10v6h-4v4h-6V22z"/>
+  <path class="a" d="M42 22v10h-6v-4h-4v-6h10z"/>
+  <path class="a" d="M22 42v-10h6v4h4v6H22z"/>
+  <path class="a" d="M42 42H32v-6h4v-4h6v10z"/>
+</svg>

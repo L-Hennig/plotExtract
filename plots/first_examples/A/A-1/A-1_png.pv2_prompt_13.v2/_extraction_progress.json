@@ -1,0 +1,604 @@
+{
+  "status": "running",
+  "stage": "EXTRACT_STAGE_7",
+  "stage_index": 7,
+  "total_stages": 9,
+  "percentage": 77.8,
+  "accumulated_facts": {
+    "plot_type_facts": {
+      "declared_in_article_info": "unknown",
+      "visually_verified": true,
+      "plot_type": "time-kill plot",
+      "confidence": 0.8,
+      "reason": "The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), with multiple curves showing bacterial burden over time under different treatment conditions. This matches the expected structure of a time-kill plot."
+    },
+    "axis_facts": {
+      "x_axis": {
+        "quantity": "time",
+        "unit": "hours",
+        "discrete": false,
+        "lower_plausible_limit": 0,
+        "upper_plausible_limit": 26,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          22,
+          24,
+          26
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "22",
+          "24",
+          "26"
+        ],
+        "breaks": [
+          {
+            "start": 12,
+            "end": 22,
+            "reason": "Non-uniform spacing between 12 and 22 hours"
+          }
+        ],
+        "confidence": 0.95
+      },
+      "y_axis": {
+        "quantity": "bacterial burden",
+        "unit": "log10 CFU/mL",
+        "scale": "log10",
+        "upper_plausible_limit": 16,
+        "lower_plausible_limit": 0,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "14",
+          "16"
+        ],
+        "breaks": [],
+        "grid": {
+          "present": true,
+          "aligned_y_ticks": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            14,
+            16
+          ],
+          "aligned_x_ticks": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            22,
+            24,
+            26
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    "geometry_facts": {
+      "plot_box_px": {
+        "left": 60,
+        "top": 40,
+        "right": 620,
+        "bottom": 460
+      },
+      "x_axis_geometry": {
+        "scale": "linear",
+        "anchors": [
+          {
+            "x_value_hours": 0,
+            "x_px": 60
+          },
+          {
+            "x_value_hours": 6,
+            "x_px": 200
+          },
+          {
+            "x_value_hours": 12,
+            "x_px": 340
+          },
+          {
+            "x_value_hours": 26,
+            "x_px": 620
+          }
+        ],
+        "x_break": {
+          "present": true,
+          "break_px_start": 340,
+          "break_px_end": 460,
+          "left_end_value_hours": 12,
+          "right_start_value_hours": 22,
+          "left_segment_anchors": [
+            {
+              "x_value_hours": 0,
+              "x_px": 60
+            },
+            {
+              "x_value_hours": 6,
+              "x_px": 200
+            }
+          ],
+          "right_segment_anchors": [
+            {
+              "x_value_hours": 24,
+              "x_px": 540
+            },
+            {
+              "x_value_hours": 26,
+              "x_px": 620
+            }
+          ]
+        }
+      },
+      "y_axis_geometry": {
+        "scale": "log10",
+        "decade_anchors": [
+          {
+            "log10_value": 0,
+            "y_px": 460
+          },
+          {
+            "log10_value": 4,
+            "y_px": 345
+          },
+          {
+            "log10_value": 8,
+            "y_px": 230
+          },
+          {
+            "log10_value": 12,
+            "y_px": 115
+          }
+        ],
+        "y0_tick": {
+          "present": true,
+          "y_px": 460
+        }
+      },
+      "confidence": 0.9
+    },
+    "accumulated_facts": {
+      "article_info": {
+        "curve_legend": [
+          {
+            "curve_label": "Blank",
+            "description": "No treatment",
+            "expected_trend": "Increase in bacterial burden over time"
+          },
+          {
+            "curve_label": "COL 0.125ug/mL",
+            "description": "Colistin at 0.125 micrograms per milliliter",
+            "expected_trend": "Reduction or inhibition of bacterial growth"
+          },
+          {
+            "curve_label": "MINO 1ug/mL",
+            "description": "Minocycline at 1 microgram per milliliter",
+            "expected_trend": "Reduction or inhibition of bacterial growth"
+          },
+          {
+            "curve_label": "MEM 4ug/mL",
+            "description": "Meropenem at 4 micrograms per milliliter",
+            "expected_trend": "Reduction or inhibition of bacterial growth"
+          },
+          {
+            "curve_label": "RFP 0.06ug/mL",
+            "description": "Rifampicin at 0.06 micrograms per milliliter",
+            "expected_trend": "Reduction or inhibition of bacterial growth"
+          },
+          {
+            "curve_label": "COL 0.125ug/mL + MEM 4ug/mL",
+            "description": "Combination of Colistin and Meropenem",
+            "expected_trend": "Enhanced reduction or inhibition of bacterial growth"
+          },
+          {
+            "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+            "description": "Combination of Colistin and Minocycline",
+            "expected_trend": "Enhanced reduction or inhibition of bacterial growth"
+          },
+          {
+            "curve_label": "COL 0.125ug/mL + RFP 0.06ug/mL",
+            "description": "Combination of Colistin and Rifampicin",
+            "expected_trend": "Enhanced reduction or inhibition of bacterial growth"
+          }
+        ]
+      },
+      "plot_type_facts": {
+        "declared_in_article_info": "unknown",
+        "visually_verified": true,
+        "plot_type": "time-kill plot",
+        "confidence": 0.8,
+        "reason": "The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), with multiple curves showing bacterial burden over time under different treatment conditions. This matches the expected structure of a time-kill plot."
+      },
+      "axis_facts": {
+        "x_axis": {
+          "quantity": "time",
+          "unit": "hours",
+          "discrete": false,
+          "lower_plausible_limit": 0,
+          "upper_plausible_limit": 26,
+          "ticks_verified": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            22,
+            24,
+            26
+          ],
+          "tick_labels": [
+            "0",
+            "2",
+            "4",
+            "6",
+            "8",
+            "10",
+            "12",
+            "22",
+            "24",
+            "26"
+          ],
+          "breaks": [
+            {
+              "start": 12,
+              "end": 22,
+              "reason": "Non-uniform spacing between 12 and 22 hours"
+            }
+          ],
+          "confidence": 0.95
+        },
+        "y_axis": {
+          "quantity": "bacterial burden",
+          "unit": "log10 CFU/mL",
+          "scale": "log10",
+          "upper_plausible_limit": 16,
+          "lower_plausible_limit": 0,
+          "ticks_verified": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            14,
+            16
+          ],
+          "tick_labels": [
+            "0",
+            "2",
+            "4",
+            "6",
+            "8",
+            "10",
+            "12",
+            "14",
+            "16"
+          ],
+          "breaks": [],
+          "grid": {
+            "present": true,
+            "aligned_y_ticks": [
+              0,
+              2,
+              4,
+              6,
+              8,
+              10,
+              12,
+              14,
+              16
+            ],
+            "aligned_x_ticks": [
+              0,
+              2,
+              4,
+              6,
+              8,
+              10,
+              12,
+              22,
+              24,
+              26
+            ]
+          },
+          "confidence": 0.95
+        }
+      },
+      "geometry_facts": {
+        "plot_box_px": {
+          "left": 60,
+          "top": 40,
+          "right": 620,
+          "bottom": 460
+        },
+        "x_axis_geometry": {
+          "scale": "linear",
+          "anchors": [
+            {
+              "x_value_hours": 0,
+              "x_px": 60
+            },
+            {
+              "x_value_hours": 6,
+              "x_px": 200
+            },
+            {
+              "x_value_hours": 12,
+              "x_px": 340
+            },
+            {
+              "x_value_hours": 26,
+              "x_px": 620
+            }
+          ],
+          "x_break": {
+            "present": true,
+            "break_px_start": 340,
+            "break_px_end": 460,
+            "left_end_value_hours": 12,
+            "right_start_value_hours": 22,
+            "left_segment_anchors": [
+              {
+                "x_value_hours": 0,
+                "x_px": 60
+              },
+              {
+                "x_value_hours": 6,
+                "x_px": 200
+              }
+            ],
+            "right_segment_anchors": [
+              {
+                "x_value_hours": 24,
+                "x_px": 540
+              },
+              {
+                "x_value_hours": 26,
+                "x_px": 620
+              }
+            ]
+          }
+        },
+        "y_axis_geometry": {
+          "scale": "log10",
+          "decade_anchors": [
+            {
+              "log10_value": 0,
+              "y_px": 460
+            },
+            {
+              "log10_value": 4,
+              "y_px": 345
+            },
+            {
+              "log10_value": 8,
+              "y_px": 230
+            },
+            {
+              "log10_value": 12,
+              "y_px": 115
+            }
+          ],
+          "y0_tick": {
+            "present": true,
+            "y_px": 460
+          }
+        },
+        "confidence": 0.9
+      },
+      "curve_style_facts": {
+        "curves": [
+          {
+            "curve_label": "Blank",
+            "colour": "black",
+            "line_type": "dotted",
+            "marker_symbol": "x",
+            "source": "figure_legend",
+            "confidence": 0.95
+          },
+          {
+            "curve_label": "COL 0.125ug/mL",
+            "colour": "black",
+            "line_type": "solid",
+            "marker_symbol": "square",
+            "source": "figure_legend",
+            "confidence": 0.95
+          },
+          {
+            "curve_label": "MINO 1ug/mL",
+            "colour": "black",
+            "line_type": "dashed",
+            "marker_symbol": "triangle up",
+            "source": "figure_legend",
+            "confidence": 0.95
+          },
+          {
+            "curve_label": "MEM 4ug/mL",
+            "colour": "black",
+            "line_type": "dotted",
+            "marker_symbol": "circle",
+            "source": "figure_legend",
+            "confidence": 0.95
+          },
+          {
+            "curve_label": "RFP 0.06ug/mL",
+            "colour": "black",
+            "line_type": "dotted",
+            "marker_symbol": "inverted triangle",
+            "source": "figure_legend",
+            "confidence": 0.95
+          },
+          {
+            "curve_label": "COL 0.125ug/mL + MEM 4ug/mL",
+            "colour": "black",
+            "line_type": "dotted",
+            "marker_symbol": "circle",
+            "source": "figure_legend",
+            "confidence": 0.95
+          },
+          {
+            "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+            "colour": "black",
+            "line_type": "dashed",
+            "marker_symbol": "triangle up",
+            "source": "figure_legend",
+            "confidence": 0.95
+          },
+          {
+            "curve_label": "COL 0.125ug/mL + RFP 0.06ug/mL",
+            "colour": "black",
+            "line_type": "dotted",
+            "marker_symbol": "inverted triangle",
+            "source": "figure_legend",
+            "confidence": 0.95
+          }
+        ]
+      }
+    },
+    "re_extraction": {
+      "requests": [
+        {
+          "curve_label": "Blank",
+          "issue_type": "direction_suspicious_unknown_expectation",
+          "target_times_hours": [
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "growth/increase",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.6,
+            "pct_decreasing": 0.0,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 0.5,
+              "from_time": 22,
+              "to_time": 24,
+              "delta": 0.5
+            }
+          },
+          "visual_guidance": "Verify the bacterial burden continues to increase or stabilizes after 22 hours, matching the expected growth trend for the untreated control."
+        },
+        {
+          "curve_label": "COL 0.125ug/mL",
+          "issue_type": "direction_flip_full",
+          "target_times_hours": [
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "kill/decrease",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.8,
+            "pct_decreasing": 0.2,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 0.5,
+              "from_time": 22,
+              "to_time": 24,
+              "delta": 0.0
+            }
+          },
+          "visual_guidance": "Check for bacterial regrowth or stabilization after 22 hours; expected trend is continued reduction or inhibition."
+        },
+        {
+          "curve_label": "MINO 1ug/mL",
+          "issue_type": "direction_flip_full",
+          "target_times_hours": [
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "kill/decrease",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.0,
+            "pct_decreasing": 0.4,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 0.5,
+              "from_time": 12,
+              "to_time": 22,
+              "delta": -0.5
+            }
+          },
+          "visual_guidance": "Re-examine the curve for unexpected regrowth or stabilization after 12 hours; expected trend is continued bacterial kill."
+        },
+        {
+          "curve_label": "RFP 0.06ug/mL",
+          "issue_type": "direction_flip_full",
+          "target_times_hours": [
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "kill/decrease",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.6,
+            "pct_decreasing": 0.0,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 0.5,
+              "from_time": 22,
+              "to_time": 24,
+              "delta": 0.0
+            }
+          },
+          "visual_guidance": "Verify if bacterial burden increases after 22 hours; expected trend is reduction or inhibition."
+        }
+      ]
+    }
+  },
+  "stage_duration_ms": 0,
+  "timestamp": 1769650138.840555,
+  "console_output": "===== STAGE 1 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.8,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), with multiple curves showing bacterial burden over time under different treatment conditions. This matches the expected structure of a time-kill plot.\"\n  }\n}\n===== STAGE 2 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.8,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), with multiple curves showing bacterial burden over time under different treatment conditions. This matches the expected structure of a time-kill plot.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours\"\n        }\n      ],\n      \"confidence\": 0.95\n    }\n  }\n}\n===== STAGE 3 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.8,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), with multiple curves showing bacterial burden over time under different treatment conditions. This matches the expected structure of a time-kill plot.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  }\n}\n===== STAGE 4 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.8,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), with multiple curves showing bacterial burden over time under different treatment conditions. This matches the expected structure of a time-kill plot.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"geometry_facts\": {\n    \"plot_box_px\": {\n      \"left\": 60,\n      \"top\": 40,\n      \"right\": 620,\n      \"bottom\": 460\n    },\n    \"x_axis_geometry\": {\n      \"scale\": \"linear\",\n      \"anchors\": [\n        {\n          \"x_value_hours\": 0,\n          \"x_px\": 60\n        },\n        {\n          \"x_value_hours\": 6,\n          \"x_px\": 200\n        },\n        {\n          \"x_value_hours\": 12,\n          \"x_px\": 340\n        },\n        {\n          \"x_value_hours\": 26,\n          \"x_px\": 620\n        }\n      ],\n      \"x_break\": {\n        \"present\": true,\n        \"break_px_start\": 340,\n        \"break_px_end\": 460,\n        \"left_end_value_hours\": 12,\n        \"right_start_value_hours\": 22,\n        \"left_segment_anchors\": [\n          {\n            \"x_value_hours\": 0,\n            \"x_px\": 60\n          },\n          {\n            \"x_value_hours\": 6,\n            \"x_px\": 200\n          }\n        ],\n        \"right_segment_anchors\": [\n          {\n            \"x_value_hours\": 24,\n            \"x_px\": 540\n          },\n          {\n            \"x_value_hours\": 26,\n            \"x_px\": 620\n          }\n        ]\n      }\n    },\n    \"y_axis_geometry\": {\n      \"scale\": \"log10\",\n      \"decade_anchors\": [\n        {\n          \"log10_value\": 0,\n          \"y_px\": 460\n        },\n        {\n          \"log10_value\": 4,\n          \"y_px\": 345\n        },\n        {\n          \"log10_value\": 8,\n          \"y_px\": 230\n        },\n        {\n          \"log10_value\": 12,\n          \"y_px\": 115\n        }\n      ],\n      \"y0_tick\": {\n        \"present\": true,\n        \"y_px\": 460\n      }\n    },\n    \"confidence\": 0.9\n  }\n}\n===== STAGE 5 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.8,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), with multiple curves showing bacterial burden over time under different treatment conditions. This matches the expected structure of a time-kill plot.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"geometry_facts\": {\n    \"plot_box_px\": {\n      \"left\": 60,\n      \"top\": 40,\n      \"right\": 620,\n      \"bottom\": 460\n    },\n    \"x_axis_geometry\": {\n      \"scale\": \"linear\",\n      \"anchors\": [\n        {\n          \"x_value_hours\": 0,\n          \"x_px\": 60\n        },\n        {\n          \"x_value_hours\": 6,\n          \"x_px\": 200\n        },\n        {\n          \"x_value_hours\": 12,\n          \"x_px\": 340\n        },\n        {\n          \"x_value_hours\": 26,\n          \"x_px\": 620\n        }\n      ],\n      \"x_break\": {\n        \"present\": true,\n        \"break_px_start\": 340,\n        \"break_px_end\": 460,\n        \"left_end_value_hours\": 12,\n        \"right_start_value_hours\": 22,\n        \"left_segment_anchors\": [\n          {\n            \"x_value_hours\": 0,\n            \"x_px\": 60\n          },\n          {\n            \"x_value_hours\": 6,\n            \"x_px\": 200\n          }\n        ],\n        \"right_segment_anchors\": [\n          {\n            \"x_value_hours\": 24,\n            \"x_px\": 540\n          },\n          {\n            \"x_value_hours\": 26,\n            \"x_px\": 620\n          }\n        ]\n      }\n    },\n    \"y_axis_geometry\": {\n      \"scale\": \"log10\",\n      \"decade_anchors\": [\n        {\n          \"log10_value\": 0,\n          \"y_px\": 460\n        },\n        {\n          \"log10_value\": 4,\n          \"y_px\": 345\n        },\n        {\n          \"log10_value\": 8,\n          \"y_px\": 230\n        },\n        {\n          \"log10_value\": 12,\n          \"y_px\": 115\n        }\n      ],\n      \"y0_tick\": {\n        \"present\": true,\n        \"y_px\": 460\n      }\n    },\n    \"confidence\": 0.9\n  },\n  \"accumulated_facts\": {\n    \"article_info\": {\n      \"curve_legend\": [\n        {\n          \"curve_label\": \"Blank\",\n          \"description\": \"No treatment\",\n          \"expected_trend\": \"Increase in bacterial burden over time\"\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL\",\n          \"description\": \"Colistin at 0.125 micrograms per milliliter\",\n          \"expected_trend\": \"Reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"MINO 1ug/mL\",\n          \"description\": \"Minocycline at 1 microgram per milliliter\",\n          \"expected_trend\": \"Reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"MEM 4ug/mL\",\n          \"description\": \"Meropenem at 4 micrograms per milliliter\",\n          \"expected_trend\": \"Reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"RFP 0.06ug/mL\",\n          \"description\": \"Rifampicin at 0.06 micrograms per milliliter\",\n          \"expected_trend\": \"Reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n          \"description\": \"Combination of Colistin and Meropenem\",\n          \"expected_trend\": \"Enhanced reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n          \"description\": \"Combination of Colistin and Minocycline\",\n          \"expected_trend\": \"Enhanced reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n          \"description\": \"Combination of Colistin and Rifampicin\",\n          \"expected_trend\": \"Enhanced reduction or inhibition of bacterial growth\"\n        }\n      ]\n    },\n    \"plot_type_facts\": {\n      \"declared_in_article_info\": \"unknown\",\n      \"visually_verified\": true,\n      \"plot_type\": \"time-kill plot\",\n      \"confidence\": 0.8,\n      \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), with multiple curves showing bacterial burden over time under different treatment conditions. This matches the expected structure of a time-kill plot.\"\n    },\n    \"axis_facts\": {\n      \"x_axis\": {\n        \"quantity\": \"time\",\n        \"unit\": \"hours\",\n        \"discrete\": false,\n        \"lower_plausible_limit\": 0,\n        \"upper_plausible_limit\": 26,\n        \"ticks_verified\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ],\n        \"tick_labels\": [\n          \"0\",\n          \"2\",\n          \"4\",\n          \"6\",\n          \"8\",\n          \"10\",\n          \"12\",\n          \"22\",\n          \"24\",\n          \"26\"\n        ],\n        \"breaks\": [\n          {\n            \"start\": 12,\n            \"end\": 22,\n            \"reason\": \"Non-uniform spacing between 12 and 22 hours\"\n          }\n        ],\n        \"confidence\": 0.95\n      },\n      \"y_axis\": {\n        \"quantity\": \"bacterial burden\",\n        \"unit\": \"log10 CFU/mL\",\n        \"scale\": \"log10\",\n        \"upper_plausible_limit\": 16,\n        \"lower_plausible_limit\": 0,\n        \"ticks_verified\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"tick_labels\": [\n          \"0\",\n          \"2\",\n          \"4\",\n          \"6\",\n          \"8\",\n          \"10\",\n          \"12\",\n          \"14\",\n          \"16\"\n        ],\n        \"breaks\": [],\n        \"grid\": {\n          \"present\": true,\n          \"aligned_y_ticks\": [\n            0,\n            2,\n            4,\n            6,\n            8,\n            10,\n            12,\n            14,\n            16\n          ],\n          \"aligned_x_ticks\": [\n            0,\n            2,\n            4,\n            6,\n            8,\n            10,\n            12,\n            22,\n            24,\n            26\n          ]\n        },\n        \"confidence\": 0.95\n      }\n    },\n    \"geometry_facts\": {\n      \"plot_box_px\": {\n        \"left\": 60,\n        \"top\": 40,\n        \"right\": 620,\n        \"bottom\": 460\n      },\n      \"x_axis_geometry\": {\n        \"scale\": \"linear\",\n        \"anchors\": [\n          {\n            \"x_value_hours\": 0,\n            \"x_px\": 60\n          },\n          {\n            \"x_value_hours\": 6,\n            \"x_px\": 200\n          },\n          {\n            \"x_value_hours\": 12,\n            \"x_px\": 340\n          },\n          {\n            \"x_value_hours\": 26,\n            \"x_px\": 620\n          }\n        ],\n        \"x_break\": {\n          \"present\": true,\n          \"break_px_start\": 340,\n          \"break_px_end\": 460,\n          \"left_end_value_hours\": 12,\n          \"right_start_value_hours\": 22,\n          \"left_segment_anchors\": [\n            {\n              \"x_value_hours\": 0,\n              \"x_px\": 60\n            },\n            {\n              \"x_value_hours\": 6,\n              \"x_px\": 200\n            }\n          ],\n          \"right_segment_anchors\": [\n            {\n              \"x_value_hours\": 24,\n              \"x_px\": 540\n            },\n            {\n              \"x_value_hours\": 26,\n              \"x_px\": 620\n            }\n          ]\n        }\n      },\n      \"y_axis_geometry\": {\n        \"scale\": \"log10\",\n        \"decade_anchors\": [\n          {\n            \"log10_value\": 0,\n            \"y_px\": 460\n          },\n          {\n            \"log10_value\": 4,\n            \"y_px\": 345\n          },\n          {\n            \"log10_value\": 8,\n            \"y_px\": 230\n          },\n          {\n            \"log10_value\": 12,\n            \"y_px\": 115\n          }\n        ],\n        \"y0_tick\": {\n          \"present\": true,\n          \"y_px\": 460\n        }\n      },\n      \"confidence\": 0.9\n    },\n    \"curve_style_facts\": {\n      \"curves\": [\n        {\n          \"curve_label\": \"Blank\",\n          \"colour\": \"black\",\n          \"line_type\": \"dotted\",\n          \"marker_symbol\": \"x\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"solid\",\n          \"marker_symbol\": \"square\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"MINO 1ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dashed\",\n          \"marker_symbol\": \"triangle up\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"MEM 4ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dotted\",\n          \"marker_symbol\": \"circle\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"RFP 0.06ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dotted\",\n          \"marker_symbol\": \"inverted triangle\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dotted\",\n          \"marker_symbol\": \"circle\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dashed\",\n          \"marker_symbol\": \"triangle up\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dotted\",\n          \"marker_symbol\": \"inverted triangle\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        }\n      ]\n    }\n  }\n}\n===== STAGE 6 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.8,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), with multiple curves showing bacterial burden over time under different treatment conditions. This matches the expected structure of a time-kill plot.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"geometry_facts\": {\n    \"plot_box_px\": {\n      \"left\": 60,\n      \"top\": 40,\n      \"right\": 620,\n      \"bottom\": 460\n    },\n    \"x_axis_geometry\": {\n      \"scale\": \"linear\",\n      \"anchors\": [\n        {\n          \"x_value_hours\": 0,\n          \"x_px\": 60\n        },\n        {\n          \"x_value_hours\": 6,\n          \"x_px\": 200\n        },\n        {\n          \"x_value_hours\": 12,\n          \"x_px\": 340\n        },\n        {\n          \"x_value_hours\": 26,\n          \"x_px\": 620\n        }\n      ],\n      \"x_break\": {\n        \"present\": true,\n        \"break_px_start\": 340,\n        \"break_px_end\": 460,\n        \"left_end_value_hours\": 12,\n        \"right_start_value_hours\": 22,\n        \"left_segment_anchors\": [\n          {\n            \"x_value_hours\": 0,\n            \"x_px\": 60\n          },\n          {\n            \"x_value_hours\": 6,\n            \"x_px\": 200\n          }\n        ],\n        \"right_segment_anchors\": [\n          {\n            \"x_value_hours\": 24,\n            \"x_px\": 540\n          },\n          {\n            \"x_value_hours\": 26,\n            \"x_px\": 620\n          }\n        ]\n      }\n    },\n    \"y_axis_geometry\": {\n      \"scale\": \"log10\",\n      \"decade_anchors\": [\n        {\n          \"log10_value\": 0,\n          \"y_px\": 460\n        },\n        {\n          \"log10_value\": 4,\n          \"y_px\": 345\n        },\n        {\n          \"log10_value\": 8,\n          \"y_px\": 230\n        },\n        {\n          \"log10_value\": 12,\n          \"y_px\": 115\n        }\n      ],\n      \"y0_tick\": {\n        \"present\": true,\n        \"y_px\": 460\n      }\n    },\n    \"confidence\": 0.9\n  },\n  \"accumulated_facts\": {\n    \"article_info\": {\n      \"curve_legend\": [\n        {\n          \"curve_label\": \"Blank\",\n          \"description\": \"No treatment\",\n          \"expected_trend\": \"Increase in bacterial burden over time\"\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL\",\n          \"description\": \"Colistin at 0.125 micrograms per milliliter\",\n          \"expected_trend\": \"Reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"MINO 1ug/mL\",\n          \"description\": \"Minocycline at 1 microgram per milliliter\",\n          \"expected_trend\": \"Reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"MEM 4ug/mL\",\n          \"description\": \"Meropenem at 4 micrograms per milliliter\",\n          \"expected_trend\": \"Reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"RFP 0.06ug/mL\",\n          \"description\": \"Rifampicin at 0.06 micrograms per milliliter\",\n          \"expected_trend\": \"Reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n          \"description\": \"Combination of Colistin and Meropenem\",\n          \"expected_trend\": \"Enhanced reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n          \"description\": \"Combination of Colistin and Minocycline\",\n          \"expected_trend\": \"Enhanced reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n          \"description\": \"Combination of Colistin and Rifampicin\",\n          \"expected_trend\": \"Enhanced reduction or inhibition of bacterial growth\"\n        }\n      ]\n    },\n    \"plot_type_facts\": {\n      \"declared_in_article_info\": \"unknown\",\n      \"visually_verified\": true,\n      \"plot_type\": \"time-kill plot\",\n      \"confidence\": 0.8,\n      \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), with multiple curves showing bacterial burden over time under different treatment conditions. This matches the expected structure of a time-kill plot.\"\n    },\n    \"axis_facts\": {\n      \"x_axis\": {\n        \"quantity\": \"time\",\n        \"unit\": \"hours\",\n        \"discrete\": false,\n        \"lower_plausible_limit\": 0,\n        \"upper_plausible_limit\": 26,\n        \"ticks_verified\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ],\n        \"tick_labels\": [\n          \"0\",\n          \"2\",\n          \"4\",\n          \"6\",\n          \"8\",\n          \"10\",\n          \"12\",\n          \"22\",\n          \"24\",\n          \"26\"\n        ],\n        \"breaks\": [\n          {\n            \"start\": 12,\n            \"end\": 22,\n            \"reason\": \"Non-uniform spacing between 12 and 22 hours\"\n          }\n        ],\n        \"confidence\": 0.95\n      },\n      \"y_axis\": {\n        \"quantity\": \"bacterial burden\",\n        \"unit\": \"log10 CFU/mL\",\n        \"scale\": \"log10\",\n        \"upper_plausible_limit\": 16,\n        \"lower_plausible_limit\": 0,\n        \"ticks_verified\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"tick_labels\": [\n          \"0\",\n          \"2\",\n          \"4\",\n          \"6\",\n          \"8\",\n          \"10\",\n          \"12\",\n          \"14\",\n          \"16\"\n        ],\n        \"breaks\": [],\n        \"grid\": {\n          \"present\": true,\n          \"aligned_y_ticks\": [\n            0,\n            2,\n            4,\n            6,\n            8,\n            10,\n            12,\n            14,\n            16\n          ],\n          \"aligned_x_ticks\": [\n            0,\n            2,\n            4,\n            6,\n            8,\n            10,\n            12,\n            22,\n            24,\n            26\n          ]\n        },\n        \"confidence\": 0.95\n      }\n    },\n    \"geometry_facts\": {\n      \"plot_box_px\": {\n        \"left\": 60,\n        \"top\": 40,\n        \"right\": 620,\n        \"bottom\": 460\n      },\n      \"x_axis_geometry\": {\n        \"scale\": \"linear\",\n        \"anchors\": [\n          {\n            \"x_value_hours\": 0,\n            \"x_px\": 60\n          },\n          {\n            \"x_value_hours\": 6,\n            \"x_px\": 200\n          },\n          {\n            \"x_value_hours\": 12,\n            \"x_px\": 340\n          },\n          {\n            \"x_value_hours\": 26,\n            \"x_px\": 620\n          }\n        ],\n        \"x_break\": {\n          \"present\": true,\n          \"break_px_start\": 340,\n          \"break_px_end\": 460,\n          \"left_end_value_hours\": 12,\n          \"right_start_value_hours\": 22,\n          \"left_segment_anchors\": [\n            {\n              \"x_value_hours\": 0,\n              \"x_px\": 60\n            },\n            {\n              \"x_value_hours\": 6,\n              \"x_px\": 200\n            }\n          ],\n          \"right_segment_anchors\": [\n            {\n              \"x_value_hours\": 24,\n              \"x_px\": 540\n            },\n            {\n              \"x_value_hours\": 26,\n              \"x_px\": 620\n            }\n          ]\n        }\n      },\n      \"y_axis_geometry\": {\n        \"scale\": \"log10\",\n        \"decade_anchors\": [\n          {\n            \"log10_value\": 0,\n            \"y_px\": 460\n          },\n          {\n            \"log10_value\": 4,\n            \"y_px\": 345\n          },\n          {\n            \"log10_value\": 8,\n            \"y_px\": 230\n          },\n          {\n            \"log10_value\": 12,\n            \"y_px\": 115\n          }\n        ],\n        \"y0_tick\": {\n          \"present\": true,\n          \"y_px\": 460\n        }\n      },\n      \"confidence\": 0.9\n    },\n    \"curve_style_facts\": {\n      \"curves\": [\n        {\n          \"curve_label\": \"Blank\",\n          \"colour\": \"black\",\n          \"line_type\": \"dotted\",\n          \"marker_symbol\": \"x\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"solid\",\n          \"marker_symbol\": \"square\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"MINO 1ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dashed\",\n          \"marker_symbol\": \"triangle up\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"MEM 4ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dotted\",\n          \"marker_symbol\": \"circle\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"RFP 0.06ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dotted\",\n          \"marker_symbol\": \"inverted triangle\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dotted\",\n          \"marker_symbol\": \"circle\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dashed\",\n          \"marker_symbol\": \"triangle up\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dotted\",\n          \"marker_symbol\": \"inverted triangle\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        }\n      ]\n    }\n  }\n}\n===== STAGE 7 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.8,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), with multiple curves showing bacterial burden over time under different treatment conditions. This matches the expected structure of a time-kill plot.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"geometry_facts\": {\n    \"plot_box_px\": {\n      \"left\": 60,\n      \"top\": 40,\n      \"right\": 620,\n      \"bottom\": 460\n    },\n    \"x_axis_geometry\": {\n      \"scale\": \"linear\",\n      \"anchors\": [\n        {\n          \"x_value_hours\": 0,\n          \"x_px\": 60\n        },\n        {\n          \"x_value_hours\": 6,\n          \"x_px\": 200\n        },\n        {\n          \"x_value_hours\": 12,\n          \"x_px\": 340\n        },\n        {\n          \"x_value_hours\": 26,\n          \"x_px\": 620\n        }\n      ],\n      \"x_break\": {\n        \"present\": true,\n        \"break_px_start\": 340,\n        \"break_px_end\": 460,\n        \"left_end_value_hours\": 12,\n        \"right_start_value_hours\": 22,\n        \"left_segment_anchors\": [\n          {\n            \"x_value_hours\": 0,\n            \"x_px\": 60\n          },\n          {\n            \"x_value_hours\": 6,\n            \"x_px\": 200\n          }\n        ],\n        \"right_segment_anchors\": [\n          {\n            \"x_value_hours\": 24,\n            \"x_px\": 540\n          },\n          {\n            \"x_value_hours\": 26,\n            \"x_px\": 620\n          }\n        ]\n      }\n    },\n    \"y_axis_geometry\": {\n      \"scale\": \"log10\",\n      \"decade_anchors\": [\n        {\n          \"log10_value\": 0,\n          \"y_px\": 460\n        },\n        {\n          \"log10_value\": 4,\n          \"y_px\": 345\n        },\n        {\n          \"log10_value\": 8,\n          \"y_px\": 230\n        },\n        {\n          \"log10_value\": 12,\n          \"y_px\": 115\n        }\n      ],\n      \"y0_tick\": {\n        \"present\": true,\n        \"y_px\": 460\n      }\n    },\n    \"confidence\": 0.9\n  },\n  \"accumulated_facts\": {\n    \"article_info\": {\n      \"curve_legend\": [\n        {\n          \"curve_label\": \"Blank\",\n          \"description\": \"No treatment\",\n          \"expected_trend\": \"Increase in bacterial burden over time\"\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL\",\n          \"description\": \"Colistin at 0.125 micrograms per milliliter\",\n          \"expected_trend\": \"Reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"MINO 1ug/mL\",\n          \"description\": \"Minocycline at 1 microgram per milliliter\",\n          \"expected_trend\": \"Reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"MEM 4ug/mL\",\n          \"description\": \"Meropenem at 4 micrograms per milliliter\",\n          \"expected_trend\": \"Reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"RFP 0.06ug/mL\",\n          \"description\": \"Rifampicin at 0.06 micrograms per milliliter\",\n          \"expected_trend\": \"Reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n          \"description\": \"Combination of Colistin and Meropenem\",\n          \"expected_trend\": \"Enhanced reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n          \"description\": \"Combination of Colistin and Minocycline\",\n          \"expected_trend\": \"Enhanced reduction or inhibition of bacterial growth\"\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n          \"description\": \"Combination of Colistin and Rifampicin\",\n          \"expected_trend\": \"Enhanced reduction or inhibition of bacterial growth\"\n        }\n      ]\n    },\n    \"plot_type_facts\": {\n      \"declared_in_article_info\": \"unknown\",\n      \"visually_verified\": true,\n      \"plot_type\": \"time-kill plot\",\n      \"confidence\": 0.8,\n      \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), with multiple curves showing bacterial burden over time under different treatment conditions. This matches the expected structure of a time-kill plot.\"\n    },\n    \"axis_facts\": {\n      \"x_axis\": {\n        \"quantity\": \"time\",\n        \"unit\": \"hours\",\n        \"discrete\": false,\n        \"lower_plausible_limit\": 0,\n        \"upper_plausible_limit\": 26,\n        \"ticks_verified\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ],\n        \"tick_labels\": [\n          \"0\",\n          \"2\",\n          \"4\",\n          \"6\",\n          \"8\",\n          \"10\",\n          \"12\",\n          \"22\",\n          \"24\",\n          \"26\"\n        ],\n        \"breaks\": [\n          {\n            \"start\": 12,\n            \"end\": 22,\n            \"reason\": \"Non-uniform spacing between 12 and 22 hours\"\n          }\n        ],\n        \"confidence\": 0.95\n      },\n      \"y_axis\": {\n        \"quantity\": \"bacterial burden\",\n        \"unit\": \"log10 CFU/mL\",\n        \"scale\": \"log10\",\n        \"upper_plausible_limit\": 16,\n        \"lower_plausible_limit\": 0,\n        \"ticks_verified\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"tick_labels\": [\n          \"0\",\n          \"2\",\n          \"4\",\n          \"6\",\n          \"8\",\n          \"10\",\n          \"12\",\n          \"14\",\n          \"16\"\n        ],\n        \"breaks\": [],\n        \"grid\": {\n          \"present\": true,\n          \"aligned_y_ticks\": [\n            0,\n            2,\n            4,\n            6,\n            8,\n            10,\n            12,\n            14,\n            16\n          ],\n          \"aligned_x_ticks\": [\n            0,\n            2,\n            4,\n            6,\n            8,\n            10,\n            12,\n            22,\n            24,\n            26\n          ]\n        },\n        \"confidence\": 0.95\n      }\n    },\n    \"geometry_facts\": {\n      \"plot_box_px\": {\n        \"left\": 60,\n        \"top\": 40,\n        \"right\": 620,\n        \"bottom\": 460\n      },\n      \"x_axis_geometry\": {\n        \"scale\": \"linear\",\n        \"anchors\": [\n          {\n            \"x_value_hours\": 0,\n            \"x_px\": 60\n          },\n          {\n            \"x_value_hours\": 6,\n            \"x_px\": 200\n          },\n          {\n            \"x_value_hours\": 12,\n            \"x_px\": 340\n          },\n          {\n            \"x_value_hours\": 26,\n            \"x_px\": 620\n          }\n        ],\n        \"x_break\": {\n          \"present\": true,\n          \"break_px_start\": 340,\n          \"break_px_end\": 460,\n          \"left_end_value_hours\": 12,\n          \"right_start_value_hours\": 22,\n          \"left_segment_anchors\": [\n            {\n              \"x_value_hours\": 0,\n              \"x_px\": 60\n            },\n            {\n              \"x_value_hours\": 6,\n              \"x_px\": 200\n            }\n          ],\n          \"right_segment_anchors\": [\n            {\n              \"x_value_hours\": 24,\n              \"x_px\": 540\n            },\n            {\n              \"x_value_hours\": 26,\n              \"x_px\": 620\n            }\n          ]\n        }\n      },\n      \"y_axis_geometry\": {\n        \"scale\": \"log10\",\n        \"decade_anchors\": [\n          {\n            \"log10_value\": 0,\n            \"y_px\": 460\n          },\n          {\n            \"log10_value\": 4,\n            \"y_px\": 345\n          },\n          {\n            \"log10_value\": 8,\n            \"y_px\": 230\n          },\n          {\n            \"log10_value\": 12,\n            \"y_px\": 115\n          }\n        ],\n        \"y0_tick\": {\n          \"present\": true,\n          \"y_px\": 460\n        }\n      },\n      \"confidence\": 0.9\n    },\n    \"curve_style_facts\": {\n      \"curves\": [\n        {\n          \"curve_label\": \"Blank\",\n          \"colour\": \"black\",\n          \"line_type\": \"dotted\",\n          \"marker_symbol\": \"x\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"solid\",\n          \"marker_symbol\": \"square\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"MINO 1ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dashed\",\n          \"marker_symbol\": \"triangle up\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"MEM 4ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dotted\",\n          \"marker_symbol\": \"circle\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"RFP 0.06ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dotted\",\n          \"marker_symbol\": \"inverted triangle\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dotted\",\n          \"marker_symbol\": \"circle\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dashed\",\n          \"marker_symbol\": \"triangle up\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        },\n        {\n          \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n          \"colour\": \"black\",\n          \"line_type\": \"dotted\",\n          \"marker_symbol\": \"inverted triangle\",\n          \"source\": \"figure_legend\",\n          \"confidence\": 0.95\n        }\n      ]\n    }\n  },\n  \"re_extraction\": {\n    \"requests\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"issue_type\": \"direction_suspicious_unknown_expectation\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"growth/increase\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.6,\n          \"pct_decreasing\": 0.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 0.5,\n            \"from_time\": 22,\n            \"to_time\": 24,\n            \"delta\": 0.5\n          }\n        },\n        \"visual_guidance\": \"Verify the bacterial burden continues to increase or stabilizes after 22 hours, matching the expected growth trend for the untreated control.\"\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"issue_type\": \"direction_flip_full\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.8,\n          \"pct_decreasing\": 0.2,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 0.5,\n            \"from_time\": 22,\n            \"to_time\": 24,\n            \"delta\": 0.0\n          }\n        },\n        \"visual_guidance\": \"Check for bacterial regrowth or stabilization after 22 hours; expected trend is continued reduction or inhibition.\"\n      },\n      {\n        \"curve_label\": \"MINO 1ug/mL\",\n        \"issue_type\": \"direction_flip_full\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.0,\n          \"pct_decreasing\": 0.4,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 0.5,\n            \"from_time\": 12,\n            \"to_time\": 22,\n            \"delta\": -0.5\n          }\n        },\n        \"visual_guidance\": \"Re-examine the curve for unexpected regrowth or stabilization after 12 hours; expected trend is continued bacterial kill.\"\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"issue_type\": \"direction_flip_full\",\n        \"target_times_hours\": [\n          22,\n          24,\n          26\n        ],\n        \"expected_trend\": \"kill/decrease\",\n        \"evidence\": {\n          \"n_points\": 10,\n          \"expected_n_points\": 10,\n          \"times_missing\": [],\n          \"pct_increasing\": 0.6,\n          \"pct_decreasing\": 0.0,\n          \"baseline_delta_from_median\": null,\n          \"largest_jump\": {\n            \"abs_jump\": 0.5,\n            \"from_time\": 22,\n            \"to_time\": 24,\n            \"delta\": 0.0\n          }\n        },\n        \"visual_guidance\": \"Verify if bacterial burden increases after 22 hours; expected trend is reduction or inhibition.\"\n      }\n    ]\n  }\n}\n"
+}

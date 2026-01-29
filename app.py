@@ -2612,6 +2612,184 @@ def get_outputs_v2():
     outputs = get_output_files_v2(image_path, prompt_name, version_dir_param)
     return jsonify({'outputs': outputs, 'version_dir': version_dir_param})
 
+
+def _safe_abs_under_plots(rel_path: str):
+    """Return an absolute path under PLOTS_DIR or None if unsafe."""
+    rel_path = (rel_path or '').replace('\\', '/').lstrip('/')
+    candidate = os.path.abspath(os.path.join(PLOTS_DIR, rel_path.replace('/', os.sep)))
+    plots_abs = os.path.abspath(PLOTS_DIR)
+    try:
+        if os.path.commonpath([candidate, plots_abs]) != plots_abs:
+            return None
+    except Exception:
+        return None
+    return candidate
+
+
+def _list_v2_version_dirs(image_path: str, prompt_name: str):
+    """List v2 version dirs for an image+prompt, newest first.
+
+    Matches folders like: {image_name_with_ext_underscored}.pv2_{prompt}.vN
+    """
+    import re
+
+    image_abs = _safe_abs_under_plots(image_path)
+    if not image_abs or not os.path.exists(image_abs):
+        return []
+
+    image_dir = os.path.dirname(image_abs)
+    image_name = os.path.basename(image_abs)
+    base_name = os.path.splitext(image_name)[0]
+    name_for_folder = image_name.replace('.', '_')
+    full_prompt_name = f"pv2_{prompt_name}"
+
+    version_pattern_new = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(full_prompt_name)}\.v(\d+)$')
+    version_pattern_old = re.compile(rf'^{re.escape(base_name)}\.{re.escape(full_prompt_name)}\.v(\d+)$')
+
+    found = []
+    if os.path.isdir(image_dir):
+        for item in os.listdir(image_dir):
+            item_path = os.path.join(image_dir, item)
+            if not os.path.isdir(item_path):
+                continue
+            match = version_pattern_new.match(item) or version_pattern_old.match(item)
+            if not match:
+                continue
+            try:
+                version_num = int(match.group(1))
+            except Exception:
+                continue
+            found.append((version_num, item_path))
+
+    found.sort(key=lambda x: x[0], reverse=True)
+    return found
+
+
+def _read_v2_progress_console(version_dir: str):
+    """Best-effort console text for a v2 run folder."""
+    progress_path = os.path.join(version_dir, '_extraction_progress.json')
+    progress_data = None
+    if os.path.exists(progress_path):
+        try:
+            with open(progress_path, 'r', encoding='utf-8') as f:
+                progress_data = json.load(f)
+        except Exception:
+            progress_data = None
+
+    lines = []
+    lines.append(f"📁 Loaded saved run: {os.path.basename(version_dir)}")
+
+    if progress_data:
+        status = progress_data.get('status')
+        stage = progress_data.get('stage')
+        stage_index = progress_data.get('stage_index')
+        total_stages = progress_data.get('total_stages')
+        pct = progress_data.get('percentage')
+        if status:
+            lines.append(f"Status: {status}")
+        if stage:
+            lines.append(f"Stage: {stage}")
+        if stage_index is not None and total_stages is not None:
+            lines.append(f"Progress: {stage_index}/{total_stages} ({pct if pct is not None else 'n/a'}%)")
+        lines.append('')
+        console_output = (progress_data.get('console_output') or '').strip()
+        if console_output:
+            lines.append(console_output)
+        else:
+            # Fallback: surface some facts to help debugging
+            facts = progress_data.get('accumulated_facts') or {}
+            geometry = progress_data.get('geometry_facts') or {}
+            if facts or geometry:
+                lines.append('📌 Facts (fallback):')
+                try:
+                    merged = {}
+                    if isinstance(facts, dict):
+                        merged.update(facts)
+                    if isinstance(geometry, dict):
+                        merged['geometry_facts'] = geometry
+                    lines.append(json.dumps(merged, indent=2))
+                except Exception:
+                    pass
+    else:
+        lines.append('No progress file found for this run.')
+
+    return ('\n'.join(lines)).strip() + '\n', (progress_data or {})
+
+
+@app.route('/v2/load_saved_runs', methods=['POST', 'GET'])
+def v2_load_saved_runs():
+    """Load up to 3 saved Prompt 13-style runs from disk (no extraction).
+
+    POST JSON:
+      image_path: plots-relative image path
+      prompt_name: v2 prompt folder name (e.g., "prompt_13")
+      max_runs: optional int (capped to 3)
+    """
+    if request.method == 'GET':
+        return jsonify({
+            'success': False,
+            'error': 'use_post',
+            'hint': 'POST JSON: {"image_path":"first_examples/A/A-1/A-1.png","prompt_name":"prompt_13","max_runs":3}'
+        })
+
+    payload = request.get_json(force=True, silent=True) or {}
+    image_path = payload.get('image_path') or payload.get('image') or ''
+    prompt_name = payload.get('prompt_name') or payload.get('prompt') or payload.get('prompt_file') or ''
+
+    try:
+        max_runs = int(payload.get('max_runs') or payload.get('runs') or 3)
+    except Exception:
+        max_runs = 3
+    max_runs = max(1, min(int(max_runs), 3))
+
+    if not image_path or not prompt_name:
+        return jsonify({'success': False, 'error': 'missing_params', 'runs': []}), 400
+
+    version_dirs = _list_v2_version_dirs(image_path, prompt_name)
+    if not version_dirs:
+        return jsonify({
+            'success': False,
+            'error': 'not_enough_saved_runs',
+            'found': 0,
+            'requested': max_runs,
+            'runs': [],
+        })
+
+    selected = version_dirs[:max_runs]
+    runs = []
+    for version_num, abs_dir in selected:
+        rel_dir = os.path.relpath(abs_dir, PLOTS_DIR).replace('\\', '/')
+        outputs = get_output_files_v2(image_path, prompt_name, abs_dir)
+        console_text, progress_data = _read_v2_progress_console(abs_dir)
+
+        # Consider it "successful" if the run completed or produced meaningful artifacts
+        completed = (progress_data.get('status') == 'complete')
+        has_artifacts = bool((outputs.get('images') or []) or (outputs.get('data') or []) or (outputs.get('stats') or []))
+
+        runs.append({
+            'version': version_num,
+            'version_dir': rel_dir,
+            'result': {
+                'success': bool(completed or has_artifacts),
+                'image_path': image_path,
+                'prompt_file': prompt_name,
+                'prompt_name': prompt_name,
+                'console': console_text,
+                'outputs': outputs,
+                'timings': {},
+            }
+        })
+
+    return jsonify({
+        'success': True,
+        'image_path': image_path,
+        'prompt_name': prompt_name,
+        'requested': max_runs,
+        'found': len(runs),
+        'partial': len(runs) < max_runs,
+        'runs': runs,
+    })
+
 @app.route('/read_file', methods=['POST'])
 def read_file_route():
     """Read contents of a text file."""

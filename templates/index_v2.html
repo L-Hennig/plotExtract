@@ -712,6 +712,20 @@
                                 {% endfor %}
                             </select>
                         </div>
+
+                        <div class="form-group" style="margin-top: 8px;">
+                            <label style="display: flex; align-items: center; gap: 10px; font-weight: normal;">
+                                <input type="checkbox" id="chkTestResults" onchange="toggleTestResultsMode()">
+                                Test results (load saved Prompt 13 runs for A-1.png)
+                            </label>
+                            <div id="testResultsNote" style="display:none; margin-top: 6px; color: #666; font-size: 12px;">
+                                Uses <code>first_examples/A/A-1/A-1.png</code> + <code>prompt_13</code>. Caps to 3 runs.
+                            </div>
+                            <div id="savedRunsPicker" style="display:none; margin-top: 10px;">
+                                <label for="savedRunSelect" style="display:block; margin-bottom: 5px; font-weight: bold; color: #555;">Saved run:</label>
+                                <select id="savedRunSelect" onchange="onSavedRunSelectChange()"></select>
+                            </div>
+                        </div>
                     </div>
                     <div class="col">
                         <!-- Preview selected image -->
@@ -1282,8 +1296,154 @@
         // Current task ID for polling
         let currentTaskId = null;
         let pollInterval = null;
+
+        // Test-results mode (load saved runs, no extraction)
+        const TEST_IMAGE_PATH = 'first_examples/A/A-1/A-1.png';
+        const TEST_PROMPT_NAME = 'prompt_13';
+        let savedRunsCache = [];
+
+        function toggleTestResultsMode() {
+            const chk = document.getElementById('chkTestResults');
+            const enabled = !!(chk && chk.checked);
+
+            const imageSelect = document.getElementById('imageSelect');
+            const promptSelect = document.getElementById('promptSelect');
+            const note = document.getElementById('testResultsNote');
+            const picker = document.getElementById('savedRunsPicker');
+
+            if (note) note.style.display = enabled ? 'block' : 'none';
+            if (picker) picker.style.display = 'none';
+            savedRunsCache = [];
+
+            if (enabled) {
+                // Force single mode
+                if (currentMode !== 'single') setMode('single');
+
+                if (imageSelect) {
+                    imageSelect.value = TEST_IMAGE_PATH;
+                    imageSelect.disabled = true;
+                }
+                if (promptSelect) {
+                    promptSelect.value = TEST_PROMPT_NAME;
+                    promptSelect.disabled = true;
+                }
+                onImageSelect();
+                onPromptSelect();
+
+                const consoleOutput = document.getElementById('consoleOutput');
+                if (consoleOutput) {
+                    consoleOutput.textContent = 'Test results mode enabled. Click "Run Plot Extraction" to load saved runs.\n';
+                }
+            } else {
+                if (imageSelect) imageSelect.disabled = false;
+                if (promptSelect) promptSelect.disabled = false;
+            }
+        }
+
+        function onSavedRunSelectChange() {
+            const sel = document.getElementById('savedRunSelect');
+            if (!sel) return;
+            const idx = parseInt(sel.value, 10);
+            if (Number.isNaN(idx) || idx < 0 || idx >= savedRunsCache.length) return;
+            const run = savedRunsCache[idx];
+            if (run && run.result) {
+                displayResults(run.result);
+            }
+        }
+
+        function runSavedTestResults() {
+            const btn = document.getElementById('btnRunAll');
+            const btnCancel = document.getElementById('btnCancelSingle');
+            const consoleOutput = document.getElementById('consoleOutput');
+            const picker = document.getElementById('savedRunsPicker');
+            const sel = document.getElementById('savedRunSelect');
+
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '⏳ Loading saved runs...';
+            }
+            if (btnCancel) {
+                btnCancel.style.display = 'none';
+            }
+            if (consoleOutput) {
+                consoleOutput.textContent = 'Loading saved Prompt 13 runs from disk...\n';
+            }
+
+            fetch('/v2/load_saved_runs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    image_path: TEST_IMAGE_PATH,
+                    prompt_name: TEST_PROMPT_NAME,
+                    max_runs: 3
+                })
+            })
+            .then(async res => {
+                const data = await res.json().catch(() => null);
+                return { ok: res.ok, status: res.status, data };
+            })
+            .then(({ ok, status, data }) => {
+                savedRunsCache = (data && data.runs) ? data.runs : [];
+
+                if (!ok || !data || !data.success) {
+                    const msg = (data && data.error)
+                        ? `Error: ${data.error}`
+                        : `Error: failed to load saved runs (HTTP ${status})`;
+                    if (consoleOutput) consoleOutput.textContent += msg + '\n';
+                    return;
+                }
+
+                if (sel) {
+                    sel.innerHTML = savedRunsCache.map((run, idx) => {
+                        const v = (run && run.version != null) ? `v${run.version}` : `run ${idx + 1}`;
+                        const okFlag = run && run.result && run.result.success;
+                        const suffix = okFlag ? ' (ready)' : ' (partial)';
+                        return `<option value="${idx}">${v}${suffix}</option>`;
+                    }).join('');
+                }
+                if (picker) picker.style.display = savedRunsCache.length > 0 ? 'block' : 'none';
+
+                if (data.partial && consoleOutput) {
+                    consoleOutput.textContent += `\n[WARNING] Only ${data.found}/${data.requested} saved runs found. Showing what is available.\n`;
+                }
+
+                if (savedRunsCache.length > 0) {
+                    // Prefer the newest "ready" run (i.e., one with artifacts).
+                    let defaultIdx = 0;
+                    for (let i = 0; i < savedRunsCache.length; i++) {
+                        const rr = savedRunsCache[i] && savedRunsCache[i].result;
+                        if (rr && rr.success) {
+                            defaultIdx = i;
+                            break;
+                        }
+                    }
+                    if (sel) sel.value = String(defaultIdx);
+                    const chosen = savedRunsCache[defaultIdx];
+                    if (chosen && chosen.result) {
+                        displayResults(chosen.result);
+                    }
+                } else if (consoleOutput) {
+                    consoleOutput.textContent += 'No saved runs returned.\n';
+                }
+            })
+            .catch(err => {
+                if (consoleOutput) consoleOutput.textContent += '[ERROR] ' + err + '\n';
+            })
+            .finally(() => {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = '🚀 Run Plot Extraction (and Comparison)';
+                }
+            });
+        }
         
         function runAll() {
+            const chk = document.getElementById('chkTestResults');
+            if (chk && chk.checked) {
+                runSavedTestResults();
+                return;
+            }
+
             const imagePath = document.getElementById('imageSelect').value;
             const promptFile = document.getElementById('promptSelect').value;
             

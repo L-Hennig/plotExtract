@@ -1,4 +1,4 @@
-import base64, sys, re, os, requests, json, traceback, cv2
+import base64, sys, re, os, requests, json, traceback, cv2, time
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.figure as mpl_figure
@@ -110,15 +110,62 @@ def prompt_mistral(Q):
   # Changed from "client.messages.create" to "client.chat.complete"
   # Changed model to an appropriate Mistral model
   # Increased max_tokens to the limit for Mistral
-  response = client.chat.complete(
-        model="mistral-large-2512",
-        messages=Q,
-        max_tokens=4096,
-        temperature=0,
+  # Allow overriding model + timeouts/retries via env vars.
+  model = os.getenv("PLOTEXTRACT_MISTRAL_MODEL") or "mistral-large-2512"
+  timeout_ms = None
+  try:
+    timeout_ms_env = os.getenv("PLOTEXTRACT_MISTRAL_TIMEOUT_MS")
+    timeout_ms = int(timeout_ms_env) if timeout_ms_env else 240_000
+  except Exception:
+    timeout_ms = 240_000
+
+  def _is_rate_limit_error(err: Exception) -> bool:
+    msg = str(err).lower()
+    return (
+      "status 429" in msg
+      or "rate limit" in msg
+      or "rate_limited" in msg
+      or '"code":"1300"' in msg
+      or "too many requests" in msg
     )
+
+  try:
+    max_retries = int(os.getenv("PLOTEXTRACT_MISTRAL_MAX_RETRIES") or "6")
+  except Exception:
+    max_retries = 6
+  try:
+    base_sleep_s = float(os.getenv("PLOTEXTRACT_MISTRAL_RETRY_BASE_S") or "1.0")
+  except Exception:
+    base_sleep_s = 1.0
+  try:
+    max_sleep_s = float(os.getenv("PLOTEXTRACT_MISTRAL_RETRY_MAX_S") or "20.0")
+  except Exception:
+    max_sleep_s = 20.0
+
+  last_err = None
+  for attempt in range(max_retries + 1):
+    try:
+      response = client.chat.complete(
+            model=model,
+            messages=Q,
+            max_tokens=4096,
+            temperature=0,
+            timeout_ms=timeout_ms,
+        )
+      return Q, response.choices[0].message.content
+    except Exception as e:
+      last_err = e
+      if _is_rate_limit_error(e) and attempt < max_retries:
+        sleep_s = min(max_sleep_s, base_sleep_s * (2 ** attempt))
+        print(f"[WARN] Mistral rate limit (429). Retrying in {sleep_s:.1f}s (attempt {attempt + 1}/{max_retries})", file=sys.stderr)
+        time.sleep(sleep_s)
+        continue
+      raise
+
+  # Should be unreachable, but keep for safety.
+  raise last_err
   #print(message)
   # Changed from "return(Q,message.content[0].text)" to the below line
-  return Q, response.choices[0].message.content
 
 def create_Q_2p(convo):
   Q = []

@@ -1,0 +1,717 @@
+{
+  "status": "running",
+  "stage": "EXTRACT_STAGE_8",
+  "stage_index": 9,
+  "total_stages": 9,
+  "percentage": 100.0,
+  "accumulated_facts": {
+    "plot_type_facts": {
+      "declared_in_article_info": "unknown",
+      "visually_verified": true,
+      "plot_type": "time-kill plot",
+      "confidence": 0.9,
+      "reason": "The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, further supporting this plot type."
+    },
+    "axis_facts": {
+      "x_axis": {
+        "quantity": "time",
+        "unit": "hours",
+        "discrete": false,
+        "lower_plausible_limit": 0,
+        "upper_plausible_limit": 26,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          22,
+          24,
+          26
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "22",
+          "24",
+          "26"
+        ],
+        "breaks": [
+          {
+            "start": 12,
+            "end": 22,
+            "reason": "Non-uniform spacing between 12 and 22 hours"
+          }
+        ],
+        "confidence": 0.95
+      },
+      "y_axis": {
+        "quantity": "bacterial burden",
+        "unit": "log10 CFU/mL",
+        "scale": "log10",
+        "upper_plausible_limit": 16,
+        "lower_plausible_limit": 0,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "14",
+          "16"
+        ],
+        "breaks": [],
+        "grid": {
+          "present": true,
+          "aligned_y_ticks": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            14,
+            16
+          ],
+          "aligned_x_ticks": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            22,
+            24,
+            26
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    "geometry_facts": {
+      "plot_box_px": {
+        "left": 70,
+        "top": 40,
+        "right": 630,
+        "bottom": 460
+      },
+      "x_axis_geometry": {
+        "scale": "linear",
+        "anchors": [
+          {
+            "x_value_hours": 0,
+            "x_px": 70
+          },
+          {
+            "x_value_hours": 6,
+            "x_px": 210
+          },
+          {
+            "x_value_hours": 12,
+            "x_px": 350
+          },
+          {
+            "x_value_hours": 26,
+            "x_px": 630
+          }
+        ],
+        "x_break": {
+          "present": true,
+          "break_px_start": 350,
+          "break_px_end": 470,
+          "left_end_value_hours": 12,
+          "right_start_value_hours": 22,
+          "left_segment_anchors": [
+            {
+              "x_value_hours": 0,
+              "x_px": 70
+            },
+            {
+              "x_value_hours": 6,
+              "x_px": 210
+            }
+          ],
+          "right_segment_anchors": [
+            {
+              "x_value_hours": 22,
+              "x_px": 470
+            },
+            {
+              "x_value_hours": 26,
+              "x_px": 630
+            }
+          ]
+        }
+      },
+      "y_axis_geometry": {
+        "scale": "log10",
+        "decade_anchors": [
+          {
+            "log10_value": 0,
+            "y_px": 460
+          },
+          {
+            "log10_value": 4,
+            "y_px": 345
+          },
+          {
+            "log10_value": 8,
+            "y_px": 230
+          },
+          {
+            "log10_value": 12,
+            "y_px": 115
+          }
+        ],
+        "y0_tick": {
+          "present": true,
+          "y_px": 460
+        }
+      },
+      "confidence": 0.95
+    },
+    "curve_style_facts": {
+      "curves": [
+        {
+          "curve_label": "Blank",
+          "colour": "black",
+          "line_type": "dotted",
+          "marker_symbol": "x",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "COL 0.125ug/mL",
+          "colour": "black",
+          "line_type": "solid",
+          "marker_symbol": "square",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "MINO 1ug/mL",
+          "colour": "black",
+          "line_type": "dashed",
+          "marker_symbol": "triangle",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "MEM 4ug/mL",
+          "colour": "black",
+          "line_type": "dash-dot",
+          "marker_symbol": "circle",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "RFP 0.06ug/mL",
+          "colour": "black",
+          "line_type": "dash-dot-dot",
+          "marker_symbol": "inverted_triangle",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MEM 4ug/mL",
+          "colour": "black",
+          "line_type": "dotted",
+          "marker_symbol": "circle",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+          "colour": "black",
+          "line_type": "dash-dot",
+          "marker_symbol": "triangle",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + RFP 0.06ug/mL",
+          "colour": "black",
+          "line_type": "dash-dot-dot",
+          "marker_symbol": "inverted_triangle",
+          "source": "figure_legend",
+          "confidence": 0.95
+        }
+      ]
+    },
+    "marker_facts": {
+      "markers_detected": true,
+      "curves": [
+        {
+          "curve_label": "Blank",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.2,
+              "confidence": 0.95
+            },
+            {
+              "x": 2,
+              "y": 8.5,
+              "confidence": 0.95
+            },
+            {
+              "x": 4,
+              "y": 9.5,
+              "confidence": 0.95
+            },
+            {
+              "x": 6,
+              "y": 9.8,
+              "confidence": 0.95
+            },
+            {
+              "x": 8,
+              "y": 10.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 10,
+              "y": 10.1,
+              "confidence": 0.95
+            },
+            {
+              "x": 12,
+              "y": 10.2,
+              "confidence": 0.95
+            },
+            {
+              "x": 22,
+              "y": 10.3,
+              "confidence": 0.95
+            },
+            {
+              "x": 24,
+              "y": 10.3,
+              "confidence": 0.95
+            },
+            {
+              "x": 26,
+              "y": 10.4,
+              "confidence": 0.95
+            }
+          ]
+        },
+        {
+          "curve_label": "COL 0.125ug/mL",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.2,
+              "confidence": 0.95
+            },
+            {
+              "x": 2,
+              "y": 7.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 4,
+              "y": 8.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 6,
+              "y": 8.5,
+              "confidence": 0.95
+            },
+            {
+              "x": 8,
+              "y": 9.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 10,
+              "y": 9.5,
+              "confidence": 0.95
+            },
+            {
+              "x": 12,
+              "y": 9.8,
+              "confidence": 0.95
+            },
+            {
+              "x": 22,
+              "y": 10.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 24,
+              "y": 10.1,
+              "confidence": 0.95
+            },
+            {
+              "x": 26,
+              "y": 10.2,
+              "confidence": 0.95
+            }
+          ]
+        },
+        {
+          "curve_label": "MINO 1ug/mL",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.2,
+              "confidence": 0.95
+            },
+            {
+              "x": 2,
+              "y": 6.8,
+              "confidence": 0.95
+            },
+            {
+              "x": 4,
+              "y": 7.5,
+              "confidence": 0.95
+            },
+            {
+              "x": 6,
+              "y": 8.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 8,
+              "y": 8.2,
+              "confidence": 0.95
+            },
+            {
+              "x": 10,
+              "y": 8.5,
+              "confidence": 0.95
+            },
+            {
+              "x": 12,
+              "y": 8.7,
+              "confidence": 0.95
+            },
+            {
+              "x": 22,
+              "y": 9.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 24,
+              "y": 9.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 26,
+              "y": 9.1,
+              "confidence": 0.95
+            }
+          ]
+        },
+        {
+          "curve_label": "MEM 4ug/mL",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.2,
+              "confidence": 0.95
+            },
+            {
+              "x": 2,
+              "y": 0.5,
+              "confidence": 0.95
+            },
+            {
+              "x": 4,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 6,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 8,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 10,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 12,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 22,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 24,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 26,
+              "y": 0.0,
+              "confidence": 0.95
+            }
+          ]
+        },
+        {
+          "curve_label": "RFP 0.06ug/mL",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.2,
+              "confidence": 0.95
+            },
+            {
+              "x": 2,
+              "y": 2.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 4,
+              "y": 1.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 6,
+              "y": 0.5,
+              "confidence": 0.95
+            },
+            {
+              "x": 8,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 10,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 12,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 22,
+              "y": 1.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 24,
+              "y": 1.5,
+              "confidence": 0.95
+            },
+            {
+              "x": 26,
+              "y": 2.0,
+              "confidence": 0.95
+            }
+          ]
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MEM 4ug/mL",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.2,
+              "confidence": 0.95
+            },
+            {
+              "x": 2,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 4,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 6,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 8,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 10,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 12,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 22,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 24,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 26,
+              "y": 0.0,
+              "confidence": 0.95
+            }
+          ]
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.2,
+              "confidence": 0.95
+            },
+            {
+              "x": 2,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 4,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 6,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 8,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 10,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 12,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 22,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 24,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 26,
+              "y": 0.0,
+              "confidence": 0.95
+            }
+          ]
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + RFP 0.06ug/mL",
+          "points": [
+            {
+              "x": 0,
+              "y": 6.2,
+              "confidence": 0.95
+            },
+            {
+              "x": 2,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 4,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 6,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 8,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 10,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 12,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 22,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 24,
+              "y": 0.0,
+              "confidence": 0.95
+            },
+            {
+              "x": 26,
+              "y": 0.0,
+              "confidence": 0.95
+            }
+          ]
+        }
+      ],
+      "csv_output": "Time (hours),log10 CFU/mL (Blank),Time (hours),log10 CFU/mL (COL 0.125ug/mL),Time (hours),log10 CFU/mL (MINO 1ug/mL),Time (hours),log10 CFU/mL (MEM 4ug/mL),Time (hours),log10 CFU/mL (RFP 0.06ug/mL),Time (hours),log10 CFU/mL (COL 0.125ug/mL + MEM 4ug/mL),Time (hours),log10 CFU/mL (COL 0.125ug/mL + MINO 1ug/mL),Time (hours),log10 CFU/mL (COL 0.125ug/mL + RFP 0.06ug/mL)\n0,6.2,0,6.2,0,6.2,0,6.2,0,6.2,0,6.2,0,6.2,0,6.2\n2,8.5,2,7.0,2,6.8,2,0.5,2,2.0,2,0.0,2,0.0,2,0.0\n4,9.5,4,8.0,4,7.5,4,0.0,4,1.0,4,0.0,4,0.0,4,0.0\n6,9.8,6,8.5,6,8.0,6,0.0,6,0.5,6,0.0,6,0.0,6,0.0\n8,10.0,8,9.0,8,8.2,8,0.0,8,0.0,8,0.0,8,0.0,8,0.0\n10,10.1,10,9.5,10,8.5,10,0.0,10,0.0,10,0.0,10,0.0,10,0.0\n12,10.2,12,9.8,12,8.7,12,0.0,12,0.0,12,0.0,12,0.0,12,0.0\n22,10.3,22,10.0,22,9.0,22,0.0,22,1.0,22,0.0,22,0.0,22,0.0\n24,10.3,24,10.1,24,9.0,24,0.0,24,1.5,24,0.0,24,0.0,24,0.0\n26,10.4,26,10.2,26,9.1,26,0.0,26,2.0,26,0.0,26,0.0,26,0.0",
+      "confidence": 0.9
+    },
+    "re_extraction": {
+      "results": []
+    }
+  },
+  "stage_duration_ms": 9455.330848693848,
+  "timestamp": 1769596748.8064988,
+  "console_output": "===== STAGE 1 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, further supporting this plot type.\"\n  }\n}\n===== STAGE 2 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, further supporting this plot type.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours\"\n        }\n      ],\n      \"confidence\": 0.95\n    }\n  }\n}\n===== STAGE 3 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, further supporting this plot type.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  }\n}\n===== STAGE 4 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, further supporting this plot type.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"geometry_facts\": {\n    \"plot_box_px\": {\n      \"left\": 70,\n      \"top\": 40,\n      \"right\": 630,\n      \"bottom\": 460\n    },\n    \"x_axis_geometry\": {\n      \"scale\": \"linear\",\n      \"anchors\": [\n        {\n          \"x_value_hours\": 0,\n          \"x_px\": 70\n        },\n        {\n          \"x_value_hours\": 6,\n          \"x_px\": 210\n        },\n        {\n          \"x_value_hours\": 12,\n          \"x_px\": 350\n        },\n        {\n          \"x_value_hours\": 26,\n          \"x_px\": 630\n        }\n      ],\n      \"x_break\": {\n        \"present\": true,\n        \"break_px_start\": 350,\n        \"break_px_end\": 470,\n        \"left_end_value_hours\": 12,\n        \"right_start_value_hours\": 22,\n        \"left_segment_anchors\": [\n          {\n            \"x_value_hours\": 0,\n            \"x_px\": 70\n          },\n          {\n            \"x_value_hours\": 6,\n            \"x_px\": 210\n          }\n        ],\n        \"right_segment_anchors\": [\n          {\n            \"x_value_hours\": 22,\n            \"x_px\": 470\n          },\n          {\n            \"x_value_hours\": 26,\n            \"x_px\": 630\n          }\n        ]\n      }\n    },\n    \"y_axis_geometry\": {\n      \"scale\": \"log10\",\n      \"decade_anchors\": [\n        {\n          \"log10_value\": 0,\n          \"y_px\": 460\n        },\n        {\n          \"log10_value\": 4,\n          \"y_px\": 345\n        },\n        {\n          \"log10_value\": 8,\n          \"y_px\": 230\n        },\n        {\n          \"log10_value\": 12,\n          \"y_px\": 115\n        }\n      ],\n      \"y0_tick\": {\n        \"present\": true,\n        \"y_px\": 460\n      }\n    },\n    \"confidence\": 0.95\n  }\n}\n===== STAGE 5 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, further supporting this plot type.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"geometry_facts\": {\n    \"plot_box_px\": {\n      \"left\": 70,\n      \"top\": 40,\n      \"right\": 630,\n      \"bottom\": 460\n    },\n    \"x_axis_geometry\": {\n      \"scale\": \"linear\",\n      \"anchors\": [\n        {\n          \"x_value_hours\": 0,\n          \"x_px\": 70\n        },\n        {\n          \"x_value_hours\": 6,\n          \"x_px\": 210\n        },\n        {\n          \"x_value_hours\": 12,\n          \"x_px\": 350\n        },\n        {\n          \"x_value_hours\": 26,\n          \"x_px\": 630\n        }\n      ],\n      \"x_break\": {\n        \"present\": true,\n        \"break_px_start\": 350,\n        \"break_px_end\": 470,\n        \"left_end_value_hours\": 12,\n        \"right_start_value_hours\": 22,\n        \"left_segment_anchors\": [\n          {\n            \"x_value_hours\": 0,\n            \"x_px\": 70\n          },\n          {\n            \"x_value_hours\": 6,\n            \"x_px\": 210\n          }\n        ],\n        \"right_segment_anchors\": [\n          {\n            \"x_value_hours\": 22,\n            \"x_px\": 470\n          },\n          {\n            \"x_value_hours\": 26,\n            \"x_px\": 630\n          }\n        ]\n      }\n    },\n    \"y_axis_geometry\": {\n      \"scale\": \"log10\",\n      \"decade_anchors\": [\n        {\n          \"log10_value\": 0,\n          \"y_px\": 460\n        },\n        {\n          \"log10_value\": 4,\n          \"y_px\": 345\n        },\n        {\n          \"log10_value\": 8,\n          \"y_px\": 230\n        },\n        {\n          \"log10_value\": 12,\n          \"y_px\": 115\n        }\n      ],\n      \"y0_tick\": {\n        \"present\": true,\n        \"y_px\": 460\n      }\n    },\n    \"confidence\": 0.95\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot-dot\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot-dot\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      }\n    ]\n  }\n}\n===== STAGE 6 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, further supporting this plot type.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"geometry_facts\": {\n    \"plot_box_px\": {\n      \"left\": 70,\n      \"top\": 40,\n      \"right\": 630,\n      \"bottom\": 460\n    },\n    \"x_axis_geometry\": {\n      \"scale\": \"linear\",\n      \"anchors\": [\n        {\n          \"x_value_hours\": 0,\n          \"x_px\": 70\n        },\n        {\n          \"x_value_hours\": 6,\n          \"x_px\": 210\n        },\n        {\n          \"x_value_hours\": 12,\n          \"x_px\": 350\n        },\n        {\n          \"x_value_hours\": 26,\n          \"x_px\": 630\n        }\n      ],\n      \"x_break\": {\n        \"present\": true,\n        \"break_px_start\": 350,\n        \"break_px_end\": 470,\n        \"left_end_value_hours\": 12,\n        \"right_start_value_hours\": 22,\n        \"left_segment_anchors\": [\n          {\n            \"x_value_hours\": 0,\n            \"x_px\": 70\n          },\n          {\n            \"x_value_hours\": 6,\n            \"x_px\": 210\n          }\n        ],\n        \"right_segment_anchors\": [\n          {\n            \"x_value_hours\": 22,\n            \"x_px\": 470\n          },\n          {\n            \"x_value_hours\": 26,\n            \"x_px\": 630\n          }\n        ]\n      }\n    },\n    \"y_axis_geometry\": {\n      \"scale\": \"log10\",\n      \"decade_anchors\": [\n        {\n          \"log10_value\": 0,\n          \"y_px\": 460\n        },\n        {\n          \"log10_value\": 4,\n          \"y_px\": 345\n        },\n        {\n          \"log10_value\": 8,\n          \"y_px\": 230\n        },\n        {\n          \"log10_value\": 12,\n          \"y_px\": 115\n        }\n      ],\n      \"y0_tick\": {\n        \"present\": true,\n        \"y_px\": 460\n      }\n    },\n    \"confidence\": 0.95\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot-dot\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot-dot\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      }\n    ]\n  },\n  \"marker_facts\": {\n    \"markers_detected\": true,\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 8.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 9.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 9.8,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 10.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 10.1,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 10.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 10.3,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 10.3,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 10.4,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 7.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 8.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 8.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 9.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 9.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 9.8,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 10.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 10.1,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 10.2,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"MINO 1ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 6.8,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 7.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 8.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 8.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 8.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 8.7,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 9.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 9.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 9.1,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"MEM 4ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 0.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 2.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 1.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 1.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 1.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 2.0,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          }\n        ]\n      }\n    ],\n    \"csv_output\": \"Time (hours),log10 CFU/mL (Blank),Time (hours),log10 CFU/mL (COL 0.125ug/mL),Time (hours),log10 CFU/mL (MINO 1ug/mL),Time (hours),log10 CFU/mL (MEM 4ug/mL),Time (hours),log10 CFU/mL (RFP 0.06ug/mL),Time (hours),log10 CFU/mL (COL 0.125ug/mL + MEM 4ug/mL),Time (hours),log10 CFU/mL (COL 0.125ug/mL + MINO 1ug/mL),Time (hours),log10 CFU/mL (COL 0.125ug/mL + RFP 0.06ug/mL)\\n0,6.2,0,6.2,0,6.2,0,6.2,0,6.2,0,6.2,0,6.2,0,6.2\\n2,8.5,2,7.0,2,6.8,2,0.5,2,2.0,2,0.0,2,0.0,2,0.0\\n4,9.5,4,8.0,4,7.5,4,0.0,4,1.0,4,0.0,4,0.0,4,0.0\\n6,9.8,6,8.5,6,8.0,6,0.0,6,0.5,6,0.0,6,0.0,6,0.0\\n8,10.0,8,9.0,8,8.2,8,0.0,8,0.0,8,0.0,8,0.0,8,0.0\\n10,10.1,10,9.5,10,8.5,10,0.0,10,0.0,10,0.0,10,0.0,10,0.0\\n12,10.2,12,9.8,12,8.7,12,0.0,12,0.0,12,0.0,12,0.0,12,0.0\\n22,10.3,22,10.0,22,9.0,22,0.0,22,1.0,22,0.0,22,0.0,22,0.0\\n24,10.3,24,10.1,24,9.0,24,0.0,24,1.5,24,0.0,24,0.0,24,0.0\\n26,10.4,26,10.2,26,9.1,26,0.0,26,2.0,26,0.0,26,0.0,26,0.0\",\n    \"confidence\": 0.9\n  }\n}\n===== STAGE 7 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, further supporting this plot type.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"geometry_facts\": {\n    \"plot_box_px\": {\n      \"left\": 70,\n      \"top\": 40,\n      \"right\": 630,\n      \"bottom\": 460\n    },\n    \"x_axis_geometry\": {\n      \"scale\": \"linear\",\n      \"anchors\": [\n        {\n          \"x_value_hours\": 0,\n          \"x_px\": 70\n        },\n        {\n          \"x_value_hours\": 6,\n          \"x_px\": 210\n        },\n        {\n          \"x_value_hours\": 12,\n          \"x_px\": 350\n        },\n        {\n          \"x_value_hours\": 26,\n          \"x_px\": 630\n        }\n      ],\n      \"x_break\": {\n        \"present\": true,\n        \"break_px_start\": 350,\n        \"break_px_end\": 470,\n        \"left_end_value_hours\": 12,\n        \"right_start_value_hours\": 22,\n        \"left_segment_anchors\": [\n          {\n            \"x_value_hours\": 0,\n            \"x_px\": 70\n          },\n          {\n            \"x_value_hours\": 6,\n            \"x_px\": 210\n          }\n        ],\n        \"right_segment_anchors\": [\n          {\n            \"x_value_hours\": 22,\n            \"x_px\": 470\n          },\n          {\n            \"x_value_hours\": 26,\n            \"x_px\": 630\n          }\n        ]\n      }\n    },\n    \"y_axis_geometry\": {\n      \"scale\": \"log10\",\n      \"decade_anchors\": [\n        {\n          \"log10_value\": 0,\n          \"y_px\": 460\n        },\n        {\n          \"log10_value\": 4,\n          \"y_px\": 345\n        },\n        {\n          \"log10_value\": 8,\n          \"y_px\": 230\n        },\n        {\n          \"log10_value\": 12,\n          \"y_px\": 115\n        }\n      ],\n      \"y0_tick\": {\n        \"present\": true,\n        \"y_px\": 460\n      }\n    },\n    \"confidence\": 0.95\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot-dot\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot-dot\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      }\n    ]\n  },\n  \"marker_facts\": {\n    \"markers_detected\": true,\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 8.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 9.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 9.8,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 10.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 10.1,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 10.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 10.3,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 10.3,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 10.4,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 7.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 8.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 8.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 9.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 9.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 9.8,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 10.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 10.1,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 10.2,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"MINO 1ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 6.8,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 7.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 8.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 8.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 8.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 8.7,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 9.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 9.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 9.1,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"MEM 4ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 0.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 2.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 1.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 1.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 1.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 2.0,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          }\n        ]\n      }\n    ],\n    \"csv_output\": \"Time (hours),log10 CFU/mL (Blank),Time (hours),log10 CFU/mL (COL 0.125ug/mL),Time (hours),log10 CFU/mL (MINO 1ug/mL),Time (hours),log10 CFU/mL (MEM 4ug/mL),Time (hours),log10 CFU/mL (RFP 0.06ug/mL),Time (hours),log10 CFU/mL (COL 0.125ug/mL + MEM 4ug/mL),Time (hours),log10 CFU/mL (COL 0.125ug/mL + MINO 1ug/mL),Time (hours),log10 CFU/mL (COL 0.125ug/mL + RFP 0.06ug/mL)\\n0,6.2,0,6.2,0,6.2,0,6.2,0,6.2,0,6.2,0,6.2,0,6.2\\n2,8.5,2,7.0,2,6.8,2,0.5,2,2.0,2,0.0,2,0.0,2,0.0\\n4,9.5,4,8.0,4,7.5,4,0.0,4,1.0,4,0.0,4,0.0,4,0.0\\n6,9.8,6,8.5,6,8.0,6,0.0,6,0.5,6,0.0,6,0.0,6,0.0\\n8,10.0,8,9.0,8,8.2,8,0.0,8,0.0,8,0.0,8,0.0,8,0.0\\n10,10.1,10,9.5,10,8.5,10,0.0,10,0.0,10,0.0,10,0.0,10,0.0\\n12,10.2,12,9.8,12,8.7,12,0.0,12,0.0,12,0.0,12,0.0,12,0.0\\n22,10.3,22,10.0,22,9.0,22,0.0,22,1.0,22,0.0,22,0.0,22,0.0\\n24,10.3,24,10.1,24,9.0,24,0.0,24,1.5,24,0.0,24,0.0,24,0.0\\n26,10.4,26,10.2,26,9.1,26,0.0,26,2.0,26,0.0,26,0.0,26,0.0\",\n    \"confidence\": 0.9\n  }\n}\n===== STAGE 8 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, further supporting this plot type.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"geometry_facts\": {\n    \"plot_box_px\": {\n      \"left\": 70,\n      \"top\": 40,\n      \"right\": 630,\n      \"bottom\": 460\n    },\n    \"x_axis_geometry\": {\n      \"scale\": \"linear\",\n      \"anchors\": [\n        {\n          \"x_value_hours\": 0,\n          \"x_px\": 70\n        },\n        {\n          \"x_value_hours\": 6,\n          \"x_px\": 210\n        },\n        {\n          \"x_value_hours\": 12,\n          \"x_px\": 350\n        },\n        {\n          \"x_value_hours\": 26,\n          \"x_px\": 630\n        }\n      ],\n      \"x_break\": {\n        \"present\": true,\n        \"break_px_start\": 350,\n        \"break_px_end\": 470,\n        \"left_end_value_hours\": 12,\n        \"right_start_value_hours\": 22,\n        \"left_segment_anchors\": [\n          {\n            \"x_value_hours\": 0,\n            \"x_px\": 70\n          },\n          {\n            \"x_value_hours\": 6,\n            \"x_px\": 210\n          }\n        ],\n        \"right_segment_anchors\": [\n          {\n            \"x_value_hours\": 22,\n            \"x_px\": 470\n          },\n          {\n            \"x_value_hours\": 26,\n            \"x_px\": 630\n          }\n        ]\n      }\n    },\n    \"y_axis_geometry\": {\n      \"scale\": \"log10\",\n      \"decade_anchors\": [\n        {\n          \"log10_value\": 0,\n          \"y_px\": 460\n        },\n        {\n          \"log10_value\": 4,\n          \"y_px\": 345\n        },\n        {\n          \"log10_value\": 8,\n          \"y_px\": 230\n        },\n        {\n          \"log10_value\": 12,\n          \"y_px\": 115\n        }\n      ],\n      \"y0_tick\": {\n        \"present\": true,\n        \"y_px\": 460\n      }\n    },\n    \"confidence\": 0.95\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot-dot\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot-dot\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      }\n    ]\n  },\n  \"marker_facts\": {\n    \"markers_detected\": true,\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 8.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 9.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 9.8,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 10.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 10.1,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 10.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 10.3,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 10.3,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 10.4,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 7.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 8.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 8.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 9.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 9.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 9.8,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 10.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 10.1,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 10.2,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"MINO 1ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 6.8,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 7.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 8.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 8.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 8.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 8.7,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 9.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 9.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 9.1,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"MEM 4ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 0.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 2.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 1.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 1.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 1.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 2.0,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          }\n        ]\n      }\n    ],\n    \"csv_output\": \"Time (hours),log10 CFU/mL (Blank),Time (hours),log10 CFU/mL (COL 0.125ug/mL),Time (hours),log10 CFU/mL (MINO 1ug/mL),Time (hours),log10 CFU/mL (MEM 4ug/mL),Time (hours),log10 CFU/mL (RFP 0.06ug/mL),Time (hours),log10 CFU/mL (COL 0.125ug/mL + MEM 4ug/mL),Time (hours),log10 CFU/mL (COL 0.125ug/mL + MINO 1ug/mL),Time (hours),log10 CFU/mL (COL 0.125ug/mL + RFP 0.06ug/mL)\\n0,6.2,0,6.2,0,6.2,0,6.2,0,6.2,0,6.2,0,6.2,0,6.2\\n2,8.5,2,7.0,2,6.8,2,0.5,2,2.0,2,0.0,2,0.0,2,0.0\\n4,9.5,4,8.0,4,7.5,4,0.0,4,1.0,4,0.0,4,0.0,4,0.0\\n6,9.8,6,8.5,6,8.0,6,0.0,6,0.5,6,0.0,6,0.0,6,0.0\\n8,10.0,8,9.0,8,8.2,8,0.0,8,0.0,8,0.0,8,0.0,8,0.0\\n10,10.1,10,9.5,10,8.5,10,0.0,10,0.0,10,0.0,10,0.0,10,0.0\\n12,10.2,12,9.8,12,8.7,12,0.0,12,0.0,12,0.0,12,0.0,12,0.0\\n22,10.3,22,10.0,22,9.0,22,0.0,22,1.0,22,0.0,22,0.0,22,0.0\\n24,10.3,24,10.1,24,9.0,24,0.0,24,1.5,24,0.0,24,0.0,24,0.0\\n26,10.4,26,10.2,26,9.1,26,0.0,26,2.0,26,0.0,26,0.0,26,0.0\",\n    \"confidence\": 0.9\n  },\n  \"re_extraction\": {\n    \"results\": []\n  }\n}\n===== STAGE 9 COMPLETE \u2014 ACCUMULATED FACTS =====\n{\n  \"plot_type_facts\": {\n    \"declared_in_article_info\": \"unknown\",\n    \"visually_verified\": true,\n    \"plot_type\": \"time-kill plot\",\n    \"confidence\": 0.9,\n    \"reason\": \"The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions, further supporting this plot type.\"\n  },\n  \"axis_facts\": {\n    \"x_axis\": {\n      \"quantity\": \"time\",\n      \"unit\": \"hours\",\n      \"discrete\": false,\n      \"lower_plausible_limit\": 0,\n      \"upper_plausible_limit\": 26,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        22,\n        24,\n        26\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"22\",\n        \"24\",\n        \"26\"\n      ],\n      \"breaks\": [\n        {\n          \"start\": 12,\n          \"end\": 22,\n          \"reason\": \"Non-uniform spacing between 12 and 22 hours\"\n        }\n      ],\n      \"confidence\": 0.95\n    },\n    \"y_axis\": {\n      \"quantity\": \"bacterial burden\",\n      \"unit\": \"log10 CFU/mL\",\n      \"scale\": \"log10\",\n      \"upper_plausible_limit\": 16,\n      \"lower_plausible_limit\": 0,\n      \"ticks_verified\": [\n        0,\n        2,\n        4,\n        6,\n        8,\n        10,\n        12,\n        14,\n        16\n      ],\n      \"tick_labels\": [\n        \"0\",\n        \"2\",\n        \"4\",\n        \"6\",\n        \"8\",\n        \"10\",\n        \"12\",\n        \"14\",\n        \"16\"\n      ],\n      \"breaks\": [],\n      \"grid\": {\n        \"present\": true,\n        \"aligned_y_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          14,\n          16\n        ],\n        \"aligned_x_ticks\": [\n          0,\n          2,\n          4,\n          6,\n          8,\n          10,\n          12,\n          22,\n          24,\n          26\n        ]\n      },\n      \"confidence\": 0.95\n    }\n  },\n  \"geometry_facts\": {\n    \"plot_box_px\": {\n      \"left\": 70,\n      \"top\": 40,\n      \"right\": 630,\n      \"bottom\": 460\n    },\n    \"x_axis_geometry\": {\n      \"scale\": \"linear\",\n      \"anchors\": [\n        {\n          \"x_value_hours\": 0,\n          \"x_px\": 70\n        },\n        {\n          \"x_value_hours\": 6,\n          \"x_px\": 210\n        },\n        {\n          \"x_value_hours\": 12,\n          \"x_px\": 350\n        },\n        {\n          \"x_value_hours\": 26,\n          \"x_px\": 630\n        }\n      ],\n      \"x_break\": {\n        \"present\": true,\n        \"break_px_start\": 350,\n        \"break_px_end\": 470,\n        \"left_end_value_hours\": 12,\n        \"right_start_value_hours\": 22,\n        \"left_segment_anchors\": [\n          {\n            \"x_value_hours\": 0,\n            \"x_px\": 70\n          },\n          {\n            \"x_value_hours\": 6,\n            \"x_px\": 210\n          }\n        ],\n        \"right_segment_anchors\": [\n          {\n            \"x_value_hours\": 22,\n            \"x_px\": 470\n          },\n          {\n            \"x_value_hours\": 26,\n            \"x_px\": 630\n          }\n        ]\n      }\n    },\n    \"y_axis_geometry\": {\n      \"scale\": \"log10\",\n      \"decade_anchors\": [\n        {\n          \"log10_value\": 0,\n          \"y_px\": 460\n        },\n        {\n          \"log10_value\": 4,\n          \"y_px\": 345\n        },\n        {\n          \"log10_value\": 8,\n          \"y_px\": 230\n        },\n        {\n          \"log10_value\": 12,\n          \"y_px\": 115\n        }\n      ],\n      \"y0_tick\": {\n        \"present\": true,\n        \"y_px\": 460\n      }\n    },\n    \"confidence\": 0.95\n  },\n  \"curve_style_facts\": {\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"x\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"solid\",\n        \"marker_symbol\": \"square\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dashed\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot-dot\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dotted\",\n        \"marker_symbol\": \"circle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot\",\n        \"marker_symbol\": \"triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n        \"colour\": \"black\",\n        \"line_type\": \"dash-dot-dot\",\n        \"marker_symbol\": \"inverted_triangle\",\n        \"source\": \"figure_legend\",\n        \"confidence\": 0.95\n      }\n    ]\n  },\n  \"marker_facts\": {\n    \"markers_detected\": true,\n    \"curves\": [\n      {\n        \"curve_label\": \"Blank\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 8.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 9.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 9.8,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 10.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 10.1,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 10.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 10.3,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 10.3,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 10.4,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 7.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 8.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 8.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 9.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 9.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 9.8,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 10.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 10.1,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 10.2,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"MINO 1ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 6.8,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 7.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 8.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 8.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 8.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 8.7,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 9.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 9.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 9.1,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"MEM 4ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 0.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"RFP 0.06ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 2.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 1.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 1.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 1.5,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 2.0,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MEM 4ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + MINO 1ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          }\n        ]\n      },\n      {\n        \"curve_label\": \"COL 0.125ug/mL + RFP 0.06ug/mL\",\n        \"points\": [\n          {\n            \"x\": 0,\n            \"y\": 6.2,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 2,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 4,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 6,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 8,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 10,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 12,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 22,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 24,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          },\n          {\n            \"x\": 26,\n            \"y\": 0.0,\n            \"confidence\": 0.95\n          }\n        ]\n      }\n    ],\n    \"csv_output\": \"Time (hours),log10 CFU/mL (Blank),Time (hours),log10 CFU/mL (COL 0.125ug/mL),Time (hours),log10 CFU/mL (MINO 1ug/mL),Time (hours),log10 CFU/mL (MEM 4ug/mL),Time (hours),log10 CFU/mL (RFP 0.06ug/mL),Time (hours),log10 CFU/mL (COL 0.125ug/mL + MEM 4ug/mL),Time (hours),log10 CFU/mL (COL 0.125ug/mL + MINO 1ug/mL),Time (hours),log10 CFU/mL (COL 0.125ug/mL + RFP 0.06ug/mL)\\n0,6.2,0,6.2,0,6.2,0,6.2,0,6.2,0,6.2,0,6.2,0,6.2\\n2,8.5,2,7.0,2,6.8,2,0.5,2,2.0,2,0.0,2,0.0,2,0.0\\n4,9.5,4,8.0,4,7.5,4,0.0,4,1.0,4,0.0,4,0.0,4,0.0\\n6,9.8,6,8.5,6,8.0,6,0.0,6,0.5,6,0.0,6,0.0,6,0.0\\n8,10.0,8,9.0,8,8.2,8,0.0,8,0.0,8,0.0,8,0.0,8,0.0\\n10,10.1,10,9.5,10,8.5,10,0.0,10,0.0,10,0.0,10,0.0,10,0.0\\n12,10.2,12,9.8,12,8.7,12,0.0,12,0.0,12,0.0,12,0.0,12,0.0\\n22,10.3,22,10.0,22,9.0,22,0.0,22,1.0,22,0.0,22,0.0,22,0.0\\n24,10.3,24,10.1,24,9.0,24,0.0,24,1.5,24,0.0,24,0.0,24,0.0\\n26,10.4,26,10.2,26,9.1,26,0.0,26,2.0,26,0.0,26,0.0,26,0.0\",\n    \"confidence\": 0.9\n  },\n  \"re_extraction\": {\n    \"results\": []\n  }\n}\n"
+}

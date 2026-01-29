@@ -1,5 +1,5 @@
 # =====================================================================
-# PlotExtract V2 - Prompt 7
+# PlotExtract V2 - Prompt 8
 # Stage renumbering:
 # - New STAGE 4 = curve definitions (style metadata)
 # - Old STAGE 4 (data extraction) is now STAGE 5

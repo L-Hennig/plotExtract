@@ -25,7 +25,7 @@ plots/synthetic/**
 !plots/synthetic/*/*/*.context.json
 
 # UI state files (local)
-UserInterface/extraction_state.json
-UserInterface/batch_runs.json
-UserInterface/synthetic_settings.json
-UserInterface/synthetic_settings_v2.json
+WebExtract/extraction_state.json
+WebExtract/batch_runs.json
+WebExtract/synthetic_settings.json
+WebExtract/synthetic_settings_v2.json

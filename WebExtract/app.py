@@ -32,7 +32,7 @@ UI_DIR = os.path.dirname(os.path.abspath(__file__))
 # Repo root: Plot_Extract/
 REPO_ROOT = os.path.abspath(os.path.join(UI_DIR, '..'))
 
-# Serve templates/static from the UserInterface folder, but run the backend
+# Serve templates/static from the WebExtract folder, but run the backend
 # pipelines using the Prototype folder (scripts, plots, prompts).
 app = Flask(
     __name__,
@@ -57,6 +57,103 @@ UI_EXAMPLES_DIR = os.path.join(UI_DIR, 'examples')
 ALLOWED_IMAGE_EXTS = {'.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff', '.webp'}
 
 PYTHON_EXE = sys.executable or 'python'
+
+
+def _safe_abs_under_plots(rel_path: str) -> str | None:
+    """Return absolute path under PLOTS_DIR for a plots-relative path, else None."""
+    if not rel_path:
+        return None
+    try:
+        p = str(rel_path).replace('\\', '/').lstrip('/')
+    except Exception:
+        return None
+    # Prevent traversal
+    if any(part == '..' for part in p.split('/')):
+        return None
+    abs_p = os.path.abspath(os.path.join(PLOTS_DIR, p.replace('/', os.sep)))
+    if not abs_p.startswith(os.path.abspath(PLOTS_DIR)):
+        return None
+    return abs_p
+
+
+def _list_v2_version_dirs(image_path: str, prompt_name: str) -> list[tuple[int, str]]:
+    """Return list of (version_num, version_dir_abs) for v2 runs of image+prompt."""
+    import re
+
+    if not image_path or not prompt_name:
+        return []
+
+    image_abs = _safe_abs_under_plots(image_path)
+    if not image_abs:
+        return []
+
+    image_dir = os.path.dirname(image_abs)
+    image_name = os.path.basename(image_abs)
+    base_name = os.path.splitext(image_name)[0]
+    name_for_folder = image_name.replace('.', '_')
+    full_prompt_name = f"pv2_{prompt_name}"
+
+    pat_new = re.compile(rf'^{re.escape(name_for_folder)}\.{re.escape(full_prompt_name)}\.v(\d+)$')
+    pat_old = re.compile(rf'^{re.escape(base_name)}\.{re.escape(full_prompt_name)}\.v(\d+)$')
+
+    out: list[tuple[int, str]] = []
+    if not os.path.isdir(image_dir):
+        return out
+
+    for item in os.listdir(image_dir):
+        item_path = os.path.join(image_dir, item)
+        if not os.path.isdir(item_path):
+            continue
+        m = pat_new.match(item) or pat_old.match(item)
+        if not m:
+            continue
+        try:
+            v = int(m.group(1))
+        except Exception:
+            continue
+        out.append((v, item_path))
+
+    out.sort(key=lambda t: t[0], reverse=True)
+    return out
+
+
+def _read_v2_progress_console(version_dir: str) -> tuple[str, bool]:
+    """Return (console_text, success) from a v2 version folder if possible."""
+    version_dir = _resolve_path_under_plots(version_dir)
+    progress_path = os.path.join(version_dir, '_extraction_progress.json')
+    if os.path.isfile(progress_path):
+        try:
+            with open(progress_path, 'r', encoding='utf-8') as f:
+                pj = json.load(f)
+            console_text = ''
+            if isinstance(pj, dict):
+                console_text = str(pj.get('console_output') or '')
+                status = str(pj.get('status') or '')
+                success = status.lower() == 'completed'
+                if not status:
+                    cur_stage = pj.get('current_stage')
+                    tot = pj.get('total_stages')
+                    success = (cur_stage == tot) if (cur_stage is not None and tot is not None) else bool(console_text)
+            else:
+                success = False
+            return console_text, bool(success)
+        except Exception:
+            pass
+
+    # Fallback: try to find any tracking/log file.
+    try:
+        cand = None
+        for f in os.listdir(version_dir):
+            if f.endswith('.mistral.out_tracking') or f.endswith('.out_tracking'):
+                cand = os.path.join(version_dir, f)
+                break
+        if cand and os.path.isfile(cand):
+            with open(cand, 'r', encoding='utf-8', errors='replace') as fp:
+                return fp.read(), True
+    except Exception:
+        pass
+
+    return '', False
 
 
 def _resolve_path_under_plots(path_value):
@@ -101,7 +198,7 @@ os.makedirs(SYNTHETIC_DIR, exist_ok=True)
 
 STATE_DIR = UI_DIR
 
-# Settings/state files (kept under UserInterface so this UI stays isolated)
+# Settings/state files (kept under WebExtract so this UI stays isolated)
 SETTINGS_FILE = os.path.join(STATE_DIR, 'synthetic_settings.json')
 SETTINGS_FILE_V2 = os.path.join(STATE_DIR, 'synthetic_settings_v2.json')
 EXTRACTION_STATE_FILE = os.path.join(STATE_DIR, 'extraction_state.json')
@@ -2300,6 +2397,13 @@ def _scan_version_folder(folder_path, version_label, outputs, plots_dir):
             
         elif f.endswith('_data'):
             outputs['data'].append({'path': rel_path, 'label': f'Extracted Data ({version_label})', 'filename': f})
+
+        elif f.endswith('.csv'):
+            # Many pipelines persist extracted results as CSV in the version folder.
+            label = f'Extracted CSV ({version_label})'
+            if f.endswith('-original.csv'):
+                label = f'Original Data ({version_label})'
+            outputs['data'].append({'path': rel_path, 'label': label, 'filename': f})
             
         elif f.endswith('_code') or f.endswith('_conversation') or f.endswith('_validate') or f.endswith('_validate_why'):
             outputs['other'].append({'path': rel_path, 'filename': f, 'version': version_label})
@@ -2743,6 +2847,77 @@ def get_outputs_v2():
 
     outputs = get_output_files_v2(image_path, prompt_name, version_dir_param)
     return jsonify({'outputs': outputs, 'version_dir': version_dir_param})
+
+
+@app.route('/v2/load_saved_runs', methods=['POST', 'GET'])
+def v2_load_saved_runs():
+    """Load precomputed v2 runs from disk without executing extraction.
+
+    Returns runs as objects compatible with the UI polling result:
+      { success, outputs, console }
+    """
+    if request.method == 'GET':
+        return jsonify({
+            'success': False,
+            'error': 'use_post',
+            'hint': 'POST JSON: {"image_path": "first_examples/A/A-1/A-1.png", "prompt_name": "prompt_13", "limit": 3}',
+        })
+
+    data = request.json or {}
+    image_path = (data.get('image_path') or data.get('image') or '').strip().replace('\\', '/')
+    prompt_name = (data.get('prompt_name') or data.get('prompt') or data.get('prompt_file') or '').strip()
+    limit = data.get('limit')
+
+    try:
+        n = int(limit) if limit is not None else 3
+    except Exception:
+        n = 3
+    n = max(1, min(10, n))
+
+    image_abs = _safe_abs_under_plots(image_path)
+    if not image_abs or not os.path.isfile(image_abs):
+        return jsonify({'success': False, 'error': 'image_not_found', 'image_path': image_path}), 404
+
+    if not prompt_name:
+        return jsonify({'success': False, 'error': 'missing_prompt_name'}), 400
+
+    versions = _list_v2_version_dirs(image_path, prompt_name)
+    if len(versions) < n and len(versions) == 0:
+        # Return 200 with success=false so the UI can show a helpful message
+        # without confusing this with a missing route.
+        return jsonify({
+            'success': False,
+            'error': 'not_enough_saved_runs',
+            'found': 0,
+            'requested': n,
+            'image_path': image_path,
+            'prompt_name': prompt_name,
+        })
+
+    take_n = min(n, len(versions))
+    runs = []
+    for v, vdir in versions[:take_n]:
+        console_text, ok = _read_v2_progress_console(vdir)
+        outputs = get_output_files_v2(image_path, prompt_name, vdir)
+        runs.append({
+            'version': v,
+            'version_dir': os.path.relpath(vdir, PLOTS_DIR).replace('\\', '/'),
+            'result': {
+                'success': bool(ok),
+                'outputs': outputs,
+                'console': console_text,
+            }
+        })
+
+    return jsonify({
+        'success': True,
+        'image_path': image_path,
+        'prompt_name': prompt_name,
+        'requested': n,
+        'found': len(runs),
+        'partial': len(runs) < n,
+        'runs': runs,
+    })
 
 @app.route('/read_file', methods=['POST'])
 def read_file_route():

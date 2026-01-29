@@ -294,14 +294,62 @@ def prompt_mistral(client, messages):
     except Exception:
         timeout_ms = 240_000
 
-    response = client.chat.complete(
-        model="mistral-large-2512",
-        messages=messages,
-        max_tokens=4096,
-        temperature=0,
-        timeout_ms=timeout_ms,
-    )
-    return messages, response.choices[0].message.content
+    # Allow overriding model via env var.
+    # Default remains the legacy value to avoid breaking existing pipelines.
+    model = os.getenv("PLOTEXTRACT_MISTRAL_MODEL") or "mistral-large-2512"
+
+    def _is_rate_limit_error(err: Exception) -> bool:
+        msg = str(err).lower()
+        return (
+            "status 429" in msg
+            or "rate limit" in msg
+            or "rate_limited" in msg
+            or '"code":"1300"' in msg
+            or "too many requests" in msg
+        )
+
+    # Retry transient rate limits (429).
+    # Defaults are conservative; override if you have stricter/looser quotas.
+    try:
+        max_retries = int(os.getenv("PLOTEXTRACT_MISTRAL_MAX_RETRIES") or "6")
+    except Exception:
+        max_retries = 6
+    try:
+        base_sleep_s = float(os.getenv("PLOTEXTRACT_MISTRAL_RETRY_BASE_S") or "1.0")
+    except Exception:
+        base_sleep_s = 1.0
+    try:
+        max_sleep_s = float(os.getenv("PLOTEXTRACT_MISTRAL_RETRY_MAX_S") or "20.0")
+    except Exception:
+        max_sleep_s = 20.0
+
+    last_err: Optional[Exception] = None
+    for attempt in range(max_retries + 1):
+        try:
+            response = client.chat.complete(
+                model=model,
+                messages=messages,
+                max_tokens=4096,
+                temperature=0,
+                timeout_ms=timeout_ms,
+            )
+            return messages, response.choices[0].message.content
+        except Exception as e:
+            last_err = e
+            if _is_rate_limit_error(e) and attempt < max_retries:
+                sleep_s = min(max_sleep_s, base_sleep_s * (2 ** attempt))
+                print(
+                    f"[WARN] Mistral rate limit (429). Retrying in {sleep_s:.1f}s (attempt {attempt + 1}/{max_retries})",
+                    file=sys.stderr,
+                )
+                time.sleep(sleep_s)
+                continue
+            raise
+
+    # Should be unreachable, but keep for safety.
+    if last_err is not None:
+        raise last_err
+    raise RuntimeError("prompt_mistral failed without an exception")
 
 
 def clean_code_response(code_text):
@@ -625,6 +673,21 @@ def stack_images_vertically(image1_path, image2_path, border_color, output_dir, 
         borderType=cv2.BORDER_CONSTANT,
         value=color,
     )
+
+    # Validation images can exceed the provider's multimodal limits when stacking.
+    # Downscale to a safe maximum dimension (default 1024) to avoid HTTP 400 errors.
+    try:
+        max_dim = int(os.getenv("PLOTEXTRACT_VALIDATION_MAX_DIM", "1024"))
+    except Exception:
+        max_dim = 1024
+    if max_dim and max_dim > 0:
+        h, w = combined_image_with_border.shape[:2]
+        max_wh = max(w, h)
+        if max_wh > max_dim:
+            scale = max_dim / float(max_wh)
+            new_w = max(1, int(round(w * scale)))
+            new_h = max(1, int(round(h * scale)))
+            combined_image_with_border = cv2.resize(combined_image_with_border, (new_w, new_h), interpolation=cv2.INTER_AREA)
 
     original_filename = os.path.basename(image1_path)
     base_name = original_filename.rsplit(".", 1)[0] if "." in original_filename else original_filename
@@ -1378,7 +1441,16 @@ if stacked:
     validation_details = {}
 
     def run_validation(prompt_text):
-        msg = create_Q_1p([[encode_image(stacked), prompt_text]])
+        # The stacked comparison image is always saved as PNG.
+        # Do not rely on PNGJPG (derived from the original input extension) or the API can reject the request.
+        stacked_b64 = encode_image(stacked)
+        msg = [{
+            "role": "user",
+            "content": [
+                {"type": "text", "text": prompt_text},
+                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{stacked_b64}"}},
+            ],
+        }]
         _, validate_resp = prompt_mistral(client, msg)
         return validate_resp
 

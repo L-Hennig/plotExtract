@@ -1,0 +1,2958 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PlotExtract — Data Extraction</title>
+  <link rel="stylesheet" href="/static/ui.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <div class="brand">
+        <div class="brand__title">PlotExtract</div>
+        <div class="brand__subtitle">Upload a plot image → extract data</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h1 class="h1">Extract data from a plot image</h1>
+      <p class="muted">Choose an image (upload or example), select a prompt (EX 1 or EX 2), then run extraction.</p>
+
+      <div class="grid">
+        <div class="panel">
+          <h2 class="h2">1) Choose image</h2>
+
+          <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Upload image">
+            <div class="dropzone__title">Drag and drop an image here</div>
+            <div class="dropzone__subtitle">or click to choose a file</div>
+            <input id="fileInput" class="dropzone__input" type="file" accept="image/*" />
+          </div>
+
+          <div class="divider">or</div>
+
+          <label class="label" for="exampleSelect">Pick an example</label>
+          <div class="row">
+            <select id="exampleSelect" class="select">
+              <option value="">(no example selected)</option>
+            </select>
+            <button id="btnLoadExample" class="btn" type="button">Use example</button>
+          </div>
+
+          <div style="margin-top: 10px;">
+            <label class="check">
+              <input id="chkTestResults" type="checkbox" />
+              Test results (A-1.png · prompt_13 · loads saved runs)
+            </label>
+            <div class="muted" style="margin-top: 4px;">When enabled, extraction will not run; the UI loads precomputed outputs from disk.</div>
+          </div>
+
+          <div id="uploadStatus" class="notice" style="display:none"></div>
+        </div>
+
+        <div class="panel">
+          <h2 class="h2">Preview</h2>
+          <div class="preview">
+            <img id="previewImg" class="preview__img" alt="Image preview" style="display:none" />
+            <div id="previewEmpty" class="preview__empty">No image selected</div>
+          </div>
+          <div class="kv">
+            <div class="kv__k">Selected</div>
+            <div id="selectedFileLabel" class="kv__v">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack" style="margin-top: 18px;">
+        <div class="panel">
+          <h2 class="h2">2) Choose prompt</h2>
+
+          <label class="label" for="promptSelect">Prompt</label>
+          <select id="promptSelect" class="select">
+            <optgroup label="EX 1">
+              {% for p in ex1_prompts %}
+              <option value="ex1::{{ p }}">{{ p }}</option>
+              {% endfor %}
+            </optgroup>
+            <optgroup label="EX 2">
+              {% for p in ex2_prompts %}
+              <option value="ex2::{{ p }}">{{ p }}</option>
+              {% endfor %}
+            </optgroup>
+          </select>
+
+          <div id="articleInfoWrap" style="display:none; margin-top: 12px;">
+            <label class="label" for="articleInfo">Additional information (EX 2)</label>
+            <textarea id="articleInfo" class="textarea" rows="6" placeholder="Optional: paste figure caption/legend or short experimental context. This can improve extraction for some prompts."></textarea>
+            <div class="muted" style="margin-top: 6px;">Shown only for EX 2 prompts.</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2 class="h2">3) Run extraction</h2>
+
+          <label class="label" for="trialCount" style="margin-top: 2px;">Trials</label>
+          <div class="row" style="margin-bottom: 10px;">
+            <select id="trialCount" class="select" aria-label="Number of trials">
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+            <div class="muted" style="flex: 2;">Runs multiple independent extractions on the same plot.</div>
+          </div>
+
+          <div class="row">
+            <button id="btnExtract" class="btn btn-primary" type="button">Run extraction</button>
+            <button id="btnCancel" class="btn" type="button" style="display:none">Cancel</button>
+          </div>
+
+          <div id="progressWrap" class="progress" style="display:none">
+            <div class="progress__bar">
+              <div id="progressFill" class="progress__fill" style="width:0%"></div>
+            </div>
+            <div class="progress__meta">
+              <div id="progressText" class="mono">Ready.</div>
+              <div id="elapsedText" class="muted">—</div>
+            </div>
+          </div>
+
+          <div id="resultWrap" style="display:none; margin-top: 14px;">
+            <h3 class="h3">Result</h3>
+            <div id="resultSummary" class="notice"></div>
+            <div id="resultWarning" class="notice notice--warn" style="display:none"></div>
+
+            <div class="resultsLayout" style="margin-top: 10px;">
+              <div class="panel">
+                <h2 class="h2">Images</h2>
+                <div id="resultGallery" class="gallery" style="display:none"></div>
+                <div id="highlightStatus" class="muted" style="margin-top: 8px;"></div>
+              </div>
+
+              <div class="panel">
+                <h2 class="h2">Curves</h2>
+                <div id="curvesEmpty" class="muted">Curves not found.</div>
+
+                <div id="trialSelectionWarning" class="notice notice--warn" style="display:none; margin: 8px 0 10px;"></div>
+
+                <div id="trialExportControls" class="row" style="display:none; margin: 8px 0 10px;">
+                  <button id="btnDownloadTrialsCsv" class="btn btn-primary" type="button" disabled>Download CSV (selected / averaged)</button>
+                </div>
+
+                <div id="curvesControls" class="row" style="display:none; margin: 8px 0 10px;">
+                  <button id="btnSelectAllCurves" class="btn" type="button">Select all</button>
+                  <button id="btnClearAllCurves" class="btn" type="button">Clear all</button>
+                </div>
+
+                <div id="debugControls" style="display:none; margin: 0 0 10px;">
+                  <label class="check">
+                    <input id="chkAxesDebug" type="checkbox" />
+                    Show axes overlay (debug)
+                  </label>
+                </div>
+
+                <div id="overlayAdjustControls" style="display:none; margin: 0 0 12px;">
+                  <div class="overlayAdjust__header">
+                    <div class="muted" style="margin: 0;">Overlay adjust</div>
+                    <select id="overlayAdjustTarget" class="select select--sm" aria-label="Overlay adjust target">
+                      <option value="both">Both</option>
+                      <option value="original">Original</option>
+                      <option value="replot">Replot</option>
+                    </select>
+                  </div>
+                  <div class="overlayAdjust__scale" aria-label="Overlay scale controls">
+                    <button id="btnOverlaySmaller" class="btn btn-sm overlayBtn" type="button" aria-label="Smaller">
+                      <img class="overlayBtn__icon" src="/static/icons/overlay_scale_down.png" alt="" />
+                    </button>
+                    <button id="btnOverlayReset" class="btn btn-sm overlayBtn" type="button" aria-label="Reset">Reset</button>
+                    <button id="btnOverlayBigger" class="btn btn-sm overlayBtn" type="button" aria-label="Bigger">
+                      <img class="overlayBtn__icon" src="/static/icons/overlay_scale_up.png" alt="" />
+                    </button>
+                  </div>
+                  <div class="overlayAdjust__pad" aria-label="Overlay move controls">
+                    <button id="btnOverlayUp" class="btn btn-sm overlayBtn overlayBtn--up" type="button" aria-label="Up">↑</button>
+                    <button id="btnOverlayLeft" class="btn btn-sm overlayBtn overlayBtn--left" type="button" aria-label="Left">←</button>
+                    <button id="btnOverlayRight" class="btn btn-sm overlayBtn overlayBtn--right" type="button" aria-label="Right">→</button>
+                    <button id="btnOverlayDown" class="btn btn-sm overlayBtn overlayBtn--down" type="button" aria-label="Down">↓</button>
+                  </div>
+                  <div class="muted" style="margin-top: 6px;">Tip: hold Shift for bigger steps.</div>
+                </div>
+
+                <div id="curvesTableWrap" class="tableWrap" style="display:none;"></div>
+
+                <div id="trialsGridWrap" class="tableWrap" style="display:none;"></div>
+
+                <div class="divider" style="margin: 12px 0;">downloads</div>
+                <div class="row">
+                  <a id="downloadCsvBtn" class="btn btn-primary" href="#" download style="display:none">Download CSV (all curves)</a>
+                  <button id="downloadCsvConfirmedBtn" class="btn" type="button" style="display:none">Download CSV (confirmed only)</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel" style="margin-top: 14px;">
+              <div class="row" style="align-items: baseline;">
+                <h2 class="h2" style="margin:0;">Console</h2>
+                <button id="btnToggleConsole" class="btn" type="button">Show</button>
+                <button id="btnCopyConsole" class="btn" type="button">Copy</button>
+              </div>
+              <div id="consoleWrap" class="consoleWrap consoleWrap--collapsed">
+                <pre id="resultConsole" class="console"></pre>
+              </div>
+            </div>
+
+            <div id="resultLinks" class="links"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card card--subtle">
+      <h2 class="h2">Examples folder</h2>
+      <p class="muted">Put example images in <span class="mono">WebExtract/examples</span>. They’ll show up in the dropdown automatically.</p>
+    </section>
+  </main>
+
+<script>
+(() => {
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const previewImg = document.getElementById('previewImg');
+  const previewEmpty = document.getElementById('previewEmpty');
+  const selectedFileLabel = document.getElementById('selectedFileLabel');
+  const uploadStatus = document.getElementById('uploadStatus');
+
+  const exampleSelect = document.getElementById('exampleSelect');
+  const btnLoadExample = document.getElementById('btnLoadExample');
+
+  const promptSelect = document.getElementById('promptSelect');
+  const articleInfoWrap = document.getElementById('articleInfoWrap');
+  const articleInfo = document.getElementById('articleInfo');
+
+  const btnExtract = document.getElementById('btnExtract');
+  const btnCancel = document.getElementById('btnCancel');
+
+  const trialCount = document.getElementById('trialCount');
+
+  const chkTestResults = document.getElementById('chkTestResults');
+
+  const progressWrap = document.getElementById('progressWrap');
+  const progressFill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+  const elapsedText = document.getElementById('elapsedText');
+
+  const resultWrap = document.getElementById('resultWrap');
+  const resultSummary = document.getElementById('resultSummary');
+  const resultWarning = document.getElementById('resultWarning');
+  const resultGallery = document.getElementById('resultGallery');
+  const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+  const downloadCsvConfirmedBtn = document.getElementById('downloadCsvConfirmedBtn');
+  const resultLinks = document.getElementById('resultLinks');
+  const resultConsole = document.getElementById('resultConsole');
+  const consoleWrap = document.getElementById('consoleWrap');
+  const btnToggleConsole = document.getElementById('btnToggleConsole');
+  const btnCopyConsole = document.getElementById('btnCopyConsole');
+
+  const curvesEmpty = document.getElementById('curvesEmpty');
+
+  const trialSelectionWarning = document.getElementById('trialSelectionWarning');
+  const trialExportControls = document.getElementById('trialExportControls');
+  const btnDownloadTrialsCsv = document.getElementById('btnDownloadTrialsCsv');
+  const curvesControls = document.getElementById('curvesControls');
+  const btnSelectAllCurves = document.getElementById('btnSelectAllCurves');
+  const btnClearAllCurves = document.getElementById('btnClearAllCurves');
+  const curvesTableWrap = document.getElementById('curvesTableWrap');
+  const trialsGridWrap = document.getElementById('trialsGridWrap');
+  const highlightStatus = document.getElementById('highlightStatus');
+  const debugControls = document.getElementById('debugControls');
+  const chkAxesDebug = document.getElementById('chkAxesDebug');
+  const overlayAdjustControls = document.getElementById('overlayAdjustControls');
+  const overlayAdjustTarget = document.getElementById('overlayAdjustTarget');
+  const btnOverlayBigger = document.getElementById('btnOverlayBigger');
+  const btnOverlaySmaller = document.getElementById('btnOverlaySmaller');
+  const btnOverlayReset = document.getElementById('btnOverlayReset');
+  const btnOverlayUp = document.getElementById('btnOverlayUp');
+  const btnOverlayDown = document.getElementById('btnOverlayDown');
+  const btnOverlayLeft = document.getElementById('btnOverlayLeft');
+  const btnOverlayRight = document.getElementById('btnOverlayRight');
+
+  let currentImagePath = null; // plots-relative path (e.g., batch_uploads/ui_xxx.png)
+  let currentTaskId = null;
+  let currentPipeline = null;
+  let pollTimer = null;
+
+  // Result-state for hover/selection and overlays
+  let lastResult = null;
+  let confirmedCurves = new Set();
+  let hoveredCurve = null;
+  let accumulatedFacts = null;
+  let extractedCsvMeta = null;
+  let extractedCsvTextCache = null;
+  let curveStyles = []; // [{curve_label, colour, line_type, marker_symbol}]
+  let curvePolylinesPx = new Map(); // curve_label -> [{x,y} in ORIGINAL image pixels]
+  let overlayEnabled = false;
+  let resizeObserver = null;
+  let showAxesDebug = false;
+
+  // Multi-trial state
+  let trialsMode = false;
+  let trialsCancelRequested = false;
+  let trialRuns = []; // [{ taskId, result, ok, outputs, consoleText, accumulatedFacts, curveStyles, curveLabels, extractedCsvMeta }]
+  let trialSelections = new Map(); // curve_label -> Set(trialIndex)
+  let unionCurveLabels = []; // ordered list
+
+  // Hover state for trials overlays (row+column intersection, or a specific hovered cell)
+  let trialsHover = {
+    rowCurveLabel: null,
+    colRunIndex: null,
+    cellCurveLabel: null,
+    cellRunIndex: null,
+  };
+
+  // Test-results mode (load precomputed runs without executing extraction)
+  let testResultsMode = false;
+  const TEST_IMAGE_PATH = 'first_examples/A/A-1/A-1.png';
+  const TEST_PROMPT_VALUE = 'ex2::prompt_13';
+  const TEST_PROMPT_NAME = 'prompt_13';
+
+  function _setTrialCountLimit(maxN) {
+    const lim = Math.max(1, Math.min(5, Number(maxN) || 5));
+    if (!trialCount) return;
+    for (const opt of Array.from(trialCount.querySelectorAll('option'))) {
+      const v = Number(opt.value);
+      opt.disabled = Number.isFinite(v) ? (v > lim) : false;
+    }
+    const cur = _getTrialCount();
+    if (cur > lim) trialCount.value = String(lim);
+  }
+
+  function _setControlsDisabled(disabled) {
+    try { fileInput.disabled = !!disabled; } catch (_) {}
+    try { exampleSelect.disabled = !!disabled; } catch (_) {}
+    try { btnLoadExample.disabled = !!disabled; } catch (_) {}
+    try { promptSelect.disabled = !!disabled; } catch (_) {}
+    try { articleInfo.disabled = !!disabled; } catch (_) {}
+  }
+
+  function _setTestResultsMode(enabled) {
+    testResultsMode = !!enabled;
+    if (chkTestResults) chkTestResults.checked = testResultsMode;
+
+    if (testResultsMode) {
+      // Lock image + prompt
+      currentImagePath = TEST_IMAGE_PATH;
+      selectedFileLabel.textContent = TEST_IMAGE_PATH;
+      setPreviewFromUrl('/plots/' + TEST_IMAGE_PATH);
+      clearNotice(uploadStatus);
+      setNotice(uploadStatus, 'Test mode enabled: using A-1.png + prompt_13. Extraction will not run.', 'info');
+
+      // Ensure prompt is set
+      const opt = Array.from(promptSelect.querySelectorAll('option')).find(o => o.value === TEST_PROMPT_VALUE);
+      if (opt) promptSelect.value = TEST_PROMPT_VALUE;
+      onPromptChanged();
+
+      _setTrialCountLimit(3);
+      _setControlsDisabled(true);
+    } else {
+      _setTrialCountLimit(5);
+      _setControlsDisabled(false);
+    }
+  }
+
+  // Manual overlay adjustment (display-space transform per image)
+  let overlayAdjust = {
+    original: { s: 1.0, dx: 0.0, dy: 0.0 },
+    replot: { s: 1.0, dx: 0.0, dy: 0.0 },
+    target: 'both',
+  };
+
+  function _loadOverlayAdjustPref() {
+    try {
+      const raw = localStorage.getItem('plotextract_overlay_adjust');
+      if (raw) {
+        const obj = JSON.parse(raw);
+        const o = obj && obj.original ? obj.original : null;
+        const r = obj && obj.replot ? obj.replot : null;
+        overlayAdjust = {
+          original: {
+            s: _safeNumber(o && o.s) ?? 1.0,
+            dx: _safeNumber(o && o.dx) ?? 0.0,
+            dy: _safeNumber(o && o.dy) ?? 0.0,
+          },
+          replot: {
+            s: _safeNumber(r && r.s) ?? 1.0,
+            dx: _safeNumber(r && r.dx) ?? 0.0,
+            dy: _safeNumber(r && r.dy) ?? 0.0,
+          },
+          target: (obj && typeof obj.target === 'string') ? obj.target : 'both',
+        };
+      }
+    } catch (_) {}
+
+    if (overlayAdjustTarget) overlayAdjustTarget.value = overlayAdjust.target || 'both';
+  }
+
+  function _saveOverlayAdjustPref() {
+    try {
+      localStorage.setItem('plotextract_overlay_adjust', JSON.stringify(overlayAdjust));
+    } catch (_) {}
+  }
+
+  function _applyAdjustToTargets(fn) {
+    const t = overlayAdjust.target || 'both';
+    if (t === 'original' || t === 'both') fn(overlayAdjust.original);
+    if (t === 'replot' || t === 'both') fn(overlayAdjust.replot);
+    _saveOverlayAdjustPref();
+  }
+
+  // Console collapse
+  let consoleOpen = false;
+
+  function _loadConsolePref() {
+    try {
+      const v = localStorage.getItem('plotextract_console_open');
+      consoleOpen = (v === '1');
+    } catch (_) {
+      consoleOpen = false;
+    }
+    _syncConsoleCollapsed();
+  }
+
+  function _saveConsolePref() {
+    try {
+      localStorage.setItem('plotextract_console_open', consoleOpen ? '1' : '0');
+    } catch (_) {}
+  }
+
+  function _syncConsoleCollapsed() {
+    if (!consoleWrap || !btnToggleConsole) return;
+    consoleWrap.classList.toggle('consoleWrap--collapsed', !consoleOpen);
+    btnToggleConsole.textContent = consoleOpen ? 'Hide' : 'Show';
+  }
+
+  function _loadAxesDebugPref() {
+    try {
+      const v = localStorage.getItem('plotextract_axes_debug');
+      showAxesDebug = (v === '1');
+    } catch (_) {
+      showAxesDebug = false;
+    }
+    if (chkAxesDebug) chkAxesDebug.checked = !!showAxesDebug;
+  }
+
+  function _saveAxesDebugPref() {
+    try {
+      localStorage.setItem('plotextract_axes_debug', showAxesDebug ? '1' : '0');
+    } catch (_) {}
+  }
+
+  function setNotice(el, msg, kind='info') {
+    el.style.display = 'block';
+    el.className = 'notice notice--' + kind;
+    el.textContent = msg;
+  }
+
+  function clearNotice(el) {
+    el.style.display = 'none';
+    el.textContent = '';
+  }
+
+  function setPreviewFromUrl(url) {
+    previewImg.src = url;
+    previewImg.style.display = 'block';
+    previewEmpty.style.display = 'none';
+  }
+
+  function setPreviewFromFile(file) {
+    const url = URL.createObjectURL(file);
+    previewImg.src = url;
+    previewImg.style.display = 'block';
+    previewEmpty.style.display = 'none';
+  }
+
+  async function refreshExamples() {
+    try {
+      const res = await fetch('/ui/examples');
+      const data = await res.json();
+      const items = (data && data.examples) ? data.examples : [];
+      for (const opt of Array.from(exampleSelect.querySelectorAll('option')).slice(1)) {
+        opt.remove();
+      }
+      for (const p of items) {
+        const opt = document.createElement('option');
+        opt.value = p;
+        opt.textContent = p;
+        exampleSelect.appendChild(opt);
+      }
+      btnLoadExample.disabled = items.length === 0;
+    } catch (e) {
+      btnLoadExample.disabled = true;
+    }
+  }
+
+  function getPipelineAndPrompt() {
+    const v = promptSelect.value || '';
+    if (v.startsWith('ex1::')) return { pipeline: 'ex1', prompt: v.slice('ex1::'.length) };
+    if (v.startsWith('ex2::')) return { pipeline: 'ex2', prompt: v.slice('ex2::'.length) };
+    return { pipeline: null, prompt: null };
+  }
+
+  function onPromptChanged() {
+    const { pipeline } = getPipelineAndPrompt();
+    articleInfoWrap.style.display = (pipeline === 'ex2') ? 'block' : 'none';
+  }
+
+  async function uploadFile(file) {
+    clearNotice(uploadStatus);
+    currentImagePath = null;
+
+    setPreviewFromFile(file);
+    selectedFileLabel.textContent = file.name;
+    setNotice(uploadStatus, 'Uploading…', 'info');
+
+    const form = new FormData();
+    form.append('file', file);
+
+    const res = await fetch('/ui/upload', { method: 'POST', body: form });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok || !data.success) {
+      setNotice(uploadStatus, 'Upload failed: ' + (data.error || 'unknown_error'), 'error');
+      return;
+    }
+
+    currentImagePath = data.image_path;
+    setPreviewFromUrl(data.preview_url);
+    setNotice(uploadStatus, 'Uploaded. Ready to extract.', 'success');
+  }
+
+  async function prepareExample(examplePath) {
+    clearNotice(uploadStatus);
+    currentImagePath = null;
+
+    if (!examplePath) {
+      setNotice(uploadStatus, 'Select an example first.', 'warn');
+      return;
+    }
+
+    selectedFileLabel.textContent = examplePath;
+    setPreviewFromUrl('/ui/examples/' + encodeURI(examplePath));
+    setNotice(uploadStatus, 'Preparing example…', 'info');
+
+    const res = await fetch('/ui/prepare_example', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ example_path: examplePath })
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success) {
+      setNotice(uploadStatus, 'Could not prepare example: ' + (data.error || 'unknown_error'), 'error');
+      return;
+    }
+
+    currentImagePath = data.image_path;
+    setPreviewFromUrl(data.preview_url);
+    setNotice(uploadStatus, 'Example ready. Click “Run extraction”.', 'success');
+  }
+
+  function resetResult() {
+    resultWrap.style.display = 'none';
+    resultSummary.textContent = '';
+    resultWarning.style.display = 'none';
+    resultWarning.textContent = '';
+    resultGallery.style.display = 'none';
+    resultGallery.innerHTML = '';
+    downloadCsvBtn.style.display = 'none';
+    downloadCsvBtn.href = '#';
+    downloadCsvConfirmedBtn.style.display = 'none';
+    resultLinks.innerHTML = '';
+
+    resultConsole.textContent = '';
+    curvesEmpty.style.display = 'block';
+
+    trialSelectionWarning.style.display = 'none';
+    trialSelectionWarning.textContent = '';
+    trialExportControls.style.display = 'none';
+    btnDownloadTrialsCsv.disabled = true;
+    trialsGridWrap.style.display = 'none';
+    trialsGridWrap.innerHTML = '';
+
+    curvesControls.style.display = 'none';
+    debugControls.style.display = 'none';
+    overlayAdjustControls.style.display = 'none';
+    curvesTableWrap.style.display = 'none';
+    curvesTableWrap.innerHTML = '';
+    highlightStatus.textContent = '';
+
+    lastResult = null;
+    confirmedCurves = new Set();
+    hoveredCurve = null;
+    accumulatedFacts = null;
+    extractedCsvMeta = null;
+    extractedCsvTextCache = null;
+    curveStyles = [];
+    curvePolylinesPx = new Map();
+    overlayEnabled = false;
+
+    trialsMode = false;
+    trialsCancelRequested = false;
+    trialRuns = [];
+    trialSelections = new Map();
+    unionCurveLabels = [];
+    trialsHover = { rowCurveLabel: null, colRunIndex: null, cellCurveLabel: null, cellRunIndex: null };
+    if (resizeObserver) {
+      try { resizeObserver.disconnect(); } catch (_) {}
+      resizeObserver = null;
+    }
+
+    // Keep console collapsed by default per user preference.
+    _loadConsolePref();
+  }
+
+  function _overlayStepFromEvent(ev) {
+    return (ev && ev.shiftKey) ? 10 : 2;
+  }
+
+  function _overlayScaleFromEvent(ev) {
+    // Multiplicative step feels better than additive.
+    return (ev && ev.shiftKey) ? 1.10 : 1.03;
+  }
+
+  function _setWarning(msg) {
+    if (!msg) {
+      resultWarning.style.display = 'none';
+      resultWarning.textContent = '';
+      return;
+    }
+    resultWarning.style.display = 'block';
+    resultWarning.textContent = msg;
+  }
+
+  function _looksLikeRateLimit(consoleText) {
+    const t = (consoleText || '').toLowerCase();
+    return t.includes('429') || t.includes('rate limit') || t.includes('too many requests');
+  }
+
+  function _extractJsonObjectFrom(text, startIndex) {
+    const s = String(text || '');
+    const start = s.indexOf('{', Math.max(0, startIndex || 0));
+    if (start < 0) return null;
+
+    let depth = 0;
+    let inString = false;
+    let escape = false;
+
+    for (let i = start; i < s.length; i++) {
+      const ch = s[i];
+      if (inString) {
+        if (escape) {
+          escape = false;
+        } else if (ch === '\\') {
+          escape = true;
+        } else if (ch === '"') {
+          inString = false;
+        }
+        continue;
+      }
+
+      if (ch === '"') {
+        inString = true;
+        continue;
+      }
+      if (ch === '{') depth++;
+      if (ch === '}') {
+        depth--;
+        if (depth === 0) {
+          return s.slice(start, i + 1);
+        }
+      }
+    }
+    return null;
+  }
+
+  function _extractLatestAccumulatedFactsFromConsole(consoleText) {
+    const s = String(consoleText || '');
+    const re = /^===== STAGE\s+\d+\s+COMPLETE\s+—\s+ACCUMULATED FACTS\s+=====$/gm;
+    let lastMatch = null;
+    let m;
+    while ((m = re.exec(s)) !== null) lastMatch = m;
+    if (!lastMatch) return null;
+    const jsonText = _extractJsonObjectFrom(s, lastMatch.index + lastMatch[0].length);
+    if (!jsonText) return null;
+    try {
+      return JSON.parse(jsonText);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function _safeNumber(v) {
+    if (v == null) return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function _looksLikePowersOfTen(values) {
+    const v = (values || []).filter(x => Number.isFinite(x) && x > 0).slice().sort((a, b) => a - b);
+    if (v.length < 2) return false;
+    // If values are approximately [1, 10, 100, ...] or any subset.
+    let hits = 0;
+    for (let i = 1; i < v.length; i++) {
+      const r = v[i] / v[i - 1];
+      if (Number.isFinite(r) && Math.abs(r - 10) < 1.5) hits++;
+    }
+    return hits >= 1;
+  }
+
+  function _parseCsvRows(csvText) {
+    // Minimal CSV parser that handles quoted cells.
+    const text = String(csvText || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    const lines = text.split('\n').filter(l => l.length > 0);
+    if (lines.length === 0) return { headers: [], rows: [] };
+
+    function parseLine(line) {
+      const out = [];
+      let cur = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (inQuotes) {
+          if (ch === '"' && line[i + 1] === '"') {
+            cur += '"';
+            i++;
+          } else if (ch === '"') {
+            inQuotes = false;
+          } else {
+            cur += ch;
+          }
+        } else {
+          if (ch === ',') {
+            out.push(cur);
+            cur = '';
+          } else if (ch === '"') {
+            inQuotes = true;
+          } else {
+            cur += ch;
+          }
+        }
+      }
+      out.push(cur);
+      return out;
+    }
+
+    const headers = parseLine(lines[0]).map(h => h.trim());
+    const rows = [];
+    for (const line of lines.slice(1)) {
+      const cells = parseLine(line);
+      // Pad to header length
+      while (cells.length < headers.length) cells.push('');
+      rows.push(cells);
+    }
+    return { headers, rows };
+  }
+
+  function _csvForConfirmedOnly(csvText, curveLabels) {
+    const { headers, rows } = _parseCsvRows(csvText);
+    if (!headers.length) return null;
+
+    const selected = Array.from(curveLabels || []);
+    if (selected.length === 0) return null;
+
+    // Strategy A: per-curve paired columns like "Time (hours) (Curve)" and "... (Curve)"
+    const curveToCols = new Map();
+    const headerCurveRe = /\(([^)]+)\)\s*$/;
+    for (let i = 0; i < headers.length; i++) {
+      const h = headers[i];
+      const m = headerCurveRe.exec(h);
+      if (!m) continue;
+      const label = m[1].trim();
+      if (!curveToCols.has(label)) curveToCols.set(label, []);
+      curveToCols.get(label).push(i);
+    }
+
+    let keepIdx = [];
+    if (curveToCols.size > 0) {
+      for (const label of selected) {
+        if (curveToCols.has(label)) keepIdx = keepIdx.concat(curveToCols.get(label));
+      }
+      keepIdx = Array.from(new Set(keepIdx)).sort((a, b) => a - b);
+    } else {
+      // Strategy B: first column is time; rest are curves
+      keepIdx = [0];
+      for (let i = 1; i < headers.length; i++) {
+        const h = headers[i];
+        for (const label of selected) {
+          if (h.trim().toLowerCase() === label.trim().toLowerCase()) {
+            keepIdx.push(i);
+            break;
+          }
+        }
+      }
+      keepIdx = Array.from(new Set(keepIdx)).sort((a, b) => a - b);
+    }
+
+    function escapeCell(cell) {
+      const s = String(cell ?? '');
+      if (s.includes('"') || s.includes(',') || s.includes('\n')) {
+        return '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
+    }
+
+    const outLines = [];
+    outLines.push(keepIdx.map(i => escapeCell(headers[i] || '')).join(','));
+    for (const row of rows) {
+      outLines.push(keepIdx.map(i => escapeCell(row[i] || '')).join(','));
+    }
+    return outLines.join('\n') + '\n';
+  }
+
+  async function _fetchText(url) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('fetch_failed');
+    return await res.text();
+  }
+
+  async function _ensureExtractedCsvText() {
+    if (extractedCsvTextCache != null) return extractedCsvTextCache;
+    if (!extractedCsvMeta || !extractedCsvMeta.path) return null;
+    const url = '/plots/' + extractedCsvMeta.path;
+    try {
+      extractedCsvTextCache = await _fetchText(url);
+      return extractedCsvTextCache;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function _fitLineLeastSquares(points) {
+    // points: [{x, y}] fit y = a*x + b
+    const n = points.length;
+    if (n < 2) return null;
+    let sx = 0, sy = 0, sxx = 0, sxy = 0;
+    for (const p of points) {
+      sx += p.x;
+      sy += p.y;
+      sxx += p.x * p.x;
+      sxy += p.x * p.y;
+    }
+    const denom = (n * sxx - sx * sx);
+    if (Math.abs(denom) < 1e-9) return null;
+    const a = (n * sxy - sx * sy) / denom;
+    const b = (sy - a * sx) / n;
+    return { a, b };
+  }
+
+  function _axisPixelsLookRelativeToPlotBox(pxValues, plotStartPx, plotEndPx) {
+    const vals = (pxValues || []).filter(v => Number.isFinite(v));
+    if (vals.length < 2) return false;
+    const minV = Math.min(...vals);
+    const maxV = Math.max(...vals);
+    const plotSize = Math.max(1, (plotEndPx - plotStartPx));
+
+    const nearRelativeRange = (minV >= -0.05 * plotSize) && (maxV <= 1.05 * plotSize);
+    const plotOffsetNonTrivial = plotStartPx > 0.08 * plotSize;
+    return nearRelativeRange && plotOffsetNonTrivial;
+  }
+
+  function _buildDataToPixelMapper(facts) {
+    const g = facts && facts.geometry_facts;
+    if (!g || !g.plot_box_px || !g.x_axis_geometry || !g.y_axis_geometry) return null;
+    const pb = g.plot_box_px;
+    if (!(Number.isFinite(pb.left) && Number.isFinite(pb.right) && Number.isFinite(pb.top) && Number.isFinite(pb.bottom))) return null;
+    if (!(pb.left < pb.right && pb.top < pb.bottom)) return null;
+
+    const xGeo = g.x_axis_geometry;
+    const yGeo = g.y_axis_geometry;
+    const anchors = Array.isArray(xGeo.anchors) ? xGeo.anchors : null;
+    // Support either `decade_anchors` (older naming) or `anchors`.
+    const yAnch = Array.isArray(yGeo.decade_anchors)
+      ? yGeo.decade_anchors
+      : (Array.isArray(yGeo.anchors) ? yGeo.anchors : null);
+    if (!anchors || anchors.length < 2 || !yAnch || yAnch.length < 2) return null;
+
+    const xPoints = anchors
+      .map(a => ({ x: _safeNumber(a.x_value_hours ?? a.x_value), y: _safeNumber(a.x_px) }))
+      .filter(p => p.x != null && p.y != null);
+
+    // Some models return axis pixels relative to the plot box (0..plotWidth) instead of full image pixels.
+    // Detect and compensate so overlays use full-image coordinates.
+    const xPxVals = anchors.map(a => _safeNumber(a.x_px)).filter(v => v != null);
+    const yPxVals = yAnch.map(a => _safeNumber(a.y_px)).filter(v => v != null);
+    const xPixelsRelative = _axisPixelsLookRelativeToPlotBox(xPxVals, pb.left, pb.right);
+    const yPixelsRelative = _axisPixelsLookRelativeToPlotBox(yPxVals, pb.top, pb.bottom);
+    const xOffset = xPixelsRelative ? pb.left : 0;
+    const yOffset = yPixelsRelative ? pb.top : 0;
+
+    const rawYVals = yAnch
+      .map(a => _safeNumber(a.log10_value ?? a.y_value ?? a.value))
+      .filter(v => v != null);
+
+    const anchorsLookLikeRawDecades = _looksLikePowersOfTen(rawYVals);
+    const anchorsLookLikeLogUnits = (rawYVals.length >= 2)
+      && (Math.max(...rawYVals) <= 25)
+      && (Math.min(...rawYVals) >= -5);
+    const yPoints = yAnch
+      .map(a => {
+        const v = _safeNumber(a.log10_value ?? a.y_value ?? a.value);
+        const ypx = _safeNumber(a.y_px);
+        if (v == null || ypx == null) return null;
+        // If anchors are raw decades (1,10,100...), fit in log10-units.
+        const u = anchorsLookLikeRawDecades && v > 0 ? Math.log10(v) : v;
+        return { x: u, y: ypx };
+      })
+      .filter(p => p && p.x != null && p.y != null);
+
+    const yFit = _fitLineLeastSquares(yPoints);
+    if (!yFit) return null;
+
+    const xBreak = xGeo.x_break;
+    if (xBreak && xBreak.present === true) {
+      const leftSeg = Array.isArray(xBreak.left_segment_anchors) ? xBreak.left_segment_anchors : [];
+      const rightSeg = Array.isArray(xBreak.right_segment_anchors) ? xBreak.right_segment_anchors : [];
+      if (leftSeg.length < 2 || rightSeg.length < 2) return null;
+      const leftPts = leftSeg.map(a => ({ x: _safeNumber(a.x_value_hours), y: _safeNumber(a.x_px) })).filter(p => p.x != null && p.y != null);
+      const rightPts = rightSeg.map(a => ({ x: _safeNumber(a.x_value_hours), y: _safeNumber(a.x_px) })).filter(p => p.x != null && p.y != null);
+      if (leftPts.length < 2 || rightPts.length < 2) return null;
+
+      const leftFit = _fitLineLeastSquares(leftPts);
+      const rightFit = _fitLineLeastSquares(rightPts);
+      if (!leftFit || !rightFit) return null;
+
+      const leftEnd = _safeNumber(xBreak.left_end_value_hours);
+      const rightStart = _safeNumber(xBreak.right_start_value_hours);
+      if (leftEnd == null || rightStart == null) return null;
+
+      return {
+        plotBox: pb,
+        hasBreak: true,
+        xMap: (xVal) => {
+          const x = _safeNumber(xVal);
+          if (x == null) return null;
+          if (x <= leftEnd) return leftFit.a * x + leftFit.b + xOffset;
+          if (x >= rightStart) return rightFit.a * x + rightFit.b + xOffset;
+          return null;
+        },
+        yMap: (yVal) => {
+          let y = _safeNumber(yVal);
+          if (y == null) return null;
+          // If the axis anchors were in raw decades but the CSV appears to be in log10 units (e.g. 6..9),
+          // use y directly. Otherwise, convert raw y to log10 for mapping.
+          if (anchorsLookLikeRawDecades) {
+            if (y > 20) {
+              if (y <= 0) return null;
+              y = Math.log10(y);
+            }
+          } else if (anchorsLookLikeLogUnits) {
+            // Many plots are labeled “log10 scale” but the plotted axis is linear in log10 units (0..10).
+            // If the CSV contains raw CFU values (e.g. 1e7), convert to log10 for pixel mapping.
+            if (y > 25) {
+              if (y <= 0) return null;
+              y = Math.log10(y);
+            }
+          }
+          return yFit.a * y + yFit.b + yOffset;
+        }
+      };
+    }
+
+    const xFit = _fitLineLeastSquares(xPoints);
+    if (!xFit) return null;
+    return {
+      plotBox: pb,
+      hasBreak: false,
+      xMap: (xVal) => {
+        const x = _safeNumber(xVal);
+        if (x == null) return null;
+        return xFit.a * x + xFit.b + xOffset;
+      },
+      yMap: (yVal) => {
+        let y = _safeNumber(yVal);
+        if (y == null) return null;
+        if (anchorsLookLikeRawDecades) {
+          if (y > 20) {
+            if (y <= 0) return null;
+            y = Math.log10(y);
+          }
+        } else if (anchorsLookLikeLogUnits) {
+          if (y > 25) {
+            if (y <= 0) return null;
+            y = Math.log10(y);
+          }
+        }
+        return yFit.a * y + yFit.b + yOffset;
+      }
+    };
+  }
+
+  function _trailingParenLabel(header) {
+    // Return the final parenthesized token, e.g.
+    // "Bacterial Count (CFU/ml) (log10 scale) (Condition 1)" -> "Condition 1"
+    // "Time (hours)" -> "hours" (NOTE: we will NOT treat this as a curve label).
+    const s = String(header || '').trim();
+    const m = /\(([^)]+)\)\s*$/.exec(s);
+    return m ? m[1].trim() : null;
+  }
+
+  function _groupCsvColumnsByCurve(headers, curveStyles) {
+    const out = new Map();
+    const h = Array.isArray(headers) ? headers : [];
+    const known = new Set((Array.isArray(curveStyles) ? curveStyles : []).map(c => String(c.curve_label || '').trim()).filter(Boolean));
+
+    // Preferred: the runner's wide format is pairs: [Time, Y(curve), Time, Y(curve), ...]
+    // Time headers often contain units in parentheses (e.g. "Time (hours)") so we must
+    // *not* regex-match every header; only parse the Y column for the curve label.
+    for (let i = 0; i + 1 < h.length; i += 2) {
+      const xHeader = String(h[i] || '');
+      const yHeader = String(h[i + 1] || '');
+      const xLower = xHeader.toLowerCase();
+      if (!(xLower.includes('time') || xLower.includes('hour'))) continue;
+
+      const label = _trailingParenLabel(yHeader);
+      if (!label) continue;
+      if (known.size > 0 && !known.has(label)) continue;
+
+      out.set(label, { xIdx: i, yIdx: i + 1 });
+    }
+
+    if (out.size > 0) return out;
+
+    // Fallback: classic wide format [time, curve1, curve2, ...]
+    // If we have known curve labels, match on exact header name.
+    if (known.size > 0 && h.length >= 2) {
+      const x0 = String(h[0] || '').toLowerCase();
+      if (x0.includes('time') || x0.includes('hour')) {
+        for (let i = 1; i < h.length; i++) {
+          const name = String(h[i] || '').trim();
+          if (known.has(name)) out.set(name, { xIdx: 0, yIdx: i });
+        }
+        if (out.size > 0) return out;
+      }
+    }
+
+    return out;
+  }
+
+  async function _buildCurvePolylinesIfPossible() {
+    overlayEnabled = false;
+    curvePolylinesPx = new Map();
+    highlightStatus.textContent = '';
+
+    if (!accumulatedFacts) {
+      highlightStatus.textContent = 'Highlight unavailable (missing accumulated facts).';
+      return;
+    }
+    const mapper = _buildDataToPixelMapper(accumulatedFacts);
+    if (!mapper) {
+      highlightStatus.textContent = 'Highlight unavailable (missing geometry).';
+      return;
+    }
+
+    const csvText = await _ensureExtractedCsvText();
+    if (!csvText) {
+      highlightStatus.textContent = 'Highlight unavailable (missing extracted CSV).';
+      return;
+    }
+
+    const { headers, rows } = _parseCsvRows(csvText);
+    if (!headers.length || rows.length === 0) {
+      highlightStatus.textContent = 'Highlight unavailable (empty CSV).';
+      return;
+    }
+
+    const grouped = _groupCsvColumnsByCurve(headers, curveStyles);
+    if (grouped.size > 0) {
+      for (const cs of curveStyles) {
+        const label = cs.curve_label;
+        const g = grouped.get(label);
+        if (!g) continue;
+        const pts = [];
+        for (const r of rows) {
+          const x = _safeNumber(r[g.xIdx]);
+          const y = _safeNumber(r[g.yIdx]);
+          if (x == null || y == null) continue;
+          const xpx = mapper.xMap(x);
+          const ypx = mapper.yMap(y);
+          if (xpx == null || ypx == null) continue;
+          pts.push({ x: xpx, y: ypx });
+        }
+        if (pts.length >= 2) curvePolylinesPx.set(label, pts);
+      }
+    } else {
+      // Fallback: first column is time, remaining columns are y values keyed by header.
+      for (let i = 1; i < headers.length; i++) {
+        const label = headers[i];
+        const pts = [];
+        for (const r of rows) {
+          const x = _safeNumber(r[0]);
+          const y = _safeNumber(r[i]);
+          if (x == null || y == null) continue;
+          const xpx = mapper.xMap(x);
+          const ypx = mapper.yMap(y);
+          if (xpx == null || ypx == null) continue;
+          pts.push({ x: xpx, y: ypx });
+        }
+        if (pts.length >= 2) curvePolylinesPx.set(label, pts);
+      }
+    }
+
+    if (curvePolylinesPx.size === 0) {
+      highlightStatus.textContent = 'Highlight unavailable (could not map curves from CSV).';
+      return;
+    }
+
+    overlayEnabled = true;
+    highlightStatus.textContent = 'Hover or select curves to highlight (overlay).';
+  }
+
+  function _ensureOverlayForGalleryImage(galleryItemEl, kind) {
+    // kind: 'original' | 'replot'
+    const img = galleryItemEl.querySelector('img.gallery__img');
+    if (!img) return null;
+
+    let wrap = galleryItemEl.querySelector('.imgOverlayWrap');
+    if (!wrap) {
+      // Insert a wrapper inside the existing imgwrap, keep link clickable.
+      const imgwrap = galleryItemEl.querySelector('.gallery__imgwrap');
+      if (!imgwrap) return null;
+
+      const link = imgwrap.querySelector('a.gallery__imglink');
+      if (!link) return null;
+
+      wrap = document.createElement('div');
+      wrap.className = 'imgOverlayWrap';
+
+      // Move the img into the wrapper.
+      link.removeChild(img);
+      wrap.appendChild(img);
+
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.classList.add('imgOverlay');
+      svg.setAttribute('data-kind', kind);
+      svg.setAttribute('aria-hidden', 'true');
+      wrap.appendChild(svg);
+
+      link.appendChild(wrap);
+    }
+    return wrap;
+  }
+
+  function _computeContainTransform(imgEl) {
+    const rect = imgEl.getBoundingClientRect();
+    const naturalW = imgEl.naturalWidth || 0;
+    const naturalH = imgEl.naturalHeight || 0;
+    if (!naturalW || !naturalH) return null;
+    const scale = Math.min(rect.width / naturalW, rect.height / naturalH);
+    const dispW = naturalW * scale;
+    const dispH = naturalH * scale;
+    const offX = (rect.width - dispW) / 2;
+    const offY = (rect.height - dispH) / 2;
+    return { rect, naturalW, naturalH, scale, offX, offY };
+  }
+
+  function _renderOverlays() {
+    const items = Array.from(resultGallery.querySelectorAll('.gallery__item'));
+    if (items.length === 0) return;
+
+    // Multi-trial overlay mode: highlight only the hovered (curve, run).
+    if (trialsMode) {
+      const active = _trialActiveHover();
+
+      // Always clear existing overlay SVGs.
+      for (const item of items) {
+        const kind = item.dataset.kind
+          || (((item.querySelector('.gallery__title')?.textContent || '').toLowerCase().includes('original')) ? 'original' : 'replot');
+        const wrap = _ensureOverlayForGalleryImage(item, kind);
+        const svg = wrap ? wrap.querySelector('svg.imgOverlay') : null;
+        if (!svg) continue;
+        while (svg.firstChild) svg.removeChild(svg.firstChild);
+      }
+
+      if (!active) return;
+
+      const runIndex = active.runIndex;
+      const curveLabel = active.curveLabel;
+
+      // Lazily build polylines for the hovered run.
+      // Re-render after build completes.
+      _ensureTrialOverlayBuilt(runIndex).then(() => {
+        // If hover moved since we started building, do nothing; a new render will happen anyway.
+        const now = _trialActiveHover();
+        if (now && now.runIndex === runIndex && now.curveLabel === curveLabel) _renderOverlays();
+      }).catch(() => {});
+
+      const run = trialRuns[runIndex];
+      if (!run || !run._overlay || !run._overlay.enabled) return;
+
+      // Cache original plot box fractions for this run (for rough replot mapping).
+      let originalPlotBoxFrac = run._overlay.plotBoxFrac;
+
+      for (const item of items) {
+        const kind = item.dataset.kind
+          || (((item.querySelector('.gallery__title')?.textContent || '').toLowerCase().includes('original')) ? 'original' : 'replot');
+        const itemRun = (kind === 'replot') ? Number(item.dataset.runIndex) : null;
+        if (kind === 'replot' && itemRun !== runIndex) continue;
+
+        const wrap = _ensureOverlayForGalleryImage(item, kind);
+        const img = wrap ? wrap.querySelector('img.gallery__img') : null;
+        const svg = wrap ? wrap.querySelector('svg.imgOverlay') : null;
+        if (!img || !svg) continue;
+
+        const tx = _computeContainTransform(img);
+        if (!tx) continue;
+
+        svg.setAttribute('viewBox', `0 0 ${tx.rect.width} ${tx.rect.height}`);
+
+        const gRoot = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        const adj = (kind === 'original') ? overlayAdjust.original : overlayAdjust.replot;
+        const s = (adj && Number.isFinite(adj.s)) ? adj.s : 1.0;
+        const dx = (adj && Number.isFinite(adj.dx)) ? adj.dx : 0.0;
+        const dy = (adj && Number.isFinite(adj.dy)) ? adj.dy : 0.0;
+        const cx = tx.rect.width / 2;
+        const cy = tx.rect.height / 2;
+        gRoot.setAttribute('transform', `translate(${dx.toFixed(2)} ${dy.toFixed(2)}) translate(${cx.toFixed(2)} ${cy.toFixed(2)}) scale(${s.toFixed(6)}) translate(${-cx.toFixed(2)} ${-cy.toFixed(2)})`);
+        svg.appendChild(gRoot);
+
+        const pb = run.accumulatedFacts?.geometry_facts?.plot_box_px;
+        const plotBox = pb && Number.isFinite(pb.left) ? pb : null;
+
+        if (!originalPlotBoxFrac && kind === 'original' && plotBox && tx.naturalW && tx.naturalH) {
+          originalPlotBoxFrac = {
+            left: plotBox.left / tx.naturalW,
+            right: plotBox.right / tx.naturalW,
+            top: plotBox.top / tx.naturalH,
+            bottom: plotBox.bottom / tx.naturalH,
+          };
+          run._overlay.plotBoxFrac = originalPlotBoxFrac;
+        }
+
+        function toDisplayPoints(ptsPx) {
+          if (kind === 'original') {
+            return ptsPx.map(p => ({ x: tx.offX + p.x * tx.scale, y: tx.offY + p.y * tx.scale }));
+          }
+          if (!plotBox) return null;
+          const w = (plotBox.right - plotBox.left);
+          const h = (plotBox.bottom - plotBox.top);
+          if (!(w > 0 && h > 0)) return null;
+
+          let replotBox = null;
+          if (originalPlotBoxFrac) {
+            replotBox = {
+              left: originalPlotBoxFrac.left * tx.naturalW,
+              right: originalPlotBoxFrac.right * tx.naturalW,
+              top: originalPlotBoxFrac.top * tx.naturalH,
+              bottom: originalPlotBoxFrac.bottom * tx.naturalH,
+            };
+          }
+          if (!replotBox || !(replotBox.left < replotBox.right && replotBox.top < replotBox.bottom)) {
+            replotBox = { left: 0, right: tx.naturalW, top: 0, bottom: tx.naturalH };
+          }
+          const rw = replotBox.right - replotBox.left;
+          const rh = replotBox.bottom - replotBox.top;
+
+          return ptsPx.map(p => {
+            const nx = (p.x - plotBox.left) / w;
+            const ny = (p.y - plotBox.top) / h;
+            const xImg = replotBox.left + nx * rw;
+            const yImg = replotBox.top + ny * rh;
+            return { x: tx.offX + xImg * tx.scale, y: tx.offY + yImg * tx.scale };
+          });
+        }
+
+        // Grey context for all curves for this run.
+        for (const [label, ptsPx] of run._overlay.curvePolylinesPx.entries()) {
+          const dispPoints = toDisplayPoints(ptsPx);
+          if (!dispPoints || dispPoints.length < 2) continue;
+          const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+          poly.setAttribute('fill', 'none');
+          poly.setAttribute('stroke', '#9ca3af');
+          poly.setAttribute('stroke-width', '1.5');
+          poly.setAttribute('stroke-linejoin', 'round');
+          poly.setAttribute('stroke-linecap', 'round');
+          poly.setAttribute('opacity', label === curveLabel ? '0.0' : '0.25');
+          poly.setAttribute('points', dispPoints.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '));
+          gRoot.appendChild(poly);
+        }
+
+        // Active curve.
+        const ptsPx = run._overlay.curvePolylinesPx.get(curveLabel);
+        if (ptsPx && ptsPx.length >= 2) {
+          const dispPoints = toDisplayPoints(ptsPx);
+          if (dispPoints && dispPoints.length >= 2) {
+            const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+            poly.setAttribute('fill', 'none');
+            poly.setAttribute('stroke', '#ef4444');
+            poly.setAttribute('stroke-width', '1.25');
+            poly.setAttribute('stroke-linejoin', 'round');
+            poly.setAttribute('stroke-linecap', 'round');
+            poly.setAttribute('opacity', '0.98');
+            poly.setAttribute('points', dispPoints.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '));
+            poly.classList.add('overlayCurve');
+            gRoot.appendChild(poly);
+          }
+        }
+      }
+
+      return;
+    }
+
+    // Cache original plot box fractions (for replot mapping).
+    let originalPlotBoxFrac = null;
+
+    // Determine active highlights
+    const active = new Set(confirmedCurves);
+    if (hoveredCurve) active.add(hoveredCurve);
+
+    for (const item of items) {
+      const title = (item.querySelector('.gallery__title')?.textContent || '').toLowerCase();
+      const kind = title.includes('original') ? 'original' : (title.includes('replot') ? 'replot' : 'other');
+      if (kind === 'other') continue;
+
+      const wrap = _ensureOverlayForGalleryImage(item, kind);
+      const img = wrap ? wrap.querySelector('img.gallery__img') : null;
+      const svg = wrap ? wrap.querySelector('svg.imgOverlay') : null;
+      if (!img || !svg) continue;
+
+      // Clear
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+      if (!overlayEnabled) continue;
+
+      const tx = _computeContainTransform(img);
+      if (!tx) continue;
+
+      svg.setAttribute('viewBox', `0 0 ${tx.rect.width} ${tx.rect.height}`);
+
+      // Draw everything into a group so we can apply per-image manual adjustments.
+      const gRoot = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      const adj = (kind === 'original') ? overlayAdjust.original : overlayAdjust.replot;
+      const s = (adj && Number.isFinite(adj.s)) ? adj.s : 1.0;
+      const dx = (adj && Number.isFinite(adj.dx)) ? adj.dx : 0.0;
+      const dy = (adj && Number.isFinite(adj.dy)) ? adj.dy : 0.0;
+      const cx = tx.rect.width / 2;
+      const cy = tx.rect.height / 2;
+      // Translate (dx,dy) + scale around center
+      gRoot.setAttribute('transform', `translate(${dx.toFixed(2)} ${dy.toFixed(2)}) translate(${cx.toFixed(2)} ${cy.toFixed(2)}) scale(${s.toFixed(6)}) translate(${-cx.toFixed(2)} ${-cy.toFixed(2)})`);
+      svg.appendChild(gRoot);
+
+      // For ORIGINAL: use mapped image pixels. For REPLOT: attempt rough normalization.
+      const plotBox = accumulatedFacts?.geometry_facts?.plot_box_px;
+      const pb = plotBox && Number.isFinite(plotBox.left) ? plotBox : null;
+
+      if (!originalPlotBoxFrac && kind === 'original' && pb && tx.naturalW && tx.naturalH) {
+        originalPlotBoxFrac = {
+          left: pb.left / tx.naturalW,
+          right: pb.right / tx.naturalW,
+          top: pb.top / tx.naturalH,
+          bottom: pb.bottom / tx.naturalH,
+        };
+      }
+
+      // Optional debug overlay: plot box + anchors (original image only).
+      if (showAxesDebug && kind === 'original' && pb && pb.left < pb.right && pb.top < pb.bottom) {
+        const x0 = tx.offX + pb.left * tx.scale;
+        const y0 = tx.offY + pb.top * tx.scale;
+        const x1 = tx.offX + pb.right * tx.scale;
+        const y1 = tx.offY + pb.bottom * tx.scale;
+
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', x0.toFixed(1));
+        rect.setAttribute('y', y0.toFixed(1));
+        rect.setAttribute('width', (x1 - x0).toFixed(1));
+        rect.setAttribute('height', (y1 - y0).toFixed(1));
+        rect.setAttribute('fill', 'none');
+        rect.setAttribute('stroke', '#3b82f6');
+        rect.setAttribute('stroke-width', '2');
+        rect.setAttribute('stroke-dasharray', '6 4');
+        rect.setAttribute('opacity', '0.85');
+        gRoot.appendChild(rect);
+
+        const xAnch = accumulatedFacts?.geometry_facts?.x_axis_geometry?.anchors;
+        const yAnchDebug = accumulatedFacts?.geometry_facts?.y_axis_geometry?.decade_anchors
+          ?? accumulatedFacts?.geometry_facts?.y_axis_geometry?.anchors;
+        const xPxValsD = Array.isArray(xAnch) ? xAnch.map(a => _safeNumber(a.x_px)).filter(v => v != null) : [];
+        const yPxValsD = Array.isArray(yAnchDebug) ? yAnchDebug.map(a => _safeNumber(a.y_px)).filter(v => v != null) : [];
+        const xRel = _axisPixelsLookRelativeToPlotBox(xPxValsD, pb.left, pb.right);
+        const yRel = _axisPixelsLookRelativeToPlotBox(yPxValsD, pb.top, pb.bottom);
+        if (Array.isArray(xAnch)) {
+          for (const a of xAnch) {
+            const xp = _safeNumber(a.x_px);
+            if (xp == null) continue;
+            const cx = tx.offX + (xp + (xRel ? pb.left : 0)) * tx.scale;
+            const cy = tx.offY + pb.bottom * tx.scale;
+            const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            c.setAttribute('cx', cx.toFixed(1));
+            c.setAttribute('cy', cy.toFixed(1));
+            c.setAttribute('r', '3.5');
+            c.setAttribute('fill', '#3b82f6');
+            c.setAttribute('opacity', '0.9');
+            gRoot.appendChild(c);
+          }
+        }
+
+        const yAnch = yAnchDebug;
+        if (Array.isArray(yAnch)) {
+          for (const a of yAnch) {
+            const yp = _safeNumber(a.y_px);
+            if (yp == null) continue;
+            const cx = tx.offX + pb.left * tx.scale;
+            const cy = tx.offY + (yp + (yRel ? pb.top : 0)) * tx.scale;
+            const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            c.setAttribute('cx', cx.toFixed(1));
+            c.setAttribute('cy', cy.toFixed(1));
+            c.setAttribute('r', '3.5');
+            c.setAttribute('fill', '#3b82f6');
+            c.setAttribute('opacity', '0.9');
+            gRoot.appendChild(c);
+          }
+        }
+      }
+
+      function toDisplayPoints(ptsPx) {
+        if (kind === 'original') {
+          return ptsPx.map(p => ({
+            x: tx.offX + p.x * tx.scale,
+            y: tx.offY + p.y * tx.scale,
+          }));
+        }
+        // Replot heuristic: normalize within original plot box then map into an estimated plot box region
+        // on the replot image (derived from original plot box fractions).
+        if (!pb) return null;
+        const w = (pb.right - pb.left);
+        const h = (pb.bottom - pb.top);
+        if (!(w > 0 && h > 0)) return null;
+
+        let replotBox = null;
+        if (originalPlotBoxFrac) {
+          replotBox = {
+            left: originalPlotBoxFrac.left * tx.naturalW,
+            right: originalPlotBoxFrac.right * tx.naturalW,
+            top: originalPlotBoxFrac.top * tx.naturalH,
+            bottom: originalPlotBoxFrac.bottom * tx.naturalH,
+          };
+        }
+        if (!replotBox || !(replotBox.left < replotBox.right && replotBox.top < replotBox.bottom)) {
+          replotBox = { left: 0, right: tx.naturalW, top: 0, bottom: tx.naturalH };
+        }
+        const rw = replotBox.right - replotBox.left;
+        const rh = replotBox.bottom - replotBox.top;
+
+        return ptsPx.map(p => {
+          const nx = (p.x - pb.left) / w;
+          const ny = (p.y - pb.top) / h;
+          const xImg = replotBox.left + nx * rw;
+          const yImg = replotBox.top + ny * rh;
+          return {
+            x: tx.offX + xImg * tx.scale,
+            y: tx.offY + yImg * tx.scale,
+          };
+        });
+      }
+
+      // Draw faint context for all curves.
+      for (const [label, ptsPx] of curvePolylinesPx.entries()) {
+        const dispPoints = toDisplayPoints(ptsPx);
+        if (!dispPoints || dispPoints.length < 2) continue;
+        const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+        poly.setAttribute('fill', 'none');
+        poly.setAttribute('stroke', '#9ca3af');
+        poly.setAttribute('stroke-width', '1.5');
+        poly.setAttribute('stroke-linejoin', 'round');
+        poly.setAttribute('stroke-linecap', 'round');
+        poly.setAttribute('opacity', active.has(label) ? '0.0' : '0.25');
+        poly.setAttribute('points', dispPoints.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '));
+        gRoot.appendChild(poly);
+      }
+
+      // Draw active curves in bright red.
+      for (const label of active) {
+        const ptsPx = curvePolylinesPx.get(label);
+        if (!ptsPx || ptsPx.length < 2) continue;
+        const dispPoints = toDisplayPoints(ptsPx);
+        if (!dispPoints || dispPoints.length < 2) continue;
+
+        const isHover = hoveredCurve === label;
+        const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+        poly.setAttribute('fill', 'none');
+        poly.setAttribute('stroke', '#ef4444');
+        // Must be thinner than the grey context stroke-width (1.5).
+        poly.setAttribute('stroke-width', isHover ? '1.25' : '1.0');
+        poly.setAttribute('stroke-linejoin', 'round');
+        poly.setAttribute('stroke-linecap', 'round');
+        poly.setAttribute('opacity', isHover ? '0.98' : '0.92');
+        poly.setAttribute('points', dispPoints.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '));
+        poly.classList.add('overlayCurve');
+        gRoot.appendChild(poly);
+      }
+    }
+  }
+
+  function _renderCurvesTable() {
+    curvesTableWrap.innerHTML = '';
+    if (!Array.isArray(curveStyles) || curveStyles.length === 0) {
+      curvesEmpty.style.display = 'block';
+      curvesControls.style.display = 'none';
+      curvesTableWrap.style.display = 'none';
+      downloadCsvConfirmedBtn.style.display = 'none';
+      return;
+    }
+
+    curvesEmpty.style.display = 'none';
+    curvesControls.style.display = 'flex';
+    debugControls.style.display = 'block';
+    overlayAdjustControls.style.display = 'block';
+    curvesTableWrap.style.display = 'block';
+    downloadCsvConfirmedBtn.style.display = 'inline-flex';
+
+    const table = document.createElement('table');
+    table.className = 'table';
+    const thead = document.createElement('thead');
+    thead.innerHTML = `
+      <tr>
+        <th style="width: 38px;">✓</th>
+        <th>curve_label</th>
+        <th>marker</th>
+        <th>line</th>
+        <th>colour</th>
+      </tr>
+    `;
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    for (const c of curveStyles) {
+      const tr = document.createElement('tr');
+      tr.className = 'curveRow';
+      tr.dataset.curveLabel = c.curve_label;
+
+      const tdCb = document.createElement('td');
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = confirmedCurves.has(c.curve_label);
+      cb.addEventListener('change', () => {
+        if (cb.checked) confirmedCurves.add(c.curve_label);
+        else confirmedCurves.delete(c.curve_label);
+        _renderOverlays();
+        _syncCurveRowStates();
+      });
+      tdCb.appendChild(cb);
+
+      const tdLabel = document.createElement('td');
+      tdLabel.textContent = c.curve_label;
+      tdLabel.className = 'mono';
+
+      const tdMarker = document.createElement('td');
+      tdMarker.textContent = c.marker_symbol || '';
+
+      const tdLine = document.createElement('td');
+      tdLine.textContent = c.line_type || '';
+
+      const tdColour = document.createElement('td');
+      const sw = document.createElement('span');
+      sw.className = 'swatch';
+      sw.style.background = c.colour || '#9ca3af';
+      tdColour.appendChild(sw);
+      const lab = document.createElement('span');
+      lab.textContent = ' ' + (c.colour || '');
+      tdColour.appendChild(lab);
+
+      tr.appendChild(tdCb);
+      tr.appendChild(tdLabel);
+      tr.appendChild(tdMarker);
+      tr.appendChild(tdLine);
+      tr.appendChild(tdColour);
+
+      tr.addEventListener('mouseenter', () => {
+        hoveredCurve = c.curve_label;
+        _renderOverlays();
+        _syncCurveRowStates();
+      });
+      tr.addEventListener('mouseleave', () => {
+        hoveredCurve = null;
+        _renderOverlays();
+        _syncCurveRowStates();
+      });
+
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    curvesTableWrap.appendChild(table);
+    _syncCurveRowStates();
+  }
+
+  function _syncCurveRowStates() {
+    for (const tr of Array.from(curvesTableWrap.querySelectorAll('tr.curveRow'))) {
+      const label = tr.dataset.curveLabel;
+      const isSel = confirmedCurves.has(label);
+      const isHover = hoveredCurve === label;
+      tr.classList.toggle('curveRow--selected', isSel);
+      tr.classList.toggle('curveRow--hover', isHover);
+    }
+  }
+
+  function _pickOutputImage(outputs, predicate) {
+    const imgs = (outputs && outputs.images) ? outputs.images : [];
+    for (const it of imgs) {
+      if (!it || !it.path) continue;
+      const label = (it.label || '').toLowerCase();
+      const filename = (it.filename || '').toLowerCase();
+      if (predicate({ label, filename, item: it })) return it;
+    }
+    return null;
+  }
+
+  function _pickExtractedCsv(outputs) {
+    const data = (outputs && outputs.data) ? outputs.data : [];
+    // Prefer extracted CSVs over original data.
+    const preferred = data.filter(it => it && it.path && (it.path.toLowerCase().endsWith('.csv')));
+    const extracted = preferred.find(it => (it.label || '').toLowerCase().includes('extracted')) || preferred[0];
+    return extracted || null;
+  }
+
+  function renderPrimaryResults(outputs) {
+    // Show original + replot side-by-side by default.
+    const original = _pickOutputImage(outputs, ({ label }) => label.includes('original input'));
+    const replot = _pickOutputImage(outputs, ({ label, filename }) => label.includes('extracted replot') || filename.includes('-replot'));
+
+    if (original || replot) {
+      resultGallery.style.display = 'grid';
+      resultGallery.innerHTML = '';
+      const items = [
+        original ? { title: 'Original', url: '/plots/' + original.path } : null,
+        replot ? { title: 'Replot', url: '/plots/' + replot.path } : null,
+      ].filter(Boolean);
+
+      for (const it of items) {
+        const card = document.createElement('div');
+        card.className = 'gallery__item';
+
+        const title = document.createElement('div');
+        title.className = 'gallery__title';
+        title.textContent = it.title;
+
+        const imgWrap = document.createElement('div');
+        imgWrap.className = 'gallery__imgwrap';
+
+        const link = document.createElement('a');
+        link.className = 'gallery__imglink';
+        link.href = it.url;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.title = 'Open full-size in new tab';
+
+        const img = document.createElement('img');
+        img.className = 'gallery__img';
+        img.src = it.url;
+        img.alt = it.title;
+        img.loading = 'lazy';
+
+        img.addEventListener('load', () => {
+          // Redraw overlays when images load (natural sizes become available)
+          _renderOverlays();
+        });
+
+        link.appendChild(img);
+        imgWrap.appendChild(link);
+        card.appendChild(title);
+        card.appendChild(imgWrap);
+        resultGallery.appendChild(card);
+      }
+    }
+
+    const extractedCsv = _pickExtractedCsv(outputs);
+    extractedCsvMeta = extractedCsv;
+    if (extractedCsv && extractedCsv.path) {
+      downloadCsvBtn.href = '/plots/' + extractedCsv.path;
+      downloadCsvBtn.style.display = 'inline-flex';
+    }
+  }
+
+  function renderConsole(consoleText) {
+    resultConsole.textContent = consoleText || '';
+  }
+
+  function renderCurvesFromFactsOrConsole(result) {
+    accumulatedFacts = null;
+    curveStyles = [];
+
+    const consoleText = (result && result.console) ? String(result.console) : '';
+    accumulatedFacts = _extractLatestAccumulatedFactsFromConsole(consoleText);
+
+    if (accumulatedFacts && accumulatedFacts.curve_style_facts && Array.isArray(accumulatedFacts.curve_style_facts.curves)) {
+      curveStyles = accumulatedFacts.curve_style_facts.curves
+        .filter(c => c && c.curve_label)
+        .map(c => ({
+          curve_label: String(c.curve_label),
+          marker_symbol: c.marker_symbol != null ? String(c.marker_symbol) : '',
+          line_type: c.line_type != null ? String(c.line_type) : '',
+          colour: c.colour != null ? String(c.colour) : '',
+        }));
+    }
+
+    _renderCurvesTable();
+  }
+
+  function _sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function _setTrialWarning(msg) {
+    if (!trialSelectionWarning) return;
+    if (!msg) {
+      trialSelectionWarning.style.display = 'none';
+      trialSelectionWarning.textContent = '';
+      return;
+    }
+    trialSelectionWarning.style.display = 'block';
+    trialSelectionWarning.textContent = msg;
+  }
+
+  function _getTrialCount() {
+    const n = Number(trialCount && trialCount.value);
+    if (!Number.isFinite(n) || n < 1) return 1;
+    return Math.max(1, Math.min(5, Math.round(n)));
+  }
+
+  function _curveStylesFromAccumulatedFacts(facts) {
+    const out = [];
+    if (facts && facts.curve_style_facts && Array.isArray(facts.curve_style_facts.curves)) {
+      for (const c of facts.curve_style_facts.curves) {
+        if (!c || !c.curve_label) continue;
+        out.push({
+          curve_label: String(c.curve_label),
+          marker_symbol: c.marker_symbol != null ? String(c.marker_symbol) : '',
+          line_type: c.line_type != null ? String(c.line_type) : '',
+          colour: c.colour != null ? String(c.colour) : '',
+        });
+      }
+    }
+    return out;
+  }
+
+  function _extractTrialRunInfo(result) {
+    const consoleText = (result && result.console) ? String(result.console) : '';
+    const facts = _extractLatestAccumulatedFactsFromConsole(consoleText);
+    const styles = _curveStylesFromAccumulatedFacts(facts);
+    const labels = styles.map(s => s.curve_label);
+    const outputs = (result && result.outputs) ? result.outputs : null;
+    const csvMeta = outputs ? _pickExtractedCsv(outputs) : null;
+    const ok = !!(result && result.success);
+    return {
+      result,
+      ok,
+      outputs,
+      consoleText,
+      accumulatedFacts: facts,
+      curveStyles: styles,
+      curveLabels: labels,
+      extractedCsvMeta: csvMeta,
+
+      // Lazily built per-run overlay cache (polylines are in ORIGINAL image pixel coords).
+      _overlay: {
+        built: false,
+        enabled: false,
+        curvePolylinesPx: new Map(),
+        plotBoxFrac: null,
+      },
+    };
+  }
+
+  function _trialActiveHover() {
+    const curve = trialsHover.cellCurveLabel || trialsHover.rowCurveLabel;
+    const runIdx = (trialsHover.cellRunIndex != null) ? trialsHover.cellRunIndex : trialsHover.colRunIndex;
+    if (!curve || runIdx == null) return null;
+    return { curveLabel: curve, runIndex: runIdx };
+  }
+
+  async function _ensureTrialOverlayBuilt(runIndex) {
+    const idx = Number(runIndex);
+    if (!Number.isFinite(idx) || idx < 0 || idx >= trialRuns.length) return;
+
+    const run = trialRuns[idx];
+    if (!run || !run._overlay) return;
+    if (run._overlay.built) return;
+
+    run._overlay.built = true;
+    run._overlay.enabled = false;
+    run._overlay.curvePolylinesPx = new Map();
+
+    const facts = run.accumulatedFacts;
+    if (!facts) return;
+
+    const mapper = _buildDataToPixelMapper(facts);
+    if (!mapper) return;
+
+    const csvMeta = run.extractedCsvMeta;
+    if (!csvMeta || !csvMeta.path) return;
+
+    const csvText = await _fetchText('/plots/' + csvMeta.path).catch(() => null);
+    if (!csvText) return;
+
+    const { headers, rows } = _parseCsvRows(csvText);
+    if (!headers.length || rows.length === 0) return;
+
+    const grouped = _groupCsvColumnsByCurve(headers, run.curveStyles || []);
+    if (grouped.size > 0) {
+      for (const cs of (run.curveStyles || [])) {
+        const label = cs.curve_label;
+        const g = grouped.get(label);
+        if (!g) continue;
+        const pts = [];
+        for (const r of rows) {
+          const x = _safeNumber(r[g.xIdx]);
+          const y = _safeNumber(r[g.yIdx]);
+          if (x == null || y == null) continue;
+          const xpx = mapper.xMap(x);
+          const ypx = mapper.yMap(y);
+          if (xpx == null || ypx == null) continue;
+          pts.push({ x: xpx, y: ypx });
+        }
+        if (pts.length >= 2) run._overlay.curvePolylinesPx.set(label, pts);
+      }
+    } else {
+      // Fallback: [time, curve1, curve2, ...]
+      for (let i = 1; i < headers.length; i++) {
+        const label = headers[i];
+        const pts = [];
+        for (const r of rows) {
+          const x = _safeNumber(r[0]);
+          const y = _safeNumber(r[i]);
+          if (x == null || y == null) continue;
+          const xpx = mapper.xMap(x);
+          const ypx = mapper.yMap(y);
+          if (xpx == null || ypx == null) continue;
+          pts.push({ x: xpx, y: ypx });
+        }
+        if (pts.length >= 2) run._overlay.curvePolylinesPx.set(label, pts);
+      }
+    }
+
+    run._overlay.enabled = run._overlay.curvePolylinesPx.size > 0;
+  }
+
+  function _buildUnionCurveLabels() {
+    const seen = new Set();
+    const out = [];
+    for (const run of trialRuns) {
+      for (const lbl of (run.curveLabels || [])) {
+        const s = String(lbl || '').trim();
+        if (!s || seen.has(s)) continue;
+        seen.add(s);
+        out.push(s);
+      }
+    }
+    unionCurveLabels = out;
+  }
+
+  function _initDefaultTrialSelections() {
+    trialSelections = new Map();
+    for (const label of unionCurveLabels) {
+      // Default: select the first trial that contains the curve.
+      let idx = -1;
+      for (let i = 0; i < trialRuns.length; i++) {
+        if ((trialRuns[i].curveLabels || []).includes(label)) {
+          idx = i;
+          break;
+        }
+      }
+      if (idx >= 0) trialSelections.set(label, new Set([idx]));
+      else trialSelections.set(label, new Set());
+    }
+  }
+
+  function _updateTrialExportState() {
+    if (!trialsMode) return;
+    const missing = [];
+    for (const label of unionCurveLabels) {
+      const s = trialSelections.get(label);
+      if (!s || s.size === 0) missing.push(label);
+    }
+
+    if (missing.length > 0) {
+      _setTrialWarning('Select at least 1 run for: ' + missing.join(', '));
+      btnDownloadTrialsCsv.disabled = true;
+    } else {
+      _setTrialWarning('');
+      btnDownloadTrialsCsv.disabled = false;
+    }
+  }
+
+  function _renderTrialsGrid() {
+    if (!trialsGridWrap) return;
+    trialsGridWrap.innerHTML = '';
+
+    if (!trialsMode || trialRuns.length <= 1 || unionCurveLabels.length === 0) {
+      trialsGridWrap.style.display = 'none';
+      return;
+    }
+
+    trialsGridWrap.style.display = 'block';
+
+    const table = document.createElement('table');
+    table.className = 'trialsTable';
+
+    const thead = document.createElement('thead');
+    const hr = document.createElement('tr');
+    const th0 = document.createElement('th');
+    th0.textContent = 'Curve';
+    hr.appendChild(th0);
+    for (let i = 0; i < trialRuns.length; i++) {
+      const th = document.createElement('th');
+      th.textContent = 'Run ' + (i + 1);
+      th.className = 'trialsColHead';
+      th.dataset.runIndex = String(i);
+      th.addEventListener('mouseenter', () => {
+        trialsHover.colRunIndex = i;
+        _renderOverlays();
+        _syncTrialsHoverClasses();
+      });
+      th.addEventListener('mouseleave', () => {
+        trialsHover.colRunIndex = null;
+        _renderOverlays();
+        _syncTrialsHoverClasses();
+      });
+      hr.appendChild(th);
+    }
+    thead.appendChild(hr);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    for (const label of unionCurveLabels) {
+      const tr = document.createElement('tr');
+      tr.className = 'trialsRow';
+      tr.dataset.curveLabel = label;
+
+      const tdLabel = document.createElement('td');
+      tdLabel.className = 'trialsCurve';
+      tdLabel.textContent = label;
+      tdLabel.addEventListener('mouseenter', () => {
+        trialsHover.rowCurveLabel = label;
+        _renderOverlays();
+        _syncTrialsHoverClasses();
+      });
+      tdLabel.addEventListener('mouseleave', () => {
+        trialsHover.rowCurveLabel = null;
+        _renderOverlays();
+        _syncTrialsHoverClasses();
+      });
+      tr.appendChild(tdLabel);
+
+      for (let i = 0; i < trialRuns.length; i++) {
+        const td = document.createElement('td');
+        td.className = 'trialsCell';
+        const hasCurve = (trialRuns[i].curveLabels || []).includes(label);
+        if (!hasCurve) {
+          td.textContent = '—';
+          td.classList.add('trialsCell--missing');
+        } else {
+          const cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.className = 'trialsCb';
+          cb.checked = (trialSelections.get(label) || new Set()).has(i);
+          td.addEventListener('mouseenter', () => {
+            trialsHover.cellCurveLabel = label;
+            trialsHover.cellRunIndex = i;
+            _renderOverlays();
+            _syncTrialsHoverClasses();
+          });
+          td.addEventListener('mouseleave', () => {
+            trialsHover.cellCurveLabel = null;
+            trialsHover.cellRunIndex = null;
+            _renderOverlays();
+            _syncTrialsHoverClasses();
+          });
+          cb.addEventListener('change', () => {
+            let set = trialSelections.get(label);
+            if (!set) { set = new Set(); trialSelections.set(label, set); }
+            if (cb.checked) set.add(i);
+            else set.delete(i);
+            _updateTrialExportState();
+          });
+          td.appendChild(cb);
+        }
+        tr.appendChild(td);
+      }
+
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    trialsGridWrap.appendChild(table);
+    _updateTrialExportState();
+    _syncTrialsHoverClasses();
+  }
+
+  function _syncTrialsHoverClasses() {
+    if (!trialsGridWrap) return;
+    const active = _trialActiveHover();
+    const activeCurve = active ? active.curveLabel : null;
+    const activeRun = active ? active.runIndex : null;
+
+    for (const tr of Array.from(trialsGridWrap.querySelectorAll('tr.trialsRow'))) {
+      const curve = tr.dataset.curveLabel;
+      tr.classList.toggle('trialsRow--hover', !!activeCurve && curve === activeCurve);
+    }
+
+    const hoverRunIdx = (trialsHover.cellRunIndex != null) ? trialsHover.cellRunIndex : trialsHover.colRunIndex;
+    for (const th of Array.from(trialsGridWrap.querySelectorAll('th.trialsColHead'))) {
+      const i = Number(th.dataset.runIndex);
+      th.classList.toggle('trialsColHead--hover', hoverRunIdx != null && i === hoverRunIdx);
+    }
+
+    for (const td of Array.from(trialsGridWrap.querySelectorAll('td.trialsCell'))) {
+      const tr = td.parentElement;
+      const curve = tr ? tr.dataset.curveLabel : null;
+      const cellIndex = Array.from(tr.children).indexOf(td) - 1; // minus curve label column
+      td.classList.toggle('trialsCell--hover', activeCurve && activeRun != null && curve === activeCurve && cellIndex === activeRun);
+    }
+  }
+
+  function renderTrialGallery() {
+    if (!resultGallery) return;
+    resultGallery.style.display = 'grid';
+    resultGallery.innerHTML = '';
+
+    const firstOutputs = trialRuns[0] && trialRuns[0].outputs ? trialRuns[0].outputs : null;
+    const original = firstOutputs ? _pickOutputImage(firstOutputs, ({ label }) => label.includes('original input')) : null;
+    const items = [];
+    if (original && original.path) items.push({ kind: 'original', title: 'Original', url: '/plots/' + original.path });
+
+    for (let i = 0; i < trialRuns.length; i++) {
+      const o = trialRuns[i].outputs;
+      if (!o) continue;
+      const replot = _pickOutputImage(o, ({ label, filename }) => label.includes('extracted replot') || filename.includes('-replot'));
+      if (!replot || !replot.path) continue;
+      items.push({ kind: 'replot', runIndex: i, title: 'Replot (run ' + (i + 1) + ')', url: '/plots/' + replot.path });
+    }
+
+    for (const it of items) {
+      const card = document.createElement('div');
+      card.className = 'gallery__item';
+
+      if (it.kind === 'original') {
+        card.dataset.kind = 'original';
+      } else if (it.kind === 'replot') {
+        card.dataset.kind = 'replot';
+        card.dataset.runIndex = String(it.runIndex);
+      }
+
+      const title = document.createElement('div');
+      title.className = 'gallery__title';
+      title.textContent = it.title;
+
+      const imgWrap = document.createElement('div');
+      imgWrap.className = 'gallery__imgwrap';
+
+      const link = document.createElement('a');
+      link.className = 'gallery__imglink';
+      link.href = it.url;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.title = 'Open full-size in new tab';
+
+      const img = document.createElement('img');
+      img.className = 'gallery__img';
+      img.src = it.url;
+      img.alt = it.title;
+      img.loading = 'lazy';
+      img.addEventListener('load', () => {
+        _renderOverlays();
+      });
+      link.appendChild(img);
+
+      imgWrap.appendChild(link);
+      card.appendChild(title);
+      card.appendChild(imgWrap);
+      resultGallery.appendChild(card);
+    }
+  }
+
+  function renderOutputs(outputs) {
+    const links = [];
+    const groups = ['data', 'images', 'stats', 'other'];
+    for (const g of groups) {
+      const arr = (outputs && outputs[g]) ? outputs[g] : [];
+      for (const item of arr) {
+        if (!item || !item.path) continue;
+        links.push({
+          label: (item.label || (g + ' file')),
+          url: '/plots/' + item.path
+        });
+      }
+    }
+
+    if (links.length === 0) {
+      resultLinks.innerHTML = '<div class="muted">No output files found.</div>';
+      return;
+    }
+
+    const ul = document.createElement('ul');
+    ul.className = 'links__list';
+    for (const l of links) {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = l.url;
+      a.textContent = l.label;
+      a.target = '_blank';
+      li.appendChild(a);
+      ul.appendChild(li);
+    }
+    resultLinks.innerHTML = '';
+    resultLinks.appendChild(ul);
+  }
+
+  async function pollTask(taskId, pipeline) {
+    const statusRes = await fetch('/task_status/' + encodeURIComponent(taskId));
+    const status = await statusRes.json().catch(() => ({}));
+
+    if (status && status.status === 'not_found') {
+      progressText.textContent = 'Task not found (server restart?)';
+      return { done: true };
+    }
+
+    const elapsed = (status && typeof status.elapsed === 'number') ? status.elapsed : null;
+    elapsedText.textContent = elapsed != null ? (Math.round(elapsed) + 's elapsed') : '—';
+
+    const progressLine = (status && status.progress) ? status.progress : 'Running…';
+
+    let percent = null;
+    let stage = null;
+
+    if (pipeline === 'ex2') {
+      try {
+        const pr = await fetch('/v2/extraction_progress/' + encodeURIComponent(taskId));
+        if (pr.ok) {
+          const pd = await pr.json();
+          if (pd && typeof pd.percentage === 'number') percent = pd.percentage;
+          if (pd && pd.stage) stage = pd.stage;
+        }
+      } catch (_) {}
+    }
+
+    if (percent == null) {
+      // fallback: simple indeterminate-ish bar
+      progressFill.style.width = '25%';
+    } else {
+      progressFill.style.width = Math.max(0, Math.min(100, percent)) + '%';
+    }
+
+    progressText.textContent = stage ? (stage + ' — ' + progressLine) : progressLine;
+
+    if (status && status.status === 'completed') {
+      return { done: true, result: status.result };
+    }
+
+    return { done: false };
+  }
+
+  async function runExtraction() {
+    resetResult();
+
+    if (!currentImagePath) {
+      setNotice(uploadStatus, 'Upload an image or prepare an example first.', 'warn');
+      return;
+    }
+
+    if (testResultsMode) {
+      // Load precomputed runs from disk (no extraction)
+      const nTrials = Math.max(1, Math.min(3, _getTrialCount()));
+      await runSavedTestResults(nTrials);
+      return;
+    }
+
+    const { pipeline, prompt } = getPipelineAndPrompt();
+    if (!pipeline || !prompt) {
+      setNotice(uploadStatus, 'Select a prompt first.', 'warn');
+      return;
+    }
+
+    currentPipeline = pipeline;
+
+    btnExtract.disabled = true;
+    btnCancel.style.display = 'inline-flex';
+    progressWrap.style.display = 'block';
+    progressFill.style.width = '0%';
+    progressText.textContent = 'Starting…';
+    elapsedText.textContent = '—';
+
+    const payload = {
+      image: currentImagePath,
+      prompt: prompt,
+      runInterpolation: false,
+      runPointwise: false,
+      leftX: 0,
+      rightX: 100,
+      bottomY: 0,
+      topY: 100
+    };
+
+    let url = '/run_all';
+    if (pipeline === 'ex2') {
+      url = '/v2/run_all';
+      payload.articleInfo = (articleInfo.value || '').trim();
+      payload.debug = false;
+    }
+
+    const nTrials = _getTrialCount();
+    if (nTrials > 1) {
+      // Run sequentially to reduce rate-limit pressure.
+      trialsMode = true;
+      trialsCancelRequested = false;
+      trialRuns = [];
+
+      downloadCsvBtn.style.display = 'none';
+      downloadCsvConfirmedBtn.style.display = 'none';
+      curvesControls.style.display = 'none';
+      curvesTableWrap.style.display = 'none';
+      debugControls.style.display = 'block';
+      overlayAdjustControls.style.display = 'block';
+      highlightStatus.textContent = '';
+
+      trialExportControls.style.display = 'flex';
+      btnDownloadTrialsCsv.disabled = true;
+
+      // Clear any prior polling.
+      if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+
+      let completed = 0;
+      let anyFailures = false;
+      let combinedConsole = '';
+
+      for (let i = 0; i < nTrials; i++) {
+        if (trialsCancelRequested) break;
+
+        progressFill.style.width = Math.round((completed / nTrials) * 100) + '%';
+        progressText.textContent = 'Starting run ' + (i + 1) + ' / ' + nTrials + '…';
+
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.task_id) {
+          anyFailures = true;
+          combinedConsole += '\n\n===== RUN ' + (i + 1) + ' START FAILED =====\n' + (data.error || 'unknown_error') + '\n';
+          continue;
+        }
+
+        currentTaskId = data.task_id;
+
+        // Poll this run to completion.
+        while (true) {
+          if (trialsCancelRequested) break;
+          const { done, result } = await pollTask(currentTaskId, pipeline);
+          if (done) {
+            completed++;
+            const runInfo = _extractTrialRunInfo(result || null);
+            runInfo.taskId = currentTaskId;
+            trialRuns.push(runInfo);
+            anyFailures = anyFailures || !runInfo.ok;
+            combinedConsole += '\n\n===== RUN ' + (i + 1) + ' (task ' + currentTaskId + ') =====\n' + (runInfo.consoleText || '') + '\n';
+            break;
+          }
+          await _sleep(900);
+        }
+
+        if (trialsCancelRequested) break;
+      }
+
+      btnExtract.disabled = false;
+      btnCancel.style.display = 'none';
+      progressFill.style.width = '100%';
+
+      resultWrap.style.display = 'block';
+      setNotice(resultSummary,
+        'Trials finished: ' + completed + ' / ' + nTrials + (trialsCancelRequested ? ' (cancelled)' : '') + '.',
+        (anyFailures || completed < nTrials) ? 'warn' : 'success'
+      );
+
+      renderConsole(combinedConsole.trim());
+
+      _buildUnionCurveLabels();
+      _initDefaultTrialSelections();
+      curvesEmpty.style.display = (unionCurveLabels.length === 0) ? 'block' : 'none';
+      renderTrialGallery();
+      _renderTrialsGrid();
+
+      // Keep overlays working in trials mode: hover the trials table to choose (curve, run).
+      try {
+        if (resizeObserver) resizeObserver.disconnect();
+        resizeObserver = new ResizeObserver(() => _renderOverlays());
+        for (const img of Array.from(resultGallery.querySelectorAll('img.gallery__img'))) {
+          resizeObserver.observe(img);
+        }
+      } catch (_) {}
+
+      highlightStatus.textContent = 'Hover the trials table to highlight a curve (overlay).';
+      _renderOverlays();
+      return;
+    }
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.task_id) {
+      btnExtract.disabled = false;
+      btnCancel.style.display = 'none';
+      setNotice(uploadStatus, 'Failed to start extraction: ' + (data.error || 'unknown_error'), 'error');
+      return;
+    }
+
+    currentTaskId = data.task_id;
+
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(async () => {
+      try {
+        const { done, result } = await pollTask(currentTaskId, pipeline);
+        if (done) {
+          clearInterval(pollTimer);
+          pollTimer = null;
+          btnExtract.disabled = false;
+          btnCancel.style.display = 'none';
+          progressFill.style.width = '100%';
+
+          resultWrap.style.display = 'block';
+          lastResult = result || null;
+          const ok = !!(result && result.success);
+          const consoleText = (result && result.console) ? String(result.console) : '';
+          const hasOutputs = !!(result && result.outputs);
+
+          setNotice(resultSummary, ok ? 'Extraction completed.' : 'Extraction finished with errors.', ok ? 'success' : 'warn');
+
+          if (!ok && _looksLikeRateLimit(consoleText)) {
+            _setWarning('Extraction hit rate limit (HTTP 429). Partial outputs are available.');
+          } else {
+            _setWarning('');
+          }
+
+          renderConsole(consoleText);
+          if (hasOutputs) {
+            renderPrimaryResults(result.outputs);
+            renderOutputs(result.outputs);
+          }
+          renderCurvesFromFactsOrConsole(result);
+
+          // Build overlays (geometry + CSV) if possible, but never block UI.
+          await _buildCurvePolylinesIfPossible();
+
+          // Watch for layout changes to keep overlays aligned.
+          try {
+            if (resizeObserver) resizeObserver.disconnect();
+            resizeObserver = new ResizeObserver(() => _renderOverlays());
+            for (const img of Array.from(resultGallery.querySelectorAll('img.gallery__img'))) {
+              resizeObserver.observe(img);
+            }
+          } catch (_) {}
+
+          _renderOverlays();
+        }
+      } catch (e) {
+        // keep polling
+      }
+    }, 900);
+  }
+
+  async function runSavedTestResults(nTrials) {
+    const n = Math.max(1, Math.min(3, Number(nTrials) || 1));
+
+    btnExtract.disabled = true;
+    btnCancel.style.display = 'none';
+    progressWrap.style.display = 'block';
+    progressFill.style.width = '10%';
+    progressText.textContent = 'Loading saved runs…';
+    elapsedText.textContent = '—';
+
+    trialsMode = (n > 1);
+    trialRuns = [];
+
+    downloadCsvBtn.style.display = 'none';
+    downloadCsvConfirmedBtn.style.display = 'none';
+    curvesControls.style.display = 'none';
+    curvesTableWrap.style.display = 'none';
+    debugControls.style.display = 'block';
+    overlayAdjustControls.style.display = 'block';
+    highlightStatus.textContent = '';
+
+    trialExportControls.style.display = (n > 1) ? 'flex' : 'none';
+    btnDownloadTrialsCsv.disabled = true;
+
+    // Clear any prior polling.
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+
+    const res = await fetch('/v2/load_saved_runs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image_path: TEST_IMAGE_PATH, prompt_name: TEST_PROMPT_NAME, limit: n })
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success || !Array.isArray(data.runs)) {
+      btnExtract.disabled = false;
+      progressFill.style.width = '0%';
+      progressText.textContent = 'Failed to load saved runs.';
+
+      let msg = 'Could not load saved test runs.';
+      if ((data && data.error) === 'not_enough_saved_runs') {
+        msg = 'No saved prompt_13 runs found for A-1.png (found ' + (data.found || 0) + ', need ' + n + '). Run: tools/precompute_test_runs_prompt13_A-1.py';
+      } else if (!res.ok && res.status === 404) {
+        // If the body isn't our JSON error, this is likely a missing route (wrong server/port).
+        msg = 'Saved-runs endpoint returned 404. Make sure you loaded the UI from the WebExtract server (e.g., http://127.0.0.1:5001/).';
+      } else if (data && data.error) {
+        msg = 'Could not load saved test runs: ' + data.error;
+      } else if (!res.ok) {
+        msg = 'Could not load saved test runs (HTTP ' + res.status + ').';
+      }
+
+      // Show the error prominently in both the chooser notice and the main results panel.
+      setNotice(uploadStatus, msg, 'error');
+      resultWrap.style.display = 'block';
+      setNotice(resultSummary, msg, 'warn');
+      return;
+    }
+
+    progressFill.style.width = '100%';
+    progressText.textContent = 'Loaded.';
+
+    const runs = data.runs.slice(0, n);
+    if (data && data.partial) {
+      _setWarning('Only ' + runs.length + ' / ' + n + ' saved runs are available right now.');
+    } else {
+      _setWarning('');
+    }
+
+    if (runs.length === 0) {
+      btnExtract.disabled = false;
+      setNotice(uploadStatus, 'No saved runs returned.', 'error');
+      return;
+    }
+    if (runs.length === 1) {
+      // Render as single-run result
+      const result = runs[0] && runs[0].result ? runs[0].result : null;
+      lastResult = result;
+      resultWrap.style.display = 'block';
+      setNotice(resultSummary, 'Loaded saved test result.', (result && result.success) ? 'success' : 'warn');
+      renderConsole((result && result.console) ? String(result.console) : '');
+      if (result && result.outputs) {
+        renderPrimaryResults(result.outputs);
+        renderOutputs(result.outputs);
+      }
+      renderCurvesFromFactsOrConsole(result);
+      await _buildCurvePolylinesIfPossible();
+      try {
+        if (resizeObserver) resizeObserver.disconnect();
+        resizeObserver = new ResizeObserver(() => _renderOverlays());
+        for (const img of Array.from(resultGallery.querySelectorAll('img.gallery__img'))) {
+          resizeObserver.observe(img);
+        }
+      } catch (_) {}
+      _renderOverlays();
+      btnExtract.disabled = false;
+      return;
+    }
+
+    let combinedConsole = '';
+    let anyFailures = false;
+    for (let i = 0; i < runs.length; i++) {
+      const r = runs[i] && runs[i].result ? runs[i].result : null;
+      const runInfo = _extractTrialRunInfo(r || null);
+      runInfo.taskId = 'saved-' + (runs[i].version || (i + 1));
+      trialRuns.push(runInfo);
+      anyFailures = anyFailures || !runInfo.ok;
+      combinedConsole += '\n\n===== SAVED RUN ' + (i + 1) + ' =====\n' + (runInfo.consoleText || '') + '\n';
+    }
+
+    btnExtract.disabled = false;
+    resultWrap.style.display = 'block';
+    setNotice(resultSummary,
+      'Loaded saved trials: ' + trialRuns.length + ' / ' + n + (data && data.partial ? ' (partial)' : '') + '.',
+      anyFailures ? 'warn' : 'success'
+    );
+    renderConsole(combinedConsole.trim());
+
+    _buildUnionCurveLabels();
+    _initDefaultTrialSelections();
+    curvesEmpty.style.display = (unionCurveLabels.length === 0) ? 'block' : 'none';
+    renderTrialGallery();
+    _renderTrialsGrid();
+
+    try {
+      if (resizeObserver) resizeObserver.disconnect();
+      resizeObserver = new ResizeObserver(() => _renderOverlays());
+      for (const img of Array.from(resultGallery.querySelectorAll('img.gallery__img'))) {
+        resizeObserver.observe(img);
+      }
+    } catch (_) {}
+
+    highlightStatus.textContent = 'Hover the trials table to highlight a curve (overlay).';
+    _renderOverlays();
+  }
+
+  async function downloadConfirmedOnlyCsv() {
+    const csvText = await _ensureExtractedCsvText();
+    if (!csvText) {
+      alert('Could not load extracted CSV.');
+      return;
+    }
+    if (!confirmedCurves || confirmedCurves.size === 0) {
+      alert('Select at least one curve first.');
+      return;
+    }
+
+    const out = _csvForConfirmedOnly(csvText, confirmedCurves);
+    if (!out) {
+      alert('Could not generate confirmed-only CSV.');
+      return;
+    }
+
+    const blob = new Blob([out], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'extracted_confirmed_only.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  async function cancelTask() {
+    if (!currentTaskId) return;
+    if (trialsMode) trialsCancelRequested = true;
+    try {
+      const url = (currentPipeline === 'ex2')
+        ? ('/v2/cancel_task/' + encodeURIComponent(currentTaskId))
+        : ('/cancel_task/' + encodeURIComponent(currentTaskId));
+      await fetch(url, { method: 'POST' });
+    } catch (_) {}
+  }
+
+  function _isLikelyLog10Series(yVals) {
+    const vals = (yVals || []).filter(v => Number.isFinite(v));
+    if (vals.length < 3) return false;
+    const minV = Math.min(...vals);
+    const maxV = Math.max(...vals);
+    // Typical log10 units are within a small-ish range.
+    if (minV >= -6 && maxV <= 25) return true;
+    return false;
+  }
+
+  function _median(values) {
+    const v = (values || []).filter(x => Number.isFinite(x)).slice().sort((a, b) => a - b);
+    if (v.length === 0) return null;
+    const mid = Math.floor(v.length / 2);
+    return (v.length % 2) ? v[mid] : (v[mid - 1] + v[mid]) / 2;
+  }
+
+  function _clusterXs(xs, tol) {
+    const v = (xs || []).filter(x => Number.isFinite(x)).slice().sort((a, b) => a - b);
+    if (v.length === 0) return [];
+    const clusters = [];
+    let cur = [v[0]];
+    for (let i = 1; i < v.length; i++) {
+      const x = v[i];
+      const center = cur.reduce((a, b) => a + b, 0) / cur.length;
+      if (Math.abs(x - center) <= tol) cur.push(x);
+      else {
+        clusters.push(cur);
+        cur = [x];
+      }
+    }
+    clusters.push(cur);
+    return clusters.map(arr => arr.reduce((a, b) => a + b, 0) / arr.length);
+  }
+
+  function _interpYAtX(series, x) {
+    const pts = (series || []).filter(p => p && Number.isFinite(p.x) && Number.isFinite(p.y)).slice().sort((a, b) => a.x - b.x);
+    if (pts.length === 0) return null;
+    if (x < pts[0].x || x > pts[pts.length - 1].x) return null;
+    // Binary search for segment
+    let lo = 0, hi = pts.length - 1;
+    while (hi - lo > 1) {
+      const mid = Math.floor((lo + hi) / 2);
+      if (pts[mid].x <= x) lo = mid;
+      else hi = mid;
+    }
+    const p0 = pts[lo];
+    const p1 = pts[hi];
+    if (!p0 || !p1) return null;
+    if (Math.abs(p1.x - p0.x) < 1e-12) return p0.y;
+    const t = (x - p0.x) / (p1.x - p0.x);
+    return p0.y + t * (p1.y - p0.y);
+  }
+
+  function _extractSeriesForCurves(csvText, curveLabels) {
+    const { headers, rows } = _parseCsvRows(csvText);
+    if (!headers.length || !rows.length) return { headers, series: new Map(), headerPairs: new Map() };
+
+    const hintStyles = (curveLabels || []).map(l => ({ curve_label: l }));
+    const grouped = _groupCsvColumnsByCurve(headers, hintStyles);
+    const series = new Map();
+    const headerPairs = new Map();
+
+    if (grouped.size > 0) {
+      for (const label of (curveLabels || [])) {
+        const g = grouped.get(label);
+        if (!g) continue;
+        const pts = [];
+        for (const r of rows) {
+          const x = _safeNumber(r[g.xIdx]);
+          const y = _safeNumber(r[g.yIdx]);
+          if (x == null || y == null) continue;
+          pts.push({ x, y });
+        }
+        if (pts.length) {
+          series.set(label, pts);
+          headerPairs.set(label, { x: headers[g.xIdx] || 'Time', y: headers[g.yIdx] || String(label) });
+        }
+      }
+      return { headers, series, headerPairs };
+    }
+
+    // Fallback: [time, curve1, curve2, ...]
+    const x0 = String(headers[0] || 'Time');
+    for (let i = 1; i < headers.length; i++) {
+      const label = String(headers[i] || '').trim();
+      if (curveLabels && curveLabels.length && !curveLabels.includes(label)) continue;
+      const pts = [];
+      for (const r of rows) {
+        const x = _safeNumber(r[0]);
+        const y = _safeNumber(r[i]);
+        if (x == null || y == null) continue;
+        pts.push({ x, y });
+      }
+      if (pts.length) {
+        series.set(label, pts);
+        headerPairs.set(label, { x: x0, y: headers[i] || label });
+      }
+    }
+    return { headers, series, headerPairs };
+  }
+
+  function _averageSeriesLogSpace(seriesList) {
+    const allXs = [];
+    const spacings = [];
+    for (const s of seriesList) {
+      const pts = (s || []).slice().sort((a, b) => a.x - b.x);
+      for (const p of pts) allXs.push(p.x);
+      for (let i = 1; i < pts.length; i++) spacings.push(pts[i].x - pts[i - 1].x);
+    }
+    const medSpacing = _median(spacings.filter(d => Number.isFinite(d) && d > 0));
+    const range = (allXs.length >= 2) ? (Math.max(...allXs) - Math.min(...allXs)) : 0;
+    const tol = (medSpacing != null)
+      ? Math.max(1e-6, 0.25 * medSpacing)
+      : Math.max(1e-6, 0.002 * (range || 1));
+
+    const grid = _clusterXs(allXs, tol);
+    const out = [];
+
+    // Determine if most runs already look like log10 units.
+    const logVotes = seriesList.map(s => _isLikelyLog10Series((s || []).map(p => p.y)));
+    const treatAsLog = logVotes.filter(Boolean).length >= Math.ceil(logVotes.length / 2);
+
+    for (const x of grid) {
+      const logs = [];
+      for (const s of seriesList) {
+        const y = _interpYAtX(s, x);
+        if (y == null) continue;
+        if (treatAsLog) {
+          if (!Number.isFinite(y)) continue;
+          logs.push(y);
+        } else {
+          if (!(Number.isFinite(y) && y > 0)) continue;
+          logs.push(Math.log10(y));
+        }
+      }
+      if (logs.length === 0) continue;
+      const avgLog = logs.reduce((a, b) => a + b, 0) / logs.length;
+      const yOut = treatAsLog ? avgLog : Math.pow(10, avgLog);
+      out.push({ x, y: yOut });
+    }
+
+    return out;
+  }
+
+  function _buildWideCsvFromCurveSeries(curveOrder, curveToSeries, curveToHeaders) {
+    function esc(cell) {
+      const s = String(cell ?? '');
+      if (s.includes('"') || s.includes(',') || s.includes('\n')) return '"' + s.replace(/"/g, '""') + '"';
+      return s;
+    }
+
+    const headers = [];
+    let maxLen = 0;
+    for (const label of curveOrder) {
+      const hp = curveToHeaders.get(label) || { x: 'Time', y: label };
+      headers.push(hp.x, hp.y);
+      const pts = curveToSeries.get(label) || [];
+      maxLen = Math.max(maxLen, pts.length);
+    }
+
+    const lines = [];
+    lines.push(headers.map(esc).join(','));
+    for (let i = 0; i < maxLen; i++) {
+      const row = [];
+      for (const label of curveOrder) {
+        const pts = curveToSeries.get(label) || [];
+        if (i < pts.length) {
+          row.push(pts[i].x, pts[i].y);
+        } else {
+          row.push('', '');
+        }
+      }
+      lines.push(row.map(esc).join(','));
+    }
+    return lines.join('\n') + '\n';
+  }
+
+  async function downloadTrialsCsv() {
+    if (!trialsMode || trialRuns.length <= 1) return;
+    _updateTrialExportState();
+    if (btnDownloadTrialsCsv.disabled) return;
+
+    const curveToOutSeries = new Map();
+    const curveToOutHeaders = new Map();
+
+    for (const label of unionCurveLabels) {
+      const selected = Array.from(trialSelections.get(label) || []);
+      if (selected.length === 0) continue;
+
+      const seriesList = [];
+      let headerPair = null;
+
+      for (const idx of selected) {
+        const run = trialRuns[idx];
+        if (!run || !run.extractedCsvMeta || !run.extractedCsvMeta.path) continue;
+        const csvText = await _fetchText('/plots/' + run.extractedCsvMeta.path).catch(() => null);
+        if (!csvText) continue;
+        const parsed = _extractSeriesForCurves(csvText, [label]);
+        const s = parsed.series.get(label);
+        if (s && s.length) seriesList.push(s);
+        if (!headerPair) headerPair = parsed.headerPairs.get(label) || null;
+      }
+
+      if (seriesList.length === 0) continue;
+
+      let outSeries;
+      if (seriesList.length === 1) {
+        outSeries = seriesList[0].slice().sort((a, b) => a.x - b.x);
+      } else {
+        outSeries = _averageSeriesLogSpace(seriesList);
+      }
+
+      curveToOutSeries.set(label, outSeries);
+      if (headerPair) curveToOutHeaders.set(label, headerPair);
+    }
+
+    const csvOut = _buildWideCsvFromCurveSeries(unionCurveLabels, curveToOutSeries, curveToOutHeaders);
+    const blob = new Blob([csvOut], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'extracted_trials_selected_or_averaged.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  btnCopyConsole.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(resultConsole.textContent || '');
+      btnCopyConsole.textContent = 'Copied';
+      setTimeout(() => (btnCopyConsole.textContent = 'Copy'), 900);
+    } catch (_) {
+      alert('Copy failed (browser permissions).');
+    }
+  });
+
+  btnSelectAllCurves.addEventListener('click', () => {
+    for (const c of curveStyles) confirmedCurves.add(c.curve_label);
+    _renderCurvesTable();
+    _renderOverlays();
+  });
+
+  btnClearAllCurves.addEventListener('click', () => {
+    confirmedCurves = new Set();
+    _renderCurvesTable();
+    _renderOverlays();
+  });
+
+  btnDownloadTrialsCsv.addEventListener('click', downloadTrialsCsv);
+
+  if (chkAxesDebug) {
+    _loadAxesDebugPref();
+    chkAxesDebug.addEventListener('change', () => {
+      showAxesDebug = !!chkAxesDebug.checked;
+      _saveAxesDebugPref();
+      _renderOverlays();
+    });
+  }
+
+  // Console collapse/expand
+  if (btnToggleConsole && consoleWrap) {
+    _loadConsolePref();
+    btnToggleConsole.addEventListener('click', () => {
+      consoleOpen = !consoleOpen;
+      _syncConsoleCollapsed();
+      _saveConsolePref();
+    });
+  }
+
+  // Manual overlay adjustment controls
+  if (overlayAdjustTarget) {
+    _loadOverlayAdjustPref();
+    overlayAdjustTarget.addEventListener('change', () => {
+      overlayAdjust.target = overlayAdjustTarget.value || 'both';
+      _saveOverlayAdjustPref();
+    });
+  }
+
+  function _wireOverlayHold(btn, action) {
+    if (!btn) return;
+
+    let timerId = null;
+    let holding = false;
+
+    const stop = () => {
+      holding = false;
+      if (timerId != null) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+    };
+
+    const start = (ev) => {
+      if (!lastResult || !overlayEnabled) return;
+      ev.preventDefault();
+
+      const shiftKey = !!(ev && ev.shiftKey);
+      const tick = () => {
+        action({ shiftKey });
+        _renderOverlays();
+      };
+
+      // Run immediately, then repeat while held.
+      stop();
+      holding = true;
+      tick();
+      timerId = setInterval(() => {
+        if (!holding) return;
+        tick();
+      }, 70);
+
+      try {
+        if (ev.pointerId != null && btn.setPointerCapture) btn.setPointerCapture(ev.pointerId);
+      } catch (_) {}
+    };
+
+    btn.addEventListener('pointerdown', start);
+    btn.addEventListener('pointerup', stop);
+    btn.addEventListener('pointercancel', stop);
+    btn.addEventListener('pointerleave', stop);
+    window.addEventListener('blur', stop);
+  }
+
+  _wireOverlayHold(btnOverlayLeft, (ev) => {
+    const step = _overlayStepFromEvent(ev);
+    _applyAdjustToTargets((a) => (a.dx -= step));
+  });
+
+  _wireOverlayHold(btnOverlayRight, (ev) => {
+    const step = _overlayStepFromEvent(ev);
+    _applyAdjustToTargets((a) => (a.dx += step));
+  });
+
+  _wireOverlayHold(btnOverlayUp, (ev) => {
+    const step = _overlayStepFromEvent(ev);
+    _applyAdjustToTargets((a) => (a.dy -= step));
+  });
+
+  _wireOverlayHold(btnOverlayDown, (ev) => {
+    const step = _overlayStepFromEvent(ev);
+    _applyAdjustToTargets((a) => (a.dy += step));
+  });
+
+  _wireOverlayHold(btnOverlayBigger, (ev) => {
+    const k = _overlayScaleFromEvent(ev);
+    _applyAdjustToTargets((a) => (a.s *= k));
+  });
+
+  _wireOverlayHold(btnOverlaySmaller, (ev) => {
+    const k = _overlayScaleFromEvent(ev);
+    _applyAdjustToTargets((a) => (a.s /= k));
+  });
+
+  // Reset is intentionally one-shot.
+  if (btnOverlayReset) {
+    btnOverlayReset.addEventListener('click', () => {
+      if (!lastResult || !overlayEnabled) return;
+      _applyAdjustToTargets((a) => {
+        a.s = 1.0;
+        a.dx = 0.0;
+        a.dy = 0.0;
+      });
+      _renderOverlays();
+    });
+  }
+
+  downloadCsvConfirmedBtn.addEventListener('click', downloadConfirmedOnlyCsv);
+
+  // Wire up events
+  promptSelect.addEventListener('change', onPromptChanged);
+  onPromptChanged();
+
+  dropzone.addEventListener('click', () => {
+    if (testResultsMode) return;
+    fileInput.click();
+  });
+  dropzone.addEventListener('keydown', (e) => {
+    if (testResultsMode) return;
+    if (e.key === 'Enter' || e.key === ' ') fileInput.click();
+  });
+
+  dropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropzone.classList.add('dropzone--over');
+  });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dropzone--over'));
+  dropzone.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('dropzone--over');
+    if (testResultsMode) return;
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) await uploadFile(file);
+  });
+
+  fileInput.addEventListener('change', async () => {
+    if (testResultsMode) return;
+    const file = fileInput.files && fileInput.files[0];
+    if (file) await uploadFile(file);
+  });
+
+  btnLoadExample.addEventListener('click', async () => {
+    if (testResultsMode) return;
+    await prepareExample(exampleSelect.value);
+  });
+
+  if (chkTestResults) {
+    chkTestResults.addEventListener('change', () => {
+      _setTestResultsMode(!!chkTestResults.checked);
+    });
+  }
+
+  btnExtract.addEventListener('click', runExtraction);
+  btnCancel.addEventListener('click', cancelTask);
+
+  refreshExamples();
+})();
+</script>
+</body>
+</html>
