@@ -127,28 +127,33 @@ def _list_v2_version_dirs(image_path: str, prompt_name: str) -> list[tuple[int, 
     return out
 
 
+def _read_v2_progress_snapshot(version_dir: str) -> dict:
+    """Return parsed _extraction_progress.json for a v2 run folder, else {}."""
+    version_dir = _resolve_path_under_plots(version_dir)
+    progress_path = os.path.join(version_dir, '_extraction_progress.json')
+    if not os.path.isfile(progress_path):
+        return {}
+    try:
+        with open(progress_path, 'r', encoding='utf-8') as f:
+            pj = json.load(f)
+        return pj if isinstance(pj, dict) else {}
+    except Exception:
+        return {}
+
+
 def _read_v2_progress_console(version_dir: str) -> tuple[str, bool]:
     """Return (console_text, success) from a v2 version folder if possible."""
     version_dir = _resolve_path_under_plots(version_dir)
-    progress_path = os.path.join(version_dir, '_extraction_progress.json')
-    if os.path.isfile(progress_path):
-        try:
-            with open(progress_path, 'r', encoding='utf-8') as f:
-                pj = json.load(f)
-            console_text = ''
-            if isinstance(pj, dict):
-                console_text = str(pj.get('console_output') or '')
-                status = str(pj.get('status') or '')
-                success = status.lower() == 'completed'
-                if not status:
-                    cur_stage = pj.get('current_stage')
-                    tot = pj.get('total_stages')
-                    success = (cur_stage == tot) if (cur_stage is not None and tot is not None) else bool(console_text)
-            else:
-                success = False
-            return console_text, bool(success)
-        except Exception:
-            pass
+    pj = _read_v2_progress_snapshot(version_dir)
+    if pj:
+        console_text = str(pj.get('console_output') or '')
+        status = str(pj.get('status') or '').strip().lower()
+        success = status in {'completed', 'complete', 'success', 'succeeded'}
+        if not status:
+            cur_stage = pj.get('current_stage')
+            tot = pj.get('total_stages')
+            success = (cur_stage == tot) if (cur_stage is not None and tot is not None) else bool(console_text)
+        return console_text, bool(success)
 
     # Fallback: try to find any tracking/log file.
     try:
@@ -2888,6 +2893,7 @@ def v2_load_saved_runs():
     data = request.json or {}
     image_path = (data.get('image_path') or data.get('image') or '').strip().replace('\\', '/')
     prompt_name = (data.get('prompt_name') or data.get('prompt') or data.get('prompt_file') or '').strip()
+    version_dir_req = (data.get('version_dir') or data.get('version') or '').strip().replace('\\', '/')
     limit = data.get('limit')
 
     try:
@@ -2902,6 +2908,42 @@ def v2_load_saved_runs():
 
     if not prompt_name:
         return jsonify({'success': False, 'error': 'missing_prompt_name'}), 400
+
+    # Optional: load one specific saved run directory.
+    if version_dir_req:
+        version_abs = _safe_abs_under_plots(version_dir_req)
+        if (not version_abs) or (not os.path.isdir(version_abs)):
+            return jsonify({
+                'success': False,
+                'error': 'version_dir_not_found',
+                'version_dir': version_dir_req,
+                'image_path': image_path,
+                'prompt_name': prompt_name,
+            }), 404
+
+        progress_snapshot = _read_v2_progress_snapshot(version_abs)
+        console_text, ok = _read_v2_progress_console(version_abs)
+        outputs = get_output_files_v2(image_path, prompt_name, version_abs)
+        run = {
+            'version': 0,
+            'version_dir': os.path.relpath(version_abs, PLOTS_DIR).replace('\\', '/'),
+            'result': {
+                'success': bool(ok),
+                'outputs': outputs,
+                'console': console_text,
+                'accumulated_facts': progress_snapshot.get('accumulated_facts') if isinstance(progress_snapshot, dict) else None,
+            }
+        }
+        return jsonify({
+            'success': True,
+            'image_path': image_path,
+            'prompt_name': prompt_name,
+            'requested': 1,
+            'found': 1,
+            'partial': False,
+            'runs': [run],
+            'selected_version_dir': run['version_dir'],
+        })
 
     versions = _list_v2_version_dirs(image_path, prompt_name)
     if len(versions) < n and len(versions) == 0:
@@ -2919,6 +2961,7 @@ def v2_load_saved_runs():
     take_n = min(n, len(versions))
     runs = []
     for v, vdir in versions[:take_n]:
+        progress_snapshot = _read_v2_progress_snapshot(vdir)
         console_text, ok = _read_v2_progress_console(vdir)
         outputs = get_output_files_v2(image_path, prompt_name, vdir)
         runs.append({
@@ -2928,6 +2971,7 @@ def v2_load_saved_runs():
                 'success': bool(ok),
                 'outputs': outputs,
                 'console': console_text,
+                'accumulated_facts': progress_snapshot.get('accumulated_facts') if isinstance(progress_snapshot, dict) else None,
             }
         })
 

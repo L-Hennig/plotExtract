@@ -44,7 +44,7 @@
           <div style="margin-top: 10px;">
             <label class="check">
               <input id="chkTestResults" type="checkbox" />
-              Test results (A-1.png · prompt_13 · loads saved runs)
+                Test results (GA_copy1 · prompt_13 · key4.web saved run)
             </label>
             <div class="muted" style="margin-top: 4px;">When enabled, extraction will not run; the UI loads precomputed outputs from disk.</div>
           </div>
@@ -349,9 +349,10 @@
 
   // Test-results mode (load precomputed runs without executing extraction)
   let testResultsMode = false;
-  const TEST_IMAGE_PATH = 'first_examples/A/A-1/A-1.png';
+    const TEST_IMAGE_PATH = 'batch_uploads/ui_ex_afc0dc42_GA_copy1.png';
   const TEST_PROMPT_VALUE = 'ex2::prompt_13';
   const TEST_PROMPT_NAME = 'prompt_13';
+    const TEST_VERSION_DIR = 'batch_uploads/ui_ex_afc0dc42_GA_copy1_png.pv2_prompt_13.v1.key4.web';
 
   function _setTrialCountLimit(maxN) {
     const lim = Math.max(1, Math.min(5, Number(maxN) || 5));
@@ -382,7 +383,7 @@
       selectedFileLabel.textContent = TEST_IMAGE_PATH;
       setPreviewFromUrl('/plots/' + TEST_IMAGE_PATH);
       clearNotice(uploadStatus);
-      setNotice(uploadStatus, 'Test mode enabled: using A-1.png + prompt_13. Extraction will not run.', 'info');
+        setNotice(uploadStatus, 'Test mode enabled: using saved GA_copy1 prompt_13 key4.web run. Extraction will not run.', 'info');
 
       // Ensure prompt is set
       const opt = Array.from(promptSelect.querySelectorAll('option')).find(o => o.value === TEST_PROMPT_VALUE);
@@ -2234,8 +2235,14 @@
     accumulatedFacts = null;
     curveStyles = [];
 
+    if (result && result.accumulated_facts && typeof result.accumulated_facts === 'object') {
+      accumulatedFacts = result.accumulated_facts;
+    }
+
     const consoleText = (result && result.console) ? String(result.console) : '';
-    accumulatedFacts = _extractLatestAccumulatedFactsFromConsole(consoleText);
+    if (!accumulatedFacts) {
+      accumulatedFacts = _extractLatestAccumulatedFactsFromConsole(consoleText);
+    }
 
     if (accumulatedFacts && accumulatedFacts.curve_style_facts && Array.isArray(accumulatedFacts.curve_style_facts.curves)) {
       curveStyles = accumulatedFacts.curve_style_facts.curves
@@ -2290,7 +2297,9 @@
 
   function _extractTrialRunInfo(result) {
     const consoleText = (result && result.console) ? String(result.console) : '';
-    const facts = _extractLatestAccumulatedFactsFromConsole(consoleText);
+    const facts = (result && result.accumulated_facts && typeof result.accumulated_facts === 'object')
+      ? result.accumulated_facts
+      : _extractLatestAccumulatedFactsFromConsole(consoleText);
     const styles = _curveStylesFromAccumulatedFacts(facts);
     const labels = styles.map(s => s.curve_label);
     const outputs = (result && result.outputs) ? result.outputs : null;
@@ -2954,7 +2963,7 @@
     const res = await fetch('/v2/load_saved_runs', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image_path: TEST_IMAGE_PATH, prompt_name: TEST_PROMPT_NAME, limit: n })
+      body: JSON.stringify({ image_path: TEST_IMAGE_PATH, prompt_name: TEST_PROMPT_NAME, version_dir: TEST_VERSION_DIR, limit: n })
     });
 
     const data = await res.json().catch(() => ({}));
@@ -2965,7 +2974,7 @@
 
       let msg = 'Could not load saved test runs.';
       if ((data && data.error) === 'not_enough_saved_runs') {
-        msg = 'No saved prompt_13 runs found for A-1.png (found ' + (data.found || 0) + ', need ' + n + '). Run: tools/precompute_test_runs_prompt13_A-1.py';
+          msg = 'Saved GA_copy1 key4.web run not found (found ' + (data.found || 0) + ', need ' + n + ').';
       } else if (!res.ok && res.status === 404) {
         // If the body isn't our JSON error, this is likely a missing route (wrong server/port).
         msg = 'Saved-runs endpoint returned 404. Make sure you loaded the UI from the WebExtract server (e.g., http://127.0.0.1:5001/).';
