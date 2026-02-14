@@ -2388,7 +2388,14 @@ def _scan_version_folder(folder_path, version_label, outputs, plots_dir):
         label = None
         
         if f.endswith('.png') or f.endswith('.jpg') or f.endswith('.svg'):
-            if '-replot' in f:
+            # Keep overlay variants distinct so the UI can reliably pick the normal replot.
+            if '-replot_overlay_minmax' in f:
+                label = f'Replot Overlay (min/max axes) ({version_label})'
+            elif '-replot_overlay_full' in f:
+                label = f'Replot Overlay (full axes) ({version_label})'
+            elif '-replot_overlay' in f:
+                label = f'Replot Overlay ({version_label})'
+            elif '-replot' in f:
                 label = f'Extracted Replot ({version_label})'
             elif f.startswith('comparison_'):
                 label = f'Comparison ({version_label})'
@@ -2966,6 +2973,12 @@ def run_all():
     bottom_y = str(data.get('bottomY', 0))
     top_y = str(data.get('topY', 100))
 
+    # Optional: EX1 model selection (passed to plotExtract.py via env)
+    llm_model = (data.get('llm_model') or data.get('llmModel') or '').strip() or None
+
+    # Optional: rate-limit backoff mode (slower, disables server-side extraction timeout)
+    rate_limit_backoff = bool(data.get('rate_limit_backoff') or data.get('rateLimitBackoff') or False)
+
     # Optional: batch metadata (for persistent batch results page)
     batch_number = data.get('batch_number')
     
@@ -2983,6 +2996,8 @@ def run_all():
             'prompt_file': prompt_file,
             'batch_number': batch_number
             ,
+            'llm_model': llm_model,
+            'rate_limit_backoff': rate_limit_backoff,
             'cancel_requested': False,
             'active_pid': None,
         }
@@ -2991,7 +3006,7 @@ def run_all():
     thread = threading.Thread(
         target=run_extraction_task,
         args=(task_id, image_path, prompt_file, run_interpolation, run_pointwise, 
-              left_x, right_x, bottom_y, top_y)
+              left_x, right_x, bottom_y, top_y, llm_model, rate_limit_backoff)
     )
     thread.daemon = True
     thread.start()
@@ -3008,9 +3023,11 @@ def run_all_v2():
     prompt_name = data.get('prompt') or data.get('prompt_name')
     article_info = data.get('articleInfo', '').strip()
     llm_key = str(data.get('llmKey') or data.get('llm_key') or '').strip()
+    if not llm_key:
+        llm_key = '4'
     llm_provider = (data.get('llm_provider') or data.get('llmProvider') or '').strip() or None
     llm_model = (data.get('llm_model') or data.get('llmModel') or '').strip() or None
-    if (not llm_provider) and llm_key in ('1', '2'):
+    if (not llm_provider) and llm_key in ('1', '2', '4'):
         if llm_key == '2':
             llm_provider = 'google'
             llm_model = llm_model or 'gemma-3-27b-it'
@@ -3018,6 +3035,7 @@ def run_all_v2():
             llm_provider = 'mistral'
             llm_model = llm_model or 'mistral-large-2512'
     debug_mode = bool(data.get('debug', False))
+    rate_limit_backoff = bool(data.get('rate_limit_backoff') or data.get('rateLimitBackoff') or False)
     run_interpolation = data.get('runInterpolation', False)
     run_pointwise = data.get('runPointwise', False)
     left_x = str(data.get('leftX', 0))
@@ -3036,6 +3054,7 @@ def run_all_v2():
             'prompt_name': prompt_name,
             'pipeline': 'v2',
             'debug': debug_mode,
+            'rate_limit_backoff': rate_limit_backoff,
             'cancel_requested': False,
             'active_pid': None,
         }
@@ -3043,7 +3062,7 @@ def run_all_v2():
     thread = threading.Thread(
         target=run_extraction_task_v2,
           args=(task_id, image_path, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
-              left_x, right_x, bottom_y, top_y, llm_provider, llm_model)
+                            left_x, right_x, bottom_y, top_y, llm_provider, llm_model, rate_limit_backoff)
     )
     thread.daemon = True
     thread.start()
@@ -3143,9 +3162,11 @@ def run_batch_v2():
     batch_name = data.get('batch_name')
     article_info = data.get('articleInfo', '')
     llm_key = str(data.get('llmKey') or data.get('llm_key') or '').strip()
+    if not llm_key:
+        llm_key = '4'
     llm_provider = (data.get('llm_provider') or data.get('llmProvider') or '').strip() or None
     llm_model = (data.get('llm_model') or data.get('llmModel') or '').strip() or None
-    if (not llm_provider) and llm_key in ('1', '2'):
+    if (not llm_provider) and llm_key in ('1', '2', '4'):
         if llm_key == '2':
             llm_provider = 'google'
             llm_model = llm_model or 'gemma-3-27b-it'
@@ -3542,7 +3563,7 @@ def get_extraction_console(image_name, prompt_name):
 
 
 def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run_pointwise,
-                        left_x, right_x, bottom_y, top_y):
+                        left_x, right_x, bottom_y, top_y, llm_model=None, rate_limit_backoff: bool = False):
     """Background task that runs the extraction pipeline."""
     import re
     
@@ -3591,10 +3612,25 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
     step1_start = time.time()
     try:
         env_overrides = {'PLOTEXTRACT_OUTPUT_TAG': 'web'}
-        try:
-            extraction_timeout_s = int(os.getenv('PLOTEXTRACT_EXTRACTION_TIMEOUT_S', '500'))
-        except Exception:
-            extraction_timeout_s = 500
+        if rate_limit_backoff:
+            env_overrides.update({
+                'PLOTEXTRACT_RATE_LIMIT_BACKOFF_MODE': '1',
+                # Also disable the per-request LLM timeout in v2 (no effect on v1).
+                'PLOTEXTRACT_MISTRAL_TIMEOUT_MS': '0',
+            })
+        if llm_model:
+            env_overrides.update({
+                'PLOTEXTRACT_LLM_PROVIDER': 'mistral',
+                'PLOTEXTRACT_LLM_MODEL': str(llm_model),
+                'PLOTEXTRACT_MISTRAL_MODEL': str(llm_model),
+                'PLOTEXTRACT_LLM_KEY': '4',
+            })
+        extraction_timeout_s = None
+        if not rate_limit_backoff:
+            try:
+                extraction_timeout_s = int(os.getenv('PLOTEXTRACT_EXTRACTION_TIMEOUT_S', '500'))
+            except Exception:
+                extraction_timeout_s = 500
         result = _run_subprocess_with_cancel(
             task_id,
             [PYTHON_EXE, 'plotExtract.py', full_image_path, full_prompt_path],
@@ -3872,7 +3908,7 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
     save_extraction_state(final_result)
 
 def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
-                           left_x, right_x, bottom_y, top_y, llm_provider=None, llm_model=None):
+                           left_x, right_x, bottom_y, top_y, llm_provider=None, llm_model=None, rate_limit_backoff: bool = False):
     """Background task for PlotExtractV2 pipeline."""
     import re
 
@@ -3920,6 +3956,13 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug
         env_overrides['PLOTEXTRACT_OUTPUT_TAG'] = 'web'
         if debug_mode:
             env_overrides['PLOTEXTRACT_DEBUG'] = '1'
+        if rate_limit_backoff:
+            env_overrides['PLOTEXTRACT_RATE_LIMIT_BACKOFF_MODE'] = '1'
+            # Apply gentle pacing defaults; override via env if you want.
+            env_overrides.setdefault('PLOTEXTRACT_LLM_MIN_INTERVAL_S', '5.0')
+            env_overrides.setdefault('PLOTEXTRACT_BACKOFF_STAGE_SLEEP_S', '0.6')
+            # Disable per-request timeout in the Mistral client (0 => no timeout)
+            env_overrides.setdefault('PLOTEXTRACT_MISTRAL_TIMEOUT_MS', '0')
         provider_norm = (str(llm_provider) if llm_provider is not None else '').strip().lower()
         if llm_provider:
             env_overrides['PLOTEXTRACT_LLM_PROVIDER'] = str(llm_provider)
@@ -3927,7 +3970,7 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug
         if provider_norm == 'google':
             env_overrides['PLOTEXTRACT_LLM_KEY'] = '2'
         elif provider_norm == 'mistral':
-            env_overrides['PLOTEXTRACT_LLM_KEY'] = '1'
+            env_overrides['PLOTEXTRACT_LLM_KEY'] = '4'
         if llm_model:
             env_overrides['PLOTEXTRACT_LLM_MODEL'] = str(llm_model)
             # Back-compat: existing Mistral path reads PLOTEXTRACT_MISTRAL_MODEL
@@ -3936,10 +3979,12 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug
             if provider_norm == 'google':
                 env_overrides['PLOTEXTRACT_GOOGLE_MODEL'] = str(llm_model)
 
-        try:
-            extraction_timeout_s = int(os.getenv('PLOTEXTRACT_EXTRACTION_TIMEOUT_S', '500'))
-        except Exception:
-            extraction_timeout_s = 500
+        extraction_timeout_s = None
+        if not rate_limit_backoff:
+            try:
+                extraction_timeout_s = int(os.getenv('PLOTEXTRACT_EXTRACTION_TIMEOUT_S', '500'))
+            except Exception:
+                extraction_timeout_s = 500
 
         if not env_overrides:
             env_overrides = None
@@ -5095,7 +5140,7 @@ def list_replots():
         for root, dirs, files in os.walk(folder_path):
             # Look for replot images
             for f in files:
-                if '-replot' in f and f.endswith('.png'):
+                if '-replot' in f and '-replot_overlay' not in f and f.endswith('.png'):
                     rel_path = os.path.relpath(os.path.join(root, f), PLOTS_DIR)
                     
                     # Extract display name from path

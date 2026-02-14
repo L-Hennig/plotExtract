@@ -7,6 +7,7 @@ import sys
 import traceback
 import importlib
 import time
+import random
 import cv2
 import numpy as np
 from dotenv import load_dotenv
@@ -44,12 +45,127 @@ from extraction_tracker import ExtractionTracker
 
 # Load env for API key
 load_dotenv(override=True)
-API_KEY_MISTRAL = os.getenv("API_KEY_1")
+API_KEY_MISTRAL_1 = os.getenv("API_KEY_1")
+API_KEY_MISTRAL_3 = os.getenv("API_KEY_3")
+API_KEY_MISTRAL_4 = os.getenv("API_KEY_4")
 API_KEY_GOOGLE = os.getenv("API_KEY_2")
 
 LLM_PROVIDER = (os.getenv("PLOTEXTRACT_LLM_PROVIDER") or "mistral").strip().lower()
 LLM_MODEL = (os.getenv("PLOTEXTRACT_LLM_MODEL") or "").strip()
 LLM_KEY = (os.getenv("PLOTEXTRACT_LLM_KEY") or "").strip()
+
+
+def _env_flag(name: str) -> bool:
+    v = str(os.getenv(name, "")).strip().lower()
+    return v in {"1", "true", "yes", "on"}
+
+
+RATE_LIMIT_BACKOFF_MODE = _env_flag("PLOTEXTRACT_RATE_LIMIT_BACKOFF_MODE")
+
+try:
+    LLM_MIN_INTERVAL_S = float(
+        os.getenv("PLOTEXTRACT_LLM_MIN_INTERVAL_S")
+        or ("5.0" if RATE_LIMIT_BACKOFF_MODE else "0")
+    )
+except Exception:
+    LLM_MIN_INTERVAL_S = 5.0 if RATE_LIMIT_BACKOFF_MODE else 0.0
+LLM_MIN_INTERVAL_S = max(0.0, LLM_MIN_INTERVAL_S)
+
+try:
+    BACKOFF_STAGE_SLEEP_S = float(
+        os.getenv("PLOTEXTRACT_BACKOFF_STAGE_SLEEP_S")
+        or ("0.6" if RATE_LIMIT_BACKOFF_MODE else "0")
+    )
+except Exception:
+    BACKOFF_STAGE_SLEEP_S = 0.6 if RATE_LIMIT_BACKOFF_MODE else 0.0
+BACKOFF_STAGE_SLEEP_S = max(0.0, BACKOFF_STAGE_SLEEP_S)
+
+_LAST_LLM_CALL_TS = 0.0
+
+
+def _maybe_throttle_llm_call():
+    """Best-effort pacing to reduce bursty request rate.
+
+    This is intentionally simple: enforce a minimum interval between LLM calls
+    within a single runner process.
+    """
+    global _LAST_LLM_CALL_TS
+    if not (LLM_MIN_INTERVAL_S and LLM_MIN_INTERVAL_S > 0):
+        return
+    now = time.time()
+    dt = now - _LAST_LLM_CALL_TS
+    if dt < LLM_MIN_INTERVAL_S:
+        time.sleep(LLM_MIN_INTERVAL_S - dt)
+    _LAST_LLM_CALL_TS = time.time()
+
+
+def _format_llm_exception_details(err: Exception) -> str:
+    """Best-effort extraction of HTTP/status/body details from SDK exceptions.
+
+    Providers/SDKs vary wildly. This tries common patterns without assuming types.
+    """
+    details: dict = {
+        "type": type(err).__name__,
+        "module": type(err).__module__,
+        "repr": repr(err),
+        "str": str(err),
+    }
+
+    for attr in (
+        "status_code",
+        "http_status",
+        "code",
+        "error_code",
+        "message",
+        "detail",
+        "details",
+        "body",
+        "text",
+    ):
+        try:
+            if hasattr(err, attr):
+                details[attr] = getattr(err, attr)
+        except Exception:
+            pass
+
+    # Common: err.response (requests/httpx-like)
+    try:
+        resp = getattr(err, "response", None)
+    except Exception:
+        resp = None
+    if resp is not None:
+        try:
+            details["response_status_code"] = getattr(resp, "status_code", None)
+        except Exception:
+            pass
+        try:
+            hdrs = getattr(resp, "headers", None)
+            if hdrs is not None:
+                details["response_headers"] = dict(hdrs)
+        except Exception:
+            pass
+        try:
+            details["response_text"] = getattr(resp, "text", None)
+        except Exception:
+            pass
+        try:
+            if hasattr(resp, "json"):
+                details["response_json"] = resp.json()
+        except Exception:
+            pass
+
+    # Some SDKs store raw payload in .data / .error
+    for attr in ("data", "error"):
+        try:
+            if hasattr(err, attr):
+                details[attr] = getattr(err, attr)
+        except Exception:
+            pass
+
+    try:
+        return json.dumps(details, indent=2, ensure_ascii=False, default=str)
+    except Exception:
+        return str(details)
 
 
 def _effective_model_for_provider(provider: str) -> str:
@@ -76,8 +192,27 @@ def _effective_key_for_provider(provider: str, key: str) -> str:
     if provider == "google":
         return "2"
     if provider == "mistral":
-        return "1"
+        return "4"
     return ""
+
+
+def _select_mistral_api_key(llm_key_used: str) -> Optional[str]:
+    """Select the Mistral API key based on the requested key slot.
+
+    Conventions:
+    - key1  -> API_KEY_1
+    - key3  -> API_KEY_3
+    - key4  -> API_KEY_4 (preferred), else API_KEY_3, else API_KEY_1
+    """
+    k = (llm_key_used or "").strip()
+    if k == "1":
+        return API_KEY_MISTRAL_1
+    if k == "3":
+        return API_KEY_MISTRAL_3 or API_KEY_MISTRAL_1
+    if k == "4":
+        return API_KEY_MISTRAL_4 or API_KEY_MISTRAL_3 or API_KEY_MISTRAL_1
+    # Unknown/empty: best-effort fallback
+    return API_KEY_MISTRAL_4 or API_KEY_MISTRAL_3 or API_KEY_MISTRAL_1
 
 # Debug mode (writes per-stage prompts/outputs to disk)
 DEBUG_VERBOSE = str(os.getenv("PLOTEXTRACT_DEBUG", "")).strip().lower() in {"1", "true", "yes", "on"}
@@ -321,13 +456,15 @@ def create_Q_1p(convo):
 def prompt_mistral(client, messages):
     # Prevent indefinite hangs (e.g. network stalls / provider queueing).
     # Override per run with env var PLOTEXTRACT_MISTRAL_TIMEOUT_MS.
-    timeout_ms = None
+    # Default: 4 minutes. Set PLOTEXTRACT_MISTRAL_TIMEOUT_MS=0 to disable.
+    timeout_ms: Optional[int] = None
     try:
         timeout_ms_env = os.getenv("PLOTEXTRACT_MISTRAL_TIMEOUT_MS")
-        if timeout_ms_env:
-            timeout_ms = int(timeout_ms_env)
+        if timeout_ms_env is not None and str(timeout_ms_env).strip() != "":
+            v = int(str(timeout_ms_env).strip())
+            timeout_ms = None if v <= 0 else v
         else:
-            timeout_ms = 240_000  # 4 minutes
+            timeout_ms = 240_000
     except Exception:
         timeout_ms = 240_000
 
@@ -338,6 +475,30 @@ def prompt_mistral(client, messages):
         or (LLM_MODEL if LLM_MODEL else None)
         or "mistral-large-2512"
     )
+
+    def _messages_contain_images(msgs) -> bool:
+        try:
+            for m in (msgs or []):
+                if not isinstance(m, dict):
+                    continue
+                content = m.get("content")
+                if isinstance(content, list):
+                    for p in content:
+                        if isinstance(p, dict) and p.get("type") == "image_url":
+                            return True
+        except Exception:
+            return False
+        return False
+
+    # Some Mistral models are text-only; if the prompt includes images, fall back.
+    # This keeps the UI option available without breaking image-based extraction.
+    if model == "mistral-large-2411" and _messages_contain_images(messages):
+        fallback_model = os.getenv("PLOTEXTRACT_MISTRAL_VISION_FALLBACK_MODEL") or "mistral-large-2512"
+        print(
+            f"[WARN] Selected model '{model}' does not support image input; falling back to '{fallback_model}'.",
+            file=sys.stderr,
+        )
+        model = fallback_model
 
     def _is_rate_limit_error(err: Exception) -> bool:
         msg = str(err).lower()
@@ -350,41 +511,69 @@ def prompt_mistral(client, messages):
         )
 
     # Retry transient rate limits (429).
-    # Defaults are conservative; override if you have stricter/looser quotas.
+    # Defaults are intentionally more forgiving than before: rate-limit windows
+    # can easily be 60s+ and EX2 runs multiple LLM calls per extraction.
     try:
-        max_retries = int(os.getenv("PLOTEXTRACT_MISTRAL_MAX_RETRIES") or "6")
+        max_retries = int(os.getenv("PLOTEXTRACT_MISTRAL_MAX_RETRIES") or "8")
     except Exception:
-        max_retries = 6
+        max_retries = 8
     try:
-        base_sleep_s = float(os.getenv("PLOTEXTRACT_MISTRAL_RETRY_BASE_S") or "1.0")
+        base_sleep_s = float(os.getenv("PLOTEXTRACT_MISTRAL_RETRY_BASE_S") or "2.0")
     except Exception:
-        base_sleep_s = 1.0
+        base_sleep_s = 2.0
     try:
-        max_sleep_s = float(os.getenv("PLOTEXTRACT_MISTRAL_RETRY_MAX_S") or "20.0")
+        max_sleep_s = float(os.getenv("PLOTEXTRACT_MISTRAL_RETRY_MAX_S") or "45.0")
     except Exception:
-        max_sleep_s = 20.0
+        max_sleep_s = 45.0
+
+    # Add some jitter to avoid synchronized retries when multiple runs are started.
+    try:
+        jitter_frac = float(os.getenv("PLOTEXTRACT_MISTRAL_RETRY_JITTER_FRAC") or "0.20")
+    except Exception:
+        jitter_frac = 0.20
+    jitter_frac = max(0.0, min(jitter_frac, 0.9))
 
     last_err: Optional[Exception] = None
     for attempt in range(max_retries + 1):
         try:
+            _maybe_throttle_llm_call()
+            kwargs = {
+                "model": model,
+                "messages": messages,
+                "max_tokens": 4096,
+                "temperature": 0,
+            }
+            if timeout_ms is not None:
+                kwargs["timeout_ms"] = timeout_ms
             response = client.chat.complete(
-                model=model,
-                messages=messages,
-                max_tokens=4096,
-                temperature=0,
-                timeout_ms=timeout_ms,
+                **kwargs,
             )
             return messages, response.choices[0].message.content
         except Exception as e:
             last_err = e
-            if _is_rate_limit_error(e) and attempt < max_retries:
-                sleep_s = min(max_sleep_s, base_sleep_s * (2 ** attempt))
+            if _is_rate_limit_error(e):
+                # Log the full SDK error payload at least once.
+                if attempt == 0:
+                    print(
+                        "[WARN] Mistral rate limit details (first 429):\n" + _format_llm_exception_details(e),
+                        file=sys.stderr,
+                    )
+                if attempt < max_retries:
+                    sleep_s = min(max_sleep_s, base_sleep_s * (2 ** attempt))
+                    if jitter_frac > 0:
+                        sleep_s = sleep_s * (1.0 + (random.random() * jitter_frac))
+                    print(
+                        f"[WARN] Mistral rate limit (429). Retrying in {sleep_s:.1f}s (attempt {attempt + 1}/{max_retries})",
+                        file=sys.stderr,
+                    )
+                    time.sleep(sleep_s)
+                    continue
+                # Last attempt exhausted.
                 print(
-                    f"[WARN] Mistral rate limit (429). Retrying in {sleep_s:.1f}s (attempt {attempt + 1}/{max_retries})",
+                    "[ERROR] Mistral rate limit: retries exhausted. Last error details:\n"
+                    + _format_llm_exception_details(e),
                     file=sys.stderr,
                 )
-                time.sleep(sleep_s)
-                continue
             raise
 
     # Should be unreachable, but keep for safety.
@@ -432,17 +621,23 @@ def prompt_google(messages):
         )
 
     try:
-        max_retries = int(os.getenv("PLOTEXTRACT_GOOGLE_MAX_RETRIES") or "6")
+        max_retries = int(os.getenv("PLOTEXTRACT_GOOGLE_MAX_RETRIES") or "10")
     except Exception:
-        max_retries = 6
+        max_retries = 10
     try:
-        base_sleep_s = float(os.getenv("PLOTEXTRACT_GOOGLE_RETRY_BASE_S") or "1.0")
+        base_sleep_s = float(os.getenv("PLOTEXTRACT_GOOGLE_RETRY_BASE_S") or "2.0")
     except Exception:
-        base_sleep_s = 1.0
+        base_sleep_s = 2.0
     try:
-        max_sleep_s = float(os.getenv("PLOTEXTRACT_GOOGLE_RETRY_MAX_S") or "20.0")
+        max_sleep_s = float(os.getenv("PLOTEXTRACT_GOOGLE_RETRY_MAX_S") or "60.0")
     except Exception:
-        max_sleep_s = 20.0
+        max_sleep_s = 60.0
+
+    try:
+        jitter_frac = float(os.getenv("PLOTEXTRACT_GOOGLE_RETRY_JITTER_FRAC") or "0.20")
+    except Exception:
+        jitter_frac = 0.20
+    jitter_frac = max(0.0, min(jitter_frac, 0.9))
 
     # Flatten messages into a single prompt string plus binary image parts.
     prompt_lines = []
@@ -511,6 +706,7 @@ def prompt_google(messages):
     last_err: Optional[Exception] = None
     for attempt in range(max_retries + 1):
         try:
+            _maybe_throttle_llm_call()
             resp = model.generate_content(
                 parts,
                 generation_config={
@@ -531,6 +727,8 @@ def prompt_google(messages):
             last_err = e
             if _is_rate_limit_error(e) and attempt < max_retries:
                 sleep_s = min(max_sleep_s, base_sleep_s * (2 ** attempt))
+                if jitter_frac > 0:
+                    sleep_s = sleep_s * (1.0 + (random.random() * jitter_frac))
                 print(
                     f"[WARN] Google rate limit (429). Retrying in {sleep_s:.1f}s (attempt {attempt + 1}/{max_retries})",
                     file=sys.stderr,
@@ -1046,11 +1244,18 @@ base64_image = encode_image(api_image_path)
 # Initialize provider client(s)
 client = None
 if LLM_PROVIDER == "mistral":
-    if not API_KEY_MISTRAL:
-        raise RuntimeError("Missing API_KEY_1 for Mistral provider")
+    llm_key_used = _effective_key_for_provider("mistral", LLM_KEY)
+    api_key_mistral = _select_mistral_api_key(llm_key_used)
+    if not api_key_mistral:
+        raise RuntimeError(
+            "Missing Mistral API key for selected key slot. "
+            "Set API_KEY_4 (preferred for key4), or API_KEY_3, or API_KEY_1."
+        )
     if Mistral is None:
         raise RuntimeError("Mistral provider requested but 'mistralai' is not installed")
-    client = Mistral(api_key=API_KEY_MISTRAL)
+    if llm_key_used == "4" and (not API_KEY_MISTRAL_4) and API_KEY_MISTRAL_3:
+        print("[WARN] key4 selected but API_KEY_4 is not set; using API_KEY_3 instead.", file=sys.stderr)
+    client = Mistral(api_key=api_key_mistral)
 
 # -----------------------------------------------------------------------------
 # Preprocessing: Convert article info to structured JSON (if provided)
@@ -1476,6 +1681,10 @@ for stage_index, stage_name in enumerate(EXTRACT_STAGES):
         console_output=console_timeline,
     )
 
+    # Optional pacing between stages (helps avoid rate-limit bursts).
+    if BACKOFF_STAGE_SLEEP_S > 0 and stage_index < (len(EXTRACT_STAGES) - 1):
+        time.sleep(BACKOFF_STAGE_SLEEP_S)
+
     # Early stop on abort
     if abort:
         reason_display = abort_reason or "Abort signaled by prompt"
@@ -1612,6 +1821,254 @@ if code:
         _orig_plt_savefig = _get_original(plt.savefig)
         _orig_fig_savefig = _get_original(mpl_figure.Figure.savefig)
 
+        _in_overlay_save = {"active": False}
+
+        def _derive_overlay_paths_from_replot(path: str):
+            p = str(path)
+            if '-replot.' in p:
+                return (
+                    p.replace('-replot.', '-replot_overlay_full.', 1),
+                    p.replace('-replot.', '-replot_overlay_minmax.', 1),
+                )
+            if p.lower().endswith('.png'):
+                stem = p[:-4]
+                return stem + '_overlay_full.png', stem + '_overlay_minmax.png'
+            return p + '_overlay_full', p + '_overlay_minmax'
+
+        def _format_tick_val(v):
+            try:
+                return f"{float(v):.6g}"
+            except Exception:
+                try:
+                    return str(v)
+                except Exception:
+                    return ''
+
+        def _save_transparent_replot_overlay(fig, out_path: str, axis_mode: str = 'full', save_kwargs=None):
+            import os
+            try:
+                os.makedirs(os.path.dirname(out_path), exist_ok=True)
+            except Exception:
+                pass
+
+            fig_patch_alpha = None
+            try:
+                fig_patch_alpha = fig.patch.get_alpha()
+                fig.patch.set_alpha(0.0)
+            except Exception:
+                fig_patch_alpha = None
+
+            per_ax_state = []
+            try:
+                axes = getattr(fig, 'axes', []) or []
+            except Exception:
+                axes = []
+
+            for ax in axes:
+                st = {
+                    'ax': ax,
+                    'patch_alpha': None,
+                    'lines': [],
+                    'collections': [],
+                    'x_major_locator': None,
+                    'x_major_formatter': None,
+                    'x_minor_locator': None,
+                    'x_minor_formatter': None,
+                    'y_major_locator': None,
+                    'y_major_formatter': None,
+                    'y_minor_locator': None,
+                    'y_minor_formatter': None,
+                }
+                try:
+                    st['patch_alpha'] = ax.patch.get_alpha()
+                    ax.patch.set_alpha(0.0)
+                except Exception:
+                    st['patch_alpha'] = None
+
+                try:
+                    for ln in ax.get_lines() or []:
+                        try:
+                            st['lines'].append((ln, ln.get_color(), ln.get_alpha(), ln.get_linewidth()))
+                            ln.set_color('#ef4444')
+                            if ln.get_alpha() is None:
+                                ln.set_alpha(1.0)
+                        except Exception:
+                            continue
+                except Exception:
+                    pass
+
+                try:
+                    for coll in getattr(ax, 'collections', []) or []:
+                        try:
+                            ec = coll.get_edgecolor()
+                        except Exception:
+                            ec = None
+                        try:
+                            fc = coll.get_facecolor()
+                        except Exception:
+                            fc = None
+                        st['collections'].append((coll, ec, fc))
+                        try:
+                            coll.set_edgecolor('#ef4444')
+                        except Exception:
+                            pass
+                        try:
+                            coll.set_facecolor('#ef4444')
+                        except Exception:
+                            pass
+                except Exception:
+                    pass
+
+                if axis_mode == 'minmax':
+                    try:
+                        st['x_major_locator'] = ax.xaxis.get_major_locator()
+                        st['x_major_formatter'] = ax.xaxis.get_major_formatter()
+                        st['x_minor_locator'] = ax.xaxis.get_minor_locator()
+                        st['x_minor_formatter'] = ax.xaxis.get_minor_formatter()
+                        st['y_major_locator'] = ax.yaxis.get_major_locator()
+                        st['y_major_formatter'] = ax.yaxis.get_major_formatter()
+                        st['y_minor_locator'] = ax.yaxis.get_minor_locator()
+                        st['y_minor_formatter'] = ax.yaxis.get_minor_formatter()
+
+                        xmin, xmax = ax.get_xlim()
+                        ymin, ymax = ax.get_ylim()
+                        ax.set_xticks([xmin, xmax])
+                        ax.set_yticks([ymin, ymax])
+                        ax.set_xticklabels([_format_tick_val(xmin), _format_tick_val(xmax)])
+                        ax.set_yticklabels([_format_tick_val(ymin), _format_tick_val(ymax)])
+                        try:
+                            ax.minorticks_off()
+                        except Exception:
+                            pass
+                    except Exception:
+                        pass
+
+                per_ax_state.append(st)
+
+            dpi = None
+            bbox_inches = None
+            pad_inches = None
+            try:
+                sk = save_kwargs or {}
+                dpi = sk.get('dpi', None)
+                bbox_inches = sk.get('bbox_inches', None)
+                pad_inches = sk.get('pad_inches', None)
+            except Exception:
+                dpi = None
+                bbox_inches = None
+                pad_inches = None
+
+            if dpi is None:
+                dpi = 300
+            if bbox_inches is None:
+                bbox_inches = 'tight'
+
+            try:
+                _orig_fig_savefig(
+                    fig,
+                    out_path,
+                    dpi=dpi,
+                    bbox_inches=bbox_inches,
+                    pad_inches=pad_inches,
+                    transparent=True,
+                    facecolor='none',
+                    edgecolor='none',
+                )
+            except Exception:
+                pass
+            finally:
+                for st in per_ax_state:
+                    ax = st.get('ax')
+                    if not ax:
+                        continue
+                    try:
+                        if st.get('patch_alpha') is not None:
+                            ax.patch.set_alpha(st['patch_alpha'])
+                    except Exception:
+                        pass
+
+                    for (ln, c, a, lw) in st.get('lines', []) or []:
+                        try:
+                            ln.set_color(c)
+                            ln.set_alpha(a)
+                            ln.set_linewidth(lw)
+                        except Exception:
+                            continue
+
+                    for (coll, ec, fc) in st.get('collections', []) or []:
+                        try:
+                            if ec is not None:
+                                coll.set_edgecolor(ec)
+                        except Exception:
+                            pass
+                        try:
+                            if fc is not None:
+                                coll.set_facecolor(fc)
+                        except Exception:
+                            pass
+
+                    if axis_mode == 'minmax':
+                        try:
+                            if st.get('x_major_locator') is not None:
+                                ax.xaxis.set_major_locator(st['x_major_locator'])
+                            if st.get('x_major_formatter') is not None:
+                                ax.xaxis.set_major_formatter(st['x_major_formatter'])
+                            if st.get('x_minor_locator') is not None:
+                                ax.xaxis.set_minor_locator(st['x_minor_locator'])
+                            if st.get('x_minor_formatter') is not None:
+                                ax.xaxis.set_minor_formatter(st['x_minor_formatter'])
+                            if st.get('y_major_locator') is not None:
+                                ax.yaxis.set_major_locator(st['y_major_locator'])
+                            if st.get('y_major_formatter') is not None:
+                                ax.yaxis.set_major_formatter(st['y_major_formatter'])
+                            if st.get('y_minor_locator') is not None:
+                                ax.yaxis.set_minor_locator(st['y_minor_locator'])
+                            if st.get('y_minor_formatter') is not None:
+                                ax.yaxis.set_minor_formatter(st['y_minor_formatter'])
+                        except Exception:
+                            pass
+
+                try:
+                    if fig_patch_alpha is not None:
+                        fig.patch.set_alpha(fig_patch_alpha)
+                except Exception:
+                    pass
+
+        def _maybe_emit_replot_overlay_variants(fig, save_args, save_kwargs):
+            import os
+            if _in_overlay_save.get('active'):
+                return
+
+            out_path = None
+            try:
+                if save_args and isinstance(save_args[0], (str, os.PathLike)):
+                    out_path = os.fspath(save_args[0])
+            except Exception:
+                out_path = None
+
+            if not out_path:
+                return
+            try:
+                if not str(out_path).lower().endswith('.png'):
+                    return
+            except Exception:
+                return
+
+            try:
+                if os.path.abspath(str(out_path)) != os.path.abspath(str(replot_plot)):
+                    return
+            except Exception:
+                if str(out_path) != str(replot_plot):
+                    return
+
+            overlay_full, overlay_minmax = _derive_overlay_paths_from_replot(str(out_path))
+            try:
+                _in_overlay_save['active'] = True
+                _save_transparent_replot_overlay(fig, overlay_full, axis_mode='full', save_kwargs=save_kwargs)
+                _save_transparent_replot_overlay(fig, overlay_minmax, axis_mode='minmax', save_kwargs=save_kwargs)
+            finally:
+                _in_overlay_save['active'] = False
+
         def _apply_replot_axis_policy(fig):
             try:
                 axes = getattr(fig, 'axes', []) or []
@@ -1638,11 +2095,21 @@ if code:
                 _apply_replot_axis_policy(plt.gcf())
             except Exception:
                 pass
-            return _orig_plt_savefig(*args, **kwargs)
+            ret = _orig_plt_savefig(*args, **kwargs)
+            try:
+                _maybe_emit_replot_overlay_variants(plt.gcf(), args, kwargs)
+            except Exception:
+                pass
+            return ret
 
         def _patched_fig_savefig(self, *args, **kwargs):
             _apply_replot_axis_policy(self)
-            return _orig_fig_savefig(self, *args, **kwargs)
+            ret = _orig_fig_savefig(self, *args, **kwargs)
+            try:
+                _maybe_emit_replot_overlay_variants(self, args, kwargs)
+            except Exception:
+                pass
+            return ret
 
         _patched_plt_savefig._plotextract_is_patched = True
         _patched_plt_savefig._plotextract_original = _orig_plt_savefig

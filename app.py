@@ -2660,7 +2660,7 @@ def _list_v2_version_dirs(image_path: str, prompt_name: str):
     """List v2 version dirs for an image+prompt, newest first.
 
     Matches folders like: {image_name_with_ext_underscored}.pv2_{prompt}.vN
-    and the newer:       {image_name_with_ext_underscored}.pv2_{prompt}.vN.key1
+    and the newer:       {image_name_with_ext_underscored}.pv2_{prompt}.vN.key4
     """
     import re
 
@@ -2857,6 +2857,9 @@ def run_all():
     bottom_y = str(data.get('bottomY', 0))
     top_y = str(data.get('topY', 100))
 
+    # Optional: EX1 (v1) model selection (passed to plotExtract.py via env)
+    llm_model = (data.get('llm_model') or data.get('llmModel') or '').strip() or None
+
     # Optional: batch metadata (for persistent batch results page)
     batch_number = data.get('batch_number')
     
@@ -2874,6 +2877,7 @@ def run_all():
             'prompt_file': prompt_file,
             'batch_number': batch_number
             ,
+            'llm_model': llm_model,
             'cancel_requested': False,
             'active_pid': None,
         }
@@ -2882,7 +2886,7 @@ def run_all():
     thread = threading.Thread(
         target=run_extraction_task,
         args=(task_id, image_path, prompt_file, run_interpolation, run_pointwise, 
-              left_x, right_x, bottom_y, top_y)
+              left_x, right_x, bottom_y, top_y, llm_model)
     )
     thread.daemon = True
     thread.start()
@@ -3417,7 +3421,7 @@ def get_extraction_console(image_name, prompt_name):
 
 
 def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run_pointwise,
-                        left_x, right_x, bottom_y, top_y):
+                        left_x, right_x, bottom_y, top_y, llm_model=None):
     """Background task that runs the extraction pipeline."""
     import re
     
@@ -3469,11 +3473,23 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
             extraction_timeout_s = int(os.getenv('PLOTEXTRACT_EXTRACTION_TIMEOUT_S', '500'))
         except Exception:
             extraction_timeout_s = 500
+
+        env_overrides = None
+        if llm_model:
+            # plotExtract.py reads PLOTEXTRACT_MISTRAL_MODEL.
+            # Also set the generic name for consistency with v2.
+            env_overrides = {
+                'PLOTEXTRACT_LLM_PROVIDER': 'mistral',
+                'PLOTEXTRACT_LLM_MODEL': str(llm_model),
+                'PLOTEXTRACT_MISTRAL_MODEL': str(llm_model),
+                'PLOTEXTRACT_LLM_KEY': '4',
+            }
         result = _run_subprocess_with_cancel(
             task_id,
             [PYTHON_EXE, 'plotExtract.py', full_image_path, full_prompt_path],
             cwd=BASE_DIR,
             timeout_s=extraction_timeout_s,
+            env_overrides=env_overrides,
         )
         
         if result.get('stdout'):
@@ -3797,7 +3813,7 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug
         if provider_norm == 'google':
             env_overrides['PLOTEXTRACT_LLM_KEY'] = '2'
         elif provider_norm == 'mistral':
-            env_overrides['PLOTEXTRACT_LLM_KEY'] = '1'
+            env_overrides['PLOTEXTRACT_LLM_KEY'] = '4'
         if llm_model:
             env_overrides['PLOTEXTRACT_LLM_MODEL'] = str(llm_model)
             # Back-compat: existing Mistral path reads PLOTEXTRACT_MISTRAL_MODEL
@@ -3872,7 +3888,7 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug
         if provider_norm == 'google':
             key_suffix = '.key2'
         elif provider_norm == 'mistral':
-            key_suffix = '.key1'
+            key_suffix = '.key4'
         fallback_dir = os.path.join(image_dir, f"{name_for_folder}.{full_prompt_name}.v{version_num}{key_suffix}")
         extracted_csv = os.path.join(fallback_dir, f"{base_name}_extracted.csv")
 

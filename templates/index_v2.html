@@ -833,6 +833,7 @@
                         <label for="llmKey"><strong>LLM Key (v2):</strong></label>
                         <select id="llmKey" onchange="onLlmKeyChange()">
                             <option value="1">Key 1 (API_KEY_1 — Mistral)</option>
+                            <option value="4">Key 4 (Mistral — default)</option>
                             <option value="2">Key 2 (API_KEY_2 — Google / Gemma)</option>
                         </select>
                     </div>
@@ -1074,7 +1075,7 @@
         function onLlmKeyChange() {
             const keyEl = document.getElementById('llmKey');
             if (!keyEl) return;
-            const key = (keyEl.value || '1').trim();
+            const key = (keyEl.value || '4').trim();
             try {
                 localStorage.setItem('plotextract_llm_key_ex2', key);
             } catch (_) {}
@@ -1082,7 +1083,7 @@
 
         function getLlmSelection() {
             const keyEl = document.getElementById('llmKey');
-            const key = ((keyEl && keyEl.value) ? keyEl.value : '1').trim();
+            const key = ((keyEl && keyEl.value) ? keyEl.value : '4').trim();
             try {
                 localStorage.setItem('plotextract_llm_key_ex2', key);
             } catch (_) {}
@@ -1092,7 +1093,7 @@
                 return { llm_provider: 'google', llm_model: 'gemma-3-27b-it' };
             }
 
-            // Key 1 => Mistral
+            // Key 1/4 => Mistral
             return { llm_provider: 'mistral', llm_model: 'mistral-large-2512' };
         }
         

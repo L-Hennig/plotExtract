@@ -792,6 +792,20 @@
                     Run Pointwise Comparison
                 </label>
             </div>
+
+            <div class="row" style="margin-top: 10px;">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="llmModelEx1">LLM Model (EX 1):</label>
+                        <select id="llmModelEx1" onchange="onLlmModelEx1Change()">
+                            <option value="mistral-large-2512">mistral-large-2512</option>
+                            <option value="pixtral-large-2411">pixtral-large-2411</option>
+                            <option value="pixtral-large-latest">pixtral-large-latest</option>
+                        </select>
+                        <small style="display:block; margin-top:4px; color:#666;">This sets <code>PLOTEXTRACT_MISTRAL_MODEL</code> for <code>plotExtract.py</code>.</small>
+                    </div>
+                </div>
+            </div>
             
             <!-- Batch-only: Auto-detect axis ranges -->
             <div id="autoDetectAxisSection" class="checkbox-group batch-section" style="display: none;">
@@ -964,6 +978,7 @@
             const savedBottomY = localStorage.getItem('axisBottomY');
             const savedTopY = localStorage.getItem('axisTopY');
             const savedPrompt = localStorage.getItem('lastPrompt_ex1');
+            const savedModelEx1 = localStorage.getItem('plotextract_llm_model_ex1');
             
             if (savedLeftX !== null) document.getElementById('leftX').value = savedLeftX;
             if (savedRightX !== null) document.getElementById('rightX').value = savedRightX;
@@ -987,6 +1002,19 @@
                     if (option.value === savedPrompt) {
                         batchPromptSelect.value = savedPrompt;
                         break;
+                    }
+                }
+            }
+
+            // Restore EX1 model selection
+            if (savedModelEx1 !== null) {
+                const modelEl = document.getElementById('llmModelEx1');
+                if (modelEl) {
+                    for (let option of modelEl.options) {
+                        if (option.value === savedModelEx1) {
+                            modelEl.value = savedModelEx1;
+                            break;
+                        }
                     }
                 }
             }
@@ -1027,6 +1055,14 @@
             // Save prompt selection and sync with single mode dropdown
             localStorage.setItem('lastPrompt_ex1', promptFile);
             document.getElementById('promptSelect').value = promptFile;
+        }
+
+        function onLlmModelEx1Change() {
+            const modelEl = document.getElementById('llmModelEx1');
+            if (!modelEl) return;
+            try {
+                localStorage.setItem('plotextract_llm_model_ex1', modelEl.value || '');
+            } catch (_) {}
         }
         
         function updateCsvInfo() {
@@ -1256,6 +1292,12 @@
             localStorage.setItem('axisBottomY', bottomY);
             localStorage.setItem('axisTopY', topY);
             localStorage.setItem('lastPrompt_ex1', promptFile);
+
+            const llmModelEl = document.getElementById('llmModelEx1');
+            const llmModel = llmModelEl ? (llmModelEl.value || '') : '';
+            try {
+                localStorage.setItem('plotextract_llm_model_ex1', llmModel);
+            } catch (_) {}
             
             fetch('/run_all', {
                 method: 'POST',
@@ -1263,6 +1305,7 @@
                 body: JSON.stringify({
                     image: imagePath,
                     prompt: promptFile,
+                    llm_model: llmModel || null,
                     runInterpolation: document.getElementById('runInterpolation').checked,
                     runPointwise: document.getElementById('runPointwise').checked,
                     leftX: leftX,
@@ -1743,12 +1786,15 @@
             }
             
             // Use the same /run_all endpoint as single mode, but wait for completion synchronously
+            const llmModelEl = document.getElementById('llmModelEx1');
+            const llmModel = llmModelEl ? (llmModelEl.value || '') : '';
             const response = await fetch('/run_all', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     image: imagePath,
                     prompt: promptFile,
+                    llm_model: llmModel || null,
                     batch_number: batchNumber,
                     runInterpolation: runInterpolation,
                     runPointwise: runPointwise,

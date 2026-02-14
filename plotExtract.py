@@ -19,7 +19,19 @@ if len(sys.argv) < 3:
   sys.exit(1)
 
 # Loads API key from .env file
-api_key = os.getenv("API_KEY_1")
+def _select_mistral_api_key() -> str:
+  key = (os.getenv("PLOTEXTRACT_LLM_KEY") or "").strip() or "4"
+  if key == "1":
+    return os.getenv("API_KEY_1") or ""
+  if key == "3":
+    return os.getenv("API_KEY_3") or os.getenv("API_KEY_1") or ""
+  if key == "4":
+    return os.getenv("API_KEY_4") or os.getenv("API_KEY_3") or os.getenv("API_KEY_1") or ""
+  return os.getenv("API_KEY_4") or os.getenv("API_KEY_3") or os.getenv("API_KEY_1") or ""
+
+api_key = _select_mistral_api_key()
+if not api_key:
+  raise RuntimeError("Missing Mistral API key. Set API_KEY_4 (preferred), or API_KEY_3, or API_KEY_1")
 
 input_plot = sys.argv[1]
 input_dir = os.path.dirname(input_plot)
@@ -425,6 +437,272 @@ print("Replotting with extracted data... ", end = '', flush=True)
 _orig_plt_savefig = plt.savefig
 _orig_fig_savefig = mpl_figure.Figure.savefig
 
+_plotextract_in_overlay_save = False
+
+def _derive_overlay_paths_from_replot(path: str):
+  p = str(path)
+  if '-replot.' in p:
+    full_p = p.replace('-replot.', '-replot_overlay_full.', 1)
+    minmax_p = p.replace('-replot.', '-replot_overlay_minmax.', 1)
+    return full_p, minmax_p
+  if p.lower().endswith('.png'):
+    stem = p[:-4]
+    return stem + '_overlay_full.png', stem + '_overlay_minmax.png'
+  return p + '_overlay_full', p + '_overlay_minmax'
+
+def _format_tick_val(v):
+  try:
+    # Keep labels compact; works for ints and floats.
+    return f"{float(v):.6g}"
+  except Exception:
+    try:
+      return str(v)
+    except Exception:
+      return ''
+
+def _save_transparent_replot_overlay(fig, out_path: str, axis_mode: str = 'full', save_kwargs=None):
+  """Save a transparent overlay PNG of the current figure.
+
+  - axis_mode='full': keep axes as-is (but transparent background)
+  - axis_mode='minmax': simplify ticks to only show min/max for each axis
+  """
+  import os
+  try:
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+  except Exception:
+    pass
+
+  # Snapshot + modify style.
+  fig_patch_alpha = None
+  try:
+    fig_patch_alpha = fig.patch.get_alpha()
+    fig.patch.set_alpha(0.0)
+  except Exception:
+    fig_patch_alpha = None
+
+  per_ax_state = []
+  try:
+    axes = getattr(fig, 'axes', []) or []
+  except Exception:
+    axes = []
+
+  for ax in axes:
+    st = {
+      'ax': ax,
+      'patch_alpha': None,
+      'lines': [],
+      'collections': [],
+      'x_major_locator': None,
+      'x_major_formatter': None,
+      'x_minor_locator': None,
+      'x_minor_formatter': None,
+      'y_major_locator': None,
+      'y_major_formatter': None,
+      'y_minor_locator': None,
+      'y_minor_formatter': None,
+      'xticks': None,
+      'yticks': None,
+    }
+    try:
+      st['patch_alpha'] = ax.patch.get_alpha()
+      ax.patch.set_alpha(0.0)
+    except Exception:
+      st['patch_alpha'] = None
+
+    # Recolor lines to red.
+    try:
+      for ln in ax.get_lines() or []:
+        try:
+          st['lines'].append((ln, ln.get_color(), ln.get_alpha(), ln.get_linewidth()))
+          ln.set_color('#ef4444')
+          if ln.get_alpha() is None:
+            ln.set_alpha(1.0)
+        except Exception:
+          continue
+    except Exception:
+      pass
+
+    # Recolor common collection artists (scatter, etc.).
+    try:
+      for coll in getattr(ax, 'collections', []) or []:
+        try:
+          ec = coll.get_edgecolor()
+        except Exception:
+          ec = None
+        try:
+          fc = coll.get_facecolor()
+        except Exception:
+          fc = None
+        st['collections'].append((coll, ec, fc))
+        try:
+          coll.set_edgecolor('#ef4444')
+        except Exception:
+          pass
+        try:
+          coll.set_facecolor('#ef4444')
+        except Exception:
+          pass
+    except Exception:
+      pass
+
+    if axis_mode == 'minmax':
+      try:
+        st['x_major_locator'] = ax.xaxis.get_major_locator()
+        st['x_major_formatter'] = ax.xaxis.get_major_formatter()
+        st['x_minor_locator'] = ax.xaxis.get_minor_locator()
+        st['x_minor_formatter'] = ax.xaxis.get_minor_formatter()
+        st['y_major_locator'] = ax.yaxis.get_major_locator()
+        st['y_major_formatter'] = ax.yaxis.get_major_formatter()
+        st['y_minor_locator'] = ax.yaxis.get_minor_locator()
+        st['y_minor_formatter'] = ax.yaxis.get_minor_formatter()
+
+        xmin, xmax = ax.get_xlim()
+        ymin, ymax = ax.get_ylim()
+        st['xticks'] = ax.get_xticks()
+        st['yticks'] = ax.get_yticks()
+
+        ax.set_xticks([xmin, xmax])
+        ax.set_yticks([ymin, ymax])
+        ax.set_xticklabels([_format_tick_val(xmin), _format_tick_val(xmax)])
+        ax.set_yticklabels([_format_tick_val(ymin), _format_tick_val(ymax)])
+        try:
+          ax.minorticks_off()
+        except Exception:
+          pass
+      except Exception:
+        pass
+
+    per_ax_state.append(st)
+
+  dpi = None
+  bbox_inches = None
+  pad_inches = None
+  try:
+    sk = save_kwargs or {}
+    dpi = sk.get('dpi', None)
+    bbox_inches = sk.get('bbox_inches', None)
+    pad_inches = sk.get('pad_inches', None)
+  except Exception:
+    dpi = None
+    bbox_inches = None
+    pad_inches = None
+
+  if dpi is None:
+    dpi = 300
+  if bbox_inches is None:
+    bbox_inches = 'tight'
+
+  try:
+    # Use the original Figure.savefig to bypass our patched wrapper.
+    _orig_fig_savefig(
+      fig,
+      out_path,
+      dpi=dpi,
+      bbox_inches=bbox_inches,
+      pad_inches=pad_inches,
+      transparent=True,
+      facecolor='none',
+      edgecolor='none',
+    )
+  except Exception:
+    # Best-effort only.
+    pass
+  finally:
+    # Restore axes modifications.
+    for st in per_ax_state:
+      ax = st.get('ax')
+      if not ax:
+        continue
+      try:
+        if st.get('patch_alpha') is not None:
+          ax.patch.set_alpha(st['patch_alpha'])
+      except Exception:
+        pass
+
+      for (ln, c, a, lw) in st.get('lines', []) or []:
+        try:
+          ln.set_color(c)
+          ln.set_alpha(a)
+          ln.set_linewidth(lw)
+        except Exception:
+          continue
+
+      for (coll, ec, fc) in st.get('collections', []) or []:
+        try:
+          if ec is not None:
+            coll.set_edgecolor(ec)
+        except Exception:
+          pass
+        try:
+          if fc is not None:
+            coll.set_facecolor(fc)
+        except Exception:
+          pass
+
+      if axis_mode == 'minmax':
+        try:
+          if st.get('x_major_locator') is not None:
+            ax.xaxis.set_major_locator(st['x_major_locator'])
+          if st.get('x_major_formatter') is not None:
+            ax.xaxis.set_major_formatter(st['x_major_formatter'])
+          if st.get('x_minor_locator') is not None:
+            ax.xaxis.set_minor_locator(st['x_minor_locator'])
+          if st.get('x_minor_formatter') is not None:
+            ax.xaxis.set_minor_formatter(st['x_minor_formatter'])
+          if st.get('y_major_locator') is not None:
+            ax.yaxis.set_major_locator(st['y_major_locator'])
+          if st.get('y_major_formatter') is not None:
+            ax.yaxis.set_major_formatter(st['y_major_formatter'])
+          if st.get('y_minor_locator') is not None:
+            ax.yaxis.set_minor_locator(st['y_minor_locator'])
+          if st.get('y_minor_formatter') is not None:
+            ax.yaxis.set_minor_formatter(st['y_minor_formatter'])
+        except Exception:
+          pass
+
+    try:
+      if fig_patch_alpha is not None:
+        fig.patch.set_alpha(fig_patch_alpha)
+    except Exception:
+      pass
+
+def _maybe_emit_replot_overlay_variants(fig, save_args, save_kwargs):
+  global _plotextract_in_overlay_save
+  if _plotextract_in_overlay_save:
+    return
+
+  # Determine the save path (best-effort).
+  out_path = None
+  try:
+    if save_args and isinstance(save_args[0], (str, os.PathLike)):
+      out_path = os.fspath(save_args[0])
+  except Exception:
+    out_path = None
+
+  if not out_path:
+    return
+  try:
+    if not str(out_path).lower().endswith('.png'):
+      return
+  except Exception:
+    return
+
+  try:
+    if os.path.abspath(str(out_path)) != os.path.abspath(str(replot_plot)):
+      return
+  except Exception:
+    # If abspath fails, fall back to string compare.
+    if str(out_path) != str(replot_plot):
+      return
+
+  overlay_full, overlay_minmax = _derive_overlay_paths_from_replot(str(out_path))
+  try:
+    _plotextract_in_overlay_save = True
+    _save_transparent_replot_overlay(fig, overlay_full, axis_mode='full', save_kwargs=save_kwargs)
+    _save_transparent_replot_overlay(fig, overlay_minmax, axis_mode='minmax', save_kwargs=save_kwargs)
+  finally:
+    _plotextract_in_overlay_save = False
+
 def _apply_replot_axis_policy(fig):
   try:
     axes = getattr(fig, 'axes', []) or []
@@ -452,11 +730,21 @@ def _patched_plt_savefig(*args, **kwargs):
     _apply_replot_axis_policy(plt.gcf())
   except Exception:
     pass
-  return _orig_plt_savefig(*args, **kwargs)
+  ret = _orig_plt_savefig(*args, **kwargs)
+  try:
+    _maybe_emit_replot_overlay_variants(plt.gcf(), args, kwargs)
+  except Exception:
+    pass
+  return ret
 
 def _patched_fig_savefig(self, *args, **kwargs):
   _apply_replot_axis_policy(self)
-  return _orig_fig_savefig(self, *args, **kwargs)
+  ret = _orig_fig_savefig(self, *args, **kwargs)
+  try:
+    _maybe_emit_replot_overlay_variants(self, args, kwargs)
+  except Exception:
+    pass
+  return ret
 
 plt.savefig = _patched_plt_savefig
 mpl_figure.Figure.savefig = _patched_fig_savefig

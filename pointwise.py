@@ -48,7 +48,15 @@ def _try_init_mistral_client():
     except Exception:
         return None
 
-    api_key = os.getenv("API_KEY_1")
+    key = (os.getenv("PLOTEXTRACT_LLM_KEY") or "").strip() or "4"
+    if key == "1":
+        api_key = os.getenv("API_KEY_1")
+    elif key == "3":
+        api_key = os.getenv("API_KEY_3") or os.getenv("API_KEY_1")
+    elif key == "4":
+        api_key = os.getenv("API_KEY_4") or os.getenv("API_KEY_3") or os.getenv("API_KEY_1")
+    else:
+        api_key = os.getenv("API_KEY_4") or os.getenv("API_KEY_3") or os.getenv("API_KEY_1")
     if not api_key:
         return None
     try:

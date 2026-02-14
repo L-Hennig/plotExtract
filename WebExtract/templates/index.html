@@ -106,15 +106,22 @@
           </div>
 
           <div id="llmControls" style="display:none; margin: 8px 0 12px;">
-            <label class="label" for="llmProvider" style="margin-top: 2px;">LLM (EX 2)</label>
+            <label class="label" for="llmProvider" style="margin-top: 2px;">LLM</label>
             <div class="row">
               <select id="llmProvider" class="select" aria-label="LLM provider">
-                <option value="mistral">Key1 — Mistral</option>
+                <option value="mistral">Key4 — Mistral</option>
                 <option value="google">Key2 — Google</option>
               </select>
               <select id="llmModel" class="select" aria-label="LLM model"></select>
             </div>
-            <div class="muted" style="margin-top: 6px;">Only applies to EX 2 prompts.</div>
+            <div style="margin-top: 10px;">
+              <label class="check">
+                <input id="chkBackoffMode" type="checkbox" />
+                Rate limit backoff mode (slower, no timeout)
+              </label>
+              <div class="muted" style="margin-top: 4px;">Adds pacing between LLM calls and disables the server-side extraction timeout.</div>
+            </div>
+            <div class="muted" style="margin-top: 6px;">EX1: model only (Mistral). EX2: provider + model.</div>
           </div>
 
           <div class="row">
@@ -171,17 +178,25 @@
                     <div class="muted" style="margin: 0;">Overlay adjust</div>
                     <select id="overlayAdjustTarget" class="select select--sm" aria-label="Overlay adjust target">
                       <option value="both">Both</option>
-                      <option value="original">Original</option>
-                      <option value="replot">Replot</option>
+                      <option value="original">Curves</option>
+                      <option value="replot">Overlay replot</option>
                     </select>
+                    <button id="btnOverlayAxesMode" class="btn btn-sm" type="button" aria-label="Overlay axes mode">Axes: Full</button>
                   </div>
                   <div class="overlayAdjust__scale" aria-label="Overlay scale controls">
-                    <button id="btnOverlaySmaller" class="btn btn-sm overlayBtn" type="button" aria-label="Smaller">
-                      <img class="overlayBtn__icon" src="/static/icons/overlay_scale_down.png" alt="" />
+                    <button id="btnOverlayWidthDown" class="btn btn-sm overlayBtn" type="button" aria-label="Decrease width">
+                      <span class="overlayBtn__text" style="display:inline;">Width-</span>
                     </button>
                     <button id="btnOverlayReset" class="btn btn-sm overlayBtn" type="button" aria-label="Reset">Reset</button>
-                    <button id="btnOverlayBigger" class="btn btn-sm overlayBtn" type="button" aria-label="Bigger">
-                      <img class="overlayBtn__icon" src="/static/icons/overlay_scale_up.png" alt="" />
+                    <button id="btnOverlayWidthUp" class="btn btn-sm overlayBtn" type="button" aria-label="Increase width">
+                      <span class="overlayBtn__text" style="display:inline;">Width+</span>
+                    </button>
+                    <button id="btnOverlayHeightDown" class="btn btn-sm overlayBtn" type="button" aria-label="Decrease height">
+                      <span class="overlayBtn__text" style="display:inline;">Height-</span>
+                    </button>
+                    <div class="overlayAdjust__spacer" aria-hidden="true"></div>
+                    <button id="btnOverlayHeightUp" class="btn btn-sm overlayBtn" type="button" aria-label="Increase height">
+                      <span class="overlayBtn__text" style="display:inline;">Height+</span>
                     </button>
                   </div>
                   <div class="overlayAdjust__pad" aria-label="Overlay move controls">
@@ -252,6 +267,7 @@
   const llmControls = document.getElementById('llmControls');
   const llmProvider = document.getElementById('llmProvider');
   const llmModel = document.getElementById('llmModel');
+  const chkBackoffMode = document.getElementById('chkBackoffMode');
 
   const chkTestResults = document.getElementById('chkTestResults');
 
@@ -287,8 +303,11 @@
   const chkAxesDebug = document.getElementById('chkAxesDebug');
   const overlayAdjustControls = document.getElementById('overlayAdjustControls');
   const overlayAdjustTarget = document.getElementById('overlayAdjustTarget');
-  const btnOverlayBigger = document.getElementById('btnOverlayBigger');
-  const btnOverlaySmaller = document.getElementById('btnOverlaySmaller');
+  const btnOverlayAxesMode = document.getElementById('btnOverlayAxesMode');
+  const btnOverlayWidthUp = document.getElementById('btnOverlayWidthUp');
+  const btnOverlayWidthDown = document.getElementById('btnOverlayWidthDown');
+  const btnOverlayHeightUp = document.getElementById('btnOverlayHeightUp');
+  const btnOverlayHeightDown = document.getElementById('btnOverlayHeightDown');
   const btnOverlayReset = document.getElementById('btnOverlayReset');
   const btnOverlayUp = document.getElementById('btnOverlayUp');
   const btnOverlayDown = document.getElementById('btnOverlayDown');
@@ -380,10 +399,13 @@
 
   // Manual overlay adjustment (display-space transform per image)
   let overlayAdjust = {
-    original: { s: 1.0, dx: 0.0, dy: 0.0 },
-    replot: { s: 1.0, dx: 0.0, dy: 0.0 },
+    original: { sx: 1.0, sy: 1.0, dx: 0.0, dy: 0.0 },
+    replot: { sx: 1.0, sy: 1.0, dx: 0.0, dy: 0.0 },
     target: 'both',
   };
+
+  // Overlay replot axes mode (transparent overlay image): 'full' | 'minmax'
+  let replotOverlayAxesMode = 'full';
 
   function _loadOverlayAdjustPref() {
     try {
@@ -392,14 +414,30 @@
         const obj = JSON.parse(raw);
         const o = obj && obj.original ? obj.original : null;
         const r = obj && obj.replot ? obj.replot : null;
+
+        const _readScale = (v) => {
+          // Back-compat: older prefs stored a single `s`.
+          const sx = _safeNumber(v && v.sx);
+          const sy = _safeNumber(v && v.sy);
+          const s = _safeNumber(v && v.s);
+          return {
+            sx: sx ?? s ?? 1.0,
+            sy: sy ?? s ?? 1.0,
+          };
+        };
+
+        const os = _readScale(o);
+        const rs = _readScale(r);
         overlayAdjust = {
           original: {
-            s: _safeNumber(o && o.s) ?? 1.0,
+            sx: os.sx,
+            sy: os.sy,
             dx: _safeNumber(o && o.dx) ?? 0.0,
             dy: _safeNumber(o && o.dy) ?? 0.0,
           },
           replot: {
-            s: _safeNumber(r && r.s) ?? 1.0,
+            sx: rs.sx,
+            sy: rs.sy,
             dx: _safeNumber(r && r.dx) ?? 0.0,
             dy: _safeNumber(r && r.dy) ?? 0.0,
           },
@@ -409,6 +447,22 @@
     } catch (_) {}
 
     if (overlayAdjustTarget) overlayAdjustTarget.value = overlayAdjust.target || 'both';
+  }
+
+  function _loadReplotOverlayAxesModePref() {
+    try {
+      const v = localStorage.getItem('plotextract_replot_overlay_axes_mode');
+      if (v === 'minmax' || v === 'full') replotOverlayAxesMode = v;
+    } catch (_) {}
+    if (btnOverlayAxesMode) {
+      btnOverlayAxesMode.textContent = (replotOverlayAxesMode === 'minmax') ? 'Axes: Min/Max' : 'Axes: Full';
+    }
+  }
+
+  function _saveReplotOverlayAxesModePref() {
+    try {
+      localStorage.setItem('plotextract_replot_overlay_axes_mode', replotOverlayAxesMode);
+    } catch (_) {}
   }
 
   function _saveOverlayAdjustPref() {
@@ -520,13 +574,25 @@
     const { pipeline } = getPipelineAndPrompt();
     articleInfoWrap.style.display = (pipeline === 'ex2') ? 'block' : 'none';
     if (llmControls) {
-      llmControls.style.display = (pipeline === 'ex2') ? 'block' : 'none';
+      llmControls.style.display = 'block';
+      // EX1 uses plotExtract.py (Mistral only). Lock provider, but allow model selection.
+      if (llmProvider) {
+        if (pipeline === 'ex1') {
+          llmProvider.value = 'mistral';
+          llmProvider.disabled = true;
+        } else {
+          llmProvider.disabled = false;
+        }
+      }
+      // Ensure the model dropdown is always populated when switching prompts.
+      _refreshModelOptions(llmModel ? (llmModel.value || null) : null);
     }
   }
 
   const LLM_MODELS = {
     mistral: [
       { id: 'mistral-large-2512', label: 'mistral-large-2512' },
+      { id: 'pixtral-large-2411', label: 'pixtral-large-2411' },
       { id: 'pixtral-large-latest', label: 'pixtral-large-latest' }
     ],
     google: [
@@ -560,7 +626,10 @@
 
   function _loadSavedLlmSelection() {
     if (!llmProvider || !llmModel) return;
-    const savedProvider = localStorage.getItem('plotextract_llm_provider_web') || 'mistral';
+    let savedProvider = localStorage.getItem('plotextract_llm_provider_web') || 'mistral';
+    if (!Object.prototype.hasOwnProperty.call(LLM_MODELS, savedProvider)) {
+      savedProvider = 'mistral';
+    }
     const savedModel = localStorage.getItem('plotextract_llm_model_web') || '';
     llmProvider.value = savedProvider;
     _refreshModelOptions(savedModel);
@@ -571,6 +640,25 @@
     const model = llmModel ? (llmModel.value || '') : '';
     if (!provider) return { llm_provider: null, llm_model: null };
     return { llm_provider: provider, llm_model: model || null };
+  }
+
+  function _loadBackoffPref() {
+    if (!chkBackoffMode) return;
+    try {
+      const v = localStorage.getItem('plotextract_backoff_mode_web');
+      chkBackoffMode.checked = (v === '1');
+    } catch (_) {}
+  }
+
+  function _saveBackoffPref() {
+    if (!chkBackoffMode) return;
+    try {
+      localStorage.setItem('plotextract_backoff_mode_web', chkBackoffMode.checked ? '1' : '0');
+    } catch (_) {}
+  }
+
+  function _getBackoffMode() {
+    return !!(chkBackoffMode && chkBackoffMode.checked);
   }
 
   async function uploadFile(file) {
@@ -897,6 +985,210 @@
     }
   }
 
+  // ========= TIDY (long) CFU EXPORT (Excel template: sheet `cfu`) =========
+
+  const TIDY_CFU_COLUMNS = [
+    'Time',
+    'Log10cfu',
+    'BLOD',
+    'LOD',
+    'Conc1',
+    'Antibiotic1',
+    'Conc2',
+    'Antibiotic2',
+    'Conc3',
+    'Antibiotic3',
+    'Strain'
+  ];
+
+  // If you know the experiment-wide LOD (in log10 CFU/mL), set it here.
+  // When set, we'll flag BLOD=1 if Log10cfu < LOD.
+  const DEFAULT_LOD_LOG10 = '';
+
+  // Optional: default strain value for the export.
+  // If empty, we will try to infer from accumulated facts (if available).
+  const DEFAULT_STRAIN = '';
+
+  function _csvEscapeCell(cell) {
+    const s = String(cell ?? '');
+    if (s.includes('"') || s.includes(',') || s.includes('\n')) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+
+  function _downloadBlob(csvText, filename) {
+    const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function _normMicro(s) {
+    // Normalize micro sign variants so parsing is stable.
+    return String(s ?? '').replace(/\u03BC/g, '\u00B5'); // μ -> µ
+  }
+
+  function _getDefaultStrainFromFacts() {
+    if (DEFAULT_STRAIN) return DEFAULT_STRAIN;
+    try {
+      const ctx = accumulatedFacts && accumulatedFacts.article_info && accumulatedFacts.article_info.experimental_context;
+      const org = ctx && ctx.organism ? String(ctx.organism).trim() : '';
+      if (org) return org;
+    } catch (_) {}
+    return '';
+  }
+
+  function _parseTreatmentPartForExcel(raw) {
+    // Returns { antibiotic: string, conc: string }
+    // Handles labels like:
+    // - "COL 0.125µg/mL"
+    // - "MEM 4 µg/mL"
+    // - "Blank" / "Control"
+    const text = _normMicro(String(raw ?? '')).trim();
+    if (!text) return { antibiotic: '', conc: '' };
+
+    const lower = text.toLowerCase();
+    if (/(blank|media only|no bacteria)/i.test(text)) return { antibiotic: 'Blank', conc: '' };
+    if (/(control|untreated|no drug|growth control)/i.test(text)) return { antibiotic: 'Control', conc: '' };
+
+    // Try: NAME + NUMBER (+ optional unit)
+    // We store only the numeric concentration in ConcN to match the template.
+    const normalized = _normMicro(text);
+    const m = /^(.+?)\s+([0-9]+(?:\.[0-9]+)?)\s*(?:[\u00B5u]?g\/mL|mg\/mL|ng\/mL|[\u00B5u]?M|mM)?\s*$/i.exec(normalized);
+    if (m) {
+      return { antibiotic: m[1].trim(), conc: m[2] };
+    }
+
+    // Fallback: if there's no concentration, treat the full text as the antibiotic name.
+    return { antibiotic: text, conc: '' };
+  }
+
+  function _parseCurveLabelToExcelFields(curveLabel) {
+    // Split on '+' for combo treatments. Keep original order.
+    const raw = String(curveLabel ?? '').trim();
+    const parts = raw.split('+').map(s => s.trim()).filter(Boolean);
+    const parsed = parts.map(_parseTreatmentPartForExcel);
+
+    const concs = ['', '', ''];
+    const abxs = ['', '', ''];
+    for (let i = 0; i < Math.min(3, parsed.length); i++) {
+      concs[i] = parsed[i].conc || '';
+      abxs[i] = parsed[i].antibiotic || '';
+    }
+    return { concs, abxs };
+  }
+
+  function _extractCurveSeriesFromWideCsv(csvText, allowedLabelsSetOrNull) {
+    const { headers, rows } = _parseCsvRows(csvText);
+    if (!headers.length || !rows.length) return new Map();
+
+    const grouped = _groupCsvColumnsByCurve(headers, curveStyles);
+    const out = new Map();
+
+    // Preferred paired-column format.
+    if (grouped && grouped.size > 0) {
+      for (const [label, g] of grouped.entries()) {
+        if (allowedLabelsSetOrNull && !allowedLabelsSetOrNull.has(label)) continue;
+        const pts = [];
+        for (const r of rows) {
+          const x = _safeNumber(r[g.xIdx]);
+          const y = _safeNumber(r[g.yIdx]);
+          if (x == null || y == null) continue;
+          pts.push({ x, y });
+        }
+        out.set(label, pts);
+      }
+      return out;
+    }
+
+    // Fallback classic wide: [time, curve1, curve2, ...]
+    const timeIdx = 0;
+    for (let i = 1; i < headers.length; i++) {
+      const label = String(headers[i] ?? '').trim();
+      if (!label) continue;
+      if (allowedLabelsSetOrNull && !allowedLabelsSetOrNull.has(label)) continue;
+      const pts = [];
+      for (const r of rows) {
+        const x = _safeNumber(r[timeIdx]);
+        const y = _safeNumber(r[i]);
+        if (x == null || y == null) continue;
+        pts.push({ x, y });
+      }
+      out.set(label, pts);
+    }
+    return out;
+  }
+
+  function _buildTidyCfuCsvFromCurveSeries(curveOrder, curveToSeries) {
+    const strain = _getDefaultStrainFromFacts();
+    const lodNum = DEFAULT_LOD_LOG10 === '' ? null : _safeNumber(DEFAULT_LOD_LOG10);
+
+    const labels = Array.isArray(curveOrder) ? curveOrder.slice() : Array.from(curveToSeries.keys());
+    // Deterministic curve ordering.
+    labels.sort((a, b) => String(a).toLowerCase().localeCompare(String(b).toLowerCase()));
+
+    const rowsOut = [];
+    for (const label of labels) {
+      const pts = (curveToSeries.get(label) || []).slice().sort((p1, p2) => (p1.x - p2.x));
+      const { concs, abxs } = _parseCurveLabelToExcelFields(label);
+
+      for (const p of pts) {
+        const x = _safeNumber(p.x);
+        const y = _safeNumber(p.y);
+        if (x == null || y == null) continue;
+
+        const blod = (lodNum != null && y < lodNum) ? 1 : '';
+        const row = {
+          Time: x,
+          Log10cfu: y,
+          BLOD: blod,
+          LOD: lodNum != null ? lodNum : '',
+          Conc1: concs[0],
+          Antibiotic1: abxs[0],
+          Conc2: concs[1],
+          Antibiotic2: abxs[1],
+          Conc3: concs[2],
+          Antibiotic3: abxs[2],
+          Strain: strain
+        };
+        rowsOut.push(row);
+      }
+    }
+
+    // Deterministic row ordering: (Antibiotic1/2/3 + Conc1/2/3 + Time)
+    rowsOut.sort((r1, r2) => {
+      const k1 = [r1.Antibiotic1, r1.Conc1, r1.Antibiotic2, r1.Conc2, r1.Antibiotic3, r1.Conc3]
+        .map(v => String(v ?? '').toLowerCase()).join('|');
+      const k2 = [r2.Antibiotic1, r2.Conc1, r2.Antibiotic2, r2.Conc2, r2.Antibiotic3, r2.Conc3]
+        .map(v => String(v ?? '').toLowerCase()).join('|');
+      const a = k1.localeCompare(k2);
+      if (a !== 0) return a;
+      return (Number(r1.Time) - Number(r2.Time));
+    });
+
+    const lines = [];
+    lines.push(TIDY_CFU_COLUMNS.map(_csvEscapeCell).join(','));
+    for (const r of rowsOut) {
+      lines.push(TIDY_CFU_COLUMNS.map(k => _csvEscapeCell(r[k] ?? '')).join(','));
+    }
+    return lines.join('\n') + '\n';
+  }
+
+  async function downloadAllCurvesTidyCsv() {
+    const csvText = await _ensureExtractedCsvText();
+    if (!csvText) {
+      alert('Could not load extracted CSV.');
+      return;
+    }
+    const curveToSeries = _extractCurveSeriesFromWideCsv(csvText, null);
+    const out = _buildTidyCfuCsvFromCurveSeries(Array.from(curveToSeries.keys()), curveToSeries);
+    _downloadBlob(out, 'extracted_all_curves_tidy_cfu.csv');
+  }
+
   function _fitLineLeastSquares(points) {
     // points: [{x, y}] fit y = a*x + b
     const n = points.length;
@@ -1198,6 +1490,49 @@
       link.removeChild(img);
       wrap.appendChild(img);
 
+      // If this is the ORIGINAL card and we have a transparent replot overlay available,
+      // add it as an image layer directly on top of the original image.
+      if (kind === 'original') {
+        const fullUrl = galleryItemEl.dataset.replotOverlayFull || '';
+        const minmaxUrl = galleryItemEl.dataset.replotOverlayMinmax || '';
+        if (fullUrl || minmaxUrl) {
+          const overlayWrap = document.createElement('div');
+          overlayWrap.className = 'imgReplotOverlayWrap';
+          overlayWrap.setAttribute('aria-hidden', 'true');
+          overlayWrap.dataset.fullUrl = fullUrl;
+          overlayWrap.dataset.minmaxUrl = minmaxUrl;
+
+          const overlayImg = document.createElement('img');
+          overlayImg.className = 'imgReplotOverlay';
+          overlayImg.alt = '';
+          overlayImg.loading = 'lazy';
+          try {
+            const desired = (replotOverlayAxesMode === 'minmax') ? (minmaxUrl || fullUrl) : (fullUrl || minmaxUrl);
+            if (desired) overlayImg.src = desired;
+          } catch (_) {}
+          overlayImg.addEventListener('error', () => {
+            try { overlayWrap.style.display = 'none'; } catch (_) {}
+          }, { once: true });
+          overlayImg.addEventListener('load', () => {
+            _renderOverlays();
+          });
+
+          // Apply current adjustment immediately.
+          try {
+            const adj = overlayAdjust && overlayAdjust.replot ? overlayAdjust.replot : null;
+            const sx = (adj && Number.isFinite(adj.sx)) ? adj.sx : 1.0;
+            const sy = (adj && Number.isFinite(adj.sy)) ? adj.sy : 1.0;
+            const dx = (adj && Number.isFinite(adj.dx)) ? adj.dx : 0.0;
+            const dy = (adj && Number.isFinite(adj.dy)) ? adj.dy : 0.0;
+            overlayWrap.style.transform = `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px)`;
+            overlayImg.style.transform = `scale(${sx.toFixed(6)}, ${sy.toFixed(6)})`;
+          } catch (_) {}
+
+          overlayWrap.appendChild(overlayImg);
+          wrap.appendChild(overlayWrap);
+        }
+      }
+
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       svg.classList.add('imgOverlay');
       svg.setAttribute('data-kind', kind);
@@ -1207,6 +1542,46 @@
       link.appendChild(wrap);
     }
     return wrap;
+  }
+
+  function _syncReplotOverlayLayers() {
+    if (!resultGallery) return;
+    const items = Array.from(resultGallery.querySelectorAll('.gallery__item'));
+    for (const item of items) {
+      const kind = item.dataset.kind || (((item.querySelector('.gallery__title')?.textContent || '').toLowerCase().includes('original')) ? 'original' : 'replot');
+      if (kind !== 'original') continue;
+
+      const wrap = item.querySelector('.imgOverlayWrap');
+      if (!wrap) continue;
+      const overlayWrap = wrap.querySelector('.imgReplotOverlayWrap');
+      const overlayImg = overlayWrap ? overlayWrap.querySelector('img.imgReplotOverlay') : null;
+      if (!overlayWrap || !overlayImg) continue;
+
+      const fullUrl = overlayWrap.dataset.fullUrl || '';
+      const minmaxUrl = overlayWrap.dataset.minmaxUrl || '';
+      const desired = (replotOverlayAxesMode === 'minmax') ? (minmaxUrl || fullUrl) : (fullUrl || minmaxUrl);
+      if (!desired) {
+        try { overlayWrap.style.display = 'none'; } catch (_) {}
+        continue;
+      }
+
+      // Source swap for axes mode.
+      if (overlayImg.getAttribute('src') !== desired) {
+        overlayImg.src = desired;
+      }
+      try { overlayWrap.style.display = 'block'; } catch (_) {}
+
+      // Apply manual adjustments to the OVERLAY REPLOT layer.
+      const adj = overlayAdjust && overlayAdjust.replot ? overlayAdjust.replot : null;
+      const sx = (adj && Number.isFinite(adj.sx)) ? adj.sx : 1.0;
+      const sy = (adj && Number.isFinite(adj.sy)) ? adj.sy : 1.0;
+      const dx = (adj && Number.isFinite(adj.dx)) ? adj.dx : 0.0;
+      const dy = (adj && Number.isFinite(adj.dy)) ? adj.dy : 0.0;
+
+      // Keep translation independent of scaling by splitting transforms across wrapper/img.
+      try { overlayWrap.style.transform = `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px)`; } catch (_) {}
+      try { overlayImg.style.transform = `scale(${sx.toFixed(6)}, ${sy.toFixed(6)})`; } catch (_) {}
+    }
   }
 
   function _computeContainTransform(imgEl) {
@@ -1225,6 +1600,9 @@
   function _renderOverlays() {
     const items = Array.from(resultGallery.querySelectorAll('.gallery__item'));
     if (items.length === 0) return;
+
+    // Always keep the transparent replot overlay layer in sync.
+    _syncReplotOverlayLayers();
 
     // Multi-trial overlay mode: highlight only the hovered (curve, run).
     if (trialsMode) {
@@ -1277,12 +1655,13 @@
 
         const gRoot = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         const adj = (kind === 'original') ? overlayAdjust.original : overlayAdjust.replot;
-        const s = (adj && Number.isFinite(adj.s)) ? adj.s : 1.0;
+        const sx = (adj && Number.isFinite(adj.sx)) ? adj.sx : 1.0;
+        const sy = (adj && Number.isFinite(adj.sy)) ? adj.sy : 1.0;
         const dx = (adj && Number.isFinite(adj.dx)) ? adj.dx : 0.0;
         const dy = (adj && Number.isFinite(adj.dy)) ? adj.dy : 0.0;
         const cx = tx.rect.width / 2;
         const cy = tx.rect.height / 2;
-        gRoot.setAttribute('transform', `translate(${dx.toFixed(2)} ${dy.toFixed(2)}) translate(${cx.toFixed(2)} ${cy.toFixed(2)}) scale(${s.toFixed(6)}) translate(${-cx.toFixed(2)} ${-cy.toFixed(2)})`);
+        gRoot.setAttribute('transform', `translate(${dx.toFixed(2)} ${dy.toFixed(2)}) translate(${cx.toFixed(2)} ${cy.toFixed(2)}) scale(${sx.toFixed(6)} ${sy.toFixed(6)}) translate(${-cx.toFixed(2)} ${-cy.toFixed(2)})`);
         svg.appendChild(gRoot);
 
         const pb = run.accumulatedFacts?.geometry_facts?.plot_box_px;
@@ -1376,8 +1755,9 @@
     if (hoveredCurve) active.add(hoveredCurve);
 
     for (const item of items) {
-      const title = (item.querySelector('.gallery__title')?.textContent || '').toLowerCase();
-      const kind = title.includes('original') ? 'original' : (title.includes('replot') ? 'replot' : 'other');
+      const kind = item.dataset.kind
+        || (((item.querySelector('.gallery__title')?.textContent || '').toLowerCase().includes('original')) ? 'original'
+        : (((item.querySelector('.gallery__title')?.textContent || '').toLowerCase().includes('replot')) ? 'replot' : 'other'));
       if (kind === 'other') continue;
 
       const wrap = _ensureOverlayForGalleryImage(item, kind);
@@ -1398,13 +1778,14 @@
       // Draw everything into a group so we can apply per-image manual adjustments.
       const gRoot = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       const adj = (kind === 'original') ? overlayAdjust.original : overlayAdjust.replot;
-      const s = (adj && Number.isFinite(adj.s)) ? adj.s : 1.0;
+      const sx = (adj && Number.isFinite(adj.sx)) ? adj.sx : 1.0;
+      const sy = (adj && Number.isFinite(adj.sy)) ? adj.sy : 1.0;
       const dx = (adj && Number.isFinite(adj.dx)) ? adj.dx : 0.0;
       const dy = (adj && Number.isFinite(adj.dy)) ? adj.dy : 0.0;
       const cx = tx.rect.width / 2;
       const cy = tx.rect.height / 2;
       // Translate (dx,dy) + scale around center
-      gRoot.setAttribute('transform', `translate(${dx.toFixed(2)} ${dy.toFixed(2)}) translate(${cx.toFixed(2)} ${cy.toFixed(2)}) scale(${s.toFixed(6)}) translate(${-cx.toFixed(2)} ${-cy.toFixed(2)})`);
+      gRoot.setAttribute('transform', `translate(${dx.toFixed(2)} ${dy.toFixed(2)}) translate(${cx.toFixed(2)} ${cy.toFixed(2)}) scale(${sx.toFixed(6)} ${sy.toFixed(6)}) translate(${-cx.toFixed(2)} ${-cy.toFixed(2)})`);
       svg.appendChild(gRoot);
 
       // For ORIGINAL: use mapped image pixels. For REPLOT: attempt rough normalization.
@@ -1478,6 +1859,64 @@
             gRoot.appendChild(c);
           }
         }
+
+        // Label axis ranges (min/max) for quick sanity checks.
+        const _fmtAxisVal = (v) => {
+          const n = Number(v);
+          if (!Number.isFinite(n)) return '';
+          let s = n.toFixed(4);
+          s = s.replace(/\.0+$/, '').replace(/(\.[0-9]*?)0+$/, '$1');
+          return s;
+        };
+
+        const _addText = (x, y, text, anchor = 'start') => {
+          const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          t.setAttribute('x', String(x));
+          t.setAttribute('y', String(y));
+          t.setAttribute('fill', '#2563eb');
+          t.setAttribute('font-size', '12');
+          t.setAttribute('font-family', 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace');
+          t.setAttribute('text-anchor', anchor);
+          t.setAttribute('paint-order', 'stroke');
+          t.setAttribute('stroke', 'rgba(255,255,255,0.92)');
+          t.setAttribute('stroke-width', '3');
+          t.textContent = String(text || '');
+          gRoot.appendChild(t);
+        };
+
+        const xVals = Array.isArray(xAnch)
+          ? xAnch.map(a => _safeNumber(a.x_value_hours ?? a.x_value)).filter(v => v != null)
+          : [];
+        const yRaw = Array.isArray(yAnchDebug)
+          ? yAnchDebug.map(a => _safeNumber(a.log10_value ?? a.y_value ?? a.value)).filter(v => v != null)
+          : [];
+        const yLooksLikeDecades = _looksLikePowersOfTen(yRaw);
+        const yVals = yRaw
+          .map(v => (yLooksLikeDecades && v > 0) ? Math.log10(v) : v)
+          .filter(v => v != null);
+
+        if (xVals.length >= 2) {
+          const xmin = Math.min(...xVals);
+          const xmax = Math.max(...xVals);
+          const yForX = Math.min(tx.rect.height - 4, y1 + 14);
+          _addText(x0.toFixed(1), yForX.toFixed(1), _fmtAxisVal(xmin), 'start');
+          _addText(x1.toFixed(1), yForX.toFixed(1), _fmtAxisVal(xmax), 'end');
+        }
+
+        if (yVals.length >= 2) {
+          const ymin = Math.min(...yVals);
+          const ymax = Math.max(...yVals);
+          let xForY = x0 - 8;
+          let anchor = 'end';
+          if (xForY < 8) {
+            xForY = x0 + 8;
+            anchor = 'start';
+          }
+          const yForMax = Math.max(12, y0 + 12);
+          const yForMin = Math.min(tx.rect.height - 4, y1 - 4);
+          _addText(xForY.toFixed(1), yForMax.toFixed(1), _fmtAxisVal(ymax), anchor);
+          _addText(xForY.toFixed(1), yForMin.toFixed(1), _fmtAxisVal(ymin), anchor);
+        }
       }
 
       function toDisplayPoints(ptsPx) {
@@ -1547,14 +1986,30 @@
         const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
         poly.setAttribute('fill', 'none');
         poly.setAttribute('stroke', '#ef4444');
-        // Must be thinner than the grey context stroke-width (1.5).
-        poly.setAttribute('stroke-width', isHover ? '1.25' : '1.0');
+        // Keep the red overlay line thin so it doesn't obscure the plot.
+        poly.setAttribute('stroke-width', isHover ? '0.9' : '0.6');
         poly.setAttribute('stroke-linejoin', 'round');
         poly.setAttribute('stroke-linecap', 'round');
         poly.setAttribute('opacity', isHover ? '0.98' : '0.92');
         poly.setAttribute('points', dispPoints.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '));
         poly.classList.add('overlayCurve');
         gRoot.appendChild(poly);
+
+        // Add visible red dots along the line.
+        // Sample if the polyline has many points to keep DOM light.
+        const maxDots = 90;
+        const step = Math.max(1, Math.ceil(dispPoints.length / maxDots));
+        const dotR = isHover ? 1.9 : 1.4;
+        for (let i = 0; i < dispPoints.length; i += step) {
+          const p = dispPoints[i];
+          const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          c.setAttribute('cx', p.x.toFixed(1));
+          c.setAttribute('cy', p.y.toFixed(1));
+          c.setAttribute('r', String(dotR));
+          c.setAttribute('fill', '#ef4444');
+          c.setAttribute('opacity', isHover ? '0.95' : '0.85');
+          gRoot.appendChild(c);
+        }
       }
     }
   }
@@ -1683,7 +2138,27 @@
   function renderPrimaryResults(outputs) {
     // Show original + replot side-by-side by default.
     const original = _pickOutputImage(outputs, ({ label }) => label.includes('original input'));
-    const replot = _pickOutputImage(outputs, ({ label, filename }) => label.includes('extracted replot') || filename.includes('-replot'));
+    const replot = _pickOutputImage(outputs, ({ label, filename }) => {
+      if (label.includes('extracted replot')) return true;
+      if (filename.includes('-replot_overlay')) return false;
+      return filename.includes('-replot');
+    });
+
+    function _deriveReplotOverlayUrls(replotUrl) {
+      const u = String(replotUrl || '');
+      if (!u) return { full: '', minmax: '' };
+      if (u.includes('-replot.')) {
+        return {
+          full: u.replace('-replot.', '-replot_overlay_full.'),
+          minmax: u.replace('-replot.', '-replot_overlay_minmax.'),
+        };
+      }
+      if (u.toLowerCase().endsWith('.png')) {
+        const stem = u.slice(0, -4);
+        return { full: stem + '_overlay_full.png', minmax: stem + '_overlay_minmax.png' };
+      }
+      return { full: u + '_overlay_full', minmax: u + '_overlay_minmax' };
+    }
 
     if (original || replot) {
       resultGallery.style.display = 'grid';
@@ -1693,9 +2168,21 @@
         replot ? { title: 'Replot', url: '/plots/' + replot.path } : null,
       ].filter(Boolean);
 
+      const overlayUrls = replot ? _deriveReplotOverlayUrls('/plots/' + replot.path) : { full: '', minmax: '' };
+
       for (const it of items) {
         const card = document.createElement('div');
         card.className = 'gallery__item';
+
+        // Mark kind so overlay logic doesn't rely on title text.
+        card.dataset.kind = (it.title.toLowerCase().includes('original')) ? 'original'
+          : (it.title.toLowerCase().includes('replot') ? 'replot' : 'other');
+
+        // Only the ORIGINAL card gets the transparent replot overlay layer.
+        if (card.dataset.kind === 'original') {
+          card.dataset.replotOverlayFull = overlayUrls.full || '';
+          card.dataset.replotOverlayMinmax = overlayUrls.minmax || '';
+        }
 
         const title = document.createElement('div');
         title.className = 'gallery__title';
@@ -1733,7 +2220,8 @@
     const extractedCsv = _pickExtractedCsv(outputs);
     extractedCsvMeta = extractedCsv;
     if (extractedCsv && extractedCsv.path) {
-      downloadCsvBtn.href = '/plots/' + extractedCsv.path;
+      // We export tidy/long CSV client-side; keep button visible.
+      downloadCsvBtn.href = '#';
       downloadCsvBtn.style.display = 'inline-flex';
     }
   }
@@ -2253,7 +2741,8 @@
       leftX: 0,
       rightX: 100,
       bottomY: 0,
-      topY: 100
+      topY: 100,
+      rate_limit_backoff: _getBackoffMode(),
     };
 
     let url = '/run_all';
@@ -2263,6 +2752,10 @@
       payload.debug = false;
       const { llm_provider, llm_model } = getLlmSelection();
       if (llm_provider) payload.llm_provider = llm_provider;
+      if (llm_model) payload.llm_model = llm_model;
+    } else {
+      // EX1: allow selecting Mistral model
+      const { llm_model } = getLlmSelection();
       if (llm_model) payload.llm_model = llm_model;
     }
 
@@ -2577,21 +3070,14 @@
       return;
     }
 
-    const out = _csvForConfirmedOnly(csvText, confirmedCurves);
-    if (!out) {
-      alert('Could not generate confirmed-only CSV.');
+    const curveToSeries = _extractCurveSeriesFromWideCsv(csvText, confirmedCurves);
+    if (!curveToSeries || curveToSeries.size === 0) {
+      alert('Could not generate confirmed-only tidy CSV (no points found).');
       return;
     }
 
-    const blob = new Blob([out], { type: 'text/csv;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'extracted_confirmed_only.csv';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+    const out = _buildTidyCfuCsvFromCurveSeries(Array.from(confirmedCurves), curveToSeries);
+    _downloadBlob(out, 'extracted_confirmed_only_tidy_cfu.csv');
   }
 
   async function cancelTask() {
@@ -2822,16 +3308,8 @@
       if (headerPair) curveToOutHeaders.set(label, headerPair);
     }
 
-    const csvOut = _buildWideCsvFromCurveSeries(unionCurveLabels, curveToOutSeries, curveToOutHeaders);
-    const blob = new Blob([csvOut], { type: 'text/csv;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'extracted_trials_selected_or_averaged.csv';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+    const csvOut = _buildTidyCfuCsvFromCurveSeries(unionCurveLabels, curveToOutSeries);
+    _downloadBlob(csvOut, 'extracted_trials_selected_or_averaged_tidy_cfu.csv');
   }
 
   btnCopyConsole.addEventListener('click', async () => {
@@ -2854,6 +3332,12 @@
     confirmedCurves = new Set();
     _renderCurvesTable();
     _renderOverlays();
+  });
+
+  // Export tidy/long CSV for "all curves".
+  downloadCsvBtn.addEventListener('click', async (ev) => {
+    ev.preventDefault();
+    await downloadAllCurvesTidyCsv();
   });
 
   btnDownloadTrialsCsv.addEventListener('click', downloadTrialsCsv);
@@ -2880,9 +3364,20 @@
   // Manual overlay adjustment controls
   if (overlayAdjustTarget) {
     _loadOverlayAdjustPref();
+    _loadReplotOverlayAxesModePref();
     overlayAdjustTarget.addEventListener('change', () => {
       overlayAdjust.target = overlayAdjustTarget.value || 'both';
       _saveOverlayAdjustPref();
+    });
+  }
+
+  if (btnOverlayAxesMode) {
+    _loadReplotOverlayAxesModePref();
+    btnOverlayAxesMode.addEventListener('click', () => {
+      replotOverlayAxesMode = (replotOverlayAxesMode === 'minmax') ? 'full' : 'minmax';
+      btnOverlayAxesMode.textContent = (replotOverlayAxesMode === 'minmax') ? 'Axes: Min/Max' : 'Axes: Full';
+      _saveReplotOverlayAxesModePref();
+      _syncReplotOverlayLayers();
     });
   }
 
@@ -2901,7 +3396,7 @@
     };
 
     const start = (ev) => {
-      if (!lastResult || !overlayEnabled) return;
+      if (!lastResult) return;
       ev.preventDefault();
 
       const shiftKey = !!(ev && ev.shiftKey);
@@ -2951,22 +3446,33 @@
     _applyAdjustToTargets((a) => (a.dy += step));
   });
 
-  _wireOverlayHold(btnOverlayBigger, (ev) => {
+  _wireOverlayHold(btnOverlayWidthUp, (ev) => {
     const k = _overlayScaleFromEvent(ev);
-    _applyAdjustToTargets((a) => (a.s *= k));
+    _applyAdjustToTargets((a) => (a.sx *= k));
   });
 
-  _wireOverlayHold(btnOverlaySmaller, (ev) => {
+  _wireOverlayHold(btnOverlayWidthDown, (ev) => {
     const k = _overlayScaleFromEvent(ev);
-    _applyAdjustToTargets((a) => (a.s /= k));
+    _applyAdjustToTargets((a) => (a.sx /= k));
+  });
+
+  _wireOverlayHold(btnOverlayHeightUp, (ev) => {
+    const k = _overlayScaleFromEvent(ev);
+    _applyAdjustToTargets((a) => (a.sy *= k));
+  });
+
+  _wireOverlayHold(btnOverlayHeightDown, (ev) => {
+    const k = _overlayScaleFromEvent(ev);
+    _applyAdjustToTargets((a) => (a.sy /= k));
   });
 
   // Reset is intentionally one-shot.
   if (btnOverlayReset) {
     btnOverlayReset.addEventListener('click', () => {
-      if (!lastResult || !overlayEnabled) return;
+      if (!lastResult) return;
       _applyAdjustToTargets((a) => {
-        a.s = 1.0;
+        a.sx = 1.0;
+        a.sy = 1.0;
         a.dx = 0.0;
         a.dy = 0.0;
       });
@@ -2986,6 +3492,27 @@
       localStorage.setItem('plotextract_llm_provider_web', llmProvider ? (llmProvider.value || '') : '');
       localStorage.setItem('plotextract_llm_model_web', llmModel.value || '');
     });
+  }
+  if (chkBackoffMode) {
+    chkBackoffMode.addEventListener('change', _saveBackoffPref);
+  }
+
+  function _overlayIconFallback(icon) {
+    try {
+      const btn = icon && icon.closest && icon.closest('.overlayBtn');
+      if (btn) btn.classList.add('overlayBtn--textFallback');
+    } catch (_) {}
+  }
+
+  // If overlay icon images fail to load, show Bigger/Smaller text instead.
+  // Note: images can fail *before* this script runs, so also check `naturalWidth`.
+  for (const icon of Array.from(document.querySelectorAll('img.overlayBtn__icon'))) {
+    icon.addEventListener('error', () => _overlayIconFallback(icon), { once: true });
+    try {
+      if (icon.complete && icon.naturalWidth === 0) {
+        _overlayIconFallback(icon);
+      }
+    } catch (_) {}
   }
   onPromptChanged();
 
@@ -3033,6 +3560,7 @@
 
   refreshExamples();
   _loadSavedLlmSelection();
+  _loadBackoffPref();
 })();
 </script>
 </body>

@@ -42,7 +42,19 @@ if len(sys.argv) < 7:
     sys.exit(1)
 
 # Loads API key from .env file
-api_key = os.getenv("API_KEY_1")
+def _select_mistral_api_key() -> str:
+    key = (os.getenv("PLOTEXTRACT_LLM_KEY") or "").strip() or "4"
+    if key == "1":
+        return os.getenv("API_KEY_1") or ""
+    if key == "3":
+        return os.getenv("API_KEY_3") or os.getenv("API_KEY_1") or ""
+    if key == "4":
+        return os.getenv("API_KEY_4") or os.getenv("API_KEY_3") or os.getenv("API_KEY_1") or ""
+    return os.getenv("API_KEY_4") or os.getenv("API_KEY_3") or os.getenv("API_KEY_1") or ""
+
+api_key = _select_mistral_api_key()
+if not api_key:
+    raise RuntimeError("Missing Mistral API key. Set API_KEY_4 (preferred), or API_KEY_3, or API_KEY_1")
 client = Mistral(api_key=api_key)
 
 def prompt_mistral(prompt_text):

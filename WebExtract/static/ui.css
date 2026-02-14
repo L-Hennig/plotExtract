@@ -23,7 +23,7 @@ body {
 }
 
 .container {
-  max-width: 1050px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 18px 16px;
 }
@@ -448,6 +448,28 @@ body {
   pointer-events: none;
 }
 
+/* Transparent replot image layer over the original image. */
+.imgReplotOverlayWrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  transform: translate(0px, 0px);
+  transform-origin: center center;
+}
+
+.imgReplotOverlay {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  transform: scale(1, 1);
+  transform-origin: center center;
+  pointer-events: none;
+}
+
 .overlayCurve {
   filter: drop-shadow(0 0 2px rgba(0,0,0,0.22));
 }
@@ -477,6 +499,23 @@ body {
   pointer-events: none;
 }
 
+.overlayBtn__text {
+  display: none;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  line-height: 1;
+}
+
+/* If the SVG icons fail to load (404 / blocked), show text labels instead. */
+.overlayBtn--textFallback .overlayBtn__icon {
+  display: none;
+}
+
+.overlayBtn--textFallback .overlayBtn__text {
+  display: inline;
+}
+
 .select--sm {
   width: auto;
   padding: 8px 10px;
@@ -493,10 +532,22 @@ body {
 .overlayAdjust__scale {
   display: grid;
   grid-template-columns: 1fr 1.2fr 1fr;
+  grid-template-rows: 1fr 1fr;
   gap: 8px;
   margin-top: 8px;
   align-items: center;
 }
+
+.overlayAdjust__scale .overlayAdjust__spacer {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.overlayAdjust__scale #btnOverlayWidthDown { grid-column: 1; grid-row: 1; }
+.overlayAdjust__scale #btnOverlayReset { grid-column: 2; grid-row: 1; }
+.overlayAdjust__scale #btnOverlayWidthUp { grid-column: 3; grid-row: 1; }
+.overlayAdjust__scale #btnOverlayHeightDown { grid-column: 1; grid-row: 2; }
+.overlayAdjust__scale #btnOverlayHeightUp { grid-column: 3; grid-row: 2; }
 
 .overlayAdjust__scale #btnOverlayReset {
   min-width: 70px;
