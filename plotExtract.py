@@ -450,6 +450,81 @@ def _derive_overlay_paths_from_replot(path: str):
     return stem + '_overlay_full.png', stem + '_overlay_minmax.png'
   return p + '_overlay_full', p + '_overlay_minmax'
 
+def _derive_overlay_axes_paths_from_replot(path: str):
+  p = str(path)
+  if '-replot.' in p:
+    return (
+      p.replace('-replot.', '-replot_overlay_axes_full.', 1),
+      p.replace('-replot.', '-replot_overlay_axes_minmax.', 1),
+    )
+  if p.lower().endswith('.png'):
+    stem = p[:-4]
+    return stem + '_overlay_axes_full.png', stem + '_overlay_axes_minmax.png'
+  return p + '_overlay_axes_full', p + '_overlay_axes_minmax'
+
+def _derive_overlay_curve_path_from_replot(path: str, idx: int, axis_mode: str):
+  p = str(path)
+  tag = f"-replot_overlay_curve_{idx}_{axis_mode}."
+  if '-replot.' in p:
+    return p.replace('-replot.', tag, 1)
+  suffix = f"_overlay_curve_{idx}_{axis_mode}"
+  if p.lower().endswith('.png'):
+    return p[:-4] + suffix + '.png'
+  return p + suffix
+
+def _save_axes_and_curve_overlay_layers(fig, replot_path: str, save_kwargs=None):
+  try:
+    axes = getattr(fig, 'axes', []) or []
+  except Exception:
+    axes = []
+
+  lines = []
+  for ax in axes:
+    try:
+      for ln in ax.get_lines() or []:
+        lines.append(ln)
+    except Exception:
+      continue
+
+  if not lines:
+    return
+
+  vis_state = []
+  for ln in lines:
+    try:
+      vis_state.append(bool(ln.get_visible()))
+    except Exception:
+      vis_state.append(True)
+
+  axes_full, axes_minmax = _derive_overlay_axes_paths_from_replot(replot_path)
+  try:
+    # Axes-only layers.
+    for ln in lines:
+      try:
+        ln.set_visible(False)
+      except Exception:
+        pass
+    _save_transparent_replot_overlay(fig, axes_full, axis_mode='full', save_kwargs=save_kwargs)
+    _save_transparent_replot_overlay(fig, axes_minmax, axis_mode='minmax', save_kwargs=save_kwargs)
+
+    # Per-curve layers (1-based index to match UI table order).
+    for i, ln in enumerate(lines, start=1):
+      for other in lines:
+        try:
+          other.set_visible(other is ln)
+        except Exception:
+          pass
+      out_full = _derive_overlay_curve_path_from_replot(replot_path, i, 'full')
+      out_minmax = _derive_overlay_curve_path_from_replot(replot_path, i, 'minmax')
+      _save_transparent_replot_overlay(fig, out_full, axis_mode='full', save_kwargs=save_kwargs)
+      _save_transparent_replot_overlay(fig, out_minmax, axis_mode='minmax', save_kwargs=save_kwargs)
+  finally:
+    for ln, was_vis in zip(lines, vis_state):
+      try:
+        ln.set_visible(bool(was_vis))
+      except Exception:
+        pass
+
 def _format_tick_val(v):
   try:
     # Keep labels compact; works for ints and floats.
@@ -474,11 +549,26 @@ def _save_transparent_replot_overlay(fig, out_path: str, axis_mode: str = 'full'
 
   # Snapshot + modify style.
   fig_patch_alpha = None
+  fig_legend_state = []
   try:
     fig_patch_alpha = fig.patch.get_alpha()
     fig.patch.set_alpha(0.0)
   except Exception:
     fig_patch_alpha = None
+
+  try:
+    for lg in list(getattr(fig, 'legends', []) or []):
+      try:
+        vis = bool(lg.get_visible())
+      except Exception:
+        vis = True
+      fig_legend_state.append((lg, vis))
+      try:
+        lg.set_visible(False)
+      except Exception:
+        pass
+  except Exception:
+    fig_legend_state = []
 
   per_ax_state = []
   try:
@@ -492,6 +582,8 @@ def _save_transparent_replot_overlay(fig, out_path: str, axis_mode: str = 'full'
       'patch_alpha': None,
       'lines': [],
       'collections': [],
+      'legend': None,
+      'legend_visible': None,
       'x_major_locator': None,
       'x_major_formatter': None,
       'x_minor_locator': None,
@@ -519,6 +611,21 @@ def _save_transparent_replot_overlay(fig, out_path: str, axis_mode: str = 'full'
             ln.set_alpha(1.0)
         except Exception:
           continue
+    except Exception:
+      pass
+
+    try:
+      lg = ax.get_legend()
+      if lg is not None:
+        st['legend'] = lg
+        try:
+          st['legend_visible'] = bool(lg.get_visible())
+        except Exception:
+          st['legend_visible'] = True
+        try:
+          lg.set_visible(False)
+        except Exception:
+          pass
     except Exception:
       pass
 
@@ -639,6 +746,13 @@ def _save_transparent_replot_overlay(fig, out_path: str, axis_mode: str = 'full'
         except Exception:
           pass
 
+      try:
+        lg = st.get('legend')
+        if lg is not None:
+          lg.set_visible(bool(st.get('legend_visible')))
+      except Exception:
+        pass
+
       if axis_mode == 'minmax':
         try:
           if st.get('x_major_locator') is not None:
@@ -665,6 +779,12 @@ def _save_transparent_replot_overlay(fig, out_path: str, axis_mode: str = 'full'
         fig.patch.set_alpha(fig_patch_alpha)
     except Exception:
       pass
+
+    for (lg, was_vis) in fig_legend_state:
+      try:
+        lg.set_visible(bool(was_vis))
+      except Exception:
+        pass
 
 def _maybe_emit_replot_overlay_variants(fig, save_args, save_kwargs):
   global _plotextract_in_overlay_save
@@ -700,6 +820,7 @@ def _maybe_emit_replot_overlay_variants(fig, save_args, save_kwargs):
     _plotextract_in_overlay_save = True
     _save_transparent_replot_overlay(fig, overlay_full, axis_mode='full', save_kwargs=save_kwargs)
     _save_transparent_replot_overlay(fig, overlay_minmax, axis_mode='minmax', save_kwargs=save_kwargs)
+    _save_axes_and_curve_overlay_layers(fig, str(out_path), save_kwargs=save_kwargs)
   finally:
     _plotextract_in_overlay_save = False
 

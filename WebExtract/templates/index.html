@@ -19,7 +19,7 @@
   <main class="container">
     <section class="card">
       <h1 class="h1">Extract data from a plot image</h1>
-      <p class="muted">Choose an image (upload or example), select a prompt (EX 1 or EX 2), then run extraction.</p>
+      <p class="muted">Choose an image (upload or example), select a prompt (EX 1 or EX 2), then run extraction. Examples are loaded from WebExtract/examples.</p>
 
       <div class="grid">
         <div class="panel">
@@ -44,8 +44,18 @@
           <div style="margin-top: 10px;">
             <label class="check">
               <input id="chkTestResults" type="checkbox" />
-                Test results (GA_copy1 · prompt_13 · key4.web saved run)
+              Test results (GA_copy1 · prompt_13 · key4.web saved run)
             </label>
+            <div style="margin: 8px 0 0 22px; display: grid; gap: 6px;">
+              <label class="check">
+                <input id="chkTestRunV1" type="checkbox" checked />
+                Include run v5 (GA_copy1_png.pv2_prompt_13.v5.key4.web)
+              </label>
+              <label class="check">
+                <input id="chkTestRunV2" type="checkbox" />
+                Include run v6 (GA_copy1_png.pv2_prompt_13.v6.key4.web)
+              </label>
+            </div>
             <div class="muted" style="margin-top: 4px;">When enabled, extraction will not run; the UI loads precomputed outputs from disk.</div>
           </div>
 
@@ -157,31 +167,19 @@
 
                 <div id="trialSelectionWarning" class="notice notice--warn" style="display:none; margin: 8px 0 10px;"></div>
 
-                <div id="trialExportControls" class="row" style="display:none; margin: 8px 0 10px;">
-                  <button id="btnDownloadTrialsCsv" class="btn btn-primary" type="button" disabled>Download CSV (selected / averaged)</button>
-                </div>
-
                 <div id="curvesControls" class="row" style="display:none; margin: 8px 0 10px;">
                   <button id="btnSelectAllCurves" class="btn" type="button">Select all</button>
                   <button id="btnClearAllCurves" class="btn" type="button">Clear all</button>
                 </div>
 
-                <div id="debugControls" style="display:none; margin: 0 0 10px;">
-                  <label class="check">
-                    <input id="chkAxesDebug" type="checkbox" />
-                    Show axes overlay (debug)
-                  </label>
-                </div>
-
                 <div id="overlayAdjustControls" style="display:none; margin: 0 0 12px;">
                   <div class="overlayAdjust__header">
                     <div class="muted" style="margin: 0;">Overlay adjust</div>
-                    <select id="overlayAdjustTarget" class="select select--sm" aria-label="Overlay adjust target">
-                      <option value="both">Both</option>
-                      <option value="original">Curves</option>
-                      <option value="replot">Overlay replot</option>
-                    </select>
-                    <button id="btnOverlayAxesMode" class="btn btn-sm" type="button" aria-label="Overlay axes mode">Axes: Full</button>
+                    <div id="overlayAxesModeGroup" class="segmented" role="group" aria-label="Overlay axes mode">
+                      <button id="btnOverlayAxesMinmax" class="segmented__btn" type="button" data-mode="minmax">Min/Max</button>
+                      <button id="btnOverlayAxesFull" class="segmented__btn" type="button" data-mode="full">Full</button>
+                      <button id="btnOverlayAxesNone" class="segmented__btn" type="button" data-mode="none">None</button>
+                    </div>
                   </div>
                   <div class="overlayAdjust__scale" aria-label="Overlay scale controls">
                     <button id="btnOverlayWidthDown" class="btn btn-sm overlayBtn" type="button" aria-label="Decrease width">
@@ -205,12 +203,19 @@
                     <button id="btnOverlayRight" class="btn btn-sm overlayBtn overlayBtn--right" type="button" aria-label="Right">→</button>
                     <button id="btnOverlayDown" class="btn btn-sm overlayBtn overlayBtn--down" type="button" aria-label="Down">↓</button>
                   </div>
-                  <div class="muted" style="margin-top: 6px;">Tip: hold Shift for bigger steps.</div>
+                  <div class="muted" style="margin-top: 6px;">Tip: hold Shift for smaller steps.</div>
                 </div>
 
                 <div id="curvesTableWrap" class="tableWrap" style="display:none;"></div>
 
                 <div id="trialsGridWrap" class="tableWrap" style="display:none;"></div>
+
+                <div id="trialExportControls" class="row" style="display:none; margin: 10px 0 10px;">
+                  <span id="trialDownloadTooltipWrap" style="display:inline-flex; position: relative;" title="" data-tooltip="">
+                    <button id="btnDownloadTrialsCsv" class="btn btn-primary" type="button" disabled>Download CSV (selected / averaged)</button>
+                    <span id="trialDownloadTooltip" style="display:none; position:absolute; left:0; top:calc(100% + 6px); z-index:20; max-width:360px; padding:6px 8px; border-radius:8px; font-size:12px; line-height:1.35; background:#111827; color:#fff; box-shadow:0 2px 10px rgba(0,0,0,0.25); white-space:normal;"></span>
+                  </span>
+                </div>
 
                 <div class="divider" style="margin: 12px 0;">downloads</div>
                 <div class="row">
@@ -270,6 +275,8 @@
   const chkBackoffMode = document.getElementById('chkBackoffMode');
 
   const chkTestResults = document.getElementById('chkTestResults');
+  const chkTestRunV1 = document.getElementById('chkTestRunV1');
+  const chkTestRunV2 = document.getElementById('chkTestRunV2');
 
   const progressWrap = document.getElementById('progressWrap');
   const progressFill = document.getElementById('progressFill');
@@ -292,6 +299,8 @@
 
   const trialSelectionWarning = document.getElementById('trialSelectionWarning');
   const trialExportControls = document.getElementById('trialExportControls');
+  const trialDownloadTooltipWrap = document.getElementById('trialDownloadTooltipWrap');
+  const trialDownloadTooltip = document.getElementById('trialDownloadTooltip');
   const btnDownloadTrialsCsv = document.getElementById('btnDownloadTrialsCsv');
   const curvesControls = document.getElementById('curvesControls');
   const btnSelectAllCurves = document.getElementById('btnSelectAllCurves');
@@ -299,11 +308,11 @@
   const curvesTableWrap = document.getElementById('curvesTableWrap');
   const trialsGridWrap = document.getElementById('trialsGridWrap');
   const highlightStatus = document.getElementById('highlightStatus');
-  const debugControls = document.getElementById('debugControls');
-  const chkAxesDebug = document.getElementById('chkAxesDebug');
   const overlayAdjustControls = document.getElementById('overlayAdjustControls');
-  const overlayAdjustTarget = document.getElementById('overlayAdjustTarget');
-  const btnOverlayAxesMode = document.getElementById('btnOverlayAxesMode');
+  const overlayAxesModeGroup = document.getElementById('overlayAxesModeGroup');
+  const btnOverlayAxesMinmax = document.getElementById('btnOverlayAxesMinmax');
+  const btnOverlayAxesFull = document.getElementById('btnOverlayAxesFull');
+  const btnOverlayAxesNone = document.getElementById('btnOverlayAxesNone');
   const btnOverlayWidthUp = document.getElementById('btnOverlayWidthUp');
   const btnOverlayWidthDown = document.getElementById('btnOverlayWidthDown');
   const btnOverlayHeightUp = document.getElementById('btnOverlayHeightUp');
@@ -330,7 +339,7 @@
   let curvePolylinesPx = new Map(); // curve_label -> [{x,y} in ORIGINAL image pixels]
   let overlayEnabled = false;
   let resizeObserver = null;
-  let showAxesDebug = false;
+  const originalGalleryExpanded = true;
 
   // Multi-trial state
   let trialsMode = false;
@@ -349,10 +358,28 @@
 
   // Test-results mode (load precomputed runs without executing extraction)
   let testResultsMode = false;
-    const TEST_IMAGE_PATH = 'batch_uploads/ui_ex_afc0dc42_GA_copy1.png';
+  const TEST_IMAGE_PATH = 'synthetic/G/GA_copy1/GA_copy1.png';
   const TEST_PROMPT_VALUE = 'ex2::prompt_13';
   const TEST_PROMPT_NAME = 'prompt_13';
-    const TEST_VERSION_DIR = 'batch_uploads/ui_ex_afc0dc42_GA_copy1_png.pv2_prompt_13.v1.key4.web';
+  const TEST_RUNS = [
+    { id: 'v1', label: 'v5', versionDir: 'synthetic/G/GA_copy1/GA_copy1_png.pv2_prompt_13.v5.key4.web' },
+    { id: 'v2', label: 'v6', versionDir: 'synthetic/G/GA_copy1/GA_copy1_png.pv2_prompt_13.v6.key4.web' },
+  ];
+
+  function _getSelectedTestRuns() {
+    const out = [];
+    if (chkTestRunV1 && chkTestRunV1.checked) out.push(TEST_RUNS[0]);
+    if (chkTestRunV2 && chkTestRunV2.checked) out.push(TEST_RUNS[1]);
+    return out;
+  }
+
+  function _ensureAtLeastOneTestRun(prefer = 'v1') {
+    const selected = _getSelectedTestRuns();
+    if (selected.length > 0) return selected;
+    if (prefer === 'v2' && chkTestRunV2) chkTestRunV2.checked = true;
+    else if (chkTestRunV1) chkTestRunV1.checked = true;
+    return _getSelectedTestRuns();
+  }
 
   function _setTrialCountLimit(maxN) {
     const lim = Math.max(1, Math.min(5, Number(maxN) || 5));
@@ -376,6 +403,8 @@
   function _setTestResultsMode(enabled) {
     testResultsMode = !!enabled;
     if (chkTestResults) chkTestResults.checked = testResultsMode;
+    const selectedRuns = _ensureAtLeastOneTestRun('v1');
+    const selectedCount = Math.max(1, selectedRuns.length);
 
     if (testResultsMode) {
       // Lock image + prompt
@@ -383,37 +412,158 @@
       selectedFileLabel.textContent = TEST_IMAGE_PATH;
       setPreviewFromUrl('/plots/' + TEST_IMAGE_PATH);
       clearNotice(uploadStatus);
-        setNotice(uploadStatus, 'Test mode enabled: using saved GA_copy1 prompt_13 key4.web run. Extraction will not run.', 'info');
+      setNotice(uploadStatus, 'Test mode enabled: ' + selectedCount + ' saved run(s) selected. Extraction will not run.', 'info');
 
       // Ensure prompt is set
       const opt = Array.from(promptSelect.querySelectorAll('option')).find(o => o.value === TEST_PROMPT_VALUE);
       if (opt) promptSelect.value = TEST_PROMPT_VALUE;
       onPromptChanged();
 
-      _setTrialCountLimit(3);
+      _setTrialCountLimit(selectedCount);
+      if (trialCount) trialCount.value = String(selectedCount);
       _setControlsDisabled(true);
+      try { if (chkTestRunV1) chkTestRunV1.disabled = false; } catch (_) {}
+      try { if (chkTestRunV2) chkTestRunV2.disabled = false; } catch (_) {}
     } else {
       _setTrialCountLimit(5);
       _setControlsDisabled(false);
+      try { if (chkTestRunV1) chkTestRunV1.disabled = false; } catch (_) {}
+      try { if (chkTestRunV2) chkTestRunV2.disabled = false; } catch (_) {}
     }
   }
 
   // Manual overlay adjustment (display-space transform per image)
   let overlayAdjust = {
-    original: { sx: 1.0, sy: 1.0, dx: 0.0, dy: 0.0 },
     replot: { sx: 1.0, sy: 1.0, dx: 0.0, dy: 0.0 },
-    target: 'both',
   };
 
   // Overlay replot axes mode (transparent overlay image): 'full' | 'minmax'
   let replotOverlayAxesMode = 'full';
+  const overlayNaturalSizeCache = new Map();
+  const overlayImageMetaCache = new Map();
+
+  function _loadImageNaturalSize(url) {
+    const u = String(url || '');
+    if (!u) return Promise.resolve(null);
+    if (overlayNaturalSizeCache.has(u)) return overlayNaturalSizeCache.get(u);
+    const p = new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve({ w: img.naturalWidth || 0, h: img.naturalHeight || 0 });
+      img.onerror = () => resolve(null);
+      img.src = u;
+    });
+    overlayNaturalSizeCache.set(u, p);
+    return p;
+  }
+
+  function _loadOverlayImageMeta(url) {
+    const u = String(url || '');
+    if (!u) return Promise.resolve(null);
+    if (overlayImageMetaCache.has(u)) return overlayImageMetaCache.get(u);
+    const p = new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const w = img.naturalWidth || 0;
+        const h = img.naturalHeight || 0;
+        if (!(w > 0 && h > 0)) {
+          resolve(null);
+          return;
+        }
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d', { willReadFrequently: true });
+          if (!ctx) {
+            resolve({ w, h, cx: w / 2, cy: h / 2, axisX: null });
+            return;
+          }
+          ctx.drawImage(img, 0, 0);
+          const data = ctx.getImageData(0, 0, w, h).data;
+          let minX = w;
+          let maxX = -1;
+          let minY = h;
+          let maxY = -1;
+          const bandTop = Math.floor(h * 0.10);
+          const bandBottom = Math.ceil(h * 0.92);
+          const colCounts = new Uint32Array(w);
+          for (let y = 0; y < h; y++) {
+            const row = y * w * 4;
+            for (let x = 0; x < w; x++) {
+              const a = data[row + x * 4 + 3];
+              if (a > 3) {
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+                if (y >= bandTop && y <= bandBottom && a > 20) {
+                  colCounts[x] += 1;
+                }
+              }
+            }
+          }
+
+          let axisX = null;
+          let bestCount = 0;
+          const xLimit = Math.max(1, Math.floor(w * 0.45));
+          for (let x = 0; x < xLimit; x++) {
+            const c = colCounts[x] || 0;
+            if (c > bestCount) {
+              bestCount = c;
+              axisX = x;
+            }
+          }
+          if (!(bestCount > 0)) axisX = null;
+
+          if (maxX >= minX && maxY >= minY) {
+            resolve({ w, h, cx: (minX + maxX) / 2, cy: (minY + maxY) / 2, axisX });
+          } else {
+            resolve({ w, h, cx: w / 2, cy: h / 2, axisX });
+          }
+        } catch (_) {
+          resolve({ w, h, cx: w / 2, cy: h / 2, axisX: null });
+        }
+      };
+      img.onerror = () => resolve(null);
+      img.src = u;
+    });
+    overlayImageMetaCache.set(u, p);
+    return p;
+  }
+
+  function _primeOverlayNaturalSizes(overlayWrap) {
+    if (!overlayWrap) return;
+    const fullUrl = overlayWrap.dataset.sizeBaseFullUrl || '';
+    const minmaxUrl = overlayWrap.dataset.sizeBaseMinmaxUrl || '';
+    if (!fullUrl || !minmaxUrl) return;
+    const key = `${fullUrl}|${minmaxUrl}`;
+    if (overlayWrap.dataset.sizeBaseKey === key && overlayWrap.dataset.natFullW && overlayWrap.dataset.natMinmaxW) return;
+    overlayWrap.dataset.sizeBaseKey = key;
+    Promise.all([
+      _loadOverlayImageMeta(fullUrl),
+      _loadOverlayImageMeta(minmaxUrl),
+    ]).then(([fullMeta, minmaxMeta]) => {
+      if (fullMeta && minmaxMeta) {
+        overlayWrap.dataset.natFullW = String(fullMeta.w || 0);
+        overlayWrap.dataset.natFullH = String(fullMeta.h || 0);
+        overlayWrap.dataset.natFullCx = String(fullMeta.cx || 0);
+        overlayWrap.dataset.natFullCy = String(fullMeta.cy || 0);
+        overlayWrap.dataset.natFullAxisX = Number.isFinite(fullMeta.axisX) ? String(fullMeta.axisX) : '';
+        overlayWrap.dataset.natMinmaxW = String(minmaxMeta.w || 0);
+        overlayWrap.dataset.natMinmaxH = String(minmaxMeta.h || 0);
+        overlayWrap.dataset.natMinmaxCx = String(minmaxMeta.cx || 0);
+        overlayWrap.dataset.natMinmaxCy = String(minmaxMeta.cy || 0);
+        overlayWrap.dataset.natMinmaxAxisX = Number.isFinite(minmaxMeta.axisX) ? String(minmaxMeta.axisX) : '';
+        _renderOverlays();
+      }
+    }).catch(() => {});
+  }
 
   function _loadOverlayAdjustPref() {
     try {
       const raw = localStorage.getItem('plotextract_overlay_adjust');
       if (raw) {
         const obj = JSON.parse(raw);
-        const o = obj && obj.original ? obj.original : null;
         const r = obj && obj.replot ? obj.replot : null;
 
         const _readScale = (v) => {
@@ -427,37 +577,40 @@
           };
         };
 
-        const os = _readScale(o);
         const rs = _readScale(r);
         overlayAdjust = {
-          original: {
-            sx: os.sx,
-            sy: os.sy,
-            dx: _safeNumber(o && o.dx) ?? 0.0,
-            dy: _safeNumber(o && o.dy) ?? 0.0,
-          },
           replot: {
             sx: rs.sx,
             sy: rs.sy,
             dx: _safeNumber(r && r.dx) ?? 0.0,
             dy: _safeNumber(r && r.dy) ?? 0.0,
           },
-          target: (obj && typeof obj.target === 'string') ? obj.target : 'both',
         };
       }
     } catch (_) {}
-
-    if (overlayAdjustTarget) overlayAdjustTarget.value = overlayAdjust.target || 'both';
   }
 
   function _loadReplotOverlayAxesModePref() {
     try {
       const v = localStorage.getItem('plotextract_replot_overlay_axes_mode');
-      if (v === 'minmax' || v === 'full') replotOverlayAxesMode = v;
+      if (v === 'minmax' || v === 'full' || v === 'none') replotOverlayAxesMode = v;
     } catch (_) {}
-    if (btnOverlayAxesMode) {
-      btnOverlayAxesMode.textContent = (replotOverlayAxesMode === 'minmax') ? 'Axes: Min/Max' : 'Axes: Full';
+    _syncOverlayAxesModeButtons();
+  }
+
+  function _syncOverlayAxesModeButtons() {
+    const buttons = [btnOverlayAxesMinmax, btnOverlayAxesFull, btnOverlayAxesNone].filter(Boolean);
+    for (const btn of buttons) {
+      const mode = btn.dataset.mode || '';
+      const active = mode === replotOverlayAxesMode;
+      btn.classList.toggle('segmented__btn--active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
     }
+  }
+
+  function _setOriginalGalleryExpanded() {
+    if (!resultGallery) return;
+    resultGallery.classList.add('gallery--originalExpanded');
   }
 
   function _saveReplotOverlayAxesModePref() {
@@ -472,11 +625,10 @@
     } catch (_) {}
   }
 
-  function _applyAdjustToTargets(fn) {
-    const t = overlayAdjust.target || 'both';
-    if (t === 'original' || t === 'both') fn(overlayAdjust.original);
-    if (t === 'replot' || t === 'both') fn(overlayAdjust.replot);
+  function _applyAdjust(fn) {
+    fn(overlayAdjust.replot);
     _saveOverlayAdjustPref();
+    _renderOverlays();
   }
 
   // Console collapse
@@ -502,22 +654,6 @@
     if (!consoleWrap || !btnToggleConsole) return;
     consoleWrap.classList.toggle('consoleWrap--collapsed', !consoleOpen);
     btnToggleConsole.textContent = consoleOpen ? 'Hide' : 'Show';
-  }
-
-  function _loadAxesDebugPref() {
-    try {
-      const v = localStorage.getItem('plotextract_axes_debug');
-      showAxesDebug = (v === '1');
-    } catch (_) {
-      showAxesDebug = false;
-    }
-    if (chkAxesDebug) chkAxesDebug.checked = !!showAxesDebug;
-  }
-
-  function _saveAxesDebugPref() {
-    try {
-      localStorage.setItem('plotextract_axes_debug', showAxesDebug ? '1' : '0');
-    } catch (_) {}
   }
 
   function setNotice(el, msg, kind='info') {
@@ -722,6 +858,7 @@
     resultWarning.style.display = 'none';
     resultWarning.textContent = '';
     resultGallery.style.display = 'none';
+    resultGallery.classList.remove('gallery--originalExpanded');
     resultGallery.innerHTML = '';
     downloadCsvBtn.style.display = 'none';
     downloadCsvBtn.href = '#';
@@ -739,7 +876,6 @@
     trialsGridWrap.innerHTML = '';
 
     curvesControls.style.display = 'none';
-    debugControls.style.display = 'none';
     overlayAdjustControls.style.display = 'none';
     curvesTableWrap.style.display = 'none';
     curvesTableWrap.innerHTML = '';
@@ -771,12 +907,11 @@
   }
 
   function _overlayStepFromEvent(ev) {
-    return (ev && ev.shiftKey) ? 10 : 2;
+    return (ev && ev.shiftKey) ? 1 : 2;
   }
 
   function _overlayScaleFromEvent(ev) {
-    // Multiplicative step feels better than additive.
-    return (ev && ev.shiftKey) ? 1.10 : 1.03;
+    return (ev && ev.shiftKey) ? 1.01 : 1.03;
   }
 
   function _setWarning(msg) {
@@ -1399,75 +1534,9 @@
   }
 
   async function _buildCurvePolylinesIfPossible() {
-    overlayEnabled = false;
     curvePolylinesPx = new Map();
-    highlightStatus.textContent = '';
-
-    if (!accumulatedFacts) {
-      highlightStatus.textContent = 'Highlight unavailable (missing accumulated facts).';
-      return;
-    }
-    const mapper = _buildDataToPixelMapper(accumulatedFacts);
-    if (!mapper) {
-      highlightStatus.textContent = 'Highlight unavailable (missing geometry).';
-      return;
-    }
-
-    const csvText = await _ensureExtractedCsvText();
-    if (!csvText) {
-      highlightStatus.textContent = 'Highlight unavailable (missing extracted CSV).';
-      return;
-    }
-
-    const { headers, rows } = _parseCsvRows(csvText);
-    if (!headers.length || rows.length === 0) {
-      highlightStatus.textContent = 'Highlight unavailable (empty CSV).';
-      return;
-    }
-
-    const grouped = _groupCsvColumnsByCurve(headers, curveStyles);
-    if (grouped.size > 0) {
-      for (const cs of curveStyles) {
-        const label = cs.curve_label;
-        const g = grouped.get(label);
-        if (!g) continue;
-        const pts = [];
-        for (const r of rows) {
-          const x = _safeNumber(r[g.xIdx]);
-          const y = _safeNumber(r[g.yIdx]);
-          if (x == null || y == null) continue;
-          const xpx = mapper.xMap(x);
-          const ypx = mapper.yMap(y);
-          if (xpx == null || ypx == null) continue;
-          pts.push({ x: xpx, y: ypx });
-        }
-        if (pts.length >= 2) curvePolylinesPx.set(label, pts);
-      }
-    } else {
-      // Fallback: first column is time, remaining columns are y values keyed by header.
-      for (let i = 1; i < headers.length; i++) {
-        const label = headers[i];
-        const pts = [];
-        for (const r of rows) {
-          const x = _safeNumber(r[0]);
-          const y = _safeNumber(r[i]);
-          if (x == null || y == null) continue;
-          const xpx = mapper.xMap(x);
-          const ypx = mapper.yMap(y);
-          if (xpx == null || ypx == null) continue;
-          pts.push({ x: xpx, y: ypx });
-        }
-        if (pts.length >= 2) curvePolylinesPx.set(label, pts);
-      }
-    }
-
-    if (curvePolylinesPx.size === 0) {
-      highlightStatus.textContent = 'Highlight unavailable (could not map curves from CSV).';
-      return;
-    }
-
     overlayEnabled = true;
-    highlightStatus.textContent = 'Hover or select curves to highlight (overlay).';
+    highlightStatus.textContent = 'Whole-graph overlay active. Select/hover curves to show their overlay layers.';
   }
 
   function _ensureOverlayForGalleryImage(galleryItemEl, kind) {
@@ -1496,27 +1565,55 @@
       if (kind === 'original') {
         const fullUrl = galleryItemEl.dataset.replotOverlayFull || '';
         const minmaxUrl = galleryItemEl.dataset.replotOverlayMinmax || '';
+        const axesFullUrl = galleryItemEl.dataset.replotOverlayAxesFull || '';
+        const axesMinmaxUrl = galleryItemEl.dataset.replotOverlayAxesMinmax || '';
+        const curveFullTemplate = galleryItemEl.dataset.replotOverlayCurveFullTemplate || '';
+        const curveMinmaxTemplate = galleryItemEl.dataset.replotOverlayCurveMinmaxTemplate || '';
+        const hasAxesLayers = (galleryItemEl.dataset.replotOverlayHasAxesLayers || '0') === '1';
+        const hasCurveLayers = (galleryItemEl.dataset.replotOverlayHasCurveLayers || '0') === '1';
         if (fullUrl || minmaxUrl) {
           const overlayWrap = document.createElement('div');
           overlayWrap.className = 'imgReplotOverlayWrap';
           overlayWrap.setAttribute('aria-hidden', 'true');
           overlayWrap.dataset.fullUrl = fullUrl;
           overlayWrap.dataset.minmaxUrl = minmaxUrl;
+          overlayWrap.dataset.axesFullUrl = axesFullUrl;
+          overlayWrap.dataset.axesMinmaxUrl = axesMinmaxUrl;
+          overlayWrap.dataset.curveFullTemplate = curveFullTemplate;
+          overlayWrap.dataset.curveMinmaxTemplate = curveMinmaxTemplate;
+          overlayWrap.dataset.hasAxesLayers = hasAxesLayers ? '1' : '0';
+          overlayWrap.dataset.hasCurveLayers = hasCurveLayers ? '1' : '0';
+          overlayWrap.dataset.sizeBaseFullUrl = hasAxesLayers ? (axesFullUrl || fullUrl) : (fullUrl || axesFullUrl);
+          overlayWrap.dataset.sizeBaseMinmaxUrl = hasAxesLayers ? (axesMinmaxUrl || minmaxUrl) : (minmaxUrl || axesMinmaxUrl);
+          _primeOverlayNaturalSizes(overlayWrap);
 
-          const overlayImg = document.createElement('img');
-          overlayImg.className = 'imgReplotOverlay';
-          overlayImg.alt = '';
-          overlayImg.loading = 'lazy';
+          const axesImg = document.createElement('img');
+          axesImg.className = 'imgReplotOverlay imgReplotOverlay--axes';
+          axesImg.alt = '';
+          axesImg.loading = 'lazy';
           try {
-            const desired = (replotOverlayAxesMode === 'minmax') ? (minmaxUrl || fullUrl) : (fullUrl || minmaxUrl);
-            if (desired) overlayImg.src = desired;
+            const noAxesMode = replotOverlayAxesMode === 'none';
+            const showAxes = noAxesMode ? !hasCurveLayers : true;
+            const desired = hasAxesLayers
+              ? ((replotOverlayAxesMode === 'minmax')
+                ? (axesMinmaxUrl || axesFullUrl || minmaxUrl || fullUrl)
+                : (axesFullUrl || axesMinmaxUrl || fullUrl || minmaxUrl))
+              : ((replotOverlayAxesMode === 'minmax')
+                ? (minmaxUrl || fullUrl)
+                : (fullUrl || minmaxUrl));
+            if (showAxes && desired) axesImg.src = desired;
+            axesImg.style.display = showAxes ? 'block' : 'none';
+            axesImg.style.opacity = noAxesMode ? '0.05' : '1';
           } catch (_) {}
-          overlayImg.addEventListener('error', () => {
+          axesImg.addEventListener('error', () => {
             try { overlayWrap.style.display = 'none'; } catch (_) {}
           }, { once: true });
-          overlayImg.addEventListener('load', () => {
+          axesImg.addEventListener('load', () => {
             _renderOverlays();
           });
+
+          const curvesLayer = document.createElement('div');
+          curvesLayer.className = 'imgReplotOverlayCurves';
 
           // Apply current adjustment immediately.
           try {
@@ -1526,27 +1623,31 @@
             const dx = (adj && Number.isFinite(adj.dx)) ? adj.dx : 0.0;
             const dy = (adj && Number.isFinite(adj.dy)) ? adj.dy : 0.0;
             overlayWrap.style.transform = `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px)`;
-            overlayImg.style.transform = `scale(${sx.toFixed(6)}, ${sy.toFixed(6)})`;
+            axesImg.style.transform = `scale(${sx.toFixed(6)}, ${sy.toFixed(6)})`;
           } catch (_) {}
 
-          overlayWrap.appendChild(overlayImg);
+          overlayWrap.appendChild(axesImg);
+          overlayWrap.appendChild(curvesLayer);
           wrap.appendChild(overlayWrap);
         }
       }
 
-      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.classList.add('imgOverlay');
-      svg.setAttribute('data-kind', kind);
-      svg.setAttribute('aria-hidden', 'true');
-      wrap.appendChild(svg);
-
       link.appendChild(wrap);
     }
+
+    // Hard cleanup: never keep legacy SVG overlay in new-method mode.
+    try {
+      for (const oldSvg of Array.from(wrap.querySelectorAll('svg.imgOverlay'))) {
+        try { oldSvg.remove(); } catch (_) {}
+      }
+    } catch (_) {}
+
     return wrap;
   }
 
   function _syncReplotOverlayLayers() {
     if (!resultGallery) return;
+    const trialTargetsByRun = trialsMode ? _trialActiveTargetsByRun() : null;
     const items = Array.from(resultGallery.querySelectorAll('.gallery__item'));
     for (const item of items) {
       const kind = item.dataset.kind || (((item.querySelector('.gallery__title')?.textContent || '').toLowerCase().includes('original')) ? 'original' : 'replot');
@@ -1554,23 +1655,204 @@
 
       const wrap = item.querySelector('.imgOverlayWrap');
       if (!wrap) continue;
-      const overlayWrap = wrap.querySelector('.imgReplotOverlayWrap');
-      const overlayImg = overlayWrap ? overlayWrap.querySelector('img.imgReplotOverlay') : null;
-      if (!overlayWrap || !overlayImg) continue;
+      let trialSpecs = [];
+      if (trialsMode && item.dataset.trialOverlaySpecs) {
+        try {
+          const parsed = JSON.parse(item.dataset.trialOverlaySpecs);
+          if (Array.isArray(parsed)) trialSpecs = parsed;
+        } catch (_) {
+          trialSpecs = [];
+        }
+
+        for (const old of Array.from(wrap.querySelectorAll('.imgReplotOverlayWrap:not([data-run-index])'))) {
+          try { old.remove(); } catch (_) {}
+        }
+
+        const keepRunKeys = new Set(trialSpecs.map(s => String(Number(s && s.runIndex))));
+        for (const old of Array.from(wrap.querySelectorAll('.imgReplotOverlayWrap[data-run-index]'))) {
+          const key = String(Number(old.dataset.runIndex || '-1'));
+          if (!keepRunKeys.has(key)) {
+            try { old.remove(); } catch (_) {}
+          }
+        }
+
+        for (const spec of trialSpecs) {
+          const runIndex = Number(spec && spec.runIndex);
+          if (!Number.isFinite(runIndex) || runIndex < 0) continue;
+
+          let overlayWrap = wrap.querySelector(`.imgReplotOverlayWrap[data-run-index="${runIndex}"]`);
+          if (!overlayWrap) {
+            overlayWrap = document.createElement('div');
+            overlayWrap.className = 'imgReplotOverlayWrap';
+            overlayWrap.setAttribute('aria-hidden', 'true');
+            overlayWrap.dataset.runIndex = String(runIndex);
+
+            const axesImg = document.createElement('img');
+            axesImg.className = 'imgReplotOverlay imgReplotOverlay--axes';
+            axesImg.alt = '';
+            axesImg.loading = 'lazy';
+            axesImg.addEventListener('error', () => {
+              try { overlayWrap.style.display = 'none'; } catch (_) {}
+            }, { once: true });
+
+            const curvesLayer = document.createElement('div');
+            curvesLayer.className = 'imgReplotOverlayCurves';
+
+            overlayWrap.appendChild(axesImg);
+            overlayWrap.appendChild(curvesLayer);
+            wrap.appendChild(overlayWrap);
+          }
+
+          overlayWrap.dataset.fullUrl = String(spec && spec.fullUrl || '');
+          overlayWrap.dataset.minmaxUrl = String(spec && spec.minmaxUrl || '');
+          overlayWrap.dataset.axesFullUrl = String(spec && spec.axesFullUrl || '');
+          overlayWrap.dataset.axesMinmaxUrl = String(spec && spec.axesMinmaxUrl || '');
+          overlayWrap.dataset.curveFullTemplate = String(spec && spec.curveFullTemplate || '');
+          overlayWrap.dataset.curveMinmaxTemplate = String(spec && spec.curveMinmaxTemplate || '');
+          overlayWrap.dataset.hasAxesLayers = (spec && spec.hasAxesLayers) ? '1' : '0';
+          overlayWrap.dataset.hasCurveLayers = (spec && spec.hasCurveLayers) ? '1' : '0';
+          overlayWrap.dataset.sizeBaseFullUrl = (spec && spec.sizeBaseFullUrl) ? String(spec.sizeBaseFullUrl) : (String(spec && spec.axesFullUrl || spec && spec.fullUrl || ''));
+          overlayWrap.dataset.sizeBaseMinmaxUrl = (spec && spec.sizeBaseMinmaxUrl) ? String(spec.sizeBaseMinmaxUrl) : (String(spec && spec.axesMinmaxUrl || spec && spec.minmaxUrl || ''));
+          _primeOverlayNaturalSizes(overlayWrap);
+        }
+      }
+
+      const overlayWraps = Array.from(wrap.querySelectorAll('.imgReplotOverlayWrap'));
+      if (overlayWraps.length === 0) continue;
+
+      for (const overlayWrap of overlayWraps) {
+      const axesImg = overlayWrap ? overlayWrap.querySelector('img.imgReplotOverlay--axes') : null;
+      const curvesLayer = overlayWrap ? overlayWrap.querySelector('.imgReplotOverlayCurves') : null;
+      if (!overlayWrap || !axesImg || !curvesLayer) continue;
 
       const fullUrl = overlayWrap.dataset.fullUrl || '';
       const minmaxUrl = overlayWrap.dataset.minmaxUrl || '';
-      const desired = (replotOverlayAxesMode === 'minmax') ? (minmaxUrl || fullUrl) : (fullUrl || minmaxUrl);
-      if (!desired) {
+      const axesFullUrl = overlayWrap.dataset.axesFullUrl || '';
+      const axesMinmaxUrl = overlayWrap.dataset.axesMinmaxUrl || '';
+      const overlayRunIndex = Number(overlayWrap.dataset.runIndex || '-1');
+      const hasAxesLayers = (overlayWrap.dataset.hasAxesLayers || '0') === '1';
+      const hasCurveLayers = (overlayWrap.dataset.hasCurveLayers || '0') === '1';
+      const noAxesMode = replotOverlayAxesMode === 'none';
+      const showAxes = noAxesMode ? !hasCurveLayers : true;
+      const natFullW = Number(overlayWrap.dataset.natFullW || '0');
+      const natFullH = Number(overlayWrap.dataset.natFullH || '0');
+      const natFullCx = Number(overlayWrap.dataset.natFullCx || '0');
+      const natFullAxisX = Number(overlayWrap.dataset.natFullAxisX || 'NaN');
+      const natMinmaxW = Number(overlayWrap.dataset.natMinmaxW || '0');
+      const natMinmaxH = Number(overlayWrap.dataset.natMinmaxH || '0');
+      const natMinmaxCx = Number(overlayWrap.dataset.natMinmaxCx || '0');
+      const natMinmaxAxisX = Number(overlayWrap.dataset.natMinmaxAxisX || 'NaN');
+      const desired = hasAxesLayers
+        ? ((replotOverlayAxesMode === 'minmax')
+          ? (axesMinmaxUrl || axesFullUrl || minmaxUrl || fullUrl)
+          : (axesFullUrl || axesMinmaxUrl || fullUrl || minmaxUrl))
+        : ((replotOverlayAxesMode === 'minmax')
+          ? (minmaxUrl || fullUrl)
+          : (fullUrl || minmaxUrl));
+      if (showAxes && !desired) {
         try { overlayWrap.style.display = 'none'; } catch (_) {}
         continue;
       }
 
       // Source swap for axes mode.
-      if (overlayImg.getAttribute('src') !== desired) {
-        overlayImg.src = desired;
+      if (showAxes && axesImg.getAttribute('src') !== desired) {
+        axesImg.src = desired;
       }
+      try { axesImg.style.display = showAxes ? 'block' : 'none'; } catch (_) {}
+      try { axesImg.style.filter = ''; } catch (_) {}
+      try { axesImg.style.opacity = noAxesMode ? '0.05' : '1'; } catch (_) {}
       try { overlayWrap.style.display = 'block'; } catch (_) {}
+
+      // Determine active curve labels from table/hover to drive whole-graph curve layers.
+      const activeLabels = new Set();
+      try { curvesLayer.style.filter = ''; } catch (_) {}
+      if (trialsMode && overlayRunIndex >= 0) {
+        const labels = trialTargetsByRun ? trialTargetsByRun.get(overlayRunIndex) : null;
+        if (labels) {
+          for (const l of labels) activeLabels.add(l);
+        }
+        if (activeLabels.size === 0) {
+          try { overlayWrap.style.display = 'none'; } catch (_) {}
+          continue;
+        }
+      } else if (trialsMode) {
+        try { curvesLayer.style.filter = ''; } catch (_) {}
+        const a = _trialActiveHover();
+        if (a && a.curveLabel) activeLabels.add(a.curveLabel);
+      } else {
+        try { curvesLayer.style.filter = ''; } catch (_) {}
+        for (const l of confirmedCurves) activeLabels.add(l);
+        if (hoveredCurve) activeLabels.add(hoveredCurve);
+      }
+
+      const curveFullTemplate = overlayWrap.dataset.curveFullTemplate || '';
+      const curveMinmaxTemplate = overlayWrap.dataset.curveMinmaxTemplate || '';
+      const curveMode = (replotOverlayAxesMode === 'minmax') ? 'minmax' : 'full';
+
+      const curveTemplate = hasCurveLayers
+        ? ((curveMode === 'minmax')
+          ? (curveMinmaxTemplate || curveFullTemplate)
+          : (curveFullTemplate || curveMinmaxTemplate))
+        : '';
+
+      if (trialsMode && overlayRunIndex >= 0 && !curveTemplate) {
+        try { overlayWrap.style.display = 'none'; } catch (_) {}
+        continue;
+      }
+
+      if (noAxesMode && !hasCurveLayers) {
+        for (const el of Array.from(curvesLayer.querySelectorAll('img.imgReplotOverlay--curve'))) {
+          el.remove();
+        }
+      }
+
+      const activeIndices = new Set();
+      const styleSource = (trialsMode && overlayRunIndex >= 0 && trialRuns[overlayRunIndex] && Array.isArray(trialRuns[overlayRunIndex].curveStyles))
+        ? trialRuns[overlayRunIndex].curveStyles
+        : curveStyles;
+      if (curveTemplate && Array.isArray(styleSource)) {
+        for (const label of activeLabels) {
+          const idx = styleSource.findIndex(c => c && c.curve_label === label);
+          if (idx >= 0) activeIndices.add(idx + 1);
+        }
+      }
+
+      // Remove stale curve layers.
+      for (const el of Array.from(curvesLayer.querySelectorAll('img.imgReplotOverlay--curve'))) {
+        const idx = Number(el.dataset.curveIndex || '0');
+        if (!activeIndices.has(idx)) el.remove();
+      }
+
+      // Add current active curve layers.
+      for (const idx of activeIndices) {
+        let el = curvesLayer.querySelector(`img.imgReplotOverlay--curve[data-curve-index="${idx}"]`);
+        if (!el) {
+          el = document.createElement('img');
+          el.className = 'imgReplotOverlay imgReplotOverlay--curve';
+          el.alt = '';
+          el.loading = 'lazy';
+          el.dataset.curveIndex = String(idx);
+          el.addEventListener('error', () => {
+            try { el.remove(); } catch (_) {}
+          }, { once: true });
+          curvesLayer.appendChild(el);
+        }
+        const src = curveTemplate.replace('{i}', String(idx));
+        if (el.getAttribute('src') !== src) el.src = src;
+        try {
+          el.style.opacity = '1';
+          if (trialsMode && overlayRunIndex === 1) {
+            // Run 2: keep overlay behavior same as run 1, but recolor only chroma to blue.
+            // Hue rotation keeps neutral blacks (axes/text) black instead of tinting them blue.
+            el.style.filter = 'hue-rotate(195deg) saturate(165%)';
+            // Hide black/neutral overlay artifacts while preserving colored curve strokes.
+            el.style.mixBlendMode = 'screen';
+          } else {
+            el.style.filter = '';
+            el.style.mixBlendMode = '';
+          }
+        } catch (_) {}
+      }
 
       // Apply manual adjustments to the OVERLAY REPLOT layer.
       const adj = overlayAdjust && overlayAdjust.replot ? overlayAdjust.replot : null;
@@ -1578,10 +1860,57 @@
       const sy = (adj && Number.isFinite(adj.sy)) ? adj.sy : 1.0;
       const dx = (adj && Number.isFinite(adj.dx)) ? adj.dx : 0.0;
       const dy = (adj && Number.isFinite(adj.dy)) ? adj.dy : 0.0;
+      let autoDx = 0.0;
+      let modeScale = 1.0;
+      let manualDxScale = 1.0;
+      let manualDyScale = 1.0;
+      if (wrap) {
+        const wr = wrap.getBoundingClientRect();
+        if (wr && wr.width > 0 && wr.height > 0) {
+          overlayWrap.dataset.baseWrapW = String(wr.width);
+          overlayWrap.dataset.baseWrapH = String(wr.height);
+
+          const baseWrapW = Number(overlayWrap.dataset.baseWrapW || '0');
+          const baseWrapH = Number(overlayWrap.dataset.baseWrapH || '0');
+          if (baseWrapW > 0 && baseWrapH > 0) {
+            manualDxScale = wr.width / baseWrapW;
+            manualDyScale = wr.height / baseWrapH;
+          }
+        }
+
+        if (wr && wr.width > 0 && wr.height > 0 && natFullW > 0 && natFullH > 0 && natMinmaxW > 0 && natMinmaxH > 0) {
+          const refScale = Math.min(wr.width / natMinmaxW, wr.height / natMinmaxH);
+          const refOffX = (wr.width - natMinmaxW * refScale) / 2;
+          const refCx = natMinmaxCx > 0 ? natMinmaxCx : (natMinmaxW / 2);
+          const refDisplayCx = refOffX + refCx * refScale;
+          const refAxisDisplayX = Number.isFinite(natMinmaxAxisX) ? (refOffX + natMinmaxAxisX * refScale) : NaN;
+
+          const curW = (replotOverlayAxesMode === 'minmax') ? natMinmaxW : natFullW;
+          const curH = (replotOverlayAxesMode === 'minmax') ? natMinmaxH : natFullH;
+          const curScale = Math.min(wr.width / curW, wr.height / curH);
+          const curOffX = (wr.width - curW * curScale) / 2;
+          const curCxRaw = (replotOverlayAxesMode === 'minmax') ? natMinmaxCx : natFullCx;
+          const curCx = curCxRaw > 0 ? curCxRaw : (curW / 2);
+          const curDisplayCx = curOffX + curCx * curScale;
+          const curAxisRaw = (replotOverlayAxesMode === 'minmax') ? natMinmaxAxisX : natFullAxisX;
+          const curAxisDisplayX = Number.isFinite(curAxisRaw) ? (curOffX + curAxisRaw * curScale) : NaN;
+
+          if (refScale > 0 && curScale > 0) modeScale = refScale / curScale;
+          autoDx = Number.isFinite(refAxisDisplayX) && Number.isFinite(curAxisDisplayX)
+            ? (refAxisDisplayX - curAxisDisplayX)
+            : (refDisplayCx - curDisplayCx);
+        }
+      }
 
       // Keep translation independent of scaling by splitting transforms across wrapper/img.
-      try { overlayWrap.style.transform = `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px)`; } catch (_) {}
-      try { overlayImg.style.transform = `scale(${sx.toFixed(6)}, ${sy.toFixed(6)})`; } catch (_) {}
+      const effectiveDx = (dx * manualDxScale) + autoDx;
+      const effectiveDy = dy * manualDyScale;
+      try { overlayWrap.style.transform = `translate(${effectiveDx.toFixed(2)}px, ${effectiveDy.toFixed(2)}px)`; } catch (_) {}
+      try { axesImg.style.transform = `scale(${(sx * modeScale).toFixed(6)}, ${(sy * modeScale).toFixed(6)})`; } catch (_) {}
+      for (const el of Array.from(curvesLayer.querySelectorAll('img.imgReplotOverlay--curve'))) {
+        try { el.style.transform = `scale(${(sx * modeScale).toFixed(6)}, ${(sy * modeScale).toFixed(6)})`; } catch (_) {}
+      }
+      }
     }
   }
 
@@ -1599,420 +1928,26 @@
   }
 
   function _renderOverlays() {
-    const items = Array.from(resultGallery.querySelectorAll('.gallery__item'));
-    if (items.length === 0) return;
+    try {
+      for (const item of Array.from(resultGallery.querySelectorAll('.gallery__item'))) {
+        const kind = item.dataset.kind || (((item.querySelector('.gallery__title')?.textContent || '').toLowerCase().includes('original')) ? 'original' : 'replot');
+        _ensureOverlayForGalleryImage(item, kind);
+      }
+    } catch (_) {}
 
-    // Always keep the transparent replot overlay layer in sync.
+    // New-method only: always drive visibility with whole-graph image layers.
     _syncReplotOverlayLayers();
 
-    // Multi-trial overlay mode: highlight only the hovered (curve, run).
-    if (trialsMode) {
-      const active = _trialActiveHover();
-
-      // Always clear existing overlay SVGs.
-      for (const item of items) {
-        const kind = item.dataset.kind
-          || (((item.querySelector('.gallery__title')?.textContent || '').toLowerCase().includes('original')) ? 'original' : 'replot');
-        const wrap = _ensureOverlayForGalleryImage(item, kind);
-        const svg = wrap ? wrap.querySelector('svg.imgOverlay') : null;
-        if (!svg) continue;
-        while (svg.firstChild) svg.removeChild(svg.firstChild);
+    // Remove any legacy SVG overlays that may have been created by older code/session.
+    try {
+      for (const svg of Array.from(resultGallery.querySelectorAll('svg.imgOverlay'))) {
+        try { svg.remove(); } catch (_) {}
       }
-
-      if (!active) return;
-
-      const runIndex = active.runIndex;
-      const curveLabel = active.curveLabel;
-
-      // Lazily build polylines for the hovered run.
-      // Re-render after build completes.
-      _ensureTrialOverlayBuilt(runIndex).then(() => {
-        // If hover moved since we started building, do nothing; a new render will happen anyway.
-        const now = _trialActiveHover();
-        if (now && now.runIndex === runIndex && now.curveLabel === curveLabel) _renderOverlays();
-      }).catch(() => {});
-
-      const run = trialRuns[runIndex];
-      if (!run || !run._overlay || !run._overlay.enabled) return;
-
-      // Cache original plot box fractions for this run (for rough replot mapping).
-      let originalPlotBoxFrac = run._overlay.plotBoxFrac;
-
-      for (const item of items) {
-        const kind = item.dataset.kind
-          || (((item.querySelector('.gallery__title')?.textContent || '').toLowerCase().includes('original')) ? 'original' : 'replot');
-        const itemRun = (kind === 'replot') ? Number(item.dataset.runIndex) : null;
-        if (kind === 'replot' && itemRun !== runIndex) continue;
-
-        const wrap = _ensureOverlayForGalleryImage(item, kind);
-        const img = wrap ? wrap.querySelector('img.gallery__img') : null;
-        const svg = wrap ? wrap.querySelector('svg.imgOverlay') : null;
-        if (!img || !svg) continue;
-
-        const tx = _computeContainTransform(img);
-        if (!tx) continue;
-
-        svg.setAttribute('viewBox', `0 0 ${tx.rect.width} ${tx.rect.height}`);
-
-        const gRoot = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        const adj = (kind === 'original') ? overlayAdjust.original : overlayAdjust.replot;
-        const sx = (adj && Number.isFinite(adj.sx)) ? adj.sx : 1.0;
-        const sy = (adj && Number.isFinite(adj.sy)) ? adj.sy : 1.0;
-        const dx = (adj && Number.isFinite(adj.dx)) ? adj.dx : 0.0;
-        const dy = (adj && Number.isFinite(adj.dy)) ? adj.dy : 0.0;
-        const cx = tx.rect.width / 2;
-        const cy = tx.rect.height / 2;
-        gRoot.setAttribute('transform', `translate(${dx.toFixed(2)} ${dy.toFixed(2)}) translate(${cx.toFixed(2)} ${cy.toFixed(2)}) scale(${sx.toFixed(6)} ${sy.toFixed(6)}) translate(${-cx.toFixed(2)} ${-cy.toFixed(2)})`);
-        svg.appendChild(gRoot);
-
-        const pb = run.accumulatedFacts?.geometry_facts?.plot_box_px;
-        const plotBox = pb && Number.isFinite(pb.left) ? pb : null;
-
-        if (!originalPlotBoxFrac && kind === 'original' && plotBox && tx.naturalW && tx.naturalH) {
-          originalPlotBoxFrac = {
-            left: plotBox.left / tx.naturalW,
-            right: plotBox.right / tx.naturalW,
-            top: plotBox.top / tx.naturalH,
-            bottom: plotBox.bottom / tx.naturalH,
-          };
-          run._overlay.plotBoxFrac = originalPlotBoxFrac;
-        }
-
-        function toDisplayPoints(ptsPx) {
-          if (kind === 'original') {
-            return ptsPx.map(p => ({ x: tx.offX + p.x * tx.scale, y: tx.offY + p.y * tx.scale }));
-          }
-          if (!plotBox) return null;
-          const w = (plotBox.right - plotBox.left);
-          const h = (plotBox.bottom - plotBox.top);
-          if (!(w > 0 && h > 0)) return null;
-
-          let replotBox = null;
-          if (originalPlotBoxFrac) {
-            replotBox = {
-              left: originalPlotBoxFrac.left * tx.naturalW,
-              right: originalPlotBoxFrac.right * tx.naturalW,
-              top: originalPlotBoxFrac.top * tx.naturalH,
-              bottom: originalPlotBoxFrac.bottom * tx.naturalH,
-            };
-          }
-          if (!replotBox || !(replotBox.left < replotBox.right && replotBox.top < replotBox.bottom)) {
-            replotBox = { left: 0, right: tx.naturalW, top: 0, bottom: tx.naturalH };
-          }
-          const rw = replotBox.right - replotBox.left;
-          const rh = replotBox.bottom - replotBox.top;
-
-          return ptsPx.map(p => {
-            const nx = (p.x - plotBox.left) / w;
-            const ny = (p.y - plotBox.top) / h;
-            const xImg = replotBox.left + nx * rw;
-            const yImg = replotBox.top + ny * rh;
-            return { x: tx.offX + xImg * tx.scale, y: tx.offY + yImg * tx.scale };
-          });
-        }
-
-        // Grey context for all curves for this run.
-        for (const [label, ptsPx] of run._overlay.curvePolylinesPx.entries()) {
-          const dispPoints = toDisplayPoints(ptsPx);
-          if (!dispPoints || dispPoints.length < 2) continue;
-          const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-          poly.setAttribute('fill', 'none');
-          poly.setAttribute('stroke', '#9ca3af');
-          poly.setAttribute('stroke-width', '1.5');
-          poly.setAttribute('stroke-linejoin', 'round');
-          poly.setAttribute('stroke-linecap', 'round');
-          poly.setAttribute('opacity', label === curveLabel ? '0.0' : '0.25');
-          poly.setAttribute('points', dispPoints.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '));
-          gRoot.appendChild(poly);
-        }
-
-        // Active curve.
-        const ptsPx = run._overlay.curvePolylinesPx.get(curveLabel);
-        if (ptsPx && ptsPx.length >= 2) {
-          const dispPoints = toDisplayPoints(ptsPx);
-          if (dispPoints && dispPoints.length >= 2) {
-            const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-            poly.setAttribute('fill', 'none');
-            poly.setAttribute('stroke', '#ef4444');
-            poly.setAttribute('stroke-width', '1.25');
-            poly.setAttribute('stroke-linejoin', 'round');
-            poly.setAttribute('stroke-linecap', 'round');
-            poly.setAttribute('opacity', '0.98');
-            poly.setAttribute('points', dispPoints.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '));
-            poly.classList.add('overlayCurve');
-            gRoot.appendChild(poly);
-          }
-        }
+      for (const svg of Array.from(resultGallery.querySelectorAll('svg.imgTrialsOverlay'))) {
+        try { svg.remove(); } catch (_) {}
       }
+    } catch (_) {}
 
-      return;
-    }
-
-    // Cache original plot box fractions (for replot mapping).
-    let originalPlotBoxFrac = null;
-
-    // Determine active highlights
-    const active = new Set(confirmedCurves);
-    if (hoveredCurve) active.add(hoveredCurve);
-
-    for (const item of items) {
-      const kind = item.dataset.kind
-        || (((item.querySelector('.gallery__title')?.textContent || '').toLowerCase().includes('original')) ? 'original'
-        : (((item.querySelector('.gallery__title')?.textContent || '').toLowerCase().includes('replot')) ? 'replot' : 'other'));
-      if (kind === 'other') continue;
-
-      const wrap = _ensureOverlayForGalleryImage(item, kind);
-      const img = wrap ? wrap.querySelector('img.gallery__img') : null;
-      const svg = wrap ? wrap.querySelector('svg.imgOverlay') : null;
-      if (!img || !svg) continue;
-
-      // Clear
-      while (svg.firstChild) svg.removeChild(svg.firstChild);
-
-      if (!overlayEnabled) continue;
-
-      const tx = _computeContainTransform(img);
-      if (!tx) continue;
-
-      svg.setAttribute('viewBox', `0 0 ${tx.rect.width} ${tx.rect.height}`);
-
-      // Draw everything into a group so we can apply per-image manual adjustments.
-      const gRoot = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      const adj = (kind === 'original') ? overlayAdjust.original : overlayAdjust.replot;
-      const sx = (adj && Number.isFinite(adj.sx)) ? adj.sx : 1.0;
-      const sy = (adj && Number.isFinite(adj.sy)) ? adj.sy : 1.0;
-      const dx = (adj && Number.isFinite(adj.dx)) ? adj.dx : 0.0;
-      const dy = (adj && Number.isFinite(adj.dy)) ? adj.dy : 0.0;
-      const cx = tx.rect.width / 2;
-      const cy = tx.rect.height / 2;
-      // Translate (dx,dy) + scale around center
-      gRoot.setAttribute('transform', `translate(${dx.toFixed(2)} ${dy.toFixed(2)}) translate(${cx.toFixed(2)} ${cy.toFixed(2)}) scale(${sx.toFixed(6)} ${sy.toFixed(6)}) translate(${-cx.toFixed(2)} ${-cy.toFixed(2)})`);
-      svg.appendChild(gRoot);
-
-      // For ORIGINAL: use mapped image pixels. For REPLOT: attempt rough normalization.
-      const plotBox = accumulatedFacts?.geometry_facts?.plot_box_px;
-      const pb = plotBox && Number.isFinite(plotBox.left) ? plotBox : null;
-
-      if (!originalPlotBoxFrac && kind === 'original' && pb && tx.naturalW && tx.naturalH) {
-        originalPlotBoxFrac = {
-          left: pb.left / tx.naturalW,
-          right: pb.right / tx.naturalW,
-          top: pb.top / tx.naturalH,
-          bottom: pb.bottom / tx.naturalH,
-        };
-      }
-
-      // Optional debug overlay: plot box + anchors (original image only).
-      if (showAxesDebug && kind === 'original' && pb && pb.left < pb.right && pb.top < pb.bottom) {
-        const x0 = tx.offX + pb.left * tx.scale;
-        const y0 = tx.offY + pb.top * tx.scale;
-        const x1 = tx.offX + pb.right * tx.scale;
-        const y1 = tx.offY + pb.bottom * tx.scale;
-
-        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        rect.setAttribute('x', x0.toFixed(1));
-        rect.setAttribute('y', y0.toFixed(1));
-        rect.setAttribute('width', (x1 - x0).toFixed(1));
-        rect.setAttribute('height', (y1 - y0).toFixed(1));
-        rect.setAttribute('fill', 'none');
-        rect.setAttribute('stroke', '#3b82f6');
-        rect.setAttribute('stroke-width', '2');
-        rect.setAttribute('stroke-dasharray', '6 4');
-        rect.setAttribute('opacity', '0.85');
-        gRoot.appendChild(rect);
-
-        const xAnch = accumulatedFacts?.geometry_facts?.x_axis_geometry?.anchors;
-        const yAnchDebug = accumulatedFacts?.geometry_facts?.y_axis_geometry?.decade_anchors
-          ?? accumulatedFacts?.geometry_facts?.y_axis_geometry?.anchors;
-        const xPxValsD = Array.isArray(xAnch) ? xAnch.map(a => _safeNumber(a.x_px)).filter(v => v != null) : [];
-        const yPxValsD = Array.isArray(yAnchDebug) ? yAnchDebug.map(a => _safeNumber(a.y_px)).filter(v => v != null) : [];
-        const xRel = _axisPixelsLookRelativeToPlotBox(xPxValsD, pb.left, pb.right);
-        const yRel = _axisPixelsLookRelativeToPlotBox(yPxValsD, pb.top, pb.bottom);
-        if (Array.isArray(xAnch)) {
-          for (const a of xAnch) {
-            const xp = _safeNumber(a.x_px);
-            if (xp == null) continue;
-            const cx = tx.offX + (xp + (xRel ? pb.left : 0)) * tx.scale;
-            const cy = tx.offY + pb.bottom * tx.scale;
-            const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            c.setAttribute('cx', cx.toFixed(1));
-            c.setAttribute('cy', cy.toFixed(1));
-            c.setAttribute('r', '3.5');
-            c.setAttribute('fill', '#3b82f6');
-            c.setAttribute('opacity', '0.9');
-            gRoot.appendChild(c);
-          }
-        }
-
-        const yAnch = yAnchDebug;
-        if (Array.isArray(yAnch)) {
-          for (const a of yAnch) {
-            const yp = _safeNumber(a.y_px);
-            if (yp == null) continue;
-            const cx = tx.offX + pb.left * tx.scale;
-            const cy = tx.offY + (yp + (yRel ? pb.top : 0)) * tx.scale;
-            const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            c.setAttribute('cx', cx.toFixed(1));
-            c.setAttribute('cy', cy.toFixed(1));
-            c.setAttribute('r', '3.5');
-            c.setAttribute('fill', '#3b82f6');
-            c.setAttribute('opacity', '0.9');
-            gRoot.appendChild(c);
-          }
-        }
-
-        // Label axis ranges (min/max) for quick sanity checks.
-        const _fmtAxisVal = (v) => {
-          const n = Number(v);
-          if (!Number.isFinite(n)) return '';
-          let s = n.toFixed(4);
-          s = s.replace(/\.0+$/, '').replace(/(\.[0-9]*?)0+$/, '$1');
-          return s;
-        };
-
-        const _addText = (x, y, text, anchor = 'start') => {
-          const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          t.setAttribute('x', String(x));
-          t.setAttribute('y', String(y));
-          t.setAttribute('fill', '#2563eb');
-          t.setAttribute('font-size', '12');
-          t.setAttribute('font-family', 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace');
-          t.setAttribute('text-anchor', anchor);
-          t.setAttribute('paint-order', 'stroke');
-          t.setAttribute('stroke', 'rgba(255,255,255,0.92)');
-          t.setAttribute('stroke-width', '3');
-          t.textContent = String(text || '');
-          gRoot.appendChild(t);
-        };
-
-        const xVals = Array.isArray(xAnch)
-          ? xAnch.map(a => _safeNumber(a.x_value_hours ?? a.x_value)).filter(v => v != null)
-          : [];
-        const yRaw = Array.isArray(yAnchDebug)
-          ? yAnchDebug.map(a => _safeNumber(a.log10_value ?? a.y_value ?? a.value)).filter(v => v != null)
-          : [];
-        const yLooksLikeDecades = _looksLikePowersOfTen(yRaw);
-        const yVals = yRaw
-          .map(v => (yLooksLikeDecades && v > 0) ? Math.log10(v) : v)
-          .filter(v => v != null);
-
-        if (xVals.length >= 2) {
-          const xmin = Math.min(...xVals);
-          const xmax = Math.max(...xVals);
-          const yForX = Math.min(tx.rect.height - 4, y1 + 14);
-          _addText(x0.toFixed(1), yForX.toFixed(1), _fmtAxisVal(xmin), 'start');
-          _addText(x1.toFixed(1), yForX.toFixed(1), _fmtAxisVal(xmax), 'end');
-        }
-
-        if (yVals.length >= 2) {
-          const ymin = Math.min(...yVals);
-          const ymax = Math.max(...yVals);
-          let xForY = x0 - 8;
-          let anchor = 'end';
-          if (xForY < 8) {
-            xForY = x0 + 8;
-            anchor = 'start';
-          }
-          const yForMax = Math.max(12, y0 + 12);
-          const yForMin = Math.min(tx.rect.height - 4, y1 - 4);
-          _addText(xForY.toFixed(1), yForMax.toFixed(1), _fmtAxisVal(ymax), anchor);
-          _addText(xForY.toFixed(1), yForMin.toFixed(1), _fmtAxisVal(ymin), anchor);
-        }
-      }
-
-      function toDisplayPoints(ptsPx) {
-        if (kind === 'original') {
-          return ptsPx.map(p => ({
-            x: tx.offX + p.x * tx.scale,
-            y: tx.offY + p.y * tx.scale,
-          }));
-        }
-        // Replot heuristic: normalize within original plot box then map into an estimated plot box region
-        // on the replot image (derived from original plot box fractions).
-        if (!pb) return null;
-        const w = (pb.right - pb.left);
-        const h = (pb.bottom - pb.top);
-        if (!(w > 0 && h > 0)) return null;
-
-        let replotBox = null;
-        if (originalPlotBoxFrac) {
-          replotBox = {
-            left: originalPlotBoxFrac.left * tx.naturalW,
-            right: originalPlotBoxFrac.right * tx.naturalW,
-            top: originalPlotBoxFrac.top * tx.naturalH,
-            bottom: originalPlotBoxFrac.bottom * tx.naturalH,
-          };
-        }
-        if (!replotBox || !(replotBox.left < replotBox.right && replotBox.top < replotBox.bottom)) {
-          replotBox = { left: 0, right: tx.naturalW, top: 0, bottom: tx.naturalH };
-        }
-        const rw = replotBox.right - replotBox.left;
-        const rh = replotBox.bottom - replotBox.top;
-
-        return ptsPx.map(p => {
-          const nx = (p.x - pb.left) / w;
-          const ny = (p.y - pb.top) / h;
-          const xImg = replotBox.left + nx * rw;
-          const yImg = replotBox.top + ny * rh;
-          return {
-            x: tx.offX + xImg * tx.scale,
-            y: tx.offY + yImg * tx.scale,
-          };
-        });
-      }
-
-      // Draw faint context for all curves.
-      for (const [label, ptsPx] of curvePolylinesPx.entries()) {
-        const dispPoints = toDisplayPoints(ptsPx);
-        if (!dispPoints || dispPoints.length < 2) continue;
-        const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-        poly.setAttribute('fill', 'none');
-        poly.setAttribute('stroke', '#9ca3af');
-        poly.setAttribute('stroke-width', '1.5');
-        poly.setAttribute('stroke-linejoin', 'round');
-        poly.setAttribute('stroke-linecap', 'round');
-        poly.setAttribute('opacity', active.has(label) ? '0.0' : '0.25');
-        poly.setAttribute('points', dispPoints.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '));
-        gRoot.appendChild(poly);
-      }
-
-      // Draw active curves in bright red.
-      for (const label of active) {
-        const ptsPx = curvePolylinesPx.get(label);
-        if (!ptsPx || ptsPx.length < 2) continue;
-        const dispPoints = toDisplayPoints(ptsPx);
-        if (!dispPoints || dispPoints.length < 2) continue;
-
-        const isHover = hoveredCurve === label;
-        const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-        poly.setAttribute('fill', 'none');
-        poly.setAttribute('stroke', '#ef4444');
-        // Keep the red overlay line thin so it doesn't obscure the plot.
-        poly.setAttribute('stroke-width', isHover ? '0.9' : '0.6');
-        poly.setAttribute('stroke-linejoin', 'round');
-        poly.setAttribute('stroke-linecap', 'round');
-        poly.setAttribute('opacity', isHover ? '0.98' : '0.92');
-        poly.setAttribute('points', dispPoints.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '));
-        poly.classList.add('overlayCurve');
-        gRoot.appendChild(poly);
-
-        // Add visible red dots along the line.
-        // Sample if the polyline has many points to keep DOM light.
-        const maxDots = 90;
-        const step = Math.max(1, Math.ceil(dispPoints.length / maxDots));
-        const dotR = isHover ? 1.9 : 1.4;
-        for (let i = 0; i < dispPoints.length; i += step) {
-          const p = dispPoints[i];
-          const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-          c.setAttribute('cx', p.x.toFixed(1));
-          c.setAttribute('cy', p.y.toFixed(1));
-          c.setAttribute('r', String(dotR));
-          c.setAttribute('fill', '#ef4444');
-          c.setAttribute('opacity', isHover ? '0.95' : '0.85');
-          gRoot.appendChild(c);
-        }
-      }
-    }
   }
 
   function _renderCurvesTable() {
@@ -2027,7 +1962,6 @@
 
     curvesEmpty.style.display = 'none';
     curvesControls.style.display = 'flex';
-    debugControls.style.display = 'block';
     overlayAdjustControls.style.display = 'block';
     curvesTableWrap.style.display = 'block';
     downloadCsvConfirmedBtn.style.display = 'inline-flex';
@@ -2136,6 +2070,24 @@
     return extracted || null;
   }
 
+  function _detectReplotOverlayAssetFlags(outputs) {
+    const imgs = (outputs && outputs.images) ? outputs.images : [];
+    let hasAxesLayers = false;
+    let hasCurveLayers = false;
+    for (const it of imgs) {
+      if (!it || !it.filename) continue;
+      const filename = String(it.filename).toLowerCase();
+      if (filename.includes('-replot_overlay_axes_full') || filename.includes('-replot_overlay_axes_minmax')) {
+        hasAxesLayers = true;
+      }
+      if (filename.includes('-replot_overlay_curve_')) {
+        hasCurveLayers = true;
+      }
+      if (hasAxesLayers && hasCurveLayers) break;
+    }
+    return { hasAxesLayers, hasCurveLayers };
+  }
+
   function renderPrimaryResults(outputs) {
     // Show original + replot side-by-side by default.
     const original = _pickOutputImage(outputs, ({ label }) => label.includes('original input'));
@@ -2147,18 +2099,43 @@
 
     function _deriveReplotOverlayUrls(replotUrl) {
       const u = String(replotUrl || '');
-      if (!u) return { full: '', minmax: '' };
+      if (!u) return {
+        full: '',
+        minmax: '',
+        axesFull: '',
+        axesMinmax: '',
+        curveFullTemplate: '',
+        curveMinmaxTemplate: '',
+      };
       if (u.includes('-replot.')) {
         return {
           full: u.replace('-replot.', '-replot_overlay_full.'),
           minmax: u.replace('-replot.', '-replot_overlay_minmax.'),
+          axesFull: u.replace('-replot.', '-replot_overlay_axes_full.'),
+          axesMinmax: u.replace('-replot.', '-replot_overlay_axes_minmax.'),
+          curveFullTemplate: u.replace('-replot.', '-replot_overlay_curve_{i}_full.'),
+          curveMinmaxTemplate: u.replace('-replot.', '-replot_overlay_curve_{i}_minmax.'),
         };
       }
       if (u.toLowerCase().endsWith('.png')) {
         const stem = u.slice(0, -4);
-        return { full: stem + '_overlay_full.png', minmax: stem + '_overlay_minmax.png' };
+        return {
+          full: stem + '_overlay_full.png',
+          minmax: stem + '_overlay_minmax.png',
+          axesFull: stem + '_overlay_axes_full.png',
+          axesMinmax: stem + '_overlay_axes_minmax.png',
+          curveFullTemplate: stem + '_overlay_curve_{i}_full.png',
+          curveMinmaxTemplate: stem + '_overlay_curve_{i}_minmax.png',
+        };
       }
-      return { full: u + '_overlay_full', minmax: u + '_overlay_minmax' };
+      return {
+        full: u + '_overlay_full',
+        minmax: u + '_overlay_minmax',
+        axesFull: u + '_overlay_axes_full',
+        axesMinmax: u + '_overlay_axes_minmax',
+        curveFullTemplate: u + '_overlay_curve_{i}_full',
+        curveMinmaxTemplate: u + '_overlay_curve_{i}_minmax',
+      };
     }
 
     if (original || replot) {
@@ -2170,6 +2147,7 @@
       ].filter(Boolean);
 
       const overlayUrls = replot ? _deriveReplotOverlayUrls('/plots/' + replot.path) : { full: '', minmax: '' };
+      const overlayFlags = _detectReplotOverlayAssetFlags(outputs);
 
       for (const it of items) {
         const card = document.createElement('div');
@@ -2178,11 +2156,19 @@
         // Mark kind so overlay logic doesn't rely on title text.
         card.dataset.kind = (it.title.toLowerCase().includes('original')) ? 'original'
           : (it.title.toLowerCase().includes('replot') ? 'replot' : 'other');
+        if (card.dataset.kind === 'original') card.classList.add('gallery__item--original');
+        else if (card.dataset.kind === 'replot') card.classList.add('gallery__item--replot');
 
         // Only the ORIGINAL card gets the transparent replot overlay layer.
         if (card.dataset.kind === 'original') {
           card.dataset.replotOverlayFull = overlayUrls.full || '';
           card.dataset.replotOverlayMinmax = overlayUrls.minmax || '';
+          card.dataset.replotOverlayAxesFull = overlayUrls.axesFull || '';
+          card.dataset.replotOverlayAxesMinmax = overlayUrls.axesMinmax || '';
+          card.dataset.replotOverlayCurveFullTemplate = overlayUrls.curveFullTemplate || '';
+          card.dataset.replotOverlayCurveMinmaxTemplate = overlayUrls.curveMinmaxTemplate || '';
+          card.dataset.replotOverlayHasAxesLayers = overlayFlags.hasAxesLayers ? '1' : '0';
+          card.dataset.replotOverlayHasCurveLayers = overlayFlags.hasCurveLayers ? '1' : '0';
         }
 
         const title = document.createElement('div');
@@ -2216,6 +2202,7 @@
         card.appendChild(imgWrap);
         resultGallery.appendChild(card);
       }
+      _setOriginalGalleryExpanded();
     }
 
     const extractedCsv = _pickExtractedCsv(outputs);
@@ -2263,14 +2250,40 @@
   }
 
   function _setTrialWarning(msg) {
-    if (!trialSelectionWarning) return;
-    if (!msg) {
-      trialSelectionWarning.style.display = 'none';
-      trialSelectionWarning.textContent = '';
-      return;
-    }
-    trialSelectionWarning.style.display = 'block';
-    trialSelectionWarning.textContent = msg;
+    // Keep layout stable: show guidance as tooltip on disabled download button.
+    try {
+      if (trialSelectionWarning) {
+        trialSelectionWarning.style.display = 'none';
+        trialSelectionWarning.textContent = '';
+      }
+    } catch (_) {}
+    try {
+      if (!btnDownloadTrialsCsv) return;
+      const text = String(msg || '').trim();
+      if (text) {
+        btnDownloadTrialsCsv.title = '';
+        btnDownloadTrialsCsv.setAttribute('aria-label', text);
+        btnDownloadTrialsCsv.style.pointerEvents = 'none';
+        if (trialDownloadTooltipWrap) {
+          trialDownloadTooltipWrap.title = '';
+          trialDownloadTooltipWrap.dataset.tooltip = text;
+          trialDownloadTooltipWrap.setAttribute('aria-label', text);
+        }
+      } else {
+        btnDownloadTrialsCsv.title = '';
+        btnDownloadTrialsCsv.removeAttribute('aria-label');
+        btnDownloadTrialsCsv.style.pointerEvents = '';
+        if (trialDownloadTooltipWrap) {
+          trialDownloadTooltipWrap.title = '';
+          trialDownloadTooltipWrap.dataset.tooltip = '';
+          trialDownloadTooltipWrap.removeAttribute('aria-label');
+        }
+        if (trialDownloadTooltip) {
+          trialDownloadTooltip.style.display = 'none';
+          trialDownloadTooltip.textContent = '';
+        }
+      }
+    } catch (_) {}
   }
 
   function _getTrialCount() {
@@ -2330,6 +2343,32 @@
     const runIdx = (trialsHover.cellRunIndex != null) ? trialsHover.cellRunIndex : trialsHover.colRunIndex;
     if (!curve || runIdx == null) return null;
     return { curveLabel: curve, runIndex: runIdx };
+  }
+
+  function _trialActiveTargetsByRun() {
+    const out = new Map();
+    for (const label of unionCurveLabels) {
+      const selected = trialSelections.get(label) || new Set();
+      for (const runIndex of selected) {
+        const idx = Number(runIndex);
+        if (!Number.isFinite(idx) || idx < 0 || idx >= trialRuns.length) continue;
+        let set = out.get(idx);
+        if (!set) { set = new Set(); out.set(idx, set); }
+        set.add(String(label));
+      }
+    }
+
+    const active = _trialActiveHover();
+    if (active && active.curveLabel && active.runIndex != null) {
+      const idx = Number(active.runIndex);
+      if (Number.isFinite(idx) && idx >= 0 && idx < trialRuns.length) {
+        let set = out.get(idx);
+        if (!set) { set = new Set(); out.set(idx, set); }
+        set.add(String(active.curveLabel));
+      }
+    }
+
+    return out;
   }
 
   async function _ensureTrialOverlayBuilt(runIndex) {
@@ -2517,6 +2556,7 @@
           cb.type = 'checkbox';
           cb.className = 'trialsCb';
           cb.checked = (trialSelections.get(label) || new Set()).has(i);
+          td.style.cursor = 'pointer';
           td.addEventListener('mouseenter', () => {
             trialsHover.cellCurveLabel = label;
             trialsHover.cellRunIndex = i;
@@ -2535,7 +2575,22 @@
             if (cb.checked) set.add(i);
             else set.delete(i);
             _updateTrialExportState();
+            _renderOverlays();
+            _syncTrialsHoverClasses();
           });
+          td.addEventListener('click', (ev) => {
+            if (ev.target === cb) return;
+            cb.checked = !cb.checked;
+            cb.dispatchEvent(new Event('change', { bubbles: true }));
+          });
+          td.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter' || ev.key === ' ') {
+              ev.preventDefault();
+              cb.checked = !cb.checked;
+              cb.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+          });
+          td.tabIndex = 0;
           td.appendChild(cb);
         }
         tr.appendChild(td);
@@ -2579,17 +2634,81 @@
     resultGallery.style.display = 'grid';
     resultGallery.innerHTML = '';
 
+    function _deriveTrialOverlayUrls(replotUrl) {
+      const u = String(replotUrl || '');
+      if (!u) {
+        return {
+          full: '',
+          minmax: '',
+          axesFull: '',
+          axesMinmax: '',
+          curveFullTemplate: '',
+          curveMinmaxTemplate: '',
+        };
+      }
+      if (u.includes('-replot.')) {
+        return {
+          full: u.replace('-replot.', '-replot_overlay_full.'),
+          minmax: u.replace('-replot.', '-replot_overlay_minmax.'),
+          axesFull: u.replace('-replot.', '-replot_overlay_axes_full.'),
+          axesMinmax: u.replace('-replot.', '-replot_overlay_axes_minmax.'),
+          curveFullTemplate: u.replace('-replot.', '-replot_overlay_curve_{i}_full.'),
+          curveMinmaxTemplate: u.replace('-replot.', '-replot_overlay_curve_{i}_minmax.'),
+        };
+      }
+      if (u.toLowerCase().endsWith('.png')) {
+        const stem = u.slice(0, -4);
+        return {
+          full: stem + '_overlay_full.png',
+          minmax: stem + '_overlay_minmax.png',
+          axesFull: stem + '_overlay_axes_full.png',
+          axesMinmax: stem + '_overlay_axes_minmax.png',
+          curveFullTemplate: stem + '_overlay_curve_{i}_full.png',
+          curveMinmaxTemplate: stem + '_overlay_curve_{i}_minmax.png',
+        };
+      }
+      return {
+        full: u + '_overlay_full',
+        minmax: u + '_overlay_minmax',
+        axesFull: u + '_overlay_axes_full',
+        axesMinmax: u + '_overlay_axes_minmax',
+        curveFullTemplate: u + '_overlay_curve_{i}_full',
+        curveMinmaxTemplate: u + '_overlay_curve_{i}_minmax',
+      };
+    }
+
     const firstOutputs = trialRuns[0] && trialRuns[0].outputs ? trialRuns[0].outputs : null;
     const original = firstOutputs ? _pickOutputImage(firstOutputs, ({ label }) => label.includes('original input')) : null;
     const items = [];
     if (original && original.path) items.push({ kind: 'original', title: 'Original', url: '/plots/' + original.path });
+    const trialOverlaySpecs = [];
 
     for (let i = 0; i < trialRuns.length; i++) {
       const o = trialRuns[i].outputs;
       if (!o) continue;
-      const replot = _pickOutputImage(o, ({ label, filename }) => label.includes('extracted replot') || filename.includes('-replot'));
+      const replot = _pickOutputImage(o, ({ label, filename }) => {
+        if (label.includes('extracted replot')) return true;
+        if (filename.includes('-replot_overlay')) return false;
+        return filename.includes('-replot');
+      });
       if (!replot || !replot.path) continue;
       items.push({ kind: 'replot', runIndex: i, title: 'Replot (run ' + (i + 1) + ')', url: '/plots/' + replot.path });
+
+      const overlayUrls = _deriveTrialOverlayUrls('/plots/' + replot.path);
+      const overlayFlags = _detectReplotOverlayAssetFlags(o);
+      trialOverlaySpecs.push({
+        runIndex: i,
+        fullUrl: overlayUrls.full || '',
+        minmaxUrl: overlayUrls.minmax || '',
+        axesFullUrl: overlayUrls.axesFull || '',
+        axesMinmaxUrl: overlayUrls.axesMinmax || '',
+        curveFullTemplate: overlayUrls.curveFullTemplate || '',
+        curveMinmaxTemplate: overlayUrls.curveMinmaxTemplate || '',
+        hasAxesLayers: !!overlayFlags.hasAxesLayers,
+        hasCurveLayers: !!overlayFlags.hasCurveLayers,
+        sizeBaseFullUrl: overlayFlags.hasAxesLayers ? (overlayUrls.axesFull || overlayUrls.full || '') : (overlayUrls.full || overlayUrls.axesFull || ''),
+        sizeBaseMinmaxUrl: overlayFlags.hasAxesLayers ? (overlayUrls.axesMinmax || overlayUrls.minmax || '') : (overlayUrls.minmax || overlayUrls.axesMinmax || ''),
+      });
     }
 
     for (const it of items) {
@@ -2598,8 +2717,13 @@
 
       if (it.kind === 'original') {
         card.dataset.kind = 'original';
+        card.classList.add('gallery__item--original');
+        if (trialOverlaySpecs.length > 0) {
+          card.dataset.trialOverlaySpecs = JSON.stringify(trialOverlaySpecs);
+        }
       } else if (it.kind === 'replot') {
         card.dataset.kind = 'replot';
+        card.classList.add('gallery__item--replot');
         card.dataset.runIndex = String(it.runIndex);
       }
 
@@ -2632,6 +2756,7 @@
       card.appendChild(imgWrap);
       resultGallery.appendChild(card);
     }
+    _setOriginalGalleryExpanded();
   }
 
   function renderOutputs(outputs) {
@@ -2722,8 +2847,8 @@
 
     if (testResultsMode) {
       // Load precomputed runs from disk (no extraction)
-      const nTrials = Math.max(1, Math.min(3, _getTrialCount()));
-      await runSavedTestResults(nTrials);
+      const selectedRuns = _ensureAtLeastOneTestRun('v1');
+      await runSavedTestResults(selectedRuns.length, selectedRuns);
       return;
     }
 
@@ -2779,7 +2904,6 @@
       downloadCsvConfirmedBtn.style.display = 'none';
       curvesControls.style.display = 'none';
       curvesTableWrap.style.display = 'none';
-      debugControls.style.display = 'block';
       overlayAdjustControls.style.display = 'block';
       highlightStatus.textContent = '';
 
@@ -2847,6 +2971,7 @@
 
       _buildUnionCurveLabels();
       _initDefaultTrialSelections();
+      await Promise.all(trialRuns.map((_r, idx) => _ensureTrialOverlayBuilt(idx)));
       curvesEmpty.style.display = (unionCurveLabels.length === 0) ? 'block' : 'none';
       renderTrialGallery();
       _renderTrialsGrid();
@@ -2933,8 +3058,12 @@
     }, 900);
   }
 
-  async function runSavedTestResults(nTrials) {
-    const n = Math.max(1, Math.min(3, Number(nTrials) || 1));
+  async function runSavedTestResults(nTrials, selectedRuns) {
+    const chosenRuns = (Array.isArray(selectedRuns) && selectedRuns.length)
+      ? selectedRuns.slice()
+      : _ensureAtLeastOneTestRun('v1');
+    const n = Math.max(1, Math.min(chosenRuns.length, Number(nTrials) || chosenRuns.length || 1));
+    const runsToLoad = chosenRuns.slice(0, n);
 
     btnExtract.disabled = true;
     btnCancel.style.display = 'none';
@@ -2950,7 +3079,6 @@
     downloadCsvConfirmedBtn.style.display = 'none';
     curvesControls.style.display = 'none';
     curvesTableWrap.style.display = 'none';
-    debugControls.style.display = 'block';
     overlayAdjustControls.style.display = 'block';
     highlightStatus.textContent = '';
 
@@ -2960,29 +3088,48 @@
     // Clear any prior polling.
     if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
 
-    const res = await fetch('/v2/load_saved_runs', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image_path: TEST_IMAGE_PATH, prompt_name: TEST_PROMPT_NAME, version_dir: TEST_VERSION_DIR, limit: n })
-    });
+    const runs = [];
+    const loadErrors = [];
+    for (const runSpec of runsToLoad) {
+      const req = {
+        image_path: TEST_IMAGE_PATH,
+        prompt_name: TEST_PROMPT_NAME,
+        limit: 1,
+        version_dir: runSpec.versionDir,
+      };
 
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok || !data.success || !Array.isArray(data.runs)) {
+      let res = null;
+      let data = {};
+      try {
+        res = await fetch('/v2/load_saved_runs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(req)
+        });
+        data = await res.json().catch(() => ({}));
+      } catch (_) {
+        loadErrors.push(runSpec.label + ': request_failed');
+        continue;
+      }
+
+      if (!res.ok || !data.success || !Array.isArray(data.runs) || data.runs.length === 0) {
+        const err = (data && data.error) ? String(data.error) : ('http_' + (res ? res.status : 0));
+        loadErrors.push(runSpec.label + ': ' + err);
+        continue;
+      }
+
+      const loaded = data.runs[0] || {};
+      if (loaded && typeof loaded === 'object') loaded._testRunLabel = runSpec.label;
+      runs.push(loaded);
+    }
+
+    if (!runs.length) {
       btnExtract.disabled = false;
       progressFill.style.width = '0%';
       progressText.textContent = 'Failed to load saved runs.';
 
-      let msg = 'Could not load saved test runs.';
-      if ((data && data.error) === 'not_enough_saved_runs') {
-          msg = 'Saved GA_copy1 key4.web run not found (found ' + (data.found || 0) + ', need ' + n + ').';
-      } else if (!res.ok && res.status === 404) {
-        // If the body isn't our JSON error, this is likely a missing route (wrong server/port).
-        msg = 'Saved-runs endpoint returned 404. Make sure you loaded the UI from the WebExtract server (e.g., http://127.0.0.1:5001/).';
-      } else if (data && data.error) {
-        msg = 'Could not load saved test runs: ' + data.error;
-      } else if (!res.ok) {
-        msg = 'Could not load saved test runs (HTTP ' + res.status + ').';
-      }
+      let msg = 'Could not load selected saved test runs.';
+      if (loadErrors.length) msg += ' ' + loadErrors.join(' | ');
 
       // Show the error prominently in both the chooser notice and the main results panel.
       setNotice(uploadStatus, msg, 'error');
@@ -2994,9 +3141,8 @@
     progressFill.style.width = '100%';
     progressText.textContent = 'Loaded.';
 
-    const runs = data.runs.slice(0, n);
-    if (data && data.partial) {
-      _setWarning('Only ' + runs.length + ' / ' + n + ' saved runs are available right now.');
+    if (runs.length < n || loadErrors.length) {
+      _setWarning('Loaded ' + runs.length + ' / ' + n + ' selected saved runs.' + (loadErrors.length ? (' Errors: ' + loadErrors.join(' | ')) : ''));
     } else {
       _setWarning('');
     }
@@ -3036,22 +3182,24 @@
     for (let i = 0; i < runs.length; i++) {
       const r = runs[i] && runs[i].result ? runs[i].result : null;
       const runInfo = _extractTrialRunInfo(r || null);
-      runInfo.taskId = 'saved-' + (runs[i].version || (i + 1));
+      const runLabel = String((runs[i] && runs[i]._testRunLabel) || (runs[i] && runs[i].version) || (i + 1));
+      runInfo.taskId = 'saved-' + runLabel;
       trialRuns.push(runInfo);
       anyFailures = anyFailures || !runInfo.ok;
-      combinedConsole += '\n\n===== SAVED RUN ' + (i + 1) + ' =====\n' + (runInfo.consoleText || '') + '\n';
+      combinedConsole += '\n\n===== SAVED RUN ' + runLabel + ' =====\n' + (runInfo.consoleText || '') + '\n';
     }
 
     btnExtract.disabled = false;
     resultWrap.style.display = 'block';
     setNotice(resultSummary,
-      'Loaded saved trials: ' + trialRuns.length + ' / ' + n + (data && data.partial ? ' (partial)' : '') + '.',
+      'Loaded saved trials: ' + trialRuns.length + ' / ' + n + (loadErrors.length ? ' (partial)' : '') + '.',
       anyFailures ? 'warn' : 'success'
     );
     renderConsole(combinedConsole.trim());
 
     _buildUnionCurveLabels();
     _initDefaultTrialSelections();
+    await Promise.all(trialRuns.map((_r, idx) => _ensureTrialOverlayBuilt(idx)));
     curvesEmpty.style.display = (unionCurveLabels.length === 0) ? 'block' : 'none';
     renderTrialGallery();
     _renderTrialsGrid();
@@ -3278,20 +3426,16 @@
     return lines.join('\n') + '\n';
   }
 
-  async function downloadTrialsCsv() {
-    if (!trialsMode || trialRuns.length <= 1) return;
-    _updateTrialExportState();
-    if (btnDownloadTrialsCsv.disabled) return;
+  async function _buildTrialsSelectedOrAveragedOutput() {
+    if (!trialsMode || trialRuns.length <= 1) return null;
 
     const curveToOutSeries = new Map();
-    const curveToOutHeaders = new Map();
 
     for (const label of unionCurveLabels) {
       const selected = Array.from(trialSelections.get(label) || []);
       if (selected.length === 0) continue;
 
       const seriesList = [];
-      let headerPair = null;
 
       for (const idx of selected) {
         const run = trialRuns[idx];
@@ -3301,7 +3445,6 @@
         const parsed = _extractSeriesForCurves(csvText, [label]);
         const s = parsed.series.get(label);
         if (s && s.length) seriesList.push(s);
-        if (!headerPair) headerPair = parsed.headerPairs.get(label) || null;
       }
 
       if (seriesList.length === 0) continue;
@@ -3314,11 +3457,22 @@
       }
 
       curveToOutSeries.set(label, outSeries);
-      if (headerPair) curveToOutHeaders.set(label, headerPair);
     }
 
     const csvOut = _buildTidyCfuCsvFromCurveSeries(unionCurveLabels, curveToOutSeries);
-    _downloadBlob(csvOut, 'extracted_trials_selected_or_averaged_tidy_cfu.csv');
+    return {
+      csvOut,
+      curveToOutSeries,
+    };
+  }
+
+  async function downloadTrialsCsv() {
+    if (!trialsMode || trialRuns.length <= 1) return;
+    _updateTrialExportState();
+    if (btnDownloadTrialsCsv.disabled) return;
+    const out = await _buildTrialsSelectedOrAveragedOutput();
+    if (!out || !out.csvOut) return;
+    _downloadBlob(out.csvOut, 'extracted_trials_selected_or_averaged_tidy_cfu.csv');
   }
 
   btnCopyConsole.addEventListener('click', async () => {
@@ -3351,15 +3505,6 @@
 
   btnDownloadTrialsCsv.addEventListener('click', downloadTrialsCsv);
 
-  if (chkAxesDebug) {
-    _loadAxesDebugPref();
-    chkAxesDebug.addEventListener('change', () => {
-      showAxesDebug = !!chkAxesDebug.checked;
-      _saveAxesDebugPref();
-      _renderOverlays();
-    });
-  }
-
   // Console collapse/expand
   if (btnToggleConsole && consoleWrap) {
     _loadConsolePref();
@@ -3371,57 +3516,107 @@
   }
 
   // Manual overlay adjustment controls
-  if (overlayAdjustTarget) {
-    _loadOverlayAdjustPref();
-    _loadReplotOverlayAxesModePref();
-    overlayAdjustTarget.addEventListener('change', () => {
-      overlayAdjust.target = overlayAdjustTarget.value || 'both';
-      _saveOverlayAdjustPref();
-    });
-  }
+  _loadOverlayAdjustPref();
+  _loadReplotOverlayAxesModePref();
 
-  if (btnOverlayAxesMode) {
+  if (overlayAxesModeGroup) {
     _loadReplotOverlayAxesModePref();
-    btnOverlayAxesMode.addEventListener('click', () => {
-      replotOverlayAxesMode = (replotOverlayAxesMode === 'minmax') ? 'full' : 'minmax';
-      btnOverlayAxesMode.textContent = (replotOverlayAxesMode === 'minmax') ? 'Axes: Min/Max' : 'Axes: Full';
-      _saveReplotOverlayAxesModePref();
-      _syncReplotOverlayLayers();
-    });
+    for (const btn of [btnOverlayAxesMinmax, btnOverlayAxesFull, btnOverlayAxesNone]) {
+      if (!btn) continue;
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.mode || 'full';
+        if (mode !== 'minmax' && mode !== 'full' && mode !== 'none') return;
+        replotOverlayAxesMode = mode;
+        _syncOverlayAxesModeButtons();
+        _saveReplotOverlayAxesModePref();
+        _syncReplotOverlayLayers();
+      });
+    }
   }
 
   function _wireOverlayHold(btn, action) {
     if (!btn) return;
 
-    let timerId = null;
-    let holding = false;
+    const _canAdjustOverlay = () => {
+      if (!resultGallery) return false;
+      if (resultGallery.style.display === 'none') return false;
+      return !!resultGallery.querySelector('.imgReplotOverlayWrap');
+    };
 
-    const stop = () => {
-      holding = false;
-      if (timerId != null) {
-        clearInterval(timerId);
-        timerId = null;
+    let holdTimeoutId = null;
+    let repeatIntervalId = null;
+    let isPressed = false;
+    let didRepeat = false;
+    let pressShiftKey = false;
+    let holdStartedAt = 0;
+
+    const HOLD_DELAY_MS = 700;
+    const REPEAT_INTERVAL_MS = 95;
+    const REPEAT_INTERVAL_FAST_MS = 60;
+    const REPEAT_ACCEL_AFTER_MS = 2200;
+
+    const clearTimers = () => {
+      if (holdTimeoutId != null) {
+        clearTimeout(holdTimeoutId);
+        holdTimeoutId = null;
+      }
+      if (repeatIntervalId != null) {
+        clearInterval(repeatIntervalId);
+        repeatIntervalId = null;
       }
     };
 
+    const runAction = () => {
+      action({ shiftKey: pressShiftKey });
+      _renderOverlays();
+    };
+
+    const startRepeat = () => {
+      if (!isPressed) return;
+      didRepeat = true;
+      holdStartedAt = Date.now();
+      runAction();
+      let activeInterval = REPEAT_INTERVAL_MS;
+      repeatIntervalId = setInterval(() => {
+        if (!isPressed) return;
+        if (activeInterval !== REPEAT_INTERVAL_FAST_MS && (Date.now() - holdStartedAt) >= REPEAT_ACCEL_AFTER_MS) {
+          clearInterval(repeatIntervalId);
+          activeInterval = REPEAT_INTERVAL_FAST_MS;
+          repeatIntervalId = setInterval(() => {
+            if (!isPressed) return;
+            runAction();
+          }, activeInterval);
+          return;
+        }
+        runAction();
+      }, activeInterval);
+    };
+
+    const endPress = (shouldClick) => {
+      if (!isPressed) {
+        clearTimers();
+        return;
+      }
+      isPressed = false;
+      const shouldRunSingle = !!shouldClick && !didRepeat;
+      clearTimers();
+      if (shouldRunSingle) {
+        runAction();
+      }
+      didRepeat = false;
+    };
+
     const start = (ev) => {
-      if (!lastResult) return;
+      if (!_canAdjustOverlay()) return;
       ev.preventDefault();
-
-      const shiftKey = !!(ev && ev.shiftKey);
-      const tick = () => {
-        action({ shiftKey });
-        _renderOverlays();
-      };
-
-      // Run immediately, then repeat while held.
-      stop();
-      holding = true;
-      tick();
-      timerId = setInterval(() => {
-        if (!holding) return;
-        tick();
-      }, 70);
+      endPress(false);
+      isPressed = true;
+      didRepeat = false;
+      pressShiftKey = !!(ev && ev.shiftKey);
+      holdTimeoutId = setTimeout(() => {
+        holdTimeoutId = null;
+        startRepeat();
+      }, HOLD_DELAY_MS);
 
       try {
         if (ev.pointerId != null && btn.setPointerCapture) btn.setPointerCapture(ev.pointerId);
@@ -3429,57 +3624,57 @@
     };
 
     btn.addEventListener('pointerdown', start);
-    btn.addEventListener('pointerup', stop);
-    btn.addEventListener('pointercancel', stop);
-    btn.addEventListener('pointerleave', stop);
-    window.addEventListener('blur', stop);
+    btn.addEventListener('pointerup', () => endPress(true));
+    btn.addEventListener('pointercancel', () => endPress(false));
+    btn.addEventListener('pointerleave', () => endPress(false));
+    window.addEventListener('blur', () => endPress(false));
   }
 
   _wireOverlayHold(btnOverlayLeft, (ev) => {
     const step = _overlayStepFromEvent(ev);
-    _applyAdjustToTargets((a) => (a.dx -= step));
+    _applyAdjust((a) => (a.dx -= step));
   });
 
   _wireOverlayHold(btnOverlayRight, (ev) => {
     const step = _overlayStepFromEvent(ev);
-    _applyAdjustToTargets((a) => (a.dx += step));
+    _applyAdjust((a) => (a.dx += step));
   });
 
   _wireOverlayHold(btnOverlayUp, (ev) => {
     const step = _overlayStepFromEvent(ev);
-    _applyAdjustToTargets((a) => (a.dy -= step));
+    _applyAdjust((a) => (a.dy -= step));
   });
 
   _wireOverlayHold(btnOverlayDown, (ev) => {
     const step = _overlayStepFromEvent(ev);
-    _applyAdjustToTargets((a) => (a.dy += step));
+    _applyAdjust((a) => (a.dy += step));
   });
 
   _wireOverlayHold(btnOverlayWidthUp, (ev) => {
     const k = _overlayScaleFromEvent(ev);
-    _applyAdjustToTargets((a) => (a.sx *= k));
+    _applyAdjust((a) => (a.sx *= k));
   });
 
   _wireOverlayHold(btnOverlayWidthDown, (ev) => {
     const k = _overlayScaleFromEvent(ev);
-    _applyAdjustToTargets((a) => (a.sx /= k));
+    _applyAdjust((a) => (a.sx /= k));
   });
 
   _wireOverlayHold(btnOverlayHeightUp, (ev) => {
     const k = _overlayScaleFromEvent(ev);
-    _applyAdjustToTargets((a) => (a.sy *= k));
+    _applyAdjust((a) => (a.sy *= k));
   });
 
   _wireOverlayHold(btnOverlayHeightDown, (ev) => {
     const k = _overlayScaleFromEvent(ev);
-    _applyAdjustToTargets((a) => (a.sy /= k));
+    _applyAdjust((a) => (a.sy /= k));
   });
 
   // Reset is intentionally one-shot.
   if (btnOverlayReset) {
     btnOverlayReset.addEventListener('click', () => {
-      if (!lastResult) return;
-      _applyAdjustToTargets((a) => {
+      if (!resultGallery || resultGallery.style.display === 'none' || !resultGallery.querySelector('.imgReplotOverlayWrap')) return;
+      _applyAdjust((a) => {
         a.sx = 1.0;
         a.sy = 1.0;
         a.dx = 0.0;
@@ -3562,6 +3757,45 @@
     chkTestResults.addEventListener('change', () => {
       _setTestResultsMode(!!chkTestResults.checked);
     });
+  }
+
+  if (chkTestRunV1) {
+    chkTestRunV1.addEventListener('change', () => {
+      _ensureAtLeastOneTestRun('v2');
+      if (testResultsMode) _setTestResultsMode(true);
+    });
+  }
+
+  if (chkTestRunV2) {
+    chkTestRunV2.addEventListener('change', () => {
+      _ensureAtLeastOneTestRun('v1');
+      if (testResultsMode) _setTestResultsMode(true);
+    });
+  }
+
+  function _showTrialDownloadTooltip() {
+    if (!trialDownloadTooltipWrap || !trialDownloadTooltip) return;
+    const text = String(trialDownloadTooltipWrap.dataset.tooltip || '').trim();
+    if (!text) {
+      trialDownloadTooltip.style.display = 'none';
+      trialDownloadTooltip.textContent = '';
+      return;
+    }
+    trialDownloadTooltip.textContent = text;
+    trialDownloadTooltip.style.display = 'block';
+  }
+
+  function _hideTrialDownloadTooltip() {
+    if (!trialDownloadTooltip) return;
+    trialDownloadTooltip.style.display = 'none';
+    trialDownloadTooltip.textContent = '';
+  }
+
+  if (trialDownloadTooltipWrap) {
+    trialDownloadTooltipWrap.addEventListener('mouseenter', _showTrialDownloadTooltip);
+    trialDownloadTooltipWrap.addEventListener('mouseleave', _hideTrialDownloadTooltip);
+    trialDownloadTooltipWrap.addEventListener('focusin', _showTrialDownloadTooltip);
+    trialDownloadTooltipWrap.addEventListener('focusout', _hideTrialDownloadTooltip);
   }
 
   btnExtract.addEventListener('click', runExtraction);

@@ -86,6 +86,65 @@ def _safe_abs_under_plots(rel_path: str) -> str | None:
     return abs_p
 
 
+def _safe_abs_under_ui_examples(rel_path: str) -> str | None:
+    """Return absolute path under UI_EXAMPLES_DIR for a examples-relative path, else None."""
+    if not rel_path:
+        return None
+    try:
+        p = str(rel_path).replace('\\', '/').lstrip('/')
+    except Exception:
+        return None
+    if any(part == '..' for part in p.split('/')):
+        return None
+    abs_p = os.path.abspath(os.path.join(UI_EXAMPLES_DIR, p.replace('/', os.sep)))
+    if not abs_p.startswith(os.path.abspath(UI_EXAMPLES_DIR)):
+        return None
+    return abs_p
+
+
+def _resolve_ui_example_to_plots_rel(example_rel_path: str) -> str | None:
+    """Map a UI example (WebExtract/examples) to its canonical plots-relative image path."""
+    example_name = os.path.basename(example_rel_path or '').strip()
+    if not example_name:
+        return None
+
+    example_name_lower = example_name.lower()
+    example_stem_lower = os.path.splitext(example_name_lower)[0]
+    candidates = []
+
+    for root, _dirs, files in os.walk(PLOTS_DIR):
+        for fname in files:
+            if fname.lower() != example_name_lower:
+                continue
+            if os.path.splitext(fname)[1].lower() not in ALLOWED_IMAGE_EXTS:
+                continue
+            full_path = os.path.join(root, fname)
+            rel_path = os.path.relpath(full_path, PLOTS_DIR).replace('\\', '/')
+            candidates.append(rel_path)
+
+    if not candidates:
+        return None
+
+    def _rank(rel_path: str):
+        parts = rel_path.split('/')
+        top = (parts[0].lower() if parts else '')
+        parent = (parts[-2].lower() if len(parts) >= 2 else '')
+        top_rank = 0
+        if top == 'synthetic':
+            top_rank = 0
+        elif top == 'first_examples':
+            top_rank = 1
+        elif top == 'quick_test':
+            top_rank = 2
+        else:
+            top_rank = 3
+        parent_rank = 0 if parent == example_stem_lower else 1
+        return (top_rank, parent_rank, len(parts), rel_path.lower())
+
+    candidates.sort(key=_rank)
+    return candidates[0]
+
+
 def _list_v2_version_dirs(image_path: str, prompt_name: str) -> list[tuple[int, str]]:
     """Return list of (version_num, version_dir_abs) for v2 runs of image+prompt."""
     import re
@@ -2614,15 +2673,16 @@ def _iter_example_files():
     for root, _dirs, files in os.walk(UI_EXAMPLES_DIR):
         for name in files:
             ext = os.path.splitext(name)[1].lower()
-            if ext in ALLOWED_IMAGE_EXTS:
-                full_path = os.path.join(root, name)
-                rel_path = os.path.relpath(full_path, UI_EXAMPLES_DIR).replace('\\', '/')
-                yield rel_path
+            if ext not in ALLOWED_IMAGE_EXTS:
+                continue
+            full_path = os.path.join(root, name)
+            rel_path = os.path.relpath(full_path, UI_EXAMPLES_DIR).replace('\\', '/')
+            yield rel_path
 
 
 @app.route('/ui/examples')
 def ui_examples():
-    """List available example images shipped with the UI."""
+    """List example images from WebExtract/examples."""
     return jsonify({'examples': sorted(set(_iter_example_files()))})
 
 
@@ -2669,14 +2729,14 @@ def ui_upload():
 
 @app.route('/ui/prepare_example', methods=['POST'])
 def ui_prepare_example():
-    """Copy a bundled example image into batch_uploads and return its plots-relative path."""
+    """Validate a WebExtract/examples image and resolve it to canonical plots path."""
     data = request.json or {}
     example_path = (data.get('example_path') or '').strip().replace('\\', '/')
     if not example_path:
         return jsonify({'success': False, 'error': 'missing_example_path'}), 400
 
-    src_full = os.path.abspath(os.path.join(UI_EXAMPLES_DIR, example_path.replace('/', os.sep)))
-    if not src_full.startswith(os.path.abspath(UI_EXAMPLES_DIR)):
+    src_full = _safe_abs_under_ui_examples(example_path)
+    if not src_full:
         return jsonify({'success': False, 'error': 'invalid_example_path'}), 400
 
     if not os.path.isfile(src_full):
@@ -2685,20 +2745,15 @@ def ui_prepare_example():
     if not _is_allowed_image(src_full):
         return jsonify({'success': False, 'error': 'unsupported_file_type'}), 400
 
-    token = str(uuid.uuid4())[:8]
-    base_name = secure_filename(os.path.basename(src_full))
-    dest_name = f"ui_ex_{token}_{base_name}"
+    rel_image_path = _resolve_ui_example_to_plots_rel(example_path)
+    if not rel_image_path:
+        return jsonify({'success': False, 'error': 'example_not_mapped_in_plots'}), 400
 
-    os.makedirs(BATCH_DIR, exist_ok=True)
-    dest_full = os.path.join(BATCH_DIR, dest_name)
-    shutil.copy2(src_full, dest_full)
-
-    rel_image_path = os.path.relpath(dest_full, PLOTS_DIR).replace('\\', '/')
     return jsonify({
         'success': True,
         'image_path': rel_image_path,
         'preview_url': f"/plots/{rel_image_path}",
-        'filename': dest_name,
+        'filename': os.path.basename(src_full),
     })
 
 @app.route('/check_csv', methods=['POST'])
