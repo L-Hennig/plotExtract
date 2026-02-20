@@ -314,6 +314,16 @@ body {
   padding: 10px;
 }
 
+.gallery__item--original {
+  padding: 16px;
+  background: var(--card);
+}
+
+.gallery__item--original .gallery__imgwrap {
+  padding: 18px 28px;
+  box-sizing: border-box;
+}
+
 .gallery__title {
   font-weight: 700;
   font-size: 13px;
@@ -337,7 +347,7 @@ body {
 }
 
 .gallery--originalExpanded .gallery__item--original .gallery__imgwrap {
-  height: 440px;
+  height: auto;
 }
 
 .gallery__imglink {
@@ -484,6 +494,88 @@ body {
   inset: 0;
 }
 
+.imgReplotAdjustLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.imgReplotAdjustFrame {
+  display: none;
+}
+
+.imgReplotAdjustHandle {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.001);
+  border: 0;
+  pointer-events: auto;
+}
+
+.imgReplotAdjustHandle::after {
+  content: '';
+  position: absolute;
+  border-radius: 999px;
+  border: 1.2px solid rgba(220, 38, 38, 0.9);
+  background: rgba(220, 38, 38, 0.2);
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
+  pointer-events: none;
+}
+
+.imgReplotAdjustHandle--left,
+.imgReplotAdjustHandle--right {
+  cursor: ew-resize;
+}
+
+.imgReplotAdjustHandle--left::after,
+.imgReplotAdjustHandle--right::after {
+  width: 12px;
+  height: min(34px, calc(100% - 2px));
+  min-height: 8px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.imgReplotAdjustHandle--top,
+.imgReplotAdjustHandle--bottom {
+  cursor: ns-resize;
+}
+
+.imgReplotAdjustHandle--top::after,
+.imgReplotAdjustHandle--bottom::after {
+  width: min(34px, calc(100% - 2px));
+  min-width: 8px;
+  height: 12px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.imgReplotAdjustCenter {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(220, 38, 38, 0.18);
+  border: 1.5px solid rgba(220, 38, 38, 0.85);
+  transform: translate(-50%, -50%);
+  cursor: move;
+  pointer-events: auto;
+}
+
+.imgReplotGuideAxis {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.imgReplotGuideAxis--y {
+  border-left: 2px solid rgba(220, 38, 38, 0.95);
+}
+
+.imgReplotGuideAxis--x {
+  border-top: 2px solid rgba(220, 38, 38, 0.95);
+}
+
 .consoleWrap--collapsed {
   display: none;
 }
@@ -611,3 +703,233 @@ body {
 .overlayBtn--left { grid-column: 1; grid-row: 2; }
 .overlayBtn--right { grid-column: 3; grid-row: 2; }
 .overlayBtn--down { grid-column: 2; grid-row: 3; }
+
+/* Adjust section */
+.adjustLayout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+@media (max-width: 900px) {
+  .adjustLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.adjustCanvasWrap {
+  height: 460px;
+  border-radius: 12px;
+  border: 1px solid var(--stroke);
+  background: rgba(255, 255, 255, 0.7);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+
+.adjustImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.adjustOverlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.adjustOverlay--axes,
+.adjustOverlay--curves {
+  pointer-events: none;
+}
+
+.adjustOverlay--curves {
+  pointer-events: auto;
+  cursor: crosshair;
+}
+
+.adjustAxesRect {
+  fill: none;
+  stroke: rgba(79, 70, 229, 0.65);
+  stroke-width: 1.5;
+}
+
+.adjustAxesTick {
+  stroke: rgba(79, 70, 229, 0.75);
+  stroke-width: 1.25;
+}
+
+.adjustAxesLabel {
+  fill: rgba(67, 56, 202, 0.9);
+  font-size: 13px;
+  font-weight: 600;
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 2px;
+  stroke-linejoin: round;
+}
+
+.adjustCurveLine {
+  stroke: #dc2626;
+}
+
+.adjustPoint {
+  fill: #dc2626;
+  stroke: #dc2626;
+  stroke-width: 1;
+}
+
+.adjustPoint--selected {
+  stroke: #991b1b;
+  stroke-width: 1.8;
+}
+
+#adjustDeletePointsRow.is-disabled {
+  opacity: 0.55;
+}
+
+#adjustDeletePointsRow.is-disabled .toggle {
+  cursor: not-allowed;
+}
+
+#adjustAddPointsRow.is-disabled {
+  opacity: 0.55;
+}
+
+#adjustAddPointsRow.is-disabled .toggle {
+  cursor: not-allowed;
+}
+
+.adjustVisibleCurvesList {
+  margin-top: 6px;
+  max-height: 120px;
+  overflow: auto;
+  border: 1px solid var(--stroke);
+  border-radius: 10px;
+  padding: 6px 8px;
+  background: #fff;
+}
+
+.adjustVisibleCurveItem {
+  display: block;
+  margin: 2px 0;
+}
+
+.adjustInput {
+  width: 100%;
+  padding: 10px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--stroke);
+  background: #ffffff;
+  color: var(--text);
+  outline: none;
+}
+
+.adjustInput:focus {
+  border-color: rgba(79, 70, 229, 0.45);
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+}
+
+.saveHistoryList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.saveHistoryItem {
+  flex: 0 0 auto;
+}
+
+.saveHistoryItem--active {
+  border-color: rgba(79, 70, 229, 0.4);
+  background: rgba(79, 70, 229, 0.08);
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle__input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.toggle__track {
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  background: rgba(17, 24, 39, 0.12);
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+
+.toggle__thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.22);
+  transform: translateX(0);
+  transition: transform 140ms ease;
+}
+
+.toggle__label {
+  font-size: 14px;
+  color: rgba(17, 24, 39, 0.9);
+}
+
+.toggle__input:checked + .toggle__track {
+  background: rgba(79, 70, 229, 0.42);
+  border-color: rgba(79, 70, 229, 0.7);
+}
+
+.toggle__input:checked + .toggle__track .toggle__thumb {
+  transform: translateX(18px);
+}
+
+.toggle__input:focus-visible + .toggle__track {
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+}
+
+.adjustMovementRow {
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.adjustMovementRow > * {
+  flex: 0 0 auto;
+}
+
+.adjustMovementRow .toggle {
+  min-height: 30px;
+  padding: 2px 0;
+}
+
+#adjustOverlayMovementState {
+  font-weight: 600;
+  min-width: 26px;
+}
+
+#adjustOverlayMovementTip {
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  background: rgba(243, 245, 249, 0.75);
+  cursor: help;
+}

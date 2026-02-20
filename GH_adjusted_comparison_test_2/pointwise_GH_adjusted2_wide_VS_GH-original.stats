@@ -1,0 +1,63 @@
+# Per-curve statistics
+
+Curve 'Blank' -> 'Blank':
+  MAE X (percent): 0.00
+  MAE Y (percent): 0.60
+  Precision: 1.0000
+  Recall: 1.0000
+  MatchedPairs: 8
+  Extra extracted (unmatched): 0
+  Missed original (not found): 0
+
+Curve 'COL 0.125 µg/mL' -> 'COL 0.125 µg/mL':
+  MAE X (percent): 0.00
+  MAE Y (percent): 0.74
+  Precision: 1.0000
+  Recall: 1.0000
+  MatchedPairs: 8
+  Extra extracted (unmatched): 0
+  Missed original (not found): 0
+
+Curve 'MINO 1 µg/mL' -> 'MINO 1.0 µg/mL':
+  MAE X (percent): 0.00
+  MAE Y (percent): 1.10
+  Precision: 1.0000
+  Recall: 1.0000
+  MatchedPairs: 8
+  Extra extracted (unmatched): 0
+  Missed original (not found): 0
+
+Curve 'COL 0.125 µg/mL + MEM 4 µg/mL' -> 'COL 0.125 µg/mL + MEM 4.0 µg/mL':
+  MAE X (percent): 0.00
+  MAE Y (percent): 1.10
+  Precision: 1.0000
+  Recall: 1.0000
+  MatchedPairs: 8
+  Extra extracted (unmatched): 0
+  Missed original (not found): 0
+
+Curve 'COL 0.125 µg/mL + MINO 1 µg/mL' -> 'COL 0.125 µg/mL + MINO 1.0 µg/mL':
+  MAE X (percent): 0.00
+  MAE Y (percent): 1.31
+  Precision: 1.0000
+  Recall: 1.0000
+  MatchedPairs: 8
+  Extra extracted (unmatched): 0
+  Missed original (not found): 0
+
+Curve 'MEM 4 µg/mL' -> 'MEM 4.0 µg/mL':
+  MAE X (percent): 0.00
+  MAE Y (percent): 1.46
+  Precision: 1.0000
+  Recall: 1.0000
+  MatchedPairs: 8
+  Extra extracted (unmatched): 0
+  Missed original (not found): 0
+
+# Summary
+Number of curves: 6
+Mean MAE X (percent): 0.00
+Mean MAE Y (percent): 1.05
+Mean Precision: 1.0000
+Mean Recall: 1.0000
+Threshold (MAX_NORM_DIST): 0.1

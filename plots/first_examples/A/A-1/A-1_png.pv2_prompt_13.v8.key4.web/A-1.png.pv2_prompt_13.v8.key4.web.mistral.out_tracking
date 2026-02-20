@@ -1,0 +1,148 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\Plot_Extract\\plots\\first_examples/A/A-1/A-1.png",
+  "prompt_name": "prompt_13",
+  "overall_status": "completed",
+  "validation_status": "yes",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 410,
+      "execution_time_ms": 3273.448705673218,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T10:32:07.554415",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 511,
+      "execution_time_ms": 3339.752674102783,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T10:32:10.830643",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 925,
+      "execution_time_ms": 4111.164093017578,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T10:32:14.172887",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3A": {
+      "stage_name": "EXTRACT_STAGE_3A",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1578,
+      "execution_time_ms": 6792.299747467041,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T10:32:18.287695",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 5417,
+      "execution_time_ms": 19217.395782470703,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T10:32:25.082694",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 11342,
+      "execution_time_ms": 43682.91401863098,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T10:32:44.304491",
+      "notes": []
+    },
+    "EXTRACT_STAGE_6": {
+      "stage_name": "EXTRACT_STAGE_6",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 2809,
+      "execution_time_ms": 11316.490173339844,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T10:33:27.994010",
+      "notes": []
+    },
+    "EXTRACT_STAGE_7": {
+      "stage_name": "EXTRACT_STAGE_7",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 7481,
+      "execution_time_ms": 24774.35302734375,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T10:33:39.315437",
+      "notes": []
+    },
+    "EXTRACT_STAGE_8": {
+      "stage_name": "EXTRACT_STAGE_8",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 20,
+        "columns": [
+          "```csv"
+        ],
+        "axis_labels": [
+          "```csv"
+        ]
+      },
+      "output_length": 2051,
+      "execution_time_ms": 8838.074445724487,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T10:34:04.098041",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_8": {
+      "num_columns": 1,
+      "num_rows": 20,
+      "columns": [
+        "```csv"
+      ],
+      "axis_labels": [
+        "```csv"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 166.212059,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "Yes",
+      "num_points": "Yes",
+      "trend": "Yes"
+    }
+  }
+}

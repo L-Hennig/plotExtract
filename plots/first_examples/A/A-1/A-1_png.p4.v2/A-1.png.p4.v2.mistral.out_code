@@ -1,0 +1,57 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time = {
+    'Blank': [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+    'COL 0.125µg/mL': [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+    'MINO 1µg/mL': [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+    'MEM 4µg/mL': [0, 2, 4, 6, 8, 10, 12, 22, 24],
+    'RFP 0.06µg/mL': [0, 2, 4, 6, 8, 10, 12, 22, 24],
+    'COL 0.125µg/mL + MEM 4µg/mL': [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+    'COL 0.125µg/mL + MINO 1µg/mL': [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+    'COL 0.125µg/mL + RFP 0.06µg/mL': [0, 2, 4, 6, 8, 10, 12, 22, 24, 26]
+}
+
+log_cfu = {
+    'Blank': [6.2, 9.0, 9.5, 10.0, 10.0, 10.0, 10.0, 9.5, 9.0, 9.0],
+    'COL 0.125µg/mL': [6.2, 7.0, 9.0, 9.5, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0],
+    'MINO 1µg/mL': [6.2, 8.0, 8.5, 9.0, 9.5, 10.0, 10.0, 9.0, 8.5, 8.0],
+    'MEM 4µg/mL': [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'RFP 0.06µg/mL': [6.2, 0.0, 0.0, 0.0, 0.0, 1.0, 1.5, 0.0, 0.0],
+    'COL 0.125µg/mL + MEM 4µg/mL': [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'COL 0.125µg/mL + MINO 1µg/mL': [6.2, 0.0, 0.0, 1.0, 2.0, 2.0, 1.0, 0.0, 0.0, 0.0],
+    'COL 0.125µg/mL + RFP 0.06µg/mL': [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+}
+
+# Plot settings
+plt.figure(figsize=(8, 6))
+markers = ['x', 's', '^', 'o', 'v', 'D', '>', '<']
+linestyles = ['-', '-', '--', ':', '-.', '--', '-.', '--']
+colors = ['k', 'k', 'k', 'k', 'k', 'k', 'k', 'k']
+
+# Plot each curve
+for i, label in enumerate(time.keys()):
+    plt.plot(time[label], log_cfu[label],
+             label=label,
+             marker=markers[i],
+             linestyle=linestyles[i],
+             color=colors[i])
+
+# Axis labels
+plt.xlabel('Time (h)')
+plt.ylabel('Log cfu/mL')
+
+# Axis limits
+plt.xlim(0, 26)
+plt.ylim(0, 16)
+
+# Legend
+plt.legend()
+
+# Save plot
+output_path = r"C:\Users\Lucas\OneDrive\UCL Internship\Plot_Extract\plots\first_examples\A\A-1_png.p4.v2\A-1_png-replot.p4.v2.png"
+os.makedirs(os.path.dirname(output_path), exist_ok=True)
+plt.savefig(output_path, bbox_inches='tight', dpi=300)
+plt.close()

@@ -1,0 +1,81 @@
+# Per-curve statistics
+
+Curve 'blank' -> 'Log cfu/mL (Blank)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 2.86
+  Precision: 0.7000
+  Recall: 0.8750
+  MatchedPairs: 7
+  Extra extracted (unmatched): 3
+  Missed original (not found): 1
+
+Curve 'COL 0.125µg/mL' -> 'Log cfu/mL (COL 0.125µg/mL)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 3.13
+  Precision: 0.7000
+  Recall: 0.8750
+  MatchedPairs: 7
+  Extra extracted (unmatched): 3
+  Missed original (not found): 1
+
+Curve 'MINO 1µg/mL' -> 'Log cfu/mL (MINO 1µg/mL)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 3.69
+  Precision: 0.4000
+  Recall: 0.5000
+  MatchedPairs: 4
+  Extra extracted (unmatched): 6
+  Missed original (not found): 4
+
+Curve 'COL 0.125µg/mL + MEM 4µg/mL' -> 'Log cfu/mL (MEM 4µg/mL)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 8.85
+  Precision: 0.7778
+  Recall: 0.8750
+  MatchedPairs: 7
+  Extra extracted (unmatched): 2
+  Missed original (not found): 1
+
+Curve 'MEM 4µg/mL' -> 'Log cfu/mL (RFP 0.06µg/mL)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 1.95
+  Precision: 0.1000
+  Recall: 0.1250
+  MatchedPairs: 1
+  Extra extracted (unmatched): 9
+  Missed original (not found): 7
+
+Curve 'RFP 0.06µg/mL' -> 'Log cfu/mL (COL 0.125µg/mL + MEM 4µg/mL)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 1.95
+  Precision: 0.1000
+  Recall: 0.1250
+  MatchedPairs: 1
+  Extra extracted (unmatched): 9
+  Missed original (not found): 7
+
+Curve 'COL 0.125µg/mL + MINO 1µg/mL' -> 'Log cfu/mL (COL 0.125µg/mL + MINO 1µg/mL)':
+  MAE X (percent): 1.28
+  MAE Y (percent): 2.87
+  Precision: 0.6000
+  Recall: 0.7500
+  MatchedPairs: 6
+  Extra extracted (unmatched): 4
+  Missed original (not found): 2
+
+Curve 'COL 0.125µg/mL + RFP 0.06µg/mL' -> 'Log cfu/mL (COL 0.125µg/mL + RFP 0.06µg/mL)':
+  MAE X (percent): 0.00
+  MAE Y (percent): 7.99
+  Precision: 0.4000
+  Recall: 0.5000
+  MatchedPairs: 4
+  Extra extracted (unmatched): 6
+  Missed original (not found): 4
+
+# Summary
+Number of curves: 8
+Mean MAE X (percent): 0.16
+Mean MAE Y (percent): 4.16
+Mean Precision: 0.4722
+Mean Recall: 0.5781
+Threshold (MAX_NORM_DIST): 0.1

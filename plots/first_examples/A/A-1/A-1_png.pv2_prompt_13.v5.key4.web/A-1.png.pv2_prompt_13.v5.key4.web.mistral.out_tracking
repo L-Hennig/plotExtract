@@ -1,0 +1,167 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\Plot_Extract\\plots\\first_examples/A/A-1/A-1.png",
+  "prompt_name": "prompt_13",
+  "overall_status": "completed",
+  "validation_status": "yes",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 102,
+        "columns": [
+          "{"
+        ],
+        "axis_labels": [
+          "{"
+        ]
+      },
+      "output_length": 5272,
+      "execution_time_ms": 29505.661964416504,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:50:47.720113",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 517,
+      "execution_time_ms": 3214.319944381714,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:51:17.234916",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 925,
+      "execution_time_ms": 4315.599203109741,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:51:20.452329",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3A": {
+      "stage_name": "EXTRACT_STAGE_3A",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1591,
+      "execution_time_ms": 6991.902589797974,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:51:24.771400",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 6921,
+      "execution_time_ms": 25234.124898910522,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:51:31.767190",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 10807,
+      "execution_time_ms": 42545.83549499512,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:51:57.005242",
+      "notes": []
+    },
+    "EXTRACT_STAGE_6": {
+      "stage_name": "EXTRACT_STAGE_6",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 4751,
+      "execution_time_ms": 18197.129249572754,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:52:39.559312",
+      "notes": []
+    },
+    "EXTRACT_STAGE_7": {
+      "stage_name": "EXTRACT_STAGE_7",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 13104,
+      "execution_time_ms": 41660.749673843384,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:52:57.763941",
+      "notes": []
+    },
+    "EXTRACT_STAGE_8": {
+      "stage_name": "EXTRACT_STAGE_8",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 8,
+        "columns": [
+          "```csv"
+        ],
+        "axis_labels": [
+          "```csv"
+        ]
+      },
+      "output_length": 421,
+      "execution_time_ms": 4376.482248306274,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:53:39.435692",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_1": {
+      "num_columns": 1,
+      "num_rows": 102,
+      "columns": [
+        "{"
+      ],
+      "axis_labels": [
+        "{"
+      ]
+    },
+    "EXTRACT_STAGE_8": {
+      "num_columns": 1,
+      "num_rows": 8,
+      "columns": [
+        "```csv"
+      ],
+      "axis_labels": [
+        "```csv"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 234.322999,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "Yes",
+      "num_points": "Yes",
+      "trend": "Yes"
+    }
+  }
+}

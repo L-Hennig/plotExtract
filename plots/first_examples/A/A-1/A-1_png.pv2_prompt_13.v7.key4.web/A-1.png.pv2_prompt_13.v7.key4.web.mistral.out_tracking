@@ -1,0 +1,148 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\Plot_Extract\\plots\\first_examples/A/A-1/A-1.png",
+  "prompt_name": "prompt_13",
+  "overall_status": "completed",
+  "validation_status": "yes",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 410,
+      "execution_time_ms": 3278.4478664398193,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T09:43:24.254092",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 511,
+      "execution_time_ms": 3908.1058502197266,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T09:43:27.534639",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 925,
+      "execution_time_ms": 4840.226411819458,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T09:43:31.444904",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3A": {
+      "stage_name": "EXTRACT_STAGE_3A",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1578,
+      "execution_time_ms": 7438.223838806152,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T09:43:36.288772",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 5417,
+      "execution_time_ms": 19913.784503936768,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T09:43:43.730949",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 11342,
+      "execution_time_ms": 42977.728843688965,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T09:44:03.648595",
+      "notes": []
+    },
+    "EXTRACT_STAGE_6": {
+      "stage_name": "EXTRACT_STAGE_6",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 2052,
+      "execution_time_ms": 8638.185262680054,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T09:44:46.633660",
+      "notes": []
+    },
+    "EXTRACT_STAGE_7": {
+      "stage_name": "EXTRACT_STAGE_7",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 4422,
+      "execution_time_ms": 15391.342878341675,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T09:44:55.277304",
+      "notes": []
+    },
+    "EXTRACT_STAGE_8": {
+      "stage_name": "EXTRACT_STAGE_8",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 13,
+        "columns": [
+          "```csv"
+        ],
+        "axis_labels": [
+          "```csv"
+        ]
+      },
+      "output_length": 1175,
+      "execution_time_ms": 4959.239482879639,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T09:45:10.675742",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_8": {
+      "num_columns": 1,
+      "num_rows": 13,
+      "columns": [
+        "```csv"
+      ],
+      "axis_labels": [
+        "```csv"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 153.349722,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "Yes",
+      "num_points": "Yes",
+      "trend": "Yes"
+    }
+  }
+}

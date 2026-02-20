@@ -1,0 +1,152 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\Plot_Extract\\plots\\first_examples/A/A-1/A-1.png",
+  "prompt_name": "prompt_13",
+  "overall_status": "completed",
+  "validation_status": "yes",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 400,
+      "execution_time_ms": 3178.9350509643555,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:36:34.695579",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 511,
+      "execution_time_ms": 3656.4559936523438,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:36:37.876655",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 925,
+      "execution_time_ms": 4452.607154846191,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:36:41.535338",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3A": {
+      "stage_name": "EXTRACT_STAGE_3A",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1578,
+      "execution_time_ms": 7114.903450012207,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:36:45.990426",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 5399,
+      "execution_time_ms": 22896.913766860962,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:36:53.109257",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 11266,
+      "execution_time_ms": 43156.0480594635,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:37:16.010256",
+      "notes": []
+    },
+    "EXTRACT_STAGE_6": {
+      "stage_name": "EXTRACT_STAGE_6",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 2288,
+      "execution_time_ms": 8916.224718093872,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:37:59.172373",
+      "notes": []
+    },
+    "EXTRACT_STAGE_7": {
+      "stage_name": "EXTRACT_STAGE_7",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 3842,
+      "execution_time_ms": 13889.581203460693,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:38:08.093034",
+      "notes": []
+    },
+    "EXTRACT_STAGE_8": {
+      "stage_name": "EXTRACT_STAGE_8",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 2,
+        "num_rows": 17,
+        "columns": [
+          "Since you haven't provided the original full CSV text",
+          " I'll create a template of what the updated CSV should look like based on the re-extraction results. The actual output would need the original CSV structure to make precise replacements."
+        ],
+        "axis_labels": [
+          "Since you haven't provided the original full CSV text",
+          " I'll create a template of what the updated CSV should look like based on the re-extraction results. The actual output would need the original CSV structure to make precise replacements."
+        ]
+      },
+      "output_length": 1016,
+      "execution_time_ms": 5345.767498016357,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-19T17:38:21.988224",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_8": {
+      "num_columns": 2,
+      "num_rows": 17,
+      "columns": [
+        "Since you haven't provided the original full CSV text",
+        " I'll create a template of what the updated CSV should look like based on the re-extraction results. The actual output would need the original CSV structure to make precise replacements."
+      ],
+      "axis_labels": [
+        "Since you haven't provided the original full CSV text",
+        " I'll create a template of what the updated CSV should look like based on the re-extraction results. The actual output would need the original CSV structure to make precise replacements."
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 149.555788,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "Yes",
+      "num_points": "Yes",
+      "trend": "Yes"
+    }
+  }
+}

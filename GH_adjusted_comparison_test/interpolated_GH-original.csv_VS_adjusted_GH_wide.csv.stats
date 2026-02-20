@@ -1,0 +1,29 @@
+# Curve-by-curve statistics
+Curve 'Blank' -> 'Blank':
+  MAE: 0.003569
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+Curve 'COL 0.125 µg/mL' -> 'COL 0.125 µg/mL':
+  MAE: 0.006286
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+Curve 'MINO 1 µg/mL' -> 'MINO 1.0 µg/mL':
+  MAE: 0.011151
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+Curve 'COL 0.125 µg/mL + MEM 4 µg/mL' -> 'COL 0.125 µg/mL + MEM 4.0 µg/mL':
+  MAE: 0.007710
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+Curve 'COL 0.125 µg/mL + MINO 1 µg/mL' -> 'COL 0.125 µg/mL + MINO 1.0 µg/mL':
+  MAE: 0.680010
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+Curve 'MEM 4 µg/mL' -> 'MEM 4.0 µg/mL':
+  MAE: 0.016785
+  LeftMissed: 0.000000
+  RightMissed: 0.000000
+
+# Summary
+Number of curves: 6
+Mean MAE: 0.120918

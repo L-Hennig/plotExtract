@@ -3,6 +3,8 @@ import os
 import math
 import ast
 import io
+import re
+from difflib import SequenceMatcher
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
 
 import pandas as pd
@@ -314,20 +316,70 @@ def match_curves_heuristic(original_curves, extracted_curves):
     """Fast, deterministic curve mapping.
 
     Strategy:
-    - If labels overlap, match by exact label.
-    - Otherwise match by order.
+    - Match by exact label.
+    - Then match by normalized label (handles formatting variants like 1.0 vs 1).
+    - Then match by best normalized-string similarity.
+    - Finally fallback by order.
     """
+    def _normalize_curve_label(label: str) -> str:
+        text = str(label).strip().lower()
+        text = text.replace('μ', 'µ')
+        text = re.sub(r'\s+', ' ', text)
+        text = re.sub(r'([0-9]+)\.0+(?=(\s*µ?g\s*/\s*ml))', r'\1', text)
+        text = re.sub(r'\s*\+\s*', ' + ', text)
+        text = re.sub(r'\s+', ' ', text).strip()
+        return text
+
+    def _label_similarity(a: str, b: str) -> float:
+        return SequenceMatcher(None, a, b).ratio()
+
     original_labels = list(original_curves.keys())
     extracted_labels = list(extracted_curves.keys())
 
     mapping = {}
 
+    # 1) Exact label matches
     extracted_set = set(extracted_labels)
     for orig_label in original_labels:
         if orig_label in extracted_set:
             mapping[orig_label] = orig_label
 
+    # 2) Normalized label matches
     used = set(mapping.values())
+    orig_norm = {lab: _normalize_curve_label(lab) for lab in original_labels}
+    extr_norm = {lab: _normalize_curve_label(lab) for lab in extracted_labels}
+
+    for orig_label in original_labels:
+        if orig_label in mapping:
+            continue
+        candidates = [
+            extr_label for extr_label in extracted_labels
+            if extr_label not in used and extr_norm[extr_label] == orig_norm[orig_label]
+        ]
+        if len(candidates) == 1:
+            mapping[orig_label] = candidates[0]
+            used.add(candidates[0])
+
+    # 3) Similarity-based matches for remaining curves
+    for orig_label in original_labels:
+        if orig_label in mapping:
+            continue
+
+        best_label = None
+        best_score = -1.0
+        for extr_label in extracted_labels:
+            if extr_label in used:
+                continue
+            score = _label_similarity(orig_norm[orig_label], extr_norm[extr_label])
+            if score > best_score:
+                best_score = score
+                best_label = extr_label
+
+        if best_label is not None:
+            mapping[orig_label] = best_label
+            used.add(best_label)
+
+    # 4) Last-resort order fallback
     remaining_extracted = [lab for lab in extracted_labels if lab not in used]
     for orig_label in original_labels:
         if orig_label in mapping:

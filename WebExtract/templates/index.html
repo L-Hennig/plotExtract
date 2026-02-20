@@ -20,6 +20,13 @@
     <section class="card">
       <h1 class="h1">Extract data from a plot image</h1>
       <p class="muted">Choose an image (upload or example), select a prompt (EX 1 or EX 2), then run extraction. Examples are loaded from WebExtract/examples.</p>
+      <div class="row" style="margin: 10px 0 14px; align-items: center;">
+        <div class="muted" style="margin: 0; flex: 0 0 auto;">Mode</div>
+        <div id="uiModeGroup" class="segmented" role="group" aria-label="UI mode" style="flex: 0 0 auto;">
+          <button id="btnModeRegular" class="segmented__btn" type="button" data-mode="regular">Regular</button>
+          <button id="btnModeDebug" class="segmented__btn" type="button" data-mode="debug">Debug</button>
+        </div>
+      </div>
 
       <div class="grid">
         <div class="panel">
@@ -41,22 +48,26 @@
             <button id="btnLoadExample" class="btn" type="button">Use example</button>
           </div>
 
-          <div style="margin-top: 10px;">
+          <div id="testResultsOptions" style="margin-top: 10px;">
             <label class="check">
               <input id="chkTestResults" type="checkbox" />
-              Test results (GA_copy1 · prompt_13 · key4.web saved run)
+              Test results (precomputed saved runs)
             </label>
             <div style="margin: 8px 0 0 22px; display: grid; gap: 6px;">
               <label class="check">
                 <input id="chkTestRunV1" type="checkbox" checked />
-                Include run v5 (GA_copy1_png.pv2_prompt_13.v5.key4.web)
+                GA: Include run v5 (GA_copy1_png.pv2_prompt_13.v5.key4.web)
               </label>
               <label class="check">
                 <input id="chkTestRunV2" type="checkbox" />
-                Include run v6 (GA_copy1_png.pv2_prompt_13.v6.key4.web)
+                GA: Include run v6 (GA_copy1_png.pv2_prompt_13.v6.key4.web)
+              </label>
+              <label class="check">
+                <input id="chkTestRunGH" type="checkbox" />
+                GH: Include run v1 (GH_png.pv2_prompt_13.v1.key4.web)
               </label>
             </div>
-            <div class="muted" style="margin-top: 4px;">When enabled, extraction will not run; the UI loads precomputed outputs from disk.</div>
+            <div class="muted" style="margin-top: 4px;">When enabled, extraction will not run; the UI loads precomputed outputs from disk. GA and GH test sets are mutually exclusive.</div>
           </div>
 
           <div id="uploadStatus" class="notice" style="display:none"></div>
@@ -76,22 +87,24 @@
       </div>
 
       <div class="stack" style="margin-top: 18px;">
-        <div class="panel">
+        <div id="promptPanel" class="panel">
           <h2 class="h2">2) Choose prompt</h2>
 
-          <label class="label" for="promptSelect">Prompt</label>
-          <select id="promptSelect" class="select">
-            <optgroup label="EX 1">
-              {% for p in ex1_prompts %}
-              <option value="ex1::{{ p }}">{{ p }}</option>
-              {% endfor %}
-            </optgroup>
-            <optgroup label="EX 2">
-              {% for p in ex2_prompts %}
-              <option value="ex2::{{ p }}">{{ p }}</option>
-              {% endfor %}
-            </optgroup>
-          </select>
+          <div id="promptChooserWrap">
+            <label class="label" for="promptSelect">Prompt</label>
+            <select id="promptSelect" class="select">
+              <optgroup label="EX 1">
+                {% for p in ex1_prompts %}
+                <option value="ex1::{{ p }}">{{ p }}</option>
+                {% endfor %}
+              </optgroup>
+              <optgroup label="EX 2">
+                {% for p in ex2_prompts %}
+                <option value="ex2::{{ p }}">{{ p }}</option>
+                {% endfor %}
+              </optgroup>
+            </select>
+          </div>
 
           <div id="articleInfoWrap" style="display:none; margin-top: 12px;">
             <label class="label" for="articleInfo">Additional information (EX 2)</label>
@@ -178,32 +191,25 @@
                     <div id="overlayAxesModeGroup" class="segmented" role="group" aria-label="Overlay axes mode">
                       <button id="btnOverlayAxesMinmax" class="segmented__btn" type="button" data-mode="minmax">Min/Max</button>
                       <button id="btnOverlayAxesFull" class="segmented__btn" type="button" data-mode="full">Full</button>
-                      <button id="btnOverlayAxesNone" class="segmented__btn" type="button" data-mode="none">None</button>
                     </div>
                   </div>
-                  <div class="overlayAdjust__scale" aria-label="Overlay scale controls">
-                    <button id="btnOverlayWidthDown" class="btn btn-sm overlayBtn" type="button" aria-label="Decrease width">
-                      <span class="overlayBtn__text" style="display:inline;">Width-</span>
-                    </button>
-                    <button id="btnOverlayReset" class="btn btn-sm overlayBtn" type="button" aria-label="Reset">Reset</button>
-                    <button id="btnOverlayWidthUp" class="btn btn-sm overlayBtn" type="button" aria-label="Increase width">
-                      <span class="overlayBtn__text" style="display:inline;">Width+</span>
-                    </button>
-                    <button id="btnOverlayHeightDown" class="btn btn-sm overlayBtn" type="button" aria-label="Decrease height">
-                      <span class="overlayBtn__text" style="display:inline;">Height-</span>
-                    </button>
-                    <div class="overlayAdjust__spacer" aria-hidden="true"></div>
-                    <button id="btnOverlayHeightUp" class="btn btn-sm overlayBtn" type="button" aria-label="Increase height">
-                      <span class="overlayBtn__text" style="display:inline;">Height+</span>
-                    </button>
+                  <div class="row adjustMovementRow" style="margin-top: 8px; align-items: center;">
+                    <label class="toggle" for="btnResultsOverlayHandles">
+                      <input id="btnResultsOverlayHandles" class="toggle__input" type="checkbox" checked />
+                      <span class="toggle__track"><span class="toggle__thumb"></span></span>
+                      <span class="toggle__label">Drag handles</span>
+                    </label>
+                    <span id="resultsOverlayHandlesState" class="muted">On</span>
+                    <span class="muted">Drag edges to resize, center to move.</span>
                   </div>
-                  <div class="overlayAdjust__pad" aria-label="Overlay move controls">
-                    <button id="btnOverlayUp" class="btn btn-sm overlayBtn overlayBtn--up" type="button" aria-label="Up">↑</button>
-                    <button id="btnOverlayLeft" class="btn btn-sm overlayBtn overlayBtn--left" type="button" aria-label="Left">←</button>
-                    <button id="btnOverlayRight" class="btn btn-sm overlayBtn overlayBtn--right" type="button" aria-label="Right">→</button>
-                    <button id="btnOverlayDown" class="btn btn-sm overlayBtn overlayBtn--down" type="button" aria-label="Down">↓</button>
+                  <div class="row adjustMovementRow" style="margin-top: 6px; align-items: center;">
+                    <label class="toggle" for="btnResultsOverlayGuideAxes">
+                      <input id="btnResultsOverlayGuideAxes" class="toggle__input" type="checkbox" />
+                      <span class="toggle__track"><span class="toggle__thumb"></span></span>
+                      <span class="toggle__label">Red axes</span>
+                    </label>
+                    <span id="resultsOverlayGuideAxesState" class="muted">Off</span>
                   </div>
-                  <div class="muted" style="margin-top: 6px;">Tip: hold Shift for smaller steps.</div>
                 </div>
 
                 <div id="curvesTableWrap" class="tableWrap" style="display:none;"></div>
@@ -219,13 +225,12 @@
 
                 <div class="divider" style="margin: 12px 0;">downloads</div>
                 <div class="row">
-                  <a id="downloadCsvBtn" class="btn btn-primary" href="#" download style="display:none">Download CSV (all curves)</a>
-                  <button id="downloadCsvConfirmedBtn" class="btn" type="button" style="display:none">Download CSV (confirmed only)</button>
+                  <button id="btnSaveSelectedContinue" class="btn btn-primary" type="button" style="display:none">Save selected and continue down</button>
                 </div>
               </div>
             </div>
 
-            <div class="panel" style="margin-top: 14px;">
+            <div id="resultConsolePanel" class="panel" style="margin-top: 14px;">
               <div class="row" style="align-items: baseline;">
                 <h2 class="h2" style="margin:0;">Console</h2>
                 <button id="btnToggleConsole" class="btn" type="button">Show</button>
@@ -242,10 +247,108 @@
       </div>
     </section>
 
-    <section class="card card--subtle">
-      <h2 class="h2">Examples folder</h2>
-      <p class="muted">Put example images in <span class="mono">WebExtract/examples</span>. They’ll show up in the dropdown automatically.</p>
+    <section id="adjustSection" class="card" style="display:none; margin-top: 14px;">
+      <h2 class="h2">Adjust</h2>
+      <div id="adjustEmpty" class="muted">Click “Save selected and continue down” in Results to start adjusting points.</div>
+
+      <div id="adjustMain" class="adjustLayout" style="display:none;">
+        <div class="panel">
+          <h3 class="h3">Image + overlay</h3>
+          <div id="adjustCanvasWrap" class="adjustCanvasWrap">
+            <img id="adjustImage" class="adjustImage" alt="Adjust original" />
+            <svg id="adjustAxesOverlay" class="adjustOverlay adjustOverlay--axes" preserveAspectRatio="none"></svg>
+            <svg id="adjustCurvesOverlay" class="adjustOverlay adjustOverlay--curves" preserveAspectRatio="none"></svg>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3 class="h3">Point editor</h3>
+          <button id="btnAdjustManualControls" class="btn" type="button" style="width:100%; display:flex; align-items:center; justify-content:space-between;" aria-expanded="false" title="Show or hide manual curve/point controls.">
+            <span>Manual point selection</span>
+            <span id="adjustManualChevron" aria-hidden="true">▾</span>
+          </button>
+
+          <div id="adjustManualControls" style="display:none; margin-top: 10px;">
+            <label class="label" for="adjustCurveSelect">Curve</label>
+            <select id="adjustCurveSelect" class="select"></select>
+
+            <label class="label" for="adjustPointSelect" style="margin-top: 10px;">Point</label>
+            <select id="adjustPointSelect" class="select"></select>
+
+            <label class="label" for="adjustXInput" style="margin-top: 10px;">X value</label>
+            <input id="adjustXInput" class="adjustInput" type="number" step="any" />
+
+            <label class="label" for="adjustYInput" style="margin-top: 10px;">Y value</label>
+            <input id="adjustYInput" class="adjustInput" type="number" step="any" />
+          </div>
+
+          <div class="row" style="margin-top: 10px; align-items: center;">
+            <label class="toggle" for="btnAdjustLockX">
+              <input id="btnAdjustLockX" class="toggle__input" type="checkbox" checked />
+              <span class="toggle__track"><span class="toggle__thumb"></span></span>
+              <span class="toggle__label">Lock X values</span>
+            </label>
+            <span id="adjustLockXState" class="muted">On</span>
+          </div>
+
+          <div id="adjustDeletePointsRow" class="row" style="margin-top: 8px; align-items: center;" title="Delete mode removes points when you click a point.">
+            <label class="toggle" for="btnAdjustDeletePoints" title="Enable delete mode (only available when Overlay movement is Off).">
+              <input id="btnAdjustDeletePoints" class="toggle__input" type="checkbox" />
+              <span class="toggle__track"><span class="toggle__thumb"></span></span>
+              <span class="toggle__label">Delete points</span>
+            </label>
+            <span id="adjustDeletePointsState" class="muted" title="Current delete mode state">Off</span>
+          </div>
+
+          <div id="adjustAddPointsRow" class="row" style="margin-top: 8px; align-items: center;" title="Add mode inserts new points into the selected curve at click position.">
+            <label class="toggle" for="btnAdjustAddPoints" title="Enable add mode (only available when Overlay movement is Off). If Lock X values is On, new X values snap to nearest integer.">
+              <input id="btnAdjustAddPoints" class="toggle__input" type="checkbox" />
+              <span class="toggle__track"><span class="toggle__thumb"></span></span>
+              <span class="toggle__label">Add points</span>
+            </label>
+            <select id="adjustAddCurveSelect" class="select" style="max-width: 220px;" title="Choose which curve receives new points" aria-label="Curve for adding points"></select>
+            <span id="adjustAddPointsState" class="muted" title="Current add mode state">Off</span>
+          </div>
+
+          <div id="adjustVisibleCurvesWrap" style="margin-top: 10px;" title="Choose which curves are visible on the adjustment overlay.">
+            <div class="row" style="align-items: center;">
+              <span class="muted" title="Visible curves on the overlay">Visible curves</span>
+              <button id="btnAdjustVisibleAll" class="btn" type="button" title="Show all curves">All</button>
+              <button id="btnAdjustVisibleNone" class="btn" type="button" title="Hide all curves">None</button>
+            </div>
+            <div id="adjustVisibleCurvesList" class="adjustVisibleCurvesList" title="Tick curves to show/hide them"></div>
+            <div id="adjustVisibleCurvesHint" class="muted" style="margin-top: 4px;">All curves visible.</div>
+          </div>
+
+          <div class="row" style="margin-top: 12px;">
+            <button id="btnAdjustUndo" class="btn" type="button" title="Undo latest adjust action">Undo</button>
+            <button id="btnAdjustRedo" class="btn" type="button" title="Redo latest undone adjust action">Redo</button>
+            <button id="btnSaveAdjustment" class="btn btn-primary" type="button">Save adjustment</button>
+          </div>
+
+          <div class="row adjustMovementRow" style="margin-top: 10px; align-items: center;">
+            <label class="toggle" for="btnAdjustOverlayMovement">
+              <input id="btnAdjustOverlayMovement" class="toggle__input" type="checkbox" checked />
+              <span class="toggle__track"><span class="toggle__thumb"></span></span>
+              <span class="toggle__label">Overlay movement</span>
+            </label>
+            <span id="adjustOverlayMovementState" class="muted">On</span>
+            <span id="adjustOverlayMovementTip" class="muted" title="Unlock overlay movement, then drag edges of the red dashed box to resize (opposite edge stays fixed) or drag the center dot to move the whole overlay. Lock again to prevent accidental movement.">ⓘ How to use</span>
+          </div>
+
+          <div id="adjustStatus" class="muted" style="margin-top: 8px;"></div>
+        </div>
+      </div>
+
+      <div id="saveHistoryWrap" style="display:none; margin-top: 14px;">
+        <h3 class="h3">Save history</h3>
+        <div id="saveHistoryList" class="saveHistoryList"></div>
+        <div class="row" style="margin-top: 10px; max-width: 380px;">
+          <button id="btnDownloadCurrentSave" class="btn" type="button">Download current selected save</button>
+        </div>
+      </div>
     </section>
+
   </main>
 
 <script>
@@ -259,8 +362,14 @@
 
   const exampleSelect = document.getElementById('exampleSelect');
   const btnLoadExample = document.getElementById('btnLoadExample');
+  const testResultsOptions = document.getElementById('testResultsOptions');
+  const uiModeGroup = document.getElementById('uiModeGroup');
+  const btnModeRegular = document.getElementById('btnModeRegular');
+  const btnModeDebug = document.getElementById('btnModeDebug');
 
   const promptSelect = document.getElementById('promptSelect');
+  const promptChooserWrap = document.getElementById('promptChooserWrap');
+  const promptPanel = document.getElementById('promptPanel');
   const articleInfoWrap = document.getElementById('articleInfoWrap');
   const articleInfo = document.getElementById('articleInfo');
 
@@ -277,6 +386,7 @@
   const chkTestResults = document.getElementById('chkTestResults');
   const chkTestRunV1 = document.getElementById('chkTestRunV1');
   const chkTestRunV2 = document.getElementById('chkTestRunV2');
+  const chkTestRunGH = document.getElementById('chkTestRunGH');
 
   const progressWrap = document.getElementById('progressWrap');
   const progressFill = document.getElementById('progressFill');
@@ -287,13 +397,52 @@
   const resultSummary = document.getElementById('resultSummary');
   const resultWarning = document.getElementById('resultWarning');
   const resultGallery = document.getElementById('resultGallery');
-  const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+  const btnSaveSelectedContinue = document.getElementById('btnSaveSelectedContinue');
   const downloadCsvConfirmedBtn = document.getElementById('downloadCsvConfirmedBtn');
   const resultLinks = document.getElementById('resultLinks');
   const resultConsole = document.getElementById('resultConsole');
   const consoleWrap = document.getElementById('consoleWrap');
+  const resultConsolePanel = document.getElementById('resultConsolePanel');
   const btnToggleConsole = document.getElementById('btnToggleConsole');
   const btnCopyConsole = document.getElementById('btnCopyConsole');
+
+  const adjustSection = document.getElementById('adjustSection');
+  const adjustEmpty = document.getElementById('adjustEmpty');
+  const adjustMain = document.getElementById('adjustMain');
+  const adjustCanvasWrap = document.getElementById('adjustCanvasWrap');
+  const adjustImage = document.getElementById('adjustImage');
+  const adjustAxesOverlay = document.getElementById('adjustAxesOverlay');
+  const adjustCurvesOverlay = document.getElementById('adjustCurvesOverlay');
+  const btnAdjustManualControls = document.getElementById('btnAdjustManualControls');
+  const adjustManualControls = document.getElementById('adjustManualControls');
+  const adjustManualChevron = document.getElementById('adjustManualChevron');
+  const adjustCurveSelect = document.getElementById('adjustCurveSelect');
+  const adjustPointSelect = document.getElementById('adjustPointSelect');
+  const adjustXInput = document.getElementById('adjustXInput');
+  const adjustYInput = document.getElementById('adjustYInput');
+  const btnAdjustLockX = document.getElementById('btnAdjustLockX');
+  const adjustLockXState = document.getElementById('adjustLockXState');
+  const adjustDeletePointsRow = document.getElementById('adjustDeletePointsRow');
+  const btnAdjustDeletePoints = document.getElementById('btnAdjustDeletePoints');
+  const adjustDeletePointsState = document.getElementById('adjustDeletePointsState');
+  const adjustAddPointsRow = document.getElementById('adjustAddPointsRow');
+  const btnAdjustAddPoints = document.getElementById('btnAdjustAddPoints');
+  const adjustAddCurveSelect = document.getElementById('adjustAddCurveSelect');
+  const adjustAddPointsState = document.getElementById('adjustAddPointsState');
+  const btnAdjustVisibleAll = document.getElementById('btnAdjustVisibleAll');
+  const btnAdjustVisibleNone = document.getElementById('btnAdjustVisibleNone');
+  const adjustVisibleCurvesList = document.getElementById('adjustVisibleCurvesList');
+  const adjustVisibleCurvesHint = document.getElementById('adjustVisibleCurvesHint');
+  const btnAdjustUndo = document.getElementById('btnAdjustUndo');
+  const btnAdjustRedo = document.getElementById('btnAdjustRedo');
+  const btnAdjustOverlayMovement = document.getElementById('btnAdjustOverlayMovement');
+  const adjustOverlayMovementState = document.getElementById('adjustOverlayMovementState');
+  const adjustOverlayMovementTip = document.getElementById('adjustOverlayMovementTip');
+  const btnSaveAdjustment = document.getElementById('btnSaveAdjustment');
+  const adjustStatus = document.getElementById('adjustStatus');
+  const saveHistoryWrap = document.getElementById('saveHistoryWrap');
+  const saveHistoryList = document.getElementById('saveHistoryList');
+  const btnDownloadCurrentSave = document.getElementById('btnDownloadCurrentSave');
 
   const curvesEmpty = document.getElementById('curvesEmpty');
 
@@ -312,16 +461,10 @@
   const overlayAxesModeGroup = document.getElementById('overlayAxesModeGroup');
   const btnOverlayAxesMinmax = document.getElementById('btnOverlayAxesMinmax');
   const btnOverlayAxesFull = document.getElementById('btnOverlayAxesFull');
-  const btnOverlayAxesNone = document.getElementById('btnOverlayAxesNone');
-  const btnOverlayWidthUp = document.getElementById('btnOverlayWidthUp');
-  const btnOverlayWidthDown = document.getElementById('btnOverlayWidthDown');
-  const btnOverlayHeightUp = document.getElementById('btnOverlayHeightUp');
-  const btnOverlayHeightDown = document.getElementById('btnOverlayHeightDown');
-  const btnOverlayReset = document.getElementById('btnOverlayReset');
-  const btnOverlayUp = document.getElementById('btnOverlayUp');
-  const btnOverlayDown = document.getElementById('btnOverlayDown');
-  const btnOverlayLeft = document.getElementById('btnOverlayLeft');
-  const btnOverlayRight = document.getElementById('btnOverlayRight');
+  const btnResultsOverlayHandles = document.getElementById('btnResultsOverlayHandles');
+  const resultsOverlayHandlesState = document.getElementById('resultsOverlayHandlesState');
+  const btnResultsOverlayGuideAxes = document.getElementById('btnResultsOverlayGuideAxes');
+  const resultsOverlayGuideAxesState = document.getElementById('resultsOverlayGuideAxesState');
 
   let currentImagePath = null; // plots-relative path (e.g., batch_uploads/ui_xxx.png)
   let currentTaskId = null;
@@ -358,27 +501,106 @@
 
   // Test-results mode (load precomputed runs without executing extraction)
   let testResultsMode = false;
-  const TEST_IMAGE_PATH = 'synthetic/G/GA_copy1/GA_copy1.png';
-  const TEST_PROMPT_VALUE = 'ex2::prompt_13';
-  const TEST_PROMPT_NAME = 'prompt_13';
+  const UI_MODE_REGULAR = 'regular';
+  const UI_MODE_DEBUG = 'debug';
+  let uiMode = UI_MODE_REGULAR;
   const TEST_RUNS = [
-    { id: 'v1', label: 'v5', versionDir: 'synthetic/G/GA_copy1/GA_copy1_png.pv2_prompt_13.v5.key4.web' },
-    { id: 'v2', label: 'v6', versionDir: 'synthetic/G/GA_copy1/GA_copy1_png.pv2_prompt_13.v6.key4.web' },
+    {
+      id: 'v1',
+      label: 'v5',
+      plotId: 'ga',
+      plotLabel: 'GA_copy1',
+      imagePath: 'synthetic/G/GA_copy1/GA_copy1.png',
+      promptValue: 'ex2::prompt_13',
+      promptName: 'prompt_13',
+      versionDir: 'synthetic/G/GA_copy1/GA_copy1_png.pv2_prompt_13.v5.key4.web'
+    },
+    {
+      id: 'v2',
+      label: 'v6',
+      plotId: 'ga',
+      plotLabel: 'GA_copy1',
+      imagePath: 'synthetic/G/GA_copy1/GA_copy1.png',
+      promptValue: 'ex2::prompt_13',
+      promptName: 'prompt_13',
+      versionDir: 'synthetic/G/GA_copy1/GA_copy1_png.pv2_prompt_13.v6.key4.web'
+    },
+    {
+      id: 'gh_v1',
+      label: 'v1',
+      plotId: 'gh',
+      plotLabel: 'GH',
+      imagePath: 'synthetic/G/GH/GH.png',
+      promptValue: 'ex2::prompt_13',
+      promptName: 'prompt_13',
+      versionDir: 'synthetic/G/GH/GH_png.pv2_prompt_13.v1.key4.web'
+    },
   ];
+
+  function _findTestRunById(runId) {
+    return TEST_RUNS.find(r => r.id === runId) || null;
+  }
+
+  function _testRunSelectionPairs() {
+    return [
+      { id: 'v1', checkbox: chkTestRunV1 },
+      { id: 'v2', checkbox: chkTestRunV2 },
+      { id: 'gh_v1', checkbox: chkTestRunGH },
+    ];
+  }
+
+  function _setTestRunChecked(runId, checked) {
+    const pair = _testRunSelectionPairs().find(p => p.id === runId);
+    if (!pair || !pair.checkbox) return;
+    pair.checkbox.checked = !!checked;
+  }
+
+  function _enforceCompatibleTestRunSelection(preferId = 'v1') {
+    const selected = _getSelectedTestRuns();
+    if (!selected.length) {
+      _setTestRunChecked(preferId, true);
+      return _getSelectedTestRuns();
+    }
+
+    const selectedPlotIds = new Set(selected.map(r => String(r.plotId || '')));
+    if (selectedPlotIds.size <= 1) return selected;
+
+    const preferred = _findTestRunById(preferId);
+    const keepPlotId = (preferred && selected.some(r => r.id === preferId))
+      ? preferred.plotId
+      : selected[0].plotId;
+
+    for (const pair of _testRunSelectionPairs()) {
+      const run = _findTestRunById(pair.id);
+      if (!run || !pair.checkbox) continue;
+      pair.checkbox.checked = (run.plotId === keepPlotId) ? !!pair.checkbox.checked : false;
+    }
+
+    let fixed = _getSelectedTestRuns();
+    if (!fixed.length) {
+      const fallback = TEST_RUNS.find(r => r.plotId === keepPlotId) || TEST_RUNS[0] || null;
+      if (fallback) _setTestRunChecked(fallback.id, true);
+      fixed = _getSelectedTestRuns();
+    }
+    return fixed;
+  }
 
   function _getSelectedTestRuns() {
     const out = [];
-    if (chkTestRunV1 && chkTestRunV1.checked) out.push(TEST_RUNS[0]);
-    if (chkTestRunV2 && chkTestRunV2.checked) out.push(TEST_RUNS[1]);
+    for (const pair of _testRunSelectionPairs()) {
+      if (!pair.checkbox || !pair.checkbox.checked) continue;
+      const run = _findTestRunById(pair.id);
+      if (run) out.push(run);
+    }
     return out;
   }
 
   function _ensureAtLeastOneTestRun(prefer = 'v1') {
-    const selected = _getSelectedTestRuns();
+    let selected = _enforceCompatibleTestRunSelection(prefer);
     if (selected.length > 0) return selected;
-    if (prefer === 'v2' && chkTestRunV2) chkTestRunV2.checked = true;
-    else if (chkTestRunV1) chkTestRunV1.checked = true;
-    return _getSelectedTestRuns();
+    _setTestRunChecked(prefer, true);
+    selected = _enforceCompatibleTestRunSelection(prefer);
+    return selected;
   }
 
   function _setTrialCountLimit(maxN) {
@@ -403,20 +625,24 @@
   function _setTestResultsMode(enabled) {
     testResultsMode = !!enabled;
     if (chkTestResults) chkTestResults.checked = testResultsMode;
+
     const selectedRuns = _ensureAtLeastOneTestRun('v1');
     const selectedCount = Math.max(1, selectedRuns.length);
+    const activeRun = selectedRuns[0] || null;
+    const activeImagePath = activeRun ? String(activeRun.imagePath || '') : '';
+    const activePromptValue = activeRun ? String(activeRun.promptValue || '') : '';
+    const activePlotLabel = activeRun ? String(activeRun.plotLabel || activeRun.plotId || 'test') : 'test';
 
     if (testResultsMode) {
-      // Lock image + prompt
-      currentImagePath = TEST_IMAGE_PATH;
-      selectedFileLabel.textContent = TEST_IMAGE_PATH;
-      setPreviewFromUrl('/plots/' + TEST_IMAGE_PATH);
-      clearNotice(uploadStatus);
-      setNotice(uploadStatus, 'Test mode enabled: ' + selectedCount + ' saved run(s) selected. Extraction will not run.', 'info');
+      currentImagePath = activeImagePath;
+      selectedFileLabel.textContent = activeImagePath || '—';
+      if (activeImagePath) setPreviewFromUrl('/plots/' + activeImagePath);
 
-      // Ensure prompt is set
-      const opt = Array.from(promptSelect.querySelectorAll('option')).find(o => o.value === TEST_PROMPT_VALUE);
-      if (opt) promptSelect.value = TEST_PROMPT_VALUE;
+      clearNotice(uploadStatus);
+      setNotice(uploadStatus, 'Test mode enabled (' + activePlotLabel + '): ' + selectedCount + ' saved run(s) selected. Extraction will not run.', 'info');
+
+      const opt = Array.from(promptSelect.querySelectorAll('option')).find(o => o.value === activePromptValue);
+      if (opt) promptSelect.value = opt.value;
       onPromptChanged();
 
       _setTrialCountLimit(selectedCount);
@@ -424,12 +650,79 @@
       _setControlsDisabled(true);
       try { if (chkTestRunV1) chkTestRunV1.disabled = false; } catch (_) {}
       try { if (chkTestRunV2) chkTestRunV2.disabled = false; } catch (_) {}
+      try { if (chkTestRunGH) chkTestRunGH.disabled = false; } catch (_) {}
     } else {
       _setTrialCountLimit(5);
       _setControlsDisabled(false);
       try { if (chkTestRunV1) chkTestRunV1.disabled = false; } catch (_) {}
       try { if (chkTestRunV2) chkTestRunV2.disabled = false; } catch (_) {}
+      try { if (chkTestRunGH) chkTestRunGH.disabled = false; } catch (_) {}
     }
+  }
+
+  function _syncUiModeButtons() {
+    const buttons = [btnModeRegular, btnModeDebug].filter(Boolean);
+    for (const btn of buttons) {
+      const mode = btn.dataset.mode || '';
+      const active = mode === uiMode;
+      btn.classList.toggle('segmented__btn--active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    }
+  }
+
+  function _selectRegularDefaultPrompt() {
+    if (!promptSelect) return;
+    const opts = Array.from(promptSelect.querySelectorAll('option'));
+    const ex2Prompt13 = opts.find(o => {
+      const v = String(o.value || '').toLowerCase();
+      return v.startsWith('ex2::') && v.includes('prompt_13');
+    });
+    if (ex2Prompt13) {
+      promptSelect.value = ex2Prompt13.value;
+      return;
+    }
+    const firstEx2 = opts.find(o => String(o.value || '').toLowerCase().startsWith('ex2::'));
+    if (firstEx2) promptSelect.value = firstEx2.value;
+  }
+
+  function _applyRegularDefaults() {
+    _selectRegularDefaultPrompt();
+    if (llmProvider) llmProvider.value = 'mistral';
+    _refreshModelOptions('mistral-large-2512');
+    if (llmModel) llmModel.value = 'mistral-large-2512';
+    if (chkBackoffMode) chkBackoffMode.checked = false;
+  }
+
+  function _applyUiMode() {
+    const isRegular = uiMode === UI_MODE_REGULAR;
+    if (testResultsOptions) testResultsOptions.style.display = 'block';
+    if (promptChooserWrap) promptChooserWrap.style.display = isRegular ? 'none' : 'block';
+    if (promptPanel) {
+      const h = promptPanel.querySelector('h2.h2');
+      if (h) h.textContent = isRegular ? '2) Additional information' : '2) Choose prompt';
+    }
+    if (resultConsolePanel) resultConsolePanel.style.display = isRegular ? 'none' : 'block';
+    if (resultLinks) resultLinks.style.display = isRegular ? 'none' : '';
+    if (llmControls) llmControls.style.display = isRegular ? 'none' : 'block';
+
+    if (isRegular) {
+      _applyRegularDefaults();
+      if (articleInfoWrap) articleInfoWrap.style.display = 'block';
+    } else {
+      onPromptChanged();
+    }
+
+    _syncUiModeButtons();
+    try { localStorage.setItem('plotextract_ui_mode', uiMode); } catch (_) {}
+  }
+
+  function _loadUiModePref() {
+    try {
+      const v = localStorage.getItem('plotextract_ui_mode');
+      if (v === UI_MODE_DEBUG || v === UI_MODE_REGULAR) {
+        uiMode = v;
+      }
+    } catch (_) {}
   }
 
   // Manual overlay adjustment (display-space transform per image)
@@ -441,6 +734,59 @@
   let replotOverlayAxesMode = 'full';
   const overlayNaturalSizeCache = new Map();
   const overlayImageMetaCache = new Map();
+
+  // Adjust-state (isolated from Results mutable state)
+  let saveHistory = [];
+  let selectedSaveIndex = -1;
+  let workingSave = null;
+  let adjustSelectedCurveLabel = null;
+  let adjustSelectedPointIndex = 0;
+  let adjustManualControlsOpen = false;
+  let adjustOverlayMovementLocked = false;
+  let adjustLockXValues = true;
+  let adjustDeletePointsEnabled = false;
+  let adjustAddPointsEnabled = false;
+  let adjustAddPointCurveLabel = null;
+  let adjustVisibleCurveLabels = new Set();
+  let adjustVisibleCurveLabelsInitialized = false;
+  let adjustVisibleCurveLabelsKnown = new Set();
+  let adjustOverlayDrag = null;
+  let adjustOverlaySuppressClickUntil = 0;
+  const ADJUST_HISTORY_LIMIT = 100;
+  let adjustUndoStack = [];
+  let adjustRedoStack = [];
+  let adjustInputUndoArmed = true;
+  let resultsOverlayDrag = null;
+  let resultsOverlayHandlesEnabled = true;
+  let resultsOverlayGuideAxesEnabled = false;
+  let latestLockedAdjustOverlay = null;
+
+  function _syncResultsOverlayHandlesToggleUi() {
+    if (btnResultsOverlayHandles) {
+      btnResultsOverlayHandles.checked = !!resultsOverlayHandlesEnabled;
+      btnResultsOverlayHandles.setAttribute('aria-checked', resultsOverlayHandlesEnabled ? 'true' : 'false');
+    }
+    if (resultsOverlayHandlesState) {
+      resultsOverlayHandlesState.textContent = resultsOverlayHandlesEnabled ? 'On' : 'Off';
+    }
+  }
+
+  function _syncResultsOverlayGuideAxesToggleUi() {
+    if (btnResultsOverlayGuideAxes) {
+      btnResultsOverlayGuideAxes.checked = !!resultsOverlayGuideAxesEnabled;
+      btnResultsOverlayGuideAxes.setAttribute('aria-checked', resultsOverlayGuideAxesEnabled ? 'true' : 'false');
+    }
+    if (resultsOverlayGuideAxesState) {
+      resultsOverlayGuideAxesState.textContent = resultsOverlayGuideAxesEnabled ? 'On' : 'Off';
+    }
+  }
+
+  function _captureLatestLockedAdjustOverlay() {
+    if (!workingSave || !adjustOverlayMovementLocked) return;
+    const a = _ensureWorkingSaveOverlayAdjust();
+    if (!a) return;
+    latestLockedAdjustOverlay = _deepClone(a);
+  }
 
   function _loadImageNaturalSize(url) {
     const u = String(url || '');
@@ -475,7 +821,7 @@
           canvas.height = h;
           const ctx = canvas.getContext('2d', { willReadFrequently: true });
           if (!ctx) {
-            resolve({ w, h, cx: w / 2, cy: h / 2, axisX: null });
+            resolve({ w, h, cx: w / 2, cy: h / 2, axisX: null, minX: 0, maxX: w, minY: 0, maxY: h });
             return;
           }
           ctx.drawImage(img, 0, 0);
@@ -487,6 +833,8 @@
           const bandTop = Math.floor(h * 0.10);
           const bandBottom = Math.ceil(h * 0.92);
           const colCounts = new Uint32Array(w);
+          const rowCounts = new Uint32Array(h);
+          const xLimit = Math.max(1, Math.floor(w * 0.45));
           for (let y = 0; y < h; y++) {
             const row = y * w * 4;
             for (let x = 0; x < w; x++) {
@@ -499,13 +847,15 @@
                 if (y >= bandTop && y <= bandBottom && a > 20) {
                   colCounts[x] += 1;
                 }
+                if (x <= xLimit && a > 20) {
+                  rowCounts[y] += 1;
+                }
               }
             }
           }
 
           let axisX = null;
           let bestCount = 0;
-          const xLimit = Math.max(1, Math.floor(w * 0.45));
           for (let x = 0; x < xLimit; x++) {
             const c = colCounts[x] || 0;
             if (c > bestCount) {
@@ -515,13 +865,26 @@
           }
           if (!(bestCount > 0)) axisX = null;
 
+          let axisY = null;
+          let bestRowCount = 0;
+          const yStart = Math.max(0, Math.floor(h * 0.45));
+          const yEnd = Math.max(yStart + 1, Math.min(h, Math.ceil(h * 0.98)));
+          for (let y = yStart; y < yEnd; y++) {
+            const c = rowCounts[y] || 0;
+            if (c > bestRowCount) {
+              bestRowCount = c;
+              axisY = y;
+            }
+          }
+          if (!(bestRowCount > 0)) axisY = null;
+
           if (maxX >= minX && maxY >= minY) {
-            resolve({ w, h, cx: (minX + maxX) / 2, cy: (minY + maxY) / 2, axisX });
+            resolve({ w, h, cx: (minX + maxX) / 2, cy: (minY + maxY) / 2, axisX, axisY, minX, maxX, minY, maxY });
           } else {
-            resolve({ w, h, cx: w / 2, cy: h / 2, axisX });
+            resolve({ w, h, cx: w / 2, cy: h / 2, axisX, axisY, minX: 0, maxX: w, minY: 0, maxY: h });
           }
         } catch (_) {
-          resolve({ w, h, cx: w / 2, cy: h / 2, axisX: null });
+          resolve({ w, h, cx: w / 2, cy: h / 2, axisX: null, axisY: null, minX: 0, maxX: w, minY: 0, maxY: h });
         }
       };
       img.onerror = () => resolve(null);
@@ -549,11 +912,21 @@
         overlayWrap.dataset.natFullCx = String(fullMeta.cx || 0);
         overlayWrap.dataset.natFullCy = String(fullMeta.cy || 0);
         overlayWrap.dataset.natFullAxisX = Number.isFinite(fullMeta.axisX) ? String(fullMeta.axisX) : '';
+        overlayWrap.dataset.natFullAxisY = Number.isFinite(fullMeta.axisY) ? String(fullMeta.axisY) : '';
+        overlayWrap.dataset.natFullMinX = Number.isFinite(fullMeta.minX) ? String(fullMeta.minX) : '0';
+        overlayWrap.dataset.natFullMaxX = Number.isFinite(fullMeta.maxX) ? String(fullMeta.maxX) : String(fullMeta.w || 0);
+        overlayWrap.dataset.natFullMinY = Number.isFinite(fullMeta.minY) ? String(fullMeta.minY) : '0';
+        overlayWrap.dataset.natFullMaxY = Number.isFinite(fullMeta.maxY) ? String(fullMeta.maxY) : String(fullMeta.h || 0);
         overlayWrap.dataset.natMinmaxW = String(minmaxMeta.w || 0);
         overlayWrap.dataset.natMinmaxH = String(minmaxMeta.h || 0);
         overlayWrap.dataset.natMinmaxCx = String(minmaxMeta.cx || 0);
         overlayWrap.dataset.natMinmaxCy = String(minmaxMeta.cy || 0);
         overlayWrap.dataset.natMinmaxAxisX = Number.isFinite(minmaxMeta.axisX) ? String(minmaxMeta.axisX) : '';
+        overlayWrap.dataset.natMinmaxAxisY = Number.isFinite(minmaxMeta.axisY) ? String(minmaxMeta.axisY) : '';
+        overlayWrap.dataset.natMinmaxMinX = Number.isFinite(minmaxMeta.minX) ? String(minmaxMeta.minX) : '0';
+        overlayWrap.dataset.natMinmaxMaxX = Number.isFinite(minmaxMeta.maxX) ? String(minmaxMeta.maxX) : String(minmaxMeta.w || 0);
+        overlayWrap.dataset.natMinmaxMinY = Number.isFinite(minmaxMeta.minY) ? String(minmaxMeta.minY) : '0';
+        overlayWrap.dataset.natMinmaxMaxY = Number.isFinite(minmaxMeta.maxY) ? String(minmaxMeta.maxY) : String(minmaxMeta.h || 0);
         _renderOverlays();
       }
     }).catch(() => {});
@@ -593,13 +966,14 @@
   function _loadReplotOverlayAxesModePref() {
     try {
       const v = localStorage.getItem('plotextract_replot_overlay_axes_mode');
-      if (v === 'minmax' || v === 'full' || v === 'none') replotOverlayAxesMode = v;
+      if (v === 'minmax' || v === 'full') replotOverlayAxesMode = v;
+      else replotOverlayAxesMode = 'full';
     } catch (_) {}
     _syncOverlayAxesModeButtons();
   }
 
   function _syncOverlayAxesModeButtons() {
-    const buttons = [btnOverlayAxesMinmax, btnOverlayAxesFull, btnOverlayAxesNone].filter(Boolean);
+    const buttons = [btnOverlayAxesMinmax, btnOverlayAxesFull].filter(Boolean);
     for (const btn of buttons) {
       const mode = btn.dataset.mode || '';
       const active = mode === replotOverlayAxesMode;
@@ -611,6 +985,36 @@
   function _setOriginalGalleryExpanded() {
     if (!resultGallery) return;
     resultGallery.classList.add('gallery--originalExpanded');
+  }
+
+  function _fitResultsOriginalImages() {
+    if (!resultGallery) return;
+    const wraps = Array.from(resultGallery.querySelectorAll('.gallery__item--original .gallery__imgwrap'));
+    const viewportH = Math.max(320, window.innerHeight || 0);
+    const maxH = Math.max(280, Math.floor(viewportH * 0.72));
+    const minH = 220;
+    const shrinkFactor = 0.92;
+    for (const wrap of wraps) {
+      const img = wrap.querySelector('img.gallery__img');
+      if (!img) continue;
+      const nw = Number(img.naturalWidth || 0);
+      const nh = Number(img.naturalHeight || 0);
+      const cs = window.getComputedStyle(wrap);
+      const padL = parseFloat(cs.paddingLeft || '0') || 0;
+      const padR = parseFloat(cs.paddingRight || '0') || 0;
+      const padT = parseFloat(cs.paddingTop || '0') || 0;
+      const padB = parseFloat(cs.paddingBottom || '0') || 0;
+      const outerW = Math.max(0, wrap.clientWidth || wrap.getBoundingClientRect().width || 0);
+      const innerW = Math.max(0, outerW - padL - padR);
+      if (!(nw > 0 && nh > 0 && innerW > 0)) {
+        wrap.style.height = '';
+        continue;
+      }
+      const ratio = nw / Math.max(1e-6, nh);
+      const fittedH = Math.round((innerW / Math.max(1e-6, ratio)) * shrinkFactor);
+      const contentH = Math.max(minH, Math.min(maxH, fittedH));
+      wrap.style.height = Math.round(contentH + padT + padB) + 'px';
+    }
   }
 
   function _saveReplotOverlayAxesModePref() {
@@ -708,6 +1112,11 @@
   }
 
   function onPromptChanged() {
+    if (uiMode === UI_MODE_REGULAR) {
+      if (articleInfoWrap) articleInfoWrap.style.display = 'block';
+      if (llmControls) llmControls.style.display = 'none';
+      return;
+    }
     const { pipeline } = getPipelineAndPrompt();
     articleInfoWrap.style.display = (pipeline === 'ex2') ? 'block' : 'none';
     if (llmControls) {
@@ -860,9 +1269,8 @@
     resultGallery.style.display = 'none';
     resultGallery.classList.remove('gallery--originalExpanded');
     resultGallery.innerHTML = '';
-    downloadCsvBtn.style.display = 'none';
-    downloadCsvBtn.href = '#';
-    downloadCsvConfirmedBtn.style.display = 'none';
+    btnSaveSelectedContinue.style.display = 'none';
+    if (downloadCsvConfirmedBtn) downloadCsvConfirmedBtn.style.display = 'none';
     resultLinks.innerHTML = '';
 
     resultConsole.textContent = '';
@@ -902,16 +1310,1654 @@
       resizeObserver = null;
     }
 
+    _resetAdjustState();
+
     // Keep console collapsed by default per user preference.
     _loadConsolePref();
   }
 
+  function _deepClone(value) {
+    try {
+      return structuredClone(value);
+    } catch (_) {
+      return JSON.parse(JSON.stringify(value));
+    }
+  }
+
+  function _resetAdjustState() {
+    saveHistory = [];
+    selectedSaveIndex = -1;
+    workingSave = null;
+    adjustSelectedCurveLabel = null;
+    adjustSelectedPointIndex = 0;
+    adjustManualControlsOpen = false;
+    adjustOverlayMovementLocked = false;
+    adjustLockXValues = true;
+    adjustDeletePointsEnabled = false;
+    adjustAddPointsEnabled = false;
+    adjustAddPointCurveLabel = null;
+    adjustVisibleCurveLabels = new Set();
+    adjustVisibleCurveLabelsInitialized = false;
+    adjustVisibleCurveLabelsKnown = new Set();
+    adjustOverlayDrag = null;
+    adjustOverlaySuppressClickUntil = 0;
+    adjustUndoStack = [];
+    adjustRedoStack = [];
+    adjustInputUndoArmed = true;
+    latestLockedAdjustOverlay = null;
+    _renderAdjustSection();
+  }
+
+  function _captureAdjustHistoryState() {
+    if (!workingSave) return null;
+    return {
+      workingSave: _deepClone(workingSave),
+      adjustSelectedCurveLabel: adjustSelectedCurveLabel != null ? String(adjustSelectedCurveLabel) : null,
+      adjustSelectedPointIndex: Math.max(0, Number(adjustSelectedPointIndex) || 0),
+      adjustAddPointCurveLabel: adjustAddPointCurveLabel != null ? String(adjustAddPointCurveLabel) : null,
+    };
+  }
+
+  function _syncAdjustUndoRedoUi() {
+    const canUndo = !!(workingSave && adjustUndoStack.length > 0);
+    const canRedo = !!(workingSave && adjustRedoStack.length > 0);
+    if (btnAdjustUndo) {
+      btnAdjustUndo.disabled = !canUndo;
+      btnAdjustUndo.title = canUndo ? 'Undo latest adjust action' : 'Nothing to undo';
+    }
+    if (btnAdjustRedo) {
+      btnAdjustRedo.disabled = !canRedo;
+      btnAdjustRedo.title = canRedo ? 'Redo latest undone adjust action' : 'Nothing to redo';
+    }
+  }
+
+  function _pushAdjustUndoSnapshot() {
+    const snap = _captureAdjustHistoryState();
+    if (!snap) return false;
+    adjustUndoStack.push(snap);
+    if (adjustUndoStack.length > ADJUST_HISTORY_LIMIT) {
+      adjustUndoStack = adjustUndoStack.slice(adjustUndoStack.length - ADJUST_HISTORY_LIMIT);
+    }
+    adjustRedoStack = [];
+    _syncAdjustUndoRedoUi();
+    return true;
+  }
+
+  function _applyAdjustHistoryState(state) {
+    if (!state || !state.workingSave) return false;
+    workingSave = _deepClone(state.workingSave);
+    adjustSelectedCurveLabel = state.adjustSelectedCurveLabel != null ? String(state.adjustSelectedCurveLabel) : null;
+    adjustSelectedPointIndex = Math.max(0, Number(state.adjustSelectedPointIndex) || 0);
+    adjustAddPointCurveLabel = state.adjustAddPointCurveLabel != null ? String(state.adjustAddPointCurveLabel) : null;
+    _renderAdjustSection();
+    return true;
+  }
+
+  function _undoAdjustAction() {
+    if (!workingSave || adjustUndoStack.length === 0) return;
+    const prev = adjustUndoStack.pop();
+    const current = _captureAdjustHistoryState();
+    if (current) {
+      adjustRedoStack.push(current);
+      if (adjustRedoStack.length > ADJUST_HISTORY_LIMIT) {
+        adjustRedoStack = adjustRedoStack.slice(adjustRedoStack.length - ADJUST_HISTORY_LIMIT);
+      }
+    }
+    if (_applyAdjustHistoryState(prev) && adjustStatus) {
+      adjustStatus.textContent = 'Undo applied.';
+    }
+    _syncAdjustUndoRedoUi();
+  }
+
+  function _redoAdjustAction() {
+    if (!workingSave || adjustRedoStack.length === 0) return;
+    const next = adjustRedoStack.pop();
+    const current = _captureAdjustHistoryState();
+    if (current) {
+      adjustUndoStack.push(current);
+      if (adjustUndoStack.length > ADJUST_HISTORY_LIMIT) {
+        adjustUndoStack = adjustUndoStack.slice(adjustUndoStack.length - ADJUST_HISTORY_LIMIT);
+      }
+    }
+    if (_applyAdjustHistoryState(next) && adjustStatus) {
+      adjustStatus.textContent = 'Redo applied.';
+    }
+    _syncAdjustUndoRedoUi();
+  }
+
+  function _curveStylesToMap(styles) {
+    const m = new Map();
+    for (const c of (Array.isArray(styles) ? styles : [])) {
+      const label = String(c && c.curve_label ? c.curve_label : '').trim();
+      if (!label) continue;
+      m.set(label, c);
+    }
+    return m;
+  }
+
+  function _extractAxisRangesFromFacts(facts, curveToSeries) {
+    let xMin = null;
+    let xMax = null;
+    let yMin = null;
+    let yMax = null;
+    let xBreakMap = null;
+
+    try {
+      const axisFacts = facts && facts.axis_facts;
+      const xTicksRaw = axisFacts && axisFacts.x_axis && axisFacts.x_axis.ticks_verified;
+      const yTicksRaw = axisFacts && axisFacts.y_axis && axisFacts.y_axis.ticks_verified;
+
+      const xTicks = Array.isArray(xTicksRaw)
+        ? xTicksRaw.map(v => _safeNumber(v)).filter(v => v != null)
+        : [];
+      const yTicks = Array.isArray(yTicksRaw)
+        ? yTicksRaw.map(v => _safeNumber(v)).filter(v => v != null)
+        : [];
+
+      if (xTicks.length >= 2) {
+        xMin = Math.min(...xTicks);
+        xMax = Math.max(...xTicks);
+      }
+      if (yTicks.length >= 2) {
+        yMin = Math.min(...yTicks);
+        yMax = Math.max(...yTicks);
+      }
+    } catch (_) {}
+
+    try {
+      const g = facts && facts.geometry_facts;
+      const xa = g && g.x_axis_geometry;
+      const ya = g && g.y_axis_geometry;
+
+      const xAnch = Array.isArray(xa && xa.anchors) ? xa.anchors : [];
+      const xVals = xAnch
+        .map(a => _safeNumber(a && (a.x_value_hours ?? a.x_value)))
+        .filter(v => v != null);
+      if ((xMin == null || xMax == null || xMin >= xMax) && xVals.length > 0) {
+        xMin = Math.min(...xVals);
+        xMax = Math.max(...xVals);
+      }
+
+      const yAnchRaw = Array.isArray(ya && ya.decade_anchors)
+        ? ya.decade_anchors
+        : (Array.isArray(ya && ya.anchors) ? ya.anchors : []);
+      const yVals = yAnchRaw
+        .map(a => _safeNumber(a && (a.log10_value ?? a.y_value ?? a.value)))
+        .filter(v => v != null);
+      if ((yMin == null || yMax == null || yMin >= yMax) && yVals.length > 0) {
+        yMin = Math.min(...yVals);
+        yMax = Math.max(...yVals);
+      }
+    } catch (_) {}
+
+    const allPts = [];
+    for (const pts of curveToSeries.values()) {
+      for (const p of pts || []) {
+        if (p && Number.isFinite(p.x) && Number.isFinite(p.y)) allPts.push(p);
+      }
+    }
+    if ((xMin == null || xMax == null || xMin >= xMax) && allPts.length) {
+      xMin = Math.min(...allPts.map(p => p.x));
+      xMax = Math.max(...allPts.map(p => p.x));
+    }
+    if ((yMin == null || yMax == null || yMin >= yMax) && allPts.length) {
+      yMin = Math.min(...allPts.map(p => p.y));
+      yMax = Math.max(...allPts.map(p => p.y));
+    }
+
+    if (!(Number.isFinite(xMin) && Number.isFinite(xMax) && xMax > xMin)) {
+      xMin = 0;
+      xMax = 1;
+    }
+    if (!(Number.isFinite(yMin) && Number.isFinite(yMax) && yMax > yMin)) {
+      yMin = 0;
+      yMax = 1;
+    }
+
+    let plotBox = null;
+    try {
+      const pb = facts && facts.geometry_facts && facts.geometry_facts.plot_box_px;
+      if (pb && Number.isFinite(pb.left) && Number.isFinite(pb.right) && Number.isFinite(pb.top) && Number.isFinite(pb.bottom)
+          && pb.right > pb.left && pb.bottom > pb.top) {
+        plotBox = { left: pb.left, right: pb.right, top: pb.top, bottom: pb.bottom };
+      }
+    } catch (_) {}
+
+    try {
+      const g = facts && facts.geometry_facts;
+      const xa = g && g.x_axis_geometry;
+      const xb = xa && xa.x_break;
+      if (xb && xb.present === true) {
+        const leftSeg = Array.isArray(xb.left_segment_anchors) ? xb.left_segment_anchors : [];
+        const rightSeg = Array.isArray(xb.right_segment_anchors) ? xb.right_segment_anchors : [];
+        const leftPtsRaw = leftSeg
+          .map(a => ({ x: _safeNumber(a && (a.x_value_hours ?? a.x_value)), y: _safeNumber(a && a.x_px) }))
+          .filter(p => p.x != null && p.y != null);
+        const rightPtsRaw = rightSeg
+          .map(a => ({ x: _safeNumber(a && (a.x_value_hours ?? a.x_value)), y: _safeNumber(a && a.x_px) }))
+          .filter(p => p.x != null && p.y != null);
+
+        if (leftPtsRaw.length >= 2 && rightPtsRaw.length >= 2) {
+          const allXPx = leftPtsRaw.map(p => p.y).concat(rightPtsRaw.map(p => p.y));
+          const xPixelsRelative = (plotBox && Number.isFinite(plotBox.left) && Number.isFinite(plotBox.right))
+            ? _axisPixelsLookRelativeToPlotBox(allXPx, plotBox.left, plotBox.right)
+            : false;
+          const xOffset = xPixelsRelative && plotBox ? plotBox.left : 0;
+
+          const leftPts = leftPtsRaw.map(p => ({ x: p.x, y: p.y + xOffset }));
+          const rightPts = rightPtsRaw.map(p => ({ x: p.x, y: p.y + xOffset }));
+          const leftFit = _fitLineLeastSquares(leftPts);
+          const rightFit = _fitLineLeastSquares(rightPts);
+          const leftEnd = _safeNumber(xb.left_end_value_hours);
+          const rightStart = _safeNumber(xb.right_start_value_hours);
+
+          if (leftFit && rightFit && leftEnd != null && rightStart != null && rightStart > leftEnd) {
+            xBreakMap = {
+              present: true,
+              left_end_value: leftEnd,
+              right_start_value: rightStart,
+              left_a: leftFit.a,
+              left_b: leftFit.b,
+              right_a: rightFit.a,
+              right_b: rightFit.b,
+            };
+          }
+        }
+      }
+    } catch (_) {
+      xBreakMap = null;
+    }
+
+    return {
+      x_min: xMin,
+      x_max: xMax,
+      y_min: yMin,
+      y_max: yMax,
+      plot_box_px: plotBox,
+      x_break_map: xBreakMap,
+    };
+  }
+
+  function _curveSeriesMapToSerializable(curveToSeries) {
+    const out = [];
+    for (const [label, ptsRaw] of curveToSeries.entries()) {
+      const pts = (ptsRaw || [])
+        .filter(p => p && Number.isFinite(p.x) && Number.isFinite(p.y))
+        .map(p => ({ x: Number(p.x), y: Number(p.y) }))
+        .sort((a, b) => a.x - b.x);
+      if (!pts.length) continue;
+      out.push({ curve_label: String(label), points: pts });
+    }
+    out.sort((a, b) => a.curve_label.localeCompare(b.curve_label));
+    return out;
+  }
+
+  function _curveSeriesSerializableToMap(serialized) {
+    const m = new Map();
+    for (const it of (Array.isArray(serialized) ? serialized : [])) {
+      const label = String(it && it.curve_label ? it.curve_label : '').trim();
+      if (!label) continue;
+      const pts = (Array.isArray(it.points) ? it.points : [])
+        .filter(p => p && Number.isFinite(p.x) && Number.isFinite(p.y))
+        .map(p => ({ x: Number(p.x), y: Number(p.y) }))
+        .sort((a, b) => a.x - b.x);
+      if (!pts.length) continue;
+      m.set(label, pts);
+    }
+    return m;
+  }
+
+  function _saveLabel(save, idx) {
+    const n = Number(idx) + 1;
+    const when = save && save.created_at ? String(save.created_at) : '';
+    return 'Save #' + n + (when ? (' · ' + when) : '');
+  }
+
+  function _clampToAxisRanges(axisRanges, x, y) {
+    const xr = axisRanges || {};
+    const xMin = _safeNumber(xr.x_min) ?? 0;
+    const xMax = _safeNumber(xr.x_max) ?? 1;
+    const yMin = _safeNumber(xr.y_min) ?? 0;
+    const yMax = _safeNumber(xr.y_max) ?? 1;
+    const cx = Math.max(Math.min(x, xMax), xMin);
+    const cy = Math.max(Math.min(y, yMax), yMin);
+    return { x: cx, y: cy };
+  }
+
+  function _adjustDataToNaturalPx(save, x, y, naturalW, naturalH) {
+    const axis = save && save.axis_ranges ? save.axis_ranges : null;
+    if (!axis) return null;
+
+    const xMin = _safeNumber(axis.x_min) ?? 0;
+    const xMax = _safeNumber(axis.x_max) ?? 1;
+    const yMin = _safeNumber(axis.y_min) ?? 0;
+    const yMax = _safeNumber(axis.y_max) ?? 1;
+    const plot = axis.plot_box_px;
+
+    const boxLeft = (plot && Number.isFinite(plot.left)) ? plot.left : 0;
+    const boxRight = (plot && Number.isFinite(plot.right)) ? plot.right : Math.max(1, naturalW);
+    const boxTop = (plot && Number.isFinite(plot.top)) ? plot.top : 0;
+    const boxBottom = (plot && Number.isFinite(plot.bottom)) ? plot.bottom : Math.max(1, naturalH);
+
+    const bw = Math.max(1, boxRight - boxLeft);
+    const bh = Math.max(1, boxBottom - boxTop);
+    const xb = axis && axis.x_break_map;
+    const xv = Number(x);
+    let pxX;
+    if (xb && xb.present === true
+        && Number.isFinite(xb.left_a) && Number.isFinite(xb.left_b)
+        && Number.isFinite(xb.right_a) && Number.isFinite(xb.right_b)
+        && Number.isFinite(xb.left_end_value) && Number.isFinite(xb.right_start_value)) {
+      if (xv <= xb.left_end_value) pxX = (xb.left_a * xv) + xb.left_b;
+      else if (xv >= xb.right_start_value) pxX = (xb.right_a * xv) + xb.right_b;
+      else {
+        const pL = (xb.left_a * xb.left_end_value) + xb.left_b;
+        const pR = (xb.right_a * xb.right_start_value) + xb.right_b;
+        const tGap = (xv - xb.left_end_value) / Math.max(1e-12, (xb.right_start_value - xb.left_end_value));
+        pxX = pL + (pR - pL) * tGap;
+      }
+    } else {
+      const tx = (xv - xMin) / Math.max(1e-12, (xMax - xMin));
+      pxX = boxLeft + tx * bw;
+    }
+    const ty = (Number(y) - yMin) / Math.max(1e-12, (yMax - yMin));
+
+    return {
+      x: pxX,
+      y: boxBottom - ty * bh,
+    };
+  }
+
+  function _adjustNaturalPxToData(save, px, py, naturalW, naturalH) {
+    const axis = save && save.axis_ranges ? save.axis_ranges : null;
+    if (!axis) return null;
+
+    const xMin = _safeNumber(axis.x_min) ?? 0;
+    const xMax = _safeNumber(axis.x_max) ?? 1;
+    const yMin = _safeNumber(axis.y_min) ?? 0;
+    const yMax = _safeNumber(axis.y_max) ?? 1;
+    const plot = axis.plot_box_px;
+
+    const boxLeft = (plot && Number.isFinite(plot.left)) ? plot.left : 0;
+    const boxRight = (plot && Number.isFinite(plot.right)) ? plot.right : Math.max(1, naturalW);
+    const boxTop = (plot && Number.isFinite(plot.top)) ? plot.top : 0;
+    const boxBottom = (plot && Number.isFinite(plot.bottom)) ? plot.bottom : Math.max(1, naturalH);
+
+    const bw = Math.max(1, boxRight - boxLeft);
+    const bh = Math.max(1, boxBottom - boxTop);
+    const xb = axis && axis.x_break_map;
+    let rawX;
+    if (xb && xb.present === true
+        && Number.isFinite(xb.left_a) && Number.isFinite(xb.left_b)
+        && Number.isFinite(xb.right_a) && Number.isFinite(xb.right_b)
+        && Number.isFinite(xb.left_end_value) && Number.isFinite(xb.right_start_value)
+        && Math.abs(xb.left_a) > 1e-12 && Math.abs(xb.right_a) > 1e-12) {
+      const pL = (xb.left_a * xb.left_end_value) + xb.left_b;
+      const pR = (xb.right_a * xb.right_start_value) + xb.right_b;
+      const mid = (pL + pR) / 2;
+      const pxv = Number(px);
+      if (pxv <= mid) rawX = (pxv - xb.left_b) / xb.left_a;
+      else rawX = (pxv - xb.right_b) / xb.right_a;
+    } else {
+      const nx = (Number(px) - boxLeft) / bw;
+      rawX = xMin + nx * (xMax - xMin);
+    }
+    const ny = (boxBottom - Number(py)) / bh;
+    const rawY = yMin + ny * (yMax - yMin);
+    return _clampToAxisRanges(axis, rawX, rawY);
+  }
+
+  function _adjustDisplayNaturalToOverlaySourcePx(save, displayX, displayY, naturalW, naturalH) {
+    const a = (save && save.overlay_adjust) ? save.overlay_adjust : null;
+    const sx = _safeNumber(a && a.sx) ?? 1;
+    const sy = _safeNumber(a && a.sy) ?? 1;
+    const dx = _safeNumber(a && a.dx) ?? 0;
+    const dy = _safeNumber(a && a.dy) ?? 0;
+    const invSx = Math.abs(sx) > 1e-9 ? (1 / sx) : 1;
+    const invSy = Math.abs(sy) > 1e-9 ? (1 / sy) : 1;
+    const cx = Number(naturalW) / 2;
+    const cy = Number(naturalH) / 2;
+    return {
+      x: ((Number(displayX) - cx - dx) * invSx) + cx,
+      y: ((Number(displayY) - cy - dy) * invSy) + cy,
+    };
+  }
+
+  function _adjustContainerToNaturalPx(evt) {
+    if (!adjustCanvasWrap || !adjustImage) return null;
+    const rect = adjustCanvasWrap.getBoundingClientRect();
+    const nw = adjustImage.naturalWidth || 0;
+    const nh = adjustImage.naturalHeight || 0;
+    if (!(nw > 0 && nh > 0)) return null;
+
+    const sx = rect.width / nw;
+    const sy = rect.height / nh;
+    const scale = Math.min(sx, sy);
+    const dispW = nw * scale;
+    const dispH = nh * scale;
+    const offX = (rect.width - dispW) / 2;
+    const offY = (rect.height - dispH) / 2;
+
+    const localX = evt.clientX - rect.left;
+    const localY = evt.clientY - rect.top;
+    const nx = (localX - offX) / Math.max(1e-12, scale);
+    const ny = (localY - offY) / Math.max(1e-12, scale);
+    return {
+      x: Math.max(0, Math.min(nw, nx)),
+      y: Math.max(0, Math.min(nh, ny)),
+      naturalW: nw,
+      naturalH: nh,
+    };
+  }
+
+  function _adjustClientToNatural(clientX, clientY, clampToImage = true) {
+    if (!adjustCanvasWrap || !adjustImage) return null;
+    const rect = adjustCanvasWrap.getBoundingClientRect();
+    const nw = adjustImage.naturalWidth || 0;
+    const nh = adjustImage.naturalHeight || 0;
+    if (!(nw > 0 && nh > 0)) return null;
+
+    const sx = rect.width / nw;
+    const sy = rect.height / nh;
+    const scale = Math.min(sx, sy);
+    const dispW = nw * scale;
+    const dispH = nh * scale;
+    const offX = (rect.width - dispW) / 2;
+    const offY = (rect.height - dispH) / 2;
+
+    const localX = clientX - rect.left;
+    const localY = clientY - rect.top;
+    let nx = (localX - offX) / Math.max(1e-12, scale);
+    let ny = (localY - offY) / Math.max(1e-12, scale);
+    if (clampToImage) {
+      nx = Math.max(0, Math.min(nw, nx));
+      ny = Math.max(0, Math.min(nh, ny));
+    }
+    return { x: nx, y: ny, naturalW: nw, naturalH: nh };
+  }
+
+  function _adjustSourceBox(save, naturalW, naturalH) {
+    const pb = save && save.axis_ranges && save.axis_ranges.plot_box_px;
+    if (pb
+      && Number.isFinite(pb.left) && Number.isFinite(pb.right)
+      && Number.isFinite(pb.top) && Number.isFinite(pb.bottom)
+      && pb.right > pb.left && pb.bottom > pb.top) {
+      return {
+        left: Number(pb.left),
+        right: Number(pb.right),
+        top: Number(pb.top),
+        bottom: Number(pb.bottom),
+      };
+    }
+    return { left: 0, right: Math.max(1, naturalW), top: 0, bottom: Math.max(1, naturalH) };
+  }
+
+  function _adjustTransformedBoundsForBox(a, naturalW, naturalH, sourceBox) {
+    const sx = _safeNumber(a && a.sx) ?? 1;
+    const sy = _safeNumber(a && a.sy) ?? 1;
+    const dx = _safeNumber(a && a.dx) ?? 0;
+    const dy = _safeNumber(a && a.dy) ?? 0;
+    const cx = naturalW / 2;
+    const cy = naturalH / 2;
+    const left = ((sourceBox.left - cx) * sx) + cx + dx;
+    const right = ((sourceBox.right - cx) * sx) + cx + dx;
+    const top = ((sourceBox.top - cy) * sy) + cy + dy;
+    const bottom = ((sourceBox.bottom - cy) * sy) + cy + dy;
+    return {
+      left: Math.min(left, right),
+      right: Math.max(left, right),
+      top: Math.min(top, bottom),
+      bottom: Math.max(top, bottom),
+    };
+  }
+
+  function _adjustAdjustFromTransformedBounds(bounds, naturalW, naturalH, sourceBox) {
+    const srcW = Math.max(1e-6, sourceBox.right - sourceBox.left);
+    const srcH = Math.max(1e-6, sourceBox.bottom - sourceBox.top);
+    const outW = Math.max(1e-6, bounds.right - bounds.left);
+    const outH = Math.max(1e-6, bounds.bottom - bounds.top);
+    const cx = naturalW / 2;
+    const cy = naturalH / 2;
+
+    const sx = Math.max(0.05, Math.min(20, outW / srcW));
+    const sy = Math.max(0.05, Math.min(20, outH / srcH));
+
+    const srcCx = (sourceBox.left + sourceBox.right) / 2;
+    const srcCy = (sourceBox.top + sourceBox.bottom) / 2;
+    const outCx = (bounds.left + bounds.right) / 2;
+    const outCy = (bounds.top + bounds.bottom) / 2;
+
+    const dx = outCx - (((srcCx - cx) * sx) + cx);
+    const dy = outCy - (((srcCy - cy) * sy) + cy);
+    return { sx, sy, dx, dy };
+  }
+
+  function _startAdjustOverlayDrag(ev, role) {
+    if (!workingSave || !role) return false;
+    const a = _ensureWorkingSaveOverlayAdjust();
+    if (!a) return false;
+    const natural = _adjustClientToNatural(ev.clientX, ev.clientY, false);
+    if (!natural) return false;
+
+    const sourceBox = _adjustSourceBox(workingSave, natural.naturalW, natural.naturalH);
+    const startBounds = _adjustTransformedBoundsForBox(a, natural.naturalW, natural.naturalH, sourceBox);
+
+    adjustOverlayDrag = {
+      pointerId: ev.pointerId,
+      role,
+      moved: false,
+      undoPushed: _pushAdjustUndoSnapshot(),
+      startNatX: natural.x,
+      startNatY: natural.y,
+      naturalW: natural.naturalW,
+      naturalH: natural.naturalH,
+      sourceBox,
+      startBounds,
+    };
+
+    try {
+      if (adjustCurvesOverlay && ev.pointerId != null && adjustCurvesOverlay.setPointerCapture) {
+        adjustCurvesOverlay.setPointerCapture(ev.pointerId);
+      }
+    } catch (_) {}
+    return true;
+  }
+
+  function _updateAdjustOverlayDrag(ev) {
+    const drag = adjustOverlayDrag;
+    if (!drag) return;
+    if (ev.pointerId != null && drag.pointerId != null && ev.pointerId !== drag.pointerId) return;
+
+    const natural = _adjustClientToNatural(ev.clientX, ev.clientY, false);
+    if (!natural) return;
+
+    const dnx = natural.x - drag.startNatX;
+    const dny = natural.y - drag.startNatY;
+    const b0 = drag.startBounds;
+    const b = { left: b0.left, right: b0.right, top: b0.top, bottom: b0.bottom };
+
+    const minSizePx = 8;
+    if (drag.role === 'center') {
+      b.left += dnx;
+      b.right += dnx;
+      b.top += dny;
+      b.bottom += dny;
+    } else if (drag.role === 'left') {
+      b.left = Math.min(b.right - minSizePx, b.left + dnx);
+    } else if (drag.role === 'right') {
+      b.right = Math.max(b.left + minSizePx, b.right + dnx);
+    } else if (drag.role === 'top') {
+      b.top = Math.min(b.bottom - minSizePx, b.top + dny);
+    } else if (drag.role === 'bottom') {
+      b.bottom = Math.max(b.top + minSizePx, b.bottom + dny);
+    }
+
+    const pad = Math.max(drag.naturalW, drag.naturalH) * 2;
+    b.left = Math.max(-pad, Math.min(pad + drag.naturalW, b.left));
+    b.right = Math.max(-pad, Math.min(pad + drag.naturalW, b.right));
+    b.top = Math.max(-pad, Math.min(pad + drag.naturalH, b.top));
+    b.bottom = Math.max(-pad, Math.min(pad + drag.naturalH, b.bottom));
+
+    const next = _adjustAdjustFromTransformedBounds(b, drag.naturalW, drag.naturalH, drag.sourceBox);
+    const a = _ensureWorkingSaveOverlayAdjust();
+    if (!a) return;
+    a.sx = next.sx;
+    a.sy = next.sy;
+    a.dx = next.dx;
+    a.dy = next.dy;
+
+    if (Math.abs(dnx) > 0.75 || Math.abs(dny) > 0.75) drag.moved = true;
+    _renderAdjustOverlay();
+  }
+
+  function _finishAdjustOverlayDrag(ev, cancelled = false) {
+    const drag = adjustOverlayDrag;
+    if (!drag) return;
+    if (ev && ev.pointerId != null && drag.pointerId != null && ev.pointerId !== drag.pointerId) return;
+
+    try {
+      if (adjustCurvesOverlay && drag.pointerId != null && adjustCurvesOverlay.releasePointerCapture) {
+        adjustCurvesOverlay.releasePointerCapture(drag.pointerId);
+      }
+    } catch (_) {}
+
+    if (!cancelled && drag.moved) {
+      adjustOverlaySuppressClickUntil = Date.now() + 220;
+    } else if ((cancelled || !drag.moved) && drag.undoPushed && adjustUndoStack.length > 0) {
+      adjustUndoStack.pop();
+      _syncAdjustUndoRedoUi();
+    }
+    adjustOverlayDrag = null;
+  }
+
+  function _adjustCurrentCurvePoints() {
+    if (!workingSave || !Array.isArray(workingSave.data_curves)) return null;
+    const label = adjustSelectedCurveLabel;
+    const curve = workingSave.data_curves.find(c => c && c.curve_label === label);
+    if (!curve || !Array.isArray(curve.points)) return null;
+    return curve.points;
+  }
+
+  function _adjustCurveLabels() {
+    if (!workingSave || !Array.isArray(workingSave.data_curves)) return [];
+    return workingSave.data_curves.map(c => String(c && c.curve_label ? c.curve_label : '').trim()).filter(Boolean);
+  }
+
+  function _normalizeAdjustVisibleCurves() {
+    const labels = _adjustCurveLabels();
+    const valid = new Set(labels);
+
+    if (!adjustVisibleCurveLabelsInitialized) {
+      adjustVisibleCurveLabels = new Set(labels);
+      adjustVisibleCurveLabelsKnown = new Set(labels);
+      adjustVisibleCurveLabelsInitialized = true;
+      return labels;
+    }
+
+    const next = new Set();
+    for (const label of adjustVisibleCurveLabels) {
+      if (valid.has(label)) next.add(label);
+    }
+
+    for (const label of labels) {
+      if (!adjustVisibleCurveLabelsKnown.has(label)) {
+        next.add(label);
+      }
+    }
+
+    adjustVisibleCurveLabelsKnown = new Set(labels);
+    adjustVisibleCurveLabels = next;
+    return labels;
+  }
+
+  function _renderAdjustVisibleCurvesUi(showStatus = false) {
+    const labels = _normalizeAdjustVisibleCurves();
+    const total = labels.length;
+    let visibleCount = 0;
+    if (adjustVisibleCurvesList) {
+      adjustVisibleCurvesList.innerHTML = '';
+      for (const label of labels) {
+        const row = document.createElement('label');
+        row.className = 'check adjustVisibleCurveItem';
+        row.title = 'Toggle visibility for curve ' + label;
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = adjustVisibleCurveLabels.has(label);
+        if (cb.checked) visibleCount += 1;
+        cb.setAttribute('data-adjust-visible-curve', label);
+        const txt = document.createTextNode(' ' + label);
+        row.appendChild(cb);
+        row.appendChild(txt);
+        adjustVisibleCurvesList.appendChild(row);
+      }
+    }
+    if (adjustVisibleCurvesHint) {
+      if (total === 0) {
+        adjustVisibleCurvesHint.textContent = 'No curves available.';
+      } else if (visibleCount === total) {
+        adjustVisibleCurvesHint.textContent = 'All curves visible.';
+      } else if (visibleCount === 0) {
+        adjustVisibleCurvesHint.textContent = 'No curves visible.';
+      } else {
+        adjustVisibleCurvesHint.textContent = visibleCount + ' of ' + total + ' curves visible.';
+      }
+    }
+    if (btnAdjustVisibleAll) btnAdjustVisibleAll.disabled = total === 0 || visibleCount === total;
+    if (btnAdjustVisibleNone) btnAdjustVisibleNone.disabled = total === 0 || visibleCount === 0;
+    if (showStatus && adjustStatus) {
+      if (total === 0) {
+        adjustStatus.textContent = 'No curves available to toggle visibility.';
+      } else if (visibleCount === 0) {
+        adjustStatus.textContent = 'No curves are visible. Use “All” or tick curves to show them.';
+      } else {
+        adjustStatus.textContent = 'Visible curves: ' + visibleCount + ' / ' + total + '.';
+      }
+    }
+  }
+
+  function _renderAdjustSelectors() {
+    if (!workingSave || !Array.isArray(workingSave.data_curves)) return;
+    const curves = workingSave.data_curves;
+    const labels = curves.map(c => c.curve_label).filter(Boolean);
+    _normalizeAdjustVisibleCurves();
+
+    if (!adjustSelectedCurveLabel || !labels.includes(adjustSelectedCurveLabel)) {
+      adjustSelectedCurveLabel = labels[0] || null;
+      adjustSelectedPointIndex = 0;
+    }
+
+    adjustCurveSelect.innerHTML = '';
+    for (const label of labels) {
+      const opt = document.createElement('option');
+      opt.value = label;
+      opt.textContent = label;
+      adjustCurveSelect.appendChild(opt);
+    }
+    if (adjustSelectedCurveLabel) adjustCurveSelect.value = adjustSelectedCurveLabel;
+
+    if (!adjustAddPointCurveLabel || !labels.includes(adjustAddPointCurveLabel)) {
+      adjustAddPointCurveLabel = adjustSelectedCurveLabel || labels[0] || null;
+    }
+    if (adjustAddCurveSelect) {
+      adjustAddCurveSelect.innerHTML = '';
+      for (const label of labels) {
+        const opt = document.createElement('option');
+        opt.value = label;
+        opt.textContent = label;
+        adjustAddCurveSelect.appendChild(opt);
+      }
+      if (adjustAddPointCurveLabel) adjustAddCurveSelect.value = adjustAddPointCurveLabel;
+    }
+
+    const pts = _adjustCurrentCurvePoints() || [];
+    if (adjustSelectedPointIndex >= pts.length) adjustSelectedPointIndex = Math.max(0, pts.length - 1);
+    if (adjustSelectedPointIndex < 0) adjustSelectedPointIndex = 0;
+
+    adjustPointSelect.innerHTML = '';
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+      const opt = document.createElement('option');
+      opt.value = String(i);
+      opt.textContent = 'Point ' + (i + 1) + ' (x=' + _formatPointDisplayNumber(p.x) + ', y=' + _formatPointDisplayNumber(p.y) + ')';
+      adjustPointSelect.appendChild(opt);
+    }
+    if (pts.length > 0) adjustPointSelect.value = String(adjustSelectedPointIndex);
+
+    const cur = pts[adjustSelectedPointIndex] || { x: '', y: '' };
+    adjustXInput.value = (cur.x === '' ? '' : String(cur.x));
+    adjustYInput.value = (cur.y === '' ? '' : String(cur.y));
+    _syncAdjustLockXUi();
+    _syncAdjustAddPointsUi();
+  }
+
+  function _renderAdjustOverlay() {
+    if (!workingSave || !adjustCanvasWrap || !adjustImage) return;
+    const nw = adjustImage.naturalWidth || 0;
+    const nh = adjustImage.naturalHeight || 0;
+    if (!(nw > 0 && nh > 0)) return;
+
+    adjustAxesOverlay.setAttribute('viewBox', '0 0 ' + nw + ' ' + nh);
+    adjustCurvesOverlay.setAttribute('viewBox', '0 0 ' + nw + ' ' + nh);
+    adjustAxesOverlay.innerHTML = '';
+    adjustCurvesOverlay.innerHTML = '';
+
+    const a = (workingSave.overlay_adjust || { sx: 1, sy: 1, dx: 0, dy: 0 });
+    const dx = _safeNumber(a.dx) ?? 0;
+    const dy = _safeNumber(a.dy) ?? 0;
+    const sx = _safeNumber(a.sx) ?? 1;
+    const sy = _safeNumber(a.sy) ?? 1;
+    const cx = nw / 2;
+    const cy = nh / 2;
+    const transformPoint = (p, t) => ({
+      x: (p.x - cx) * t.sx + cx + t.dx,
+      y: (p.y - cy) * t.sy + cy + t.dy,
+    });
+    const bboxOf = (pts) => {
+      if (!pts || pts.length === 0) return null;
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      for (const p of pts) {
+        if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) continue;
+        if (p.x < minX) minX = p.x;
+        if (p.y < minY) minY = p.y;
+        if (p.x > maxX) maxX = p.x;
+        if (p.y > maxY) maxY = p.y;
+      }
+      if (!(maxX > minX && maxY > minY)) return null;
+      return { minX, minY, maxX, maxY, w: maxX - minX, h: maxY - minY, cx: (minX + maxX) / 2, cy: (minY + maxY) / 2 };
+    };
+
+    const axis = workingSave.axis_ranges || {};
+    const pb = axis.plot_box_px;
+    const showAxes = (workingSave.overlay_axes_mode || 'full') !== 'none';
+    const xMin = _safeNumber(axis.x_min);
+    const xMax = _safeNumber(axis.x_max);
+    const yMin = _safeNumber(axis.y_min);
+    const yMax = _safeNumber(axis.y_max);
+
+    const preferSavedAdjust = (workingSave.use_saved_overlay_adjust !== false);
+
+    // One-time auto-tune (optional): only run when saved-adjust preference is explicitly disabled.
+    if (!preferSavedAdjust && !workingSave._autoOverlayTuned && pb
+      && Number.isFinite(pb.left) && Number.isFinite(pb.top) && Number.isFinite(pb.right) && Number.isFinite(pb.bottom)
+      && pb.right > pb.left && pb.bottom > pb.top) {
+      const rawPts = [];
+      for (const curve of (Array.isArray(workingSave.data_curves) ? workingSave.data_curves : [])) {
+        const points = Array.isArray(curve && curve.points) ? curve.points : [];
+        for (const p of points) {
+          const m = _adjustDataToNaturalPx(workingSave, p.x, p.y, nw, nh);
+          if (m) rawPts.push(m);
+        }
+      }
+
+      const bbox0 = bboxOf(rawPts);
+      if (bbox0) {
+        const t0 = {
+          sx: Number.isFinite(sx) ? sx : 1,
+          sy: Number.isFinite(sy) ? sy : 1,
+          dx: Number.isFinite(dx) ? dx : 0,
+          dy: Number.isFinite(dy) ? dy : 0,
+        };
+        const transformed0 = rawPts.map(p => transformPoint(p, t0));
+        const b1 = bboxOf(transformed0);
+        if (b1) {
+          const target = {
+            minX: pb.left,
+            minY: pb.top,
+            maxX: pb.right,
+            maxY: pb.bottom,
+            w: Math.max(1, pb.right - pb.left),
+            h: Math.max(1, pb.bottom - pb.top),
+            cx: (pb.left + pb.right) / 2,
+            cy: (pb.top + pb.bottom) / 2,
+          };
+
+          const corrSx = Math.max(0.15, Math.min(8.0, target.w / Math.max(1e-6, b1.w)));
+          const corrSy = Math.max(0.15, Math.min(8.0, target.h / Math.max(1e-6, b1.h)));
+          const corrDx = target.cx - (((b1.cx - cx) * corrSx) + cx);
+          const corrDy = target.cy - (((b1.cy - cy) * corrSy) + cy);
+
+          const centerDist = Math.hypot(target.cx - b1.cx, target.cy - b1.cy);
+          const needsTune = centerDist > (0.03 * Math.max(nw, nh)) || Math.abs(corrSx - 1) > 0.08 || Math.abs(corrSy - 1) > 0.08;
+
+          if (needsTune) {
+            a.sx = t0.sx * corrSx;
+            a.sy = t0.sy * corrSy;
+            a.dx = (t0.dx * corrSx) + corrDx;
+            a.dy = (t0.dy * corrSy) + corrDy;
+          }
+        }
+      }
+      workingSave._autoOverlayTuned = true;
+    }
+
+    const sx1 = _safeNumber(a.sx) ?? 1;
+    const sy1 = _safeNumber(a.sy) ?? 1;
+    const dx1 = _safeNumber(a.dx) ?? 0;
+    const dy1 = _safeNumber(a.dy) ?? 0;
+    const transform = 'translate(' + dx1 + ' ' + dy1 + ') translate(' + cx + ' ' + cy + ') scale(' + sx1 + ' ' + sy1 + ') translate(' + (-cx) + ' ' + (-cy) + ')';
+    if (showAxes && pb && Number.isFinite(pb.left) && Number.isFinite(pb.top) && Number.isFinite(pb.right) && Number.isFinite(pb.bottom)) {
+      const gAxis = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      gAxis.setAttribute('transform', transform);
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', String(pb.left));
+      rect.setAttribute('y', String(pb.top));
+      rect.setAttribute('width', String(Math.max(1, pb.right - pb.left)));
+      rect.setAttribute('height', String(Math.max(1, pb.bottom - pb.top)));
+      rect.setAttribute('class', 'adjustAxesRect');
+      gAxis.appendChild(rect);
+
+      const tickLen = Math.max(6, Math.min(14, 0.012 * Math.max(nw, nh)));
+      const xMinLabel = _formatAxisTickValue(xMin);
+      const xMaxLabel = _formatAxisTickValue(xMax);
+      const yMinLabel = _formatAxisTickValue(yMin);
+      const yMaxLabel = _formatAxisTickValue(yMax);
+
+      const addTick = (x1, y1, x2, y2) => {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', String(x1));
+        line.setAttribute('y1', String(y1));
+        line.setAttribute('x2', String(x2));
+        line.setAttribute('y2', String(y2));
+        line.setAttribute('class', 'adjustAxesTick');
+        gAxis.appendChild(line);
+      };
+
+      const addLabel = (text, x, y, anchor, baseline) => {
+        if (!text) return;
+        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        t.textContent = text;
+        t.setAttribute('x', String(x));
+        t.setAttribute('y', String(y));
+        t.setAttribute('text-anchor', anchor);
+        t.setAttribute('dominant-baseline', baseline);
+        t.setAttribute('class', 'adjustAxesLabel');
+        gAxis.appendChild(t);
+      };
+
+      addTick(pb.left, pb.bottom, pb.left, pb.bottom + tickLen);
+      addTick(pb.right, pb.bottom, pb.right, pb.bottom + tickLen);
+      addTick(pb.left, pb.bottom, pb.left - tickLen, pb.bottom);
+      addTick(pb.left, pb.top, pb.left - tickLen, pb.top);
+
+      addLabel(xMinLabel, pb.left, pb.bottom + tickLen + 2, 'middle', 'hanging');
+      addLabel(xMaxLabel, pb.right, pb.bottom + tickLen + 2, 'middle', 'hanging');
+      addLabel(yMinLabel, pb.left - tickLen - 4, pb.bottom, 'end', 'middle');
+      addLabel(yMaxLabel, pb.left - tickLen - 4, pb.top, 'end', 'middle');
+
+      adjustAxesOverlay.appendChild(gAxis);
+    }
+
+    _normalizeAdjustVisibleCurves();
+    const curves = Array.isArray(workingSave.data_curves) ? workingSave.data_curves : [];
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('transform', transform);
+    const adjustOverlayColor = '#dc2626';
+    const isUnlocked = !adjustOverlayMovementLocked;
+
+    const curveStylesList = Array.isArray(workingSave.curve_styles) ? workingSave.curve_styles : [];
+    const curveStyleByLabel = new Map();
+    for (const style of curveStylesList) {
+      const styleLabel = String((style && style.curve_label) || '');
+      if (!styleLabel) continue;
+      curveStyleByLabel.set(styleLabel, style || {});
+    }
+
+    const _styleToken = (value) => String(value == null ? '' : value).trim().toLowerCase().replace(/\s+/g, '_').replace(/-/g, '_');
+    const _lineDashPattern = (lineTypeRaw) => {
+      const lineType = _styleToken(lineTypeRaw);
+      if (!lineType || lineType === 'solid') return null;
+      if (lineType === 'dashed' || lineType === 'broken' || lineType === '__') return '8 5';
+      if (lineType === 'dotted' || lineType === 'dot' || lineType === 'points') return '2 4';
+      if (lineType === 'dash_dot' || lineType === 'dashdot' || lineType === 'dot_dash') return '8 4 2 4';
+      return null;
+    };
+    const _markerShape = (markerRaw) => {
+      const marker = _styleToken(markerRaw);
+      if (!marker || marker === 'circle' || marker === 'o') return 'circle';
+      if (marker === 'none' || marker === 'no_marker') return 'none';
+      if (marker === 'square' || marker === 's') return 'square';
+      if (marker === 'diamond' || marker === 'd') return 'diamond';
+      if (marker === 'triangle' || marker === 'triangle_up' || marker === 'triangleup' || marker === '^') return 'triangle_up';
+      if (marker === 'triangle_down' || marker === 'triangledown' || marker === 'v') return 'triangle_down';
+      if (marker === 'x' || marker === 'cross' || marker === 'times') return 'x';
+      if (marker === 'plus' || marker === '+') return 'plus';
+      return 'circle';
+    };
+    const _decoratePointElement = (el, label, pointIndex, isSelected) => {
+      if (!el) return;
+      el.setAttribute('class', isSelected ? 'adjustPoint adjustPoint--selected' : 'adjustPoint');
+      el.setAttribute('data-curve-label', label);
+      el.setAttribute('data-point-index', String(pointIndex));
+    };
+    const _appendMarker = (root, markerType, point, label, pointIndex, isSelected, color) => {
+      const markerStroke = isSelected ? '#991b1b' : color;
+      const markerSize = isSelected ? 4.5 : 3;
+
+      if (markerType === 'none') {
+        if (!isSelected) return;
+        const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        ring.setAttribute('cx', String(point.x));
+        ring.setAttribute('cy', String(point.y));
+        ring.setAttribute('r', String(markerSize + 0.5));
+        ring.setAttribute('fill', 'none');
+        ring.setAttribute('stroke', markerStroke);
+        ring.setAttribute('stroke-width', '1.8');
+        _decoratePointElement(ring, label, pointIndex, isSelected);
+        root.appendChild(ring);
+        return;
+      }
+
+      if (markerType === 'circle') {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', String(point.x));
+        circle.setAttribute('cy', String(point.y));
+        circle.setAttribute('r', String(markerSize));
+        circle.setAttribute('fill', color);
+        circle.setAttribute('stroke', markerStroke);
+        _decoratePointElement(circle, label, pointIndex, isSelected);
+        root.appendChild(circle);
+        return;
+      }
+
+      if (markerType === 'square') {
+        const side = markerSize * 2;
+        const square = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        square.setAttribute('x', String(point.x - (side / 2)));
+        square.setAttribute('y', String(point.y - (side / 2)));
+        square.setAttribute('width', String(side));
+        square.setAttribute('height', String(side));
+        square.setAttribute('fill', color);
+        square.setAttribute('stroke', markerStroke);
+        _decoratePointElement(square, label, pointIndex, isSelected);
+        root.appendChild(square);
+        return;
+      }
+
+      if (markerType === 'diamond') {
+        const d = markerSize + 0.3;
+        const diamond = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        diamond.setAttribute('points', [
+          point.x + ',' + (point.y - d),
+          (point.x + d) + ',' + point.y,
+          point.x + ',' + (point.y + d),
+          (point.x - d) + ',' + point.y,
+        ].join(' '));
+        diamond.setAttribute('fill', color);
+        diamond.setAttribute('stroke', markerStroke);
+        _decoratePointElement(diamond, label, pointIndex, isSelected);
+        root.appendChild(diamond);
+        return;
+      }
+
+      if (markerType === 'triangle_up' || markerType === 'triangle_down') {
+        const h = markerSize + 1;
+        const triangle = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        if (markerType === 'triangle_up') {
+          triangle.setAttribute('points', [
+            point.x + ',' + (point.y - h),
+            (point.x + h) + ',' + (point.y + h),
+            (point.x - h) + ',' + (point.y + h),
+          ].join(' '));
+        } else {
+          triangle.setAttribute('points', [
+            point.x + ',' + (point.y + h),
+            (point.x + h) + ',' + (point.y - h),
+            (point.x - h) + ',' + (point.y - h),
+          ].join(' '));
+        }
+        triangle.setAttribute('fill', color);
+        triangle.setAttribute('stroke', markerStroke);
+        _decoratePointElement(triangle, label, pointIndex, isSelected);
+        root.appendChild(triangle);
+        return;
+      }
+
+      if (markerType === 'x' || markerType === 'plus') {
+        const span = markerSize + 1;
+        const strokeWidth = isSelected ? '1.8' : '1.4';
+        const lineA = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        const lineB = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        if (markerType === 'x') {
+          lineA.setAttribute('x1', String(point.x - span));
+          lineA.setAttribute('y1', String(point.y - span));
+          lineA.setAttribute('x2', String(point.x + span));
+          lineA.setAttribute('y2', String(point.y + span));
+          lineB.setAttribute('x1', String(point.x - span));
+          lineB.setAttribute('y1', String(point.y + span));
+          lineB.setAttribute('x2', String(point.x + span));
+          lineB.setAttribute('y2', String(point.y - span));
+        } else {
+          lineA.setAttribute('x1', String(point.x - span));
+          lineA.setAttribute('y1', String(point.y));
+          lineA.setAttribute('x2', String(point.x + span));
+          lineA.setAttribute('y2', String(point.y));
+          lineB.setAttribute('x1', String(point.x));
+          lineB.setAttribute('y1', String(point.y - span));
+          lineB.setAttribute('x2', String(point.x));
+          lineB.setAttribute('y2', String(point.y + span));
+        }
+        for (const line of [lineA, lineB]) {
+          line.setAttribute('stroke', markerStroke);
+          line.setAttribute('stroke-width', strokeWidth);
+          line.setAttribute('stroke-linecap', 'round');
+          line.setAttribute('fill', 'none');
+          _decoratePointElement(line, label, pointIndex, isSelected);
+          root.appendChild(line);
+        }
+        return;
+      }
+
+      const fallback = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      fallback.setAttribute('cx', String(point.x));
+      fallback.setAttribute('cy', String(point.y));
+      fallback.setAttribute('r', String(markerSize));
+      fallback.setAttribute('fill', color);
+      fallback.setAttribute('stroke', markerStroke);
+      _decoratePointElement(fallback, label, pointIndex, isSelected);
+      root.appendChild(fallback);
+    };
+
+    for (const curve of curves) {
+      const label = String(curve.curve_label || '');
+      if (!adjustVisibleCurveLabels.has(label)) continue;
+      const points = Array.isArray(curve.points) ? curve.points : [];
+      if (!points.length) continue;
+
+      const pxPoints = points.map(p => _adjustDataToNaturalPx(workingSave, p.x, p.y, nw, nh)).filter(Boolean);
+      if (pxPoints.length < 1) continue;
+
+      const color = adjustOverlayColor;
+      const style = curveStyleByLabel.get(label) || {};
+      const dashPattern = _lineDashPattern(style.line_type);
+      const markerType = _markerShape(style.marker_symbol);
+
+      if (pxPoints.length >= 2) {
+        const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+        poly.setAttribute('fill', 'none');
+        if (color) poly.setAttribute('stroke', color);
+        poly.setAttribute('stroke-width', '2');
+        if (dashPattern) {
+          poly.setAttribute('stroke-dasharray', dashPattern);
+        }
+        poly.setAttribute('class', 'adjustCurveLine');
+        poly.setAttribute('points', pxPoints.map(p => p.x + ',' + p.y).join(' '));
+        g.appendChild(poly);
+      }
+
+      for (let i = 0; i < pxPoints.length; i++) {
+        const p = pxPoints[i];
+        const isSelected = (label === adjustSelectedCurveLabel && i === adjustSelectedPointIndex);
+        _appendMarker(g, markerType, p, label, i, isSelected, color);
+
+        const hit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        hit.setAttribute('cx', String(p.x));
+        hit.setAttribute('cy', String(p.y));
+        hit.setAttribute('r', isSelected ? '11' : '9');
+        hit.setAttribute('fill', 'rgba(0,0,0,0.001)');
+        hit.setAttribute('data-curve-label', label);
+        hit.setAttribute('data-point-index', String(i));
+        g.appendChild(hit);
+      }
+    }
+
+    adjustCurvesOverlay.appendChild(g);
+
+    const handleSourceBox = _adjustSourceBox(workingSave, nw, nh);
+    const handleBounds = _adjustTransformedBoundsForBox(a, nw, nh, handleSourceBox);
+    const boxW = Math.max(1, handleBounds.right - handleBounds.left);
+    const boxH = Math.max(1, handleBounds.bottom - handleBounds.top);
+    const handleThickness = Math.max(8, Math.min(16, 0.015 * Math.max(nw, nh)));
+
+    const frame = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    frame.setAttribute('x', String(handleBounds.left));
+    frame.setAttribute('y', String(handleBounds.top));
+    frame.setAttribute('width', String(boxW));
+    frame.setAttribute('height', String(boxH));
+    frame.setAttribute('fill', 'none');
+    frame.setAttribute('stroke', 'rgba(220,38,38,0.75)');
+    frame.setAttribute('stroke-width', '1.5');
+    frame.setAttribute('stroke-dasharray', '5 4');
+    frame.setAttribute('pointer-events', 'none');
+    adjustCurvesOverlay.appendChild(frame);
+
+    const mkEdgeHandle = (role, x, y, w, h, cursor) => {
+      const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      r.setAttribute('x', String(x));
+      r.setAttribute('y', String(y));
+      r.setAttribute('width', String(Math.max(1, w)));
+      r.setAttribute('height', String(Math.max(1, h)));
+      r.setAttribute('fill', 'rgba(0,0,0,0.001)');
+      r.setAttribute('stroke', 'none');
+      r.setAttribute('data-adjust-drag-role', role);
+      r.style.cursor = cursor;
+      adjustCurvesOverlay.appendChild(r);
+    };
+
+    if (isUnlocked) {
+      mkEdgeHandle('left', handleBounds.left - (handleThickness / 2), handleBounds.top, handleThickness, boxH, 'ew-resize');
+      mkEdgeHandle('right', handleBounds.right - (handleThickness / 2), handleBounds.top, handleThickness, boxH, 'ew-resize');
+      mkEdgeHandle('top', handleBounds.left, handleBounds.top - (handleThickness / 2), boxW, handleThickness, 'ns-resize');
+      mkEdgeHandle('bottom', handleBounds.left, handleBounds.bottom - (handleThickness / 2), boxW, handleThickness, 'ns-resize');
+    }
+
+    if (isUnlocked) {
+      const markerLong = Math.max(20, Math.min(36, 0.08 * Math.max(boxW, boxH)));
+      const markerThick = Math.max(10, Math.min(16, 0.012 * Math.max(nw, nh)));
+
+      const mkEdgeMarker = (role, x, y, w, h, cursor, axis) => {
+        const marker = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        marker.setAttribute('x', String(x));
+        marker.setAttribute('y', String(y));
+        marker.setAttribute('width', String(Math.max(1, w)));
+        marker.setAttribute('height', String(Math.max(1, h)));
+        marker.setAttribute('rx', '4');
+        marker.setAttribute('ry', '4');
+        marker.setAttribute('fill', 'rgba(220,38,38,0.25)');
+        marker.setAttribute('stroke', 'rgba(220,38,38,0.9)');
+        marker.setAttribute('stroke-width', '1.2');
+        marker.setAttribute('data-adjust-drag-role', role);
+        marker.style.cursor = cursor;
+        adjustCurvesOverlay.appendChild(marker);
+
+        const guide = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        if (axis === 'x') {
+          const cxm = x + (w / 2);
+          guide.setAttribute('x1', String(cxm));
+          guide.setAttribute('x2', String(cxm));
+          guide.setAttribute('y1', String(y + 3));
+          guide.setAttribute('y2', String(y + h - 3));
+        } else {
+          const cym = y + (h / 2);
+          guide.setAttribute('x1', String(x + 3));
+          guide.setAttribute('x2', String(x + w - 3));
+          guide.setAttribute('y1', String(cym));
+          guide.setAttribute('y2', String(cym));
+        }
+        guide.setAttribute('stroke', 'rgba(153,27,27,0.95)');
+        guide.setAttribute('stroke-width', '1.4');
+        guide.setAttribute('stroke-linecap', 'round');
+        guide.setAttribute('data-adjust-drag-role', role);
+        guide.style.cursor = cursor;
+        adjustCurvesOverlay.appendChild(guide);
+      };
+
+      mkEdgeMarker('left', handleBounds.left - markerThick - 2, ((handleBounds.top + handleBounds.bottom) / 2) - (markerLong / 2), markerThick, markerLong, 'ew-resize', 'x');
+      mkEdgeMarker('right', handleBounds.right + 2, ((handleBounds.top + handleBounds.bottom) / 2) - (markerLong / 2), markerThick, markerLong, 'ew-resize', 'x');
+      mkEdgeMarker('top', ((handleBounds.left + handleBounds.right) / 2) - (markerLong / 2), handleBounds.top - markerThick - 2, markerLong, markerThick, 'ns-resize', 'y');
+      mkEdgeMarker('bottom', ((handleBounds.left + handleBounds.right) / 2) - (markerLong / 2), handleBounds.bottom + 2, markerLong, markerThick, 'ns-resize', 'y');
+    }
+
+    if (isUnlocked) {
+      const center = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      const centerR = Math.max(8, Math.min(14, 0.012 * Math.max(nw, nh)));
+      center.setAttribute('cx', String((handleBounds.left + handleBounds.right) / 2));
+      center.setAttribute('cy', String((handleBounds.top + handleBounds.bottom) / 2));
+      center.setAttribute('r', String(centerR));
+      center.setAttribute('fill', 'rgba(220,38,38,0.18)');
+      center.setAttribute('stroke', 'rgba(220,38,38,0.85)');
+      center.setAttribute('stroke-width', '1.5');
+      center.setAttribute('data-adjust-drag-role', 'center');
+      center.style.cursor = 'move';
+      adjustCurvesOverlay.appendChild(center);
+    }
+  }
+
+  function _renderSaveHistory() {
+    saveHistoryList.innerHTML = '';
+    if (!saveHistory.length) {
+      saveHistoryWrap.style.display = 'none';
+      return;
+    }
+    saveHistoryWrap.style.display = 'block';
+    for (let i = 0; i < saveHistory.length; i++) {
+      const save = saveHistory[i];
+      const row = document.createElement('button');
+      row.type = 'button';
+      row.className = 'btn saveHistoryItem' + (i === selectedSaveIndex ? ' saveHistoryItem--active' : '');
+      row.textContent = _saveLabel(save, i);
+      row.addEventListener('click', () => {
+        const lockedAdjust = (adjustOverlayMovementLocked && latestLockedAdjustOverlay)
+          ? _deepClone(latestLockedAdjustOverlay)
+          : null;
+        selectedSaveIndex = i;
+        workingSave = _deepClone(saveHistory[i]);
+        adjustUndoStack = [];
+        adjustRedoStack = [];
+        adjustInputUndoArmed = true;
+        if (lockedAdjust) {
+          workingSave.overlay_adjust = _deepClone(lockedAdjust);
+          workingSave.use_saved_overlay_adjust = true;
+        }
+        adjustSelectedCurveLabel = null;
+        adjustSelectedPointIndex = 0;
+        _renderAdjustSection();
+      });
+      saveHistoryList.appendChild(row);
+    }
+  }
+
+  function _renderAdjustSection() {
+    if (!adjustSection) return;
+    const hasSave = !!(workingSave && Array.isArray(workingSave.data_curves) && workingSave.data_curves.length > 0);
+    adjustSection.style.display = (hasSave || saveHistory.length > 0) ? 'block' : 'none';
+    if (adjustSection.style.display === 'none') return;
+    _syncAdjustManualControlsUi();
+    _syncAdjustOverlayMovementUi();
+    _syncAdjustDeletePointsUi();
+    _syncAdjustAddPointsUi();
+    _syncAdjustUndoRedoUi();
+    adjustEmpty.style.display = hasSave ? 'none' : 'block';
+    adjustMain.style.display = hasSave ? 'grid' : 'none';
+
+    _renderSaveHistory();
+    if (!hasSave) return;
+
+    const imagePath = String(workingSave.image_path || '');
+    _ensureWorkingSaveOverlayAdjust();
+    if (imagePath) adjustImage.src = '/plots/' + imagePath;
+    _renderAdjustSelectors();
+    _renderAdjustVisibleCurvesUi(false);
+    _renderAdjustOverlay();
+  }
+
+  function _syncAdjustManualControlsUi() {
+    if (adjustManualControls) {
+      adjustManualControls.style.display = adjustManualControlsOpen ? 'block' : 'none';
+    }
+    if (btnAdjustManualControls) {
+      btnAdjustManualControls.setAttribute('aria-expanded', adjustManualControlsOpen ? 'true' : 'false');
+      btnAdjustManualControls.title = adjustManualControlsOpen
+        ? 'Hide manual curve/point controls.'
+        : 'Show manual curve/point controls.';
+    }
+    if (adjustManualChevron) {
+      adjustManualChevron.textContent = adjustManualControlsOpen ? '▴' : '▾';
+    }
+  }
+
+  function _syncAdjustPointFromInputs() {
+    if (!workingSave) return;
+    if (!adjustOverlayMovementLocked) return;
+    const pts = _adjustCurrentCurvePoints();
+    if (!pts || !pts[adjustSelectedPointIndex]) return;
+
+    const current = pts[adjustSelectedPointIndex];
+    const xRaw = _safeNumber(adjustXInput.value);
+    const yRaw = _safeNumber(adjustYInput.value);
+    if (yRaw == null) return;
+
+    const nextX = adjustLockXValues ? Number(current.x) : xRaw;
+    if (nextX == null) return;
+
+    const clamped = _clampToAxisRanges(workingSave.axis_ranges || {}, nextX, yRaw);
+    if (Number(clamped.x) === Number(current.x) && Number(clamped.y) === Number(current.y)) return;
+    if (adjustInputUndoArmed) {
+      _pushAdjustUndoSnapshot();
+      adjustInputUndoArmed = false;
+    }
+    pts[adjustSelectedPointIndex] = { x: clamped.x, y: clamped.y };
+    adjustXInput.value = String(clamped.x);
+    adjustYInput.value = String(clamped.y);
+    _renderAdjustSelectors();
+    _renderAdjustOverlay();
+  }
+
+  async function _buildSnapshotFromResultsSelection() {
+    let curveToSeries = null;
+    let axisSourceFacts = null;
+
+    if (trialsMode) {
+      _updateTrialExportState();
+      if (btnDownloadTrialsCsv.disabled) {
+        alert('Select a run for every curve before saving a snapshot.');
+        return null;
+      }
+
+      const out = await _buildTrialsSelectedOrAveragedOutput();
+      if (!out || !(out.curveToOutSeries instanceof Map) || out.curveToOutSeries.size === 0) {
+        alert('No trial curves available to save.');
+        return null;
+      }
+      curveToSeries = out.curveToOutSeries;
+
+      const firstRunWithFacts = trialRuns.find(r => r && r.accumulatedFacts);
+      axisSourceFacts = firstRunWithFacts ? firstRunWithFacts.accumulatedFacts : null;
+    } else {
+      if (!confirmedCurves || confirmedCurves.size === 0) {
+        alert('Select at least one confirmed curve first.');
+        return null;
+      }
+      const csvText = await _ensureExtractedCsvText();
+      if (!csvText) {
+        alert('Could not load extracted CSV.');
+        return null;
+      }
+      curveToSeries = _extractCurveSeriesFromWideCsv(csvText, confirmedCurves);
+      curveToSeries = _filterCurveSeriesToAllowed(curveToSeries, confirmedCurves);
+      if (!(curveToSeries instanceof Map) || curveToSeries.size === 0) {
+        alert('No selected curves were found in the extracted CSV.');
+        return null;
+      }
+      axisSourceFacts = accumulatedFacts;
+    }
+
+    const axisRanges = _extractAxisRangesFromFacts(axisSourceFacts, curveToSeries);
+    const dataCurves = _curveSeriesMapToSerializable(curveToSeries);
+    if (!dataCurves.length) {
+      alert('No valid curve points were found to save.');
+      return null;
+    }
+
+    const saveId = saveHistory.length + 1;
+    return {
+      save_id: saveId,
+      created_at: new Date().toISOString(),
+      image_path: currentImagePath,
+      overlay_adjust: _deepClone(overlayAdjust.replot),
+      use_saved_overlay_adjust: true,
+      overlay_axes_mode: replotOverlayAxesMode,
+      axis_ranges: _deepClone(axisRanges),
+      curve_styles: _deepClone(curveStyles),
+      data_curves: _deepClone(dataCurves),
+    };
+  }
+
+  async function saveSelectedAndContinueDown() {
+    const snapshot = await _buildSnapshotFromResultsSelection();
+    if (!snapshot) return;
+
+    saveHistory.push(snapshot);
+    selectedSaveIndex = saveHistory.length - 1;
+    workingSave = _deepClone(snapshot);
+    adjustUndoStack = [];
+    adjustRedoStack = [];
+    adjustInputUndoArmed = true;
+    adjustSelectedCurveLabel = null;
+    adjustSelectedPointIndex = 0;
+    _renderAdjustSection();
+
+    adjustStatus.textContent = 'Saved snapshot #' + snapshot.save_id + '. You can now adjust points.';
+    adjustSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function _saveCurrentAdjustmentVersion() {
+    if (!workingSave) return;
+    const nextId = saveHistory.length + 1;
+    const snap = _deepClone(workingSave);
+    snap.save_id = nextId;
+    snap.created_at = new Date().toISOString();
+    saveHistory.push(snap);
+    selectedSaveIndex = saveHistory.length - 1;
+    workingSave = _deepClone(snap);
+    adjustUndoStack = [];
+    adjustRedoStack = [];
+    adjustInputUndoArmed = true;
+    _renderAdjustSection();
+    adjustStatus.textContent = 'Saved adjustment as snapshot #' + nextId + '.';
+  }
+
+  function _downloadCurrentSaveCsv() {
+    if (!workingSave || !Array.isArray(workingSave.data_curves) || workingSave.data_curves.length === 0) return;
+    const m = _curveSeriesSerializableToMap(workingSave.data_curves);
+    if (m.size === 0) return;
+    const order = workingSave.data_curves.map(c => c.curve_label).filter(l => m.has(l));
+    const out = _buildTidyCfuCsvFromCurveSeries(order, m);
+    _downloadBlob(out, 'adjust_save_' + (workingSave.save_id || 'current') + '_tidy_cfu.csv');
+  }
+
+  function _syncAdjustOverlayMovementUi() {
+    const movementOn = !adjustOverlayMovementLocked;
+    if (btnAdjustOverlayMovement) {
+      btnAdjustOverlayMovement.checked = movementOn;
+      btnAdjustOverlayMovement.setAttribute('aria-checked', movementOn ? 'true' : 'false');
+    }
+    if (adjustOverlayMovementState) {
+      adjustOverlayMovementState.textContent = adjustOverlayMovementLocked ? 'Off' : 'On';
+    }
+    if (adjustOverlayMovementTip) {
+      adjustOverlayMovementTip.textContent = adjustOverlayMovementLocked
+        ? 'ⓘ Overlay is locked'
+        : 'ⓘ Overlay is unlocked';
+    }
+    if (adjustCurvesOverlay) {
+      adjustCurvesOverlay.style.cursor = movementOn ? 'default' : 'crosshair';
+    }
+  }
+
+  function _syncAdjustLockXUi() {
+    if (btnAdjustLockX) {
+      btnAdjustLockX.checked = !!adjustLockXValues;
+      btnAdjustLockX.setAttribute('aria-checked', adjustLockXValues ? 'true' : 'false');
+    }
+    if (adjustLockXState) {
+      adjustLockXState.textContent = adjustLockXValues ? 'On' : 'Off';
+    }
+    const movementOn = !adjustOverlayMovementLocked;
+    if (adjustXInput) {
+      adjustXInput.disabled = movementOn || !!adjustLockXValues;
+      if (movementOn) {
+        adjustXInput.title = 'Point editing is disabled while overlay movement is On.';
+      } else if (adjustLockXValues) {
+        adjustXInput.title = 'X values are locked. Toggle Lock X values Off to edit X.';
+      } else {
+        adjustXInput.title = '';
+      }
+    }
+    if (adjustYInput) {
+      adjustYInput.disabled = movementOn;
+      adjustYInput.title = movementOn ? 'Point editing is disabled while overlay movement is On.' : '';
+    }
+  }
+
+  function _syncAdjustDeletePointsUi(showStatus = false) {
+    const movementOn = !adjustOverlayMovementLocked;
+    const autoDisabled = movementOn && adjustDeletePointsEnabled;
+    if (autoDisabled) {
+      adjustDeletePointsEnabled = false;
+    }
+    if (btnAdjustDeletePoints) {
+      btnAdjustDeletePoints.checked = !!adjustDeletePointsEnabled;
+      btnAdjustDeletePoints.setAttribute('aria-checked', adjustDeletePointsEnabled ? 'true' : 'false');
+      btnAdjustDeletePoints.disabled = movementOn;
+      btnAdjustDeletePoints.title = movementOn
+        ? 'Point deletion is available only when Overlay movement is Off (locked).'
+        : '';
+    }
+    if (adjustDeletePointsState) {
+      adjustDeletePointsState.textContent = adjustDeletePointsEnabled ? 'On' : 'Off';
+    }
+    if (adjustDeletePointsRow) {
+      adjustDeletePointsRow.classList.toggle('is-disabled', movementOn);
+    }
+    if (showStatus && adjustStatus) {
+      if (movementOn) {
+        adjustStatus.textContent = autoDisabled
+          ? 'Delete mode: Off (disabled while Overlay movement is On).'
+          : 'Delete mode: Off (available only when Overlay movement is Off).';
+      } else {
+        adjustStatus.textContent = adjustDeletePointsEnabled ? 'Delete mode: On.' : 'Delete mode: Off.';
+      }
+    }
+  }
+
+  function _syncAdjustAddPointsUi(showStatus = false) {
+    const movementOn = !adjustOverlayMovementLocked;
+    const hasCurves = !!(workingSave && Array.isArray(workingSave.data_curves) && workingSave.data_curves.length > 0);
+    const unavailable = movementOn || !hasCurves;
+    const autoDisabled = unavailable && adjustAddPointsEnabled;
+    if (autoDisabled) {
+      adjustAddPointsEnabled = false;
+    }
+
+    if (btnAdjustAddPoints) {
+      btnAdjustAddPoints.checked = !!adjustAddPointsEnabled;
+      btnAdjustAddPoints.setAttribute('aria-checked', adjustAddPointsEnabled ? 'true' : 'false');
+      btnAdjustAddPoints.disabled = unavailable;
+      btnAdjustAddPoints.title = movementOn
+        ? 'Point addition is available only when Overlay movement is Off (locked).'
+        : 'Enable add mode to insert points by clicking on the image. If Lock X values is On, X snaps to nearest integer.';
+    }
+    if (adjustAddCurveSelect) {
+      const current = String(adjustAddPointCurveLabel || '').trim();
+      if (current) adjustAddCurveSelect.value = current;
+      adjustAddCurveSelect.disabled = unavailable;
+      adjustAddCurveSelect.title = unavailable
+        ? 'Curve selection for adding points is available when Overlay movement is Off.'
+        : 'Curve that receives newly added points.';
+    }
+    if (adjustAddPointsState) {
+      adjustAddPointsState.textContent = adjustAddPointsEnabled ? 'On' : 'Off';
+    }
+    if (adjustAddPointsRow) {
+      adjustAddPointsRow.classList.toggle('is-disabled', unavailable);
+    }
+
+    if (showStatus && adjustStatus) {
+      if (!hasCurves) {
+        adjustStatus.textContent = 'Add mode: Off (no curves available).';
+      } else if (movementOn) {
+        adjustStatus.textContent = autoDisabled
+          ? 'Add mode: Off (disabled while Overlay movement is On).'
+          : 'Add mode: Off (available only when Overlay movement is Off).';
+      } else {
+        adjustStatus.textContent = adjustAddPointsEnabled
+          ? 'Add mode: On. Click on the overlay to add a point to the selected curve.'
+          : 'Add mode: Off.';
+      }
+    }
+  }
+
+  function _deleteAdjustPoint(label, idxRaw) {
+    if (!workingSave || !Array.isArray(workingSave.data_curves)) return false;
+    const curveLabel = String(label || '').trim();
+    if (!curveLabel) return false;
+    const idx = Number(idxRaw);
+    if (!Number.isFinite(idx) || idx < 0) return false;
+
+    const curve = workingSave.data_curves.find(c => c && c.curve_label === curveLabel);
+    if (!curve || !Array.isArray(curve.points)) return false;
+    if (idx >= curve.points.length) return false;
+
+    _pushAdjustUndoSnapshot();
+
+    curve.points.splice(idx, 1);
+    adjustSelectedCurveLabel = curveLabel;
+    if (curve.points.length === 0) {
+      adjustSelectedPointIndex = 0;
+    } else {
+      adjustSelectedPointIndex = Math.max(0, Math.min(curve.points.length - 1, idx));
+    }
+    return true;
+  }
+
+  function _addAdjustPoint(curveLabel, xRaw, yRaw) {
+    if (!workingSave || !Array.isArray(workingSave.data_curves)) return null;
+    const label = String(curveLabel || '').trim();
+    if (!label) return null;
+    const curve = workingSave.data_curves.find(c => c && c.curve_label === label);
+    if (!curve) return null;
+    if (!Array.isArray(curve.points)) curve.points = [];
+
+    const xVal = adjustLockXValues ? Math.round(Number(xRaw)) : Number(xRaw);
+    const yVal = Number(yRaw);
+    if (!Number.isFinite(xVal) || !Number.isFinite(yVal)) return null;
+
+    const clamped = _clampToAxisRanges(workingSave.axis_ranges || {}, xVal, yVal);
+    _pushAdjustUndoSnapshot();
+    const newPoint = { x: clamped.x, y: clamped.y };
+    curve.points.push(newPoint);
+    curve.points.sort((a, b) => {
+      const ax = Number(a && a.x);
+      const bx = Number(b && b.x);
+      if (!Number.isFinite(ax) && !Number.isFinite(bx)) return 0;
+      if (!Number.isFinite(ax)) return 1;
+      if (!Number.isFinite(bx)) return -1;
+      if (ax !== bx) return ax - bx;
+      const ay = Number(a && a.y);
+      const by = Number(b && b.y);
+      if (!Number.isFinite(ay) && !Number.isFinite(by)) return 0;
+      if (!Number.isFinite(ay)) return 1;
+      if (!Number.isFinite(by)) return -1;
+      return ay - by;
+    });
+
+    const idx = curve.points.indexOf(newPoint);
+    adjustSelectedCurveLabel = label;
+    adjustAddPointCurveLabel = label;
+    adjustVisibleCurveLabels.add(label);
+    adjustSelectedPointIndex = idx >= 0 ? idx : Math.max(0, curve.points.length - 1);
+    return { point: newPoint, index: adjustSelectedPointIndex };
+  }
+
+  function _ensureWorkingSaveOverlayAdjust() {
+    if (!workingSave) return null;
+    const a = workingSave.overlay_adjust || {};
+    workingSave.overlay_adjust = {
+      sx: Number.isFinite(Number(a.sx)) ? Number(a.sx) : 1.0,
+      sy: Number.isFinite(Number(a.sy)) ? Number(a.sy) : 1.0,
+      dx: Number.isFinite(Number(a.dx)) ? Number(a.dx) : 0.0,
+      dy: Number.isFinite(Number(a.dy)) ? Number(a.dy) : 0.0,
+    };
+    return workingSave.overlay_adjust;
+  }
+
+  function _applyAdjustToWorkingSave(fn) {
+    const a = _ensureWorkingSaveOverlayAdjust();
+    if (!a) return;
+    fn(a);
+    _renderAdjustOverlay();
+  }
+
   function _overlayStepFromEvent(ev) {
-    return (ev && ev.shiftKey) ? 1 : 2;
+    if (ev && ev.altKey) return 8;
+    if (ev && ev.shiftKey) return 1;
+    return 2;
   }
 
   function _overlayScaleFromEvent(ev) {
-    return (ev && ev.shiftKey) ? 1.01 : 1.03;
+    if (ev && ev.altKey) return 1.07;
+    if (ev && ev.shiftKey) return 1.01;
+    return 1.03;
   }
 
   function _setWarning(msg) {
@@ -986,6 +3032,24 @@
     if (v == null) return null;
     const n = Number(v);
     return Number.isFinite(n) ? n : null;
+  }
+
+  function _formatAxisTickValue(v) {
+    const n = Number(v);
+    if (!Number.isFinite(n)) return '';
+    if (n === 0) return '0';
+    const abs = Math.abs(n);
+    if (abs >= 1e5 || abs < 1e-4) {
+      return n.toExponential(3).replace(/e\+?/i, 'e');
+    }
+    const rounded = Math.round(n * 1e6) / 1e6;
+    return String(rounded);
+  }
+
+  function _formatPointDisplayNumber(v) {
+    const n = Number(v);
+    if (!Number.isFinite(n)) return '';
+    return n.toFixed(3).replace(/\.0+$/, '').replace(/(\.\d*?)0+$/, '$1');
   }
 
   function _looksLikePowersOfTen(values) {
@@ -1218,17 +3282,107 @@
     return { concs, abxs };
   }
 
+  function _normalizeCurveLabel(label) {
+    return _normMicro(String(label ?? ''))
+      .trim()
+      .replace(/^"|"$/g, '')
+      .replace(/\s*\/\s*/g, '/')
+      .replace(/[\u00B5\u03BC]g/gi, 'ug')
+      .replace(/\s*\+\s*/g, ' + ')
+      .replace(/\s+/g, ' ')
+      .toLowerCase();
+  }
+
+  function _curveLabelMatchCandidates(label) {
+    const raw = String(label ?? '').trim();
+    if (!raw) return [];
+
+    const out = [raw];
+
+    const trailing = _trailingParenLabel(raw);
+    if (trailing && trailing !== raw) out.push(trailing);
+
+    let stripped = raw;
+    for (let i = 0; i < 4; i++) {
+      const next = stripped.replace(/\s*\([^()]*\)\s*$/, '').trim();
+      if (!next || next === stripped) break;
+      stripped = next;
+      out.push(stripped);
+    }
+
+    const dedup = [];
+    const seen = new Set();
+    for (const cand of out) {
+      const key = _normalizeCurveLabel(cand);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      dedup.push(cand);
+    }
+    return dedup;
+  }
+
+  function _buildCurveLabelLookup(labels) {
+    const lookup = new Map();
+    for (const raw of (labels || [])) {
+      const rawText = String(raw ?? '').trim();
+      if (!rawText) continue;
+      for (const cand of _curveLabelMatchCandidates(rawText)) {
+        const norm = _normalizeCurveLabel(cand);
+        if (norm && !lookup.has(norm)) lookup.set(norm, rawText);
+      }
+    }
+    return lookup;
+  }
+
+  function _resolveCurveLabelFromLookup(candidateLabel, lookup) {
+    if (!(lookup instanceof Map) || lookup.size === 0) return null;
+    for (const cand of _curveLabelMatchCandidates(candidateLabel)) {
+      const norm = _normalizeCurveLabel(cand);
+      if (!norm) continue;
+      const resolved = lookup.get(norm);
+      if (resolved) return resolved;
+    }
+    return null;
+  }
+
+  function _filterCurveSeriesToAllowed(curveToSeries, allowedLabelsSetOrNull) {
+    if (!(curveToSeries instanceof Map)) return new Map();
+    if (!allowedLabelsSetOrNull || allowedLabelsSetOrNull.size === 0) return new Map(curveToSeries);
+
+    const allowedLookup = _buildCurveLabelLookup(Array.from(allowedLabelsSetOrNull));
+    const out = new Map();
+    for (const [label, pts] of curveToSeries.entries()) {
+      const resolved = _resolveCurveLabelFromLookup(label, allowedLookup);
+      if (!resolved) continue;
+      out.set(resolved, pts);
+    }
+    return out;
+  }
+
   function _extractCurveSeriesFromWideCsv(csvText, allowedLabelsSetOrNull) {
     const { headers, rows } = _parseCsvRows(csvText);
     if (!headers.length || !rows.length) return new Map();
 
-    const grouped = _groupCsvColumnsByCurve(headers, curveStyles);
+    const allowedNormToRaw = _buildCurveLabelLookup(
+      allowedLabelsSetOrNull ? Array.from(allowedLabelsSetOrNull) : []
+    );
+
+    const resolveAllowedLabel = (candidateLabel) => {
+      if (!allowedLabelsSetOrNull) return String(candidateLabel || '').trim();
+      return _resolveCurveLabelFromLookup(candidateLabel, allowedNormToRaw);
+    };
+
+    const hintStyles = allowedLabelsSetOrNull
+      ? Array.from(allowedLabelsSetOrNull).map(l => ({ curve_label: String(l) }))
+      : curveStyles;
+    const grouped = _groupCsvColumnsByCurve(headers, hintStyles);
     const out = new Map();
 
     // Preferred paired-column format.
     if (grouped && grouped.size > 0) {
       for (const [label, g] of grouped.entries()) {
-        if (allowedLabelsSetOrNull && !allowedLabelsSetOrNull.has(label)) continue;
+        const resolvedLabel = resolveAllowedLabel(label);
+        if (allowedLabelsSetOrNull && !resolvedLabel) continue;
         const pts = [];
         for (const r of rows) {
           const x = _safeNumber(r[g.xIdx]);
@@ -1236,7 +3390,7 @@
           if (x == null || y == null) continue;
           pts.push({ x, y });
         }
-        out.set(label, pts);
+        out.set(resolvedLabel || label, pts);
       }
       return out;
     }
@@ -1246,7 +3400,9 @@
     for (let i = 1; i < headers.length; i++) {
       const label = String(headers[i] ?? '').trim();
       if (!label) continue;
-      if (allowedLabelsSetOrNull && !allowedLabelsSetOrNull.has(label)) continue;
+      const trailing = _trailingParenLabel(label);
+      const resolvedLabel = resolveAllowedLabel(label) || (trailing ? resolveAllowedLabel(trailing) : null);
+      if (allowedLabelsSetOrNull && !resolvedLabel) continue;
       const pts = [];
       for (const r of rows) {
         const x = _safeNumber(r[timeIdx]);
@@ -1254,7 +3410,7 @@
         if (x == null || y == null) continue;
         pts.push({ x, y });
       }
-      out.set(label, pts);
+      out.set(resolvedLabel || label, pts);
     }
     return out;
   }
@@ -1497,7 +3653,10 @@
   function _groupCsvColumnsByCurve(headers, curveStyles) {
     const out = new Map();
     const h = Array.isArray(headers) ? headers : [];
-    const known = new Set((Array.isArray(curveStyles) ? curveStyles : []).map(c => String(c.curve_label || '').trim()).filter(Boolean));
+    const knownLabels = (Array.isArray(curveStyles) ? curveStyles : [])
+      .map(c => String(c.curve_label || '').trim())
+      .filter(Boolean);
+    const knownLookup = _buildCurveLabelLookup(knownLabels);
 
     // Preferred: the runner's wide format is pairs: [Time, Y(curve), Time, Y(curve), ...]
     // Time headers often contain units in parentheses (e.g. "Time (hours)") so we must
@@ -1510,21 +3669,24 @@
 
       const label = _trailingParenLabel(yHeader);
       if (!label) continue;
-      if (known.size > 0 && !known.has(label)) continue;
+      const resolvedKnown = _resolveCurveLabelFromLookup(label, knownLookup);
+      if (knownLookup.size > 0 && !resolvedKnown) continue;
 
-      out.set(label, { xIdx: i, yIdx: i + 1 });
+      out.set(resolvedKnown || label, { xIdx: i, yIdx: i + 1 });
     }
 
     if (out.size > 0) return out;
 
     // Fallback: classic wide format [time, curve1, curve2, ...]
     // If we have known curve labels, match on exact header name.
-    if (known.size > 0 && h.length >= 2) {
+    if (knownLookup.size > 0 && h.length >= 2) {
       const x0 = String(h[0] || '').toLowerCase();
       if (x0.includes('time') || x0.includes('hour')) {
         for (let i = 1; i < h.length; i++) {
           const name = String(h[i] || '').trim();
-          if (known.has(name)) out.set(name, { xIdx: 0, yIdx: i });
+          const resolvedKnown = _resolveCurveLabelFromLookup(name, knownLookup)
+            || _resolveCurveLabelFromLookup(_trailingParenLabel(name), knownLookup);
+          if (resolvedKnown) out.set(resolvedKnown, { xIdx: 0, yIdx: i });
         }
         if (out.size > 0) return out;
       }
@@ -1546,18 +3708,17 @@
 
     let wrap = galleryItemEl.querySelector('.imgOverlayWrap');
     if (!wrap) {
-      // Insert a wrapper inside the existing imgwrap, keep link clickable.
+      // Insert a wrapper inside the existing image container.
       const imgwrap = galleryItemEl.querySelector('.gallery__imgwrap');
       if (!imgwrap) return null;
 
-      const link = imgwrap.querySelector('a.gallery__imglink');
-      if (!link) return null;
+      const host = imgwrap;
 
       wrap = document.createElement('div');
       wrap.className = 'imgOverlayWrap';
 
       // Move the img into the wrapper.
-      link.removeChild(img);
+      host.removeChild(img);
       wrap.appendChild(img);
 
       // If this is the ORIGINAL card and we have a transparent replot overlay available,
@@ -1632,7 +3793,7 @@
         }
       }
 
-      link.appendChild(wrap);
+      host.appendChild(wrap);
     }
 
     // Hard cleanup: never keep legacy SVG overlay in new-method mode.
@@ -1645,9 +3806,324 @@
     return wrap;
   }
 
+  function _clearResultsOverlayHandleLayers(keepWrap = null) {
+    if (!resultGallery) return;
+    for (const layer of Array.from(resultGallery.querySelectorAll('.imgReplotAdjustLayer'))) {
+      const host = layer.parentElement;
+      if (keepWrap && host === keepWrap) continue;
+      try { layer.remove(); } catch (_) {}
+    }
+  }
+
+  function _resultsOverlayBoundsFromTransform(sourceBounds, wrapW, wrapH, scaleX, scaleY, tx, ty) {
+    const cx = wrapW / 2;
+    const cy = wrapH / 2;
+    const left = ((sourceBounds.left - cx) * scaleX) + cx + tx;
+    const right = ((sourceBounds.right - cx) * scaleX) + cx + tx;
+    const top = ((sourceBounds.top - cy) * scaleY) + cy + ty;
+    const bottom = ((sourceBounds.bottom - cy) * scaleY) + cy + ty;
+    return {
+      left: Math.min(left, right),
+      right: Math.max(left, right),
+      top: Math.min(top, bottom),
+      bottom: Math.max(top, bottom),
+    };
+  }
+
+  function _startResultsOverlayDrag(ev, layer, role) {
+    if (!layer || !role) return;
+    const wrapW = Number(layer.dataset.wrapW || '0');
+    const wrapH = Number(layer.dataset.wrapH || '0');
+    const scaleX = Number(layer.dataset.scaleX || '1');
+    const scaleY = Number(layer.dataset.scaleY || '1');
+    const tx = Number(layer.dataset.tx || '0');
+    const ty = Number(layer.dataset.ty || '0');
+    const sourceLeft = Number(layer.dataset.sourceLeft || '0');
+    const sourceRight = Number(layer.dataset.sourceRight || '0');
+    const sourceTop = Number(layer.dataset.sourceTop || '0');
+    const sourceBottom = Number(layer.dataset.sourceBottom || '0');
+    const modeScale = Number(layer.dataset.modeScale || '1');
+    const autoDx = Number(layer.dataset.autoDx || '0');
+    const manualDxScale = Number(layer.dataset.manualDxScale || '1');
+    const manualDyScale = Number(layer.dataset.manualDyScale || '1');
+    if (!(wrapW > 0 && wrapH > 0)) return;
+    if (!(sourceRight > sourceLeft && sourceBottom > sourceTop)) return;
+
+    const sourceBounds = {
+      left: sourceLeft,
+      right: sourceRight,
+      top: sourceTop,
+      bottom: sourceBottom,
+    };
+
+    const startBounds = _resultsOverlayBoundsFromTransform(sourceBounds, wrapW, wrapH, scaleX, scaleY, tx, ty);
+    resultsOverlayDrag = {
+      pointerId: ev.pointerId,
+      role,
+      startClientX: ev.clientX,
+      startClientY: ev.clientY,
+      startBounds,
+      sourceBounds,
+      wrapW,
+      wrapH,
+      modeScale: Math.abs(modeScale) > 1e-9 ? modeScale : 1,
+      autoDx,
+      manualDxScale: Math.abs(manualDxScale) > 1e-9 ? manualDxScale : 1,
+      manualDyScale: Math.abs(manualDyScale) > 1e-9 ? manualDyScale : 1,
+      moved: false,
+    };
+
+    try {
+      if (ev.pointerId != null && layer.setPointerCapture) {
+        layer.setPointerCapture(ev.pointerId);
+      }
+    } catch (_) {}
+  }
+
+  function _updateResultsOverlayDrag(ev) {
+    const drag = resultsOverlayDrag;
+    if (!drag) return;
+    if (ev.pointerId != null && drag.pointerId != null && ev.pointerId !== drag.pointerId) return;
+
+    const dnx = ev.clientX - drag.startClientX;
+    const dny = ev.clientY - drag.startClientY;
+    const b0 = drag.startBounds;
+    const b = { left: b0.left, right: b0.right, top: b0.top, bottom: b0.bottom };
+    const minSizePx = 10;
+    if (drag.role === 'center') {
+      b.left += dnx;
+      b.right += dnx;
+      b.top += dny;
+      b.bottom += dny;
+    } else if (drag.role === 'left') {
+      b.left = Math.min(b.right - minSizePx, b.left + dnx);
+    } else if (drag.role === 'right') {
+      b.right = Math.max(b.left + minSizePx, b.right + dnx);
+    } else if (drag.role === 'top') {
+      b.top = Math.min(b.bottom - minSizePx, b.top + dny);
+    } else if (drag.role === 'bottom') {
+      b.bottom = Math.max(b.top + minSizePx, b.bottom + dny);
+    } else {
+      return;
+    }
+
+    const outW = Math.max(1e-6, b.right - b.left);
+    const outH = Math.max(1e-6, b.bottom - b.top);
+    const sourceW = Math.max(1e-6, drag.sourceBounds.right - drag.sourceBounds.left);
+    const sourceH = Math.max(1e-6, drag.sourceBounds.bottom - drag.sourceBounds.top);
+    const outScaleX = Math.max(0.05, Math.min(20, outW / sourceW));
+    const outScaleY = Math.max(0.05, Math.min(20, outH / sourceH));
+    const outCx = (b.left + b.right) / 2;
+    const outCy = (b.top + b.bottom) / 2;
+    const wrapCx = drag.wrapW / 2;
+    const wrapCy = drag.wrapH / 2;
+    const sourceCx = (drag.sourceBounds.left + drag.sourceBounds.right) / 2;
+    const sourceCy = (drag.sourceBounds.top + drag.sourceBounds.bottom) / 2;
+    const tx = outCx - (((sourceCx - wrapCx) * outScaleX) + wrapCx);
+    const ty = outCy - (((sourceCy - wrapCy) * outScaleY) + wrapCy);
+
+    overlayAdjust.replot.sx = Math.max(0.05, Math.min(20, outScaleX / Math.max(1e-9, drag.modeScale)));
+    overlayAdjust.replot.sy = Math.max(0.05, Math.min(20, outScaleY / Math.max(1e-9, drag.modeScale)));
+    overlayAdjust.replot.dx = (tx - drag.autoDx) / Math.max(1e-9, drag.manualDxScale);
+    overlayAdjust.replot.dy = ty / Math.max(1e-9, drag.manualDyScale);
+
+    if (Math.abs(dnx) > 0.7 || Math.abs(dny) > 0.7) drag.moved = true;
+    _syncReplotOverlayLayers();
+  }
+
+  function _finishResultsOverlayDrag(ev, cancelled = false) {
+    const drag = resultsOverlayDrag;
+    if (!drag) return;
+    if (ev && ev.pointerId != null && drag.pointerId != null && ev.pointerId !== drag.pointerId) return;
+
+    const layer = resultGallery ? resultGallery.querySelector('.imgReplotAdjustLayer') : null;
+    try {
+      if (layer && drag.pointerId != null && layer.releasePointerCapture) {
+        layer.releasePointerCapture(drag.pointerId);
+      }
+    } catch (_) {}
+
+    if (!cancelled && drag.moved) {
+      _saveOverlayAdjustPref();
+    }
+    resultsOverlayDrag = null;
+  }
+
+  function _syncResultsOverlayDragUi(ctx) {
+    if (!resultGallery) return;
+    const wantsLayer = resultsOverlayHandlesEnabled || resultsOverlayGuideAxesEnabled;
+    if (!wantsLayer || !ctx || !ctx.wrap) {
+      if (!resultsOverlayHandlesEnabled) {
+        if (resultsOverlayDrag) _finishResultsOverlayDrag(null, true);
+      }
+      _clearResultsOverlayHandleLayers();
+      return;
+    }
+
+    const wrap = ctx.wrap;
+    _clearResultsOverlayHandleLayers(wrap);
+
+    let layer = wrap.querySelector('.imgReplotAdjustLayer');
+    if (!layer) {
+      layer = document.createElement('div');
+      layer.className = 'imgReplotAdjustLayer';
+      layer.setAttribute('aria-hidden', 'true');
+
+      const frame = document.createElement('div');
+      frame.className = 'imgReplotAdjustFrame';
+      layer.appendChild(frame);
+
+      for (const role of ['left', 'right', 'top', 'bottom']) {
+        const h = document.createElement('div');
+        h.className = 'imgReplotAdjustHandle imgReplotAdjustHandle--' + role;
+        h.setAttribute('data-overlay-drag-role', role);
+        layer.appendChild(h);
+      }
+
+      const axisY = document.createElement('div');
+      axisY.className = 'imgReplotGuideAxis imgReplotGuideAxis--y';
+      layer.appendChild(axisY);
+
+      const axisX = document.createElement('div');
+      axisX.className = 'imgReplotGuideAxis imgReplotGuideAxis--x';
+      layer.appendChild(axisX);
+
+      const center = document.createElement('div');
+      center.className = 'imgReplotAdjustCenter';
+      center.setAttribute('data-overlay-drag-role', 'center');
+      layer.appendChild(center);
+
+      layer.addEventListener('pointerdown', (ev) => {
+        const t = ev.target;
+        if (!t || !t.getAttribute) return;
+        const role = t.getAttribute('data-overlay-drag-role');
+        if (!role) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        _startResultsOverlayDrag(ev, layer, role);
+      });
+      layer.addEventListener('pointermove', (ev) => {
+        if (!resultsOverlayDrag) return;
+        _updateResultsOverlayDrag(ev);
+        ev.preventDefault();
+        ev.stopPropagation();
+      });
+      layer.addEventListener('pointerup', (ev) => {
+        if (!resultsOverlayDrag) return;
+        _finishResultsOverlayDrag(ev, false);
+        ev.preventDefault();
+        ev.stopPropagation();
+      });
+      layer.addEventListener('pointercancel', (ev) => {
+        if (!resultsOverlayDrag) return;
+        _finishResultsOverlayDrag(ev, true);
+      });
+
+      wrap.appendChild(layer);
+    }
+
+    layer.dataset.wrapW = String(ctx.wrapW || 0);
+    layer.dataset.wrapH = String(ctx.wrapH || 0);
+    layer.dataset.scaleX = String(ctx.scaleX || 1);
+    layer.dataset.scaleY = String(ctx.scaleY || 1);
+    layer.dataset.tx = String(ctx.tx || 0);
+    layer.dataset.ty = String(ctx.ty || 0);
+    layer.dataset.modeScale = String(ctx.modeScale || 1);
+    layer.dataset.autoDx = String(ctx.autoDx || 0);
+    layer.dataset.manualDxScale = String(ctx.manualDxScale || 1);
+    layer.dataset.manualDyScale = String(ctx.manualDyScale || 1);
+    layer.dataset.sourceLeft = String(ctx.sourceBounds && Number.isFinite(ctx.sourceBounds.left) ? ctx.sourceBounds.left : 0);
+    layer.dataset.sourceRight = String(ctx.sourceBounds && Number.isFinite(ctx.sourceBounds.right) ? ctx.sourceBounds.right : 0);
+    layer.dataset.sourceTop = String(ctx.sourceBounds && Number.isFinite(ctx.sourceBounds.top) ? ctx.sourceBounds.top : 0);
+    layer.dataset.sourceBottom = String(ctx.sourceBounds && Number.isFinite(ctx.sourceBounds.bottom) ? ctx.sourceBounds.bottom : 0);
+
+    const b = _resultsOverlayBoundsFromTransform(ctx.sourceBounds, ctx.wrapW, ctx.wrapH, ctx.scaleX, ctx.scaleY, ctx.tx, ctx.ty);
+    const boxW = Math.max(1, b.right - b.left);
+    const boxH = Math.max(1, b.bottom - b.top);
+    const thick = Math.max(12, Math.min(18, 0.018 * Math.max(ctx.wrapW, ctx.wrapH)));
+    const centerR = Math.max(8, Math.min(14, 0.012 * Math.max(ctx.wrapW, ctx.wrapH)));
+    const edgeInset = 2;
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+    const frame = layer.querySelector('.imgReplotAdjustFrame');
+    if (frame) {
+      frame.style.left = b.left + 'px';
+      frame.style.top = b.top + 'px';
+      frame.style.width = boxW + 'px';
+      frame.style.height = boxH + 'px';
+    }
+
+    const left = layer.querySelector('.imgReplotAdjustHandle--left');
+    const right = layer.querySelector('.imgReplotAdjustHandle--right');
+    const top = layer.querySelector('.imgReplotAdjustHandle--top');
+    const bottom = layer.querySelector('.imgReplotAdjustHandle--bottom');
+    const center = layer.querySelector('.imgReplotAdjustCenter');
+    const axisY = layer.querySelector('.imgReplotGuideAxis--y');
+    const axisX = layer.querySelector('.imgReplotGuideAxis--x');
+
+    const handlesVisible = !!resultsOverlayHandlesEnabled;
+
+    for (const el of [left, right, top, bottom, center]) {
+      if (!el) continue;
+      el.style.display = handlesVisible ? 'block' : 'none';
+    }
+    layer.style.pointerEvents = handlesVisible ? 'auto' : 'none';
+
+    if (axisY) {
+      const axisXPos = Number.isFinite(ctx.axisX) ? clamp(ctx.axisX, b.left, b.right) : b.left;
+      axisY.style.display = resultsOverlayGuideAxesEnabled ? 'block' : 'none';
+      axisY.style.left = axisXPos + 'px';
+      axisY.style.top = b.top + 'px';
+      axisY.style.height = boxH + 'px';
+    }
+    if (axisX) {
+      const axisYPos = Number.isFinite(ctx.axisY) ? clamp(ctx.axisY, b.top, b.bottom) : b.bottom;
+      axisX.style.display = resultsOverlayGuideAxesEnabled ? 'block' : 'none';
+      axisX.style.left = b.left + 'px';
+      axisX.style.top = axisYPos + 'px';
+      axisX.style.width = boxW + 'px';
+    }
+
+    if (handlesVisible && left) {
+      const x = clamp(b.left + edgeInset, 0, Math.max(0, ctx.wrapW - thick));
+      left.style.left = x + 'px';
+      left.style.top = b.top + 'px';
+      left.style.width = thick + 'px';
+      left.style.height = boxH + 'px';
+    }
+    if (handlesVisible && right) {
+      const x = clamp(b.right - thick - edgeInset, 0, Math.max(0, ctx.wrapW - thick));
+      right.style.left = x + 'px';
+      right.style.top = b.top + 'px';
+      right.style.width = thick + 'px';
+      right.style.height = boxH + 'px';
+    }
+    if (handlesVisible && top) {
+      top.style.left = b.left + 'px';
+      const y = clamp(b.top + edgeInset, 0, Math.max(0, ctx.wrapH - thick));
+      top.style.top = y + 'px';
+      top.style.width = boxW + 'px';
+      top.style.height = thick + 'px';
+    }
+    if (handlesVisible && bottom) {
+      bottom.style.left = b.left + 'px';
+      const y = clamp(b.bottom - thick - edgeInset, 0, Math.max(0, ctx.wrapH - thick));
+      bottom.style.top = y + 'px';
+      bottom.style.width = boxW + 'px';
+      bottom.style.height = thick + 'px';
+    }
+    if (handlesVisible && center) {
+      center.style.left = ((b.left + b.right) / 2) + 'px';
+      center.style.top = ((b.top + b.bottom) / 2) + 'px';
+      center.style.width = (centerR * 2) + 'px';
+      center.style.height = (centerR * 2) + 'px';
+    }
+  }
+
   function _syncReplotOverlayLayers() {
     if (!resultGallery) return;
     const trialTargetsByRun = trialsMode ? _trialActiveTargetsByRun() : null;
+    let masterCtx = null;
     const items = Array.from(resultGallery.querySelectorAll('.gallery__item'));
     for (const item of items) {
       const kind = item.dataset.kind || (((item.querySelector('.gallery__title')?.textContent || '').toLowerCase().includes('original')) ? 'original' : 'replot');
@@ -1738,10 +4214,20 @@
       const natFullH = Number(overlayWrap.dataset.natFullH || '0');
       const natFullCx = Number(overlayWrap.dataset.natFullCx || '0');
       const natFullAxisX = Number(overlayWrap.dataset.natFullAxisX || 'NaN');
+      const natFullAxisY = Number(overlayWrap.dataset.natFullAxisY || 'NaN');
       const natMinmaxW = Number(overlayWrap.dataset.natMinmaxW || '0');
       const natMinmaxH = Number(overlayWrap.dataset.natMinmaxH || '0');
       const natMinmaxCx = Number(overlayWrap.dataset.natMinmaxCx || '0');
       const natMinmaxAxisX = Number(overlayWrap.dataset.natMinmaxAxisX || 'NaN');
+      const natMinmaxAxisY = Number(overlayWrap.dataset.natMinmaxAxisY || 'NaN');
+      const natFullMinX = Number(overlayWrap.dataset.natFullMinX || '0');
+      const natFullMaxX = Number(overlayWrap.dataset.natFullMaxX || String(natFullW || 0));
+      const natFullMinY = Number(overlayWrap.dataset.natFullMinY || '0');
+      const natFullMaxY = Number(overlayWrap.dataset.natFullMaxY || String(natFullH || 0));
+      const natMinmaxMinX = Number(overlayWrap.dataset.natMinmaxMinX || '0');
+      const natMinmaxMaxX = Number(overlayWrap.dataset.natMinmaxMaxX || String(natMinmaxW || 0));
+      const natMinmaxMinY = Number(overlayWrap.dataset.natMinmaxMinY || '0');
+      const natMinmaxMaxY = Number(overlayWrap.dataset.natMinmaxMaxY || String(natMinmaxH || 0));
       const desired = hasAxesLayers
         ? ((replotOverlayAxesMode === 'minmax')
           ? (axesMinmaxUrl || axesFullUrl || minmaxUrl || fullUrl)
@@ -1864,9 +4350,15 @@
       let modeScale = 1.0;
       let manualDxScale = 1.0;
       let manualDyScale = 1.0;
+      let guideAxisX = NaN;
+      let guideAxisY = NaN;
+      let wrapW = 0.0;
+      let wrapH = 0.0;
       if (wrap) {
         const wr = wrap.getBoundingClientRect();
         if (wr && wr.width > 0 && wr.height > 0) {
+          wrapW = wr.width;
+          wrapH = wr.height;
           overlayWrap.dataset.baseWrapW = String(wr.width);
           overlayWrap.dataset.baseWrapH = String(wr.height);
 
@@ -1889,16 +4381,28 @@
           const curH = (replotOverlayAxesMode === 'minmax') ? natMinmaxH : natFullH;
           const curScale = Math.min(wr.width / curW, wr.height / curH);
           const curOffX = (wr.width - curW * curScale) / 2;
+          const curOffY = (wr.height - curH * curScale) / 2;
           const curCxRaw = (replotOverlayAxesMode === 'minmax') ? natMinmaxCx : natFullCx;
           const curCx = curCxRaw > 0 ? curCxRaw : (curW / 2);
           const curDisplayCx = curOffX + curCx * curScale;
           const curAxisRaw = (replotOverlayAxesMode === 'minmax') ? natMinmaxAxisX : natFullAxisX;
           const curAxisDisplayX = Number.isFinite(curAxisRaw) ? (curOffX + curAxisRaw * curScale) : NaN;
+          const curAxisYRaw = (replotOverlayAxesMode === 'minmax') ? natMinmaxAxisY : natFullAxisY;
+          const curAxisDisplayY = Number.isFinite(curAxisYRaw) ? (curOffY + curAxisYRaw * curScale) : NaN;
 
           if (refScale > 0 && curScale > 0) modeScale = refScale / curScale;
           autoDx = Number.isFinite(refAxisDisplayX) && Number.isFinite(curAxisDisplayX)
             ? (refAxisDisplayX - curAxisDisplayX)
             : (refDisplayCx - curDisplayCx);
+
+          const appliedScaleX = sx * modeScale;
+          const appliedScaleY = sy * modeScale;
+          if (Number.isFinite(curAxisDisplayX)) {
+            guideAxisX = ((curAxisDisplayX - (wr.width / 2)) * appliedScaleX) + (wr.width / 2) + ((dx * manualDxScale) + autoDx);
+          }
+          if (Number.isFinite(curAxisDisplayY)) {
+            guideAxisY = ((curAxisDisplayY - (wr.height / 2)) * appliedScaleY) + (wr.height / 2) + (dy * manualDyScale);
+          }
         }
       }
 
@@ -1910,8 +4414,60 @@
       for (const el of Array.from(curvesLayer.querySelectorAll('img.imgReplotOverlay--curve'))) {
         try { el.style.transform = `scale(${(sx * modeScale).toFixed(6)}, ${(sy * modeScale).toFixed(6)})`; } catch (_) {}
       }
+
+      if (wrapW > 0 && wrapH > 0) {
+        let sourceBounds = { left: 0, right: wrapW, top: 0, bottom: wrapH };
+        const sourceWNat = (replotOverlayAxesMode === 'minmax') ? natMinmaxW : natFullW;
+        const sourceHNat = (replotOverlayAxesMode === 'minmax') ? natMinmaxH : natFullH;
+        const sourceMinXNat = (replotOverlayAxesMode === 'minmax') ? natMinmaxMinX : natFullMinX;
+        const sourceMaxXNat = (replotOverlayAxesMode === 'minmax') ? natMinmaxMaxX : natFullMaxX;
+        const sourceMinYNat = (replotOverlayAxesMode === 'minmax') ? natMinmaxMinY : natFullMinY;
+        const sourceMaxYNat = (replotOverlayAxesMode === 'minmax') ? natMinmaxMaxY : natFullMaxY;
+        if (sourceWNat > 0 && sourceHNat > 0) {
+          const containScale = Math.min(wrapW / sourceWNat, wrapH / sourceHNat);
+          const offX = (wrapW - sourceWNat * containScale) / 2;
+          const offY = (wrapH - sourceHNat * containScale) / 2;
+          const minX = Math.max(0, Math.min(sourceWNat, sourceMinXNat));
+          const maxX = Math.max(minX + 1e-6, Math.min(sourceWNat, sourceMaxXNat));
+          const minY = Math.max(0, Math.min(sourceHNat, sourceMinYNat));
+          const maxY = Math.max(minY + 1e-6, Math.min(sourceHNat, sourceMaxYNat));
+          sourceBounds = {
+            left: offX + minX * containScale,
+            right: offX + maxX * containScale,
+            top: offY + minY * containScale,
+            bottom: offY + maxY * containScale,
+          };
+        }
+
+        const candidate = {
+          wrap,
+          overlayRunIndex,
+          wrapW,
+          wrapH,
+          scaleX: sx * modeScale,
+          scaleY: sy * modeScale,
+          tx: effectiveDx,
+          ty: effectiveDy,
+          modeScale,
+          autoDx,
+          manualDxScale,
+          manualDyScale,
+          sourceBounds,
+          axisX: guideAxisX,
+          axisY: guideAxisY,
+        };
+        if (!masterCtx) {
+          masterCtx = candidate;
+        } else if (trialsMode) {
+          const prevRank = (masterCtx.overlayRunIndex >= 0) ? masterCtx.overlayRunIndex : 9999;
+          const curRank = (overlayRunIndex >= 0) ? overlayRunIndex : 9999;
+          if (curRank < prevRank) masterCtx = candidate;
+        }
+      }
       }
     }
+
+    _syncResultsOverlayDragUi(masterCtx);
   }
 
   function _computeContainTransform(imgEl) {
@@ -1956,7 +4512,7 @@
       curvesEmpty.style.display = 'block';
       curvesControls.style.display = 'none';
       curvesTableWrap.style.display = 'none';
-      downloadCsvConfirmedBtn.style.display = 'none';
+      if (downloadCsvConfirmedBtn) downloadCsvConfirmedBtn.style.display = 'none';
       return;
     }
 
@@ -1964,7 +4520,7 @@
     curvesControls.style.display = 'flex';
     overlayAdjustControls.style.display = 'block';
     curvesTableWrap.style.display = 'block';
-    downloadCsvConfirmedBtn.style.display = 'inline-flex';
+    if (downloadCsvConfirmedBtn) downloadCsvConfirmedBtn.style.display = 'inline-flex';
 
     const table = document.createElement('table');
     table.className = 'table';
@@ -1990,6 +4546,7 @@
       const cb = document.createElement('input');
       cb.type = 'checkbox';
       cb.checked = confirmedCurves.has(c.curve_label);
+      cb.addEventListener('click', (ev) => ev.stopPropagation());
       cb.addEventListener('change', () => {
         if (cb.checked) confirmedCurves.add(c.curve_label);
         else confirmedCurves.delete(c.curve_label);
@@ -2034,6 +4591,11 @@
         _syncCurveRowStates();
       });
 
+      tr.addEventListener('click', () => {
+        cb.checked = !cb.checked;
+        cb.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
       tbody.appendChild(tr);
     }
     table.appendChild(tbody);
@@ -2064,10 +4626,82 @@
 
   function _pickExtractedCsv(outputs) {
     const data = (outputs && outputs.data) ? outputs.data : [];
-    // Prefer extracted CSVs over original data.
-    const preferred = data.filter(it => it && it.path && (it.path.toLowerCase().endsWith('.csv')));
-    const extracted = preferred.find(it => (it.label || '').toLowerCase().includes('extracted')) || preferred[0];
-    return extracted || null;
+    const candidates = data.filter(it => it && it.path);
+    if (!candidates.length) return null;
+
+    const looksExtracted = (it) => {
+      const label = String(it.label || '').toLowerCase();
+      const filename = String(it.filename || '').toLowerCase();
+      const path = String(it.path || '').toLowerCase();
+      const isOriginal = label.includes('original') || filename.endsWith('-original.csv') || path.endsWith('-original.csv');
+      if (isOriginal) return false;
+      return (
+        label.includes('extracted')
+        || filename.includes('.out_data')
+        || filename.includes('_data_extract_stage_')
+        || path.includes('.out_data')
+        || path.includes('_data_extract_stage_')
+      );
+    };
+
+    // Best: extracted CSV, then any extracted data artifact, then non-original CSV.
+    const extractedPool = candidates.filter(looksExtracted);
+    const extractedCsv = extractedPool.find(it => String(it.path || '').toLowerCase().endsWith('.csv'));
+    if (extractedCsv) return extractedCsv;
+    if (extractedPool.length) return extractedPool[0];
+
+    const nonOriginalCsv = candidates.find(it => {
+      const path = String(it.path || '').toLowerCase();
+      const label = String(it.label || '').toLowerCase();
+      return path.endsWith('.csv') && !label.includes('original') && !path.endsWith('-original.csv');
+    });
+    if (nonOriginalCsv) return nonOriginalCsv;
+
+    return null;
+  }
+
+  function _curveLabelsFromCsvHeaders(csvText) {
+    const { headers } = _parseCsvRows(csvText);
+    if (!Array.isArray(headers) || headers.length < 2) return [];
+
+    const out = [];
+    const seen = new Set();
+    const pushLabel = (raw) => {
+      const txt = String(raw || '').trim();
+      if (!txt) return;
+      const lower = txt.toLowerCase();
+      if (lower === 'time' || lower === 'hours') return;
+      if (seen.has(txt)) return;
+      seen.add(txt);
+      out.push(txt);
+    };
+
+    // Preferred wide-pairs format: [Time, CurveY, Time, CurveY, ...]
+    const evenPairs = headers.length >= 2 && (headers.length % 2 === 0);
+    let looksPaired = evenPairs;
+    if (looksPaired) {
+      for (let i = 0; i < headers.length; i += 2) {
+        const xh = String(headers[i] || '').toLowerCase();
+        if (!(xh.includes('time') || xh.includes('hour'))) {
+          looksPaired = false;
+          break;
+        }
+      }
+    }
+
+    if (looksPaired) {
+      for (let i = 1; i < headers.length; i += 2) {
+        const yHeader = String(headers[i] || '').trim();
+        pushLabel(_trailingParenLabel(yHeader) || yHeader);
+      }
+      return out;
+    }
+
+    // Fallback classic wide format: [Time, Curve1, Curve2, ...]
+    for (let i = 1; i < headers.length; i++) {
+      pushLabel(headers[i]);
+    }
+    return out;
   }
 
   function _detectReplotOverlayAssetFlags(outputs) {
@@ -2178,13 +4812,6 @@
         const imgWrap = document.createElement('div');
         imgWrap.className = 'gallery__imgwrap';
 
-        const link = document.createElement('a');
-        link.className = 'gallery__imglink';
-        link.href = it.url;
-        link.target = '_blank';
-        link.rel = 'noopener';
-        link.title = 'Open full-size in new tab';
-
         const img = document.createElement('img');
         img.className = 'gallery__img';
         img.src = it.url;
@@ -2193,24 +4820,23 @@
 
         img.addEventListener('load', () => {
           // Redraw overlays when images load (natural sizes become available)
+          _fitResultsOriginalImages();
           _renderOverlays();
         });
 
-        link.appendChild(img);
-        imgWrap.appendChild(link);
+        imgWrap.appendChild(img);
         card.appendChild(title);
         card.appendChild(imgWrap);
         resultGallery.appendChild(card);
       }
       _setOriginalGalleryExpanded();
+      _fitResultsOriginalImages();
     }
 
     const extractedCsv = _pickExtractedCsv(outputs);
     extractedCsvMeta = extractedCsv;
     if (extractedCsv && extractedCsv.path) {
-      // We export tidy/long CSV client-side; keep button visible.
-      downloadCsvBtn.href = '#';
-      downloadCsvBtn.style.display = 'inline-flex';
+      btnSaveSelectedContinue.style.display = 'inline-flex';
     }
   }
 
@@ -2218,7 +4844,7 @@
     resultConsole.textContent = consoleText || '';
   }
 
-  function renderCurvesFromFactsOrConsole(result) {
+  async function renderCurvesFromFactsOrConsole(result) {
     accumulatedFacts = null;
     curveStyles = [];
 
@@ -2240,6 +4866,28 @@
           line_type: c.line_type != null ? String(c.line_type) : '',
           colour: c.colour != null ? String(c.colour) : '',
         }));
+    }
+
+    // Fallback: derive curve labels from extracted CSV headers when style facts are absent.
+    if (!curveStyles.length) {
+      const csvMeta = (result && result.outputs) ? _pickExtractedCsv(result.outputs) : extractedCsvMeta;
+      if (csvMeta && csvMeta.path) {
+        extractedCsvMeta = csvMeta;
+        try {
+          const csvText = await _fetchText('/plots/' + csvMeta.path);
+          const labels = _curveLabelsFromCsvHeaders(csvText);
+          if (labels.length) {
+            curveStyles = labels.map(label => ({
+              curve_label: String(label),
+              marker_symbol: '',
+              line_type: '',
+              colour: '',
+            }));
+          }
+        } catch (_) {
+          // Keep empty state if CSV cannot be loaded.
+        }
+      }
     }
 
     _renderCurvesTable();
@@ -2734,29 +5382,23 @@
       const imgWrap = document.createElement('div');
       imgWrap.className = 'gallery__imgwrap';
 
-      const link = document.createElement('a');
-      link.className = 'gallery__imglink';
-      link.href = it.url;
-      link.target = '_blank';
-      link.rel = 'noopener';
-      link.title = 'Open full-size in new tab';
-
       const img = document.createElement('img');
       img.className = 'gallery__img';
       img.src = it.url;
       img.alt = it.title;
       img.loading = 'lazy';
       img.addEventListener('load', () => {
+        _fitResultsOriginalImages();
         _renderOverlays();
       });
-      link.appendChild(img);
 
-      imgWrap.appendChild(link);
+      imgWrap.appendChild(img);
       card.appendChild(title);
       card.appendChild(imgWrap);
       resultGallery.appendChild(card);
     }
     _setOriginalGalleryExpanded();
+    _fitResultsOriginalImages();
   }
 
   function renderOutputs(outputs) {
@@ -2840,6 +5482,10 @@
   async function runExtraction() {
     resetResult();
 
+    if (uiMode === UI_MODE_REGULAR) {
+      _applyRegularDefaults();
+    }
+
     if (!currentImagePath) {
       setNotice(uploadStatus, 'Upload an image or prepare an example first.', 'warn');
       return;
@@ -2900,8 +5546,8 @@
       trialsCancelRequested = false;
       trialRuns = [];
 
-      downloadCsvBtn.style.display = 'none';
-      downloadCsvConfirmedBtn.style.display = 'none';
+      btnSaveSelectedContinue.style.display = 'none';
+      if (downloadCsvConfirmedBtn) downloadCsvConfirmedBtn.style.display = 'none';
       curvesControls.style.display = 'none';
       curvesTableWrap.style.display = 'none';
       overlayAdjustControls.style.display = 'block';
@@ -2975,11 +5621,17 @@
       curvesEmpty.style.display = (unionCurveLabels.length === 0) ? 'block' : 'none';
       renderTrialGallery();
       _renderTrialsGrid();
+      if (trialRuns.length > 0) {
+        btnSaveSelectedContinue.style.display = 'inline-flex';
+      }
 
       // Keep overlays working in trials mode: hover the trials table to choose (curve, run).
       try {
         if (resizeObserver) resizeObserver.disconnect();
-        resizeObserver = new ResizeObserver(() => _renderOverlays());
+        resizeObserver = new ResizeObserver(() => {
+          _fitResultsOriginalImages();
+          _renderOverlays();
+        });
         for (const img of Array.from(resultGallery.querySelectorAll('img.gallery__img'))) {
           resizeObserver.observe(img);
         }
@@ -3036,7 +5688,7 @@
             renderPrimaryResults(result.outputs);
             renderOutputs(result.outputs);
           }
-          renderCurvesFromFactsOrConsole(result);
+          await renderCurvesFromFactsOrConsole(result);
 
           // Build overlays (geometry + CSV) if possible, but never block UI.
           await _buildCurvePolylinesIfPossible();
@@ -3044,7 +5696,10 @@
           // Watch for layout changes to keep overlays aligned.
           try {
             if (resizeObserver) resizeObserver.disconnect();
-            resizeObserver = new ResizeObserver(() => _renderOverlays());
+            resizeObserver = new ResizeObserver(() => {
+              _fitResultsOriginalImages();
+              _renderOverlays();
+            });
             for (const img of Array.from(resultGallery.querySelectorAll('img.gallery__img'))) {
               resizeObserver.observe(img);
             }
@@ -3075,8 +5730,8 @@
     trialsMode = (n > 1);
     trialRuns = [];
 
-    downloadCsvBtn.style.display = 'none';
-    downloadCsvConfirmedBtn.style.display = 'none';
+    btnSaveSelectedContinue.style.display = 'none';
+    if (downloadCsvConfirmedBtn) downloadCsvConfirmedBtn.style.display = 'none';
     curvesControls.style.display = 'none';
     curvesTableWrap.style.display = 'none';
     overlayAdjustControls.style.display = 'block';
@@ -3091,9 +5746,15 @@
     const runs = [];
     const loadErrors = [];
     for (const runSpec of runsToLoad) {
+      const runImagePath = String(runSpec.imagePath || '');
+      const runPromptName = String(runSpec.promptName || '');
+      if (!runImagePath || !runPromptName) {
+        loadErrors.push(runSpec.label + ': invalid_run_metadata');
+        continue;
+      }
       const req = {
-        image_path: TEST_IMAGE_PATH,
-        prompt_name: TEST_PROMPT_NAME,
+        image_path: runImagePath,
+        prompt_name: runPromptName,
         limit: 1,
         version_dir: runSpec.versionDir,
       };
@@ -3163,11 +5824,14 @@
         renderPrimaryResults(result.outputs);
         renderOutputs(result.outputs);
       }
-      renderCurvesFromFactsOrConsole(result);
+      await renderCurvesFromFactsOrConsole(result);
       await _buildCurvePolylinesIfPossible();
       try {
         if (resizeObserver) resizeObserver.disconnect();
-        resizeObserver = new ResizeObserver(() => _renderOverlays());
+        resizeObserver = new ResizeObserver(() => {
+          _fitResultsOriginalImages();
+          _renderOverlays();
+        });
         for (const img of Array.from(resultGallery.querySelectorAll('img.gallery__img'))) {
           resizeObserver.observe(img);
         }
@@ -3203,10 +5867,16 @@
     curvesEmpty.style.display = (unionCurveLabels.length === 0) ? 'block' : 'none';
     renderTrialGallery();
     _renderTrialsGrid();
+    if (trialRuns.length > 0) {
+      btnSaveSelectedContinue.style.display = 'inline-flex';
+    }
 
     try {
       if (resizeObserver) resizeObserver.disconnect();
-      resizeObserver = new ResizeObserver(() => _renderOverlays());
+      resizeObserver = new ResizeObserver(() => {
+        _fitResultsOriginalImages();
+        _renderOverlays();
+      });
       for (const img of Array.from(resultGallery.querySelectorAll('img.gallery__img'))) {
         resizeObserver.observe(img);
       }
@@ -3228,12 +5898,13 @@
     }
 
     const curveToSeries = _extractCurveSeriesFromWideCsv(csvText, confirmedCurves);
-    if (!curveToSeries || curveToSeries.size === 0) {
+    const selectedCurveToSeries = _filterCurveSeriesToAllowed(curveToSeries, confirmedCurves);
+    if (!selectedCurveToSeries || selectedCurveToSeries.size === 0) {
       alert('Could not generate confirmed-only tidy CSV (no points found).');
       return;
     }
 
-    const out = _buildTidyCfuCsvFromCurveSeries(Array.from(confirmedCurves), curveToSeries);
+    const out = _buildTidyCfuCsvFromCurveSeries(Array.from(confirmedCurves), selectedCurveToSeries);
     _downloadBlob(out, 'extracted_confirmed_only_tidy_cfu.csv');
   }
 
@@ -3497,11 +6168,304 @@
     _renderOverlays();
   });
 
-  // Export tidy/long CSV for "all curves".
-  downloadCsvBtn.addEventListener('click', async (ev) => {
-    ev.preventDefault();
-    await downloadAllCurvesTidyCsv();
-  });
+  if (btnSaveSelectedContinue) {
+    btnSaveSelectedContinue.addEventListener('click', saveSelectedAndContinueDown);
+  }
+
+  if (adjustImage) {
+    adjustImage.addEventListener('load', _renderAdjustOverlay);
+  }
+
+  if (adjustCurveSelect) {
+    adjustCurveSelect.addEventListener('change', () => {
+      adjustSelectedCurveLabel = adjustCurveSelect.value || null;
+      adjustSelectedPointIndex = 0;
+      _renderAdjustSelectors();
+      _renderAdjustOverlay();
+    });
+  }
+
+  if (adjustPointSelect) {
+    adjustPointSelect.addEventListener('change', () => {
+      adjustSelectedPointIndex = Math.max(0, Number(adjustPointSelect.value) || 0);
+      _renderAdjustSelectors();
+      _renderAdjustOverlay();
+    });
+  }
+
+  if (adjustXInput) adjustXInput.addEventListener('input', _syncAdjustPointFromInputs);
+  if (adjustYInput) adjustYInput.addEventListener('input', _syncAdjustPointFromInputs);
+  if (adjustXInput) {
+    adjustXInput.addEventListener('focus', () => {
+      adjustInputUndoArmed = true;
+    });
+    adjustXInput.addEventListener('blur', () => {
+      adjustInputUndoArmed = true;
+    });
+  }
+  if (adjustYInput) {
+    adjustYInput.addEventListener('focus', () => {
+      adjustInputUndoArmed = true;
+    });
+    adjustYInput.addEventListener('blur', () => {
+      adjustInputUndoArmed = true;
+    });
+  }
+
+  if (btnAdjustUndo) {
+    btnAdjustUndo.addEventListener('click', _undoAdjustAction);
+  }
+  if (btnAdjustRedo) {
+    btnAdjustRedo.addEventListener('click', _redoAdjustAction);
+  }
+
+  if (btnSaveAdjustment) {
+    btnSaveAdjustment.addEventListener('click', _saveCurrentAdjustmentVersion);
+  }
+
+  if (btnAdjustManualControls) {
+    btnAdjustManualControls.addEventListener('click', () => {
+      adjustManualControlsOpen = !adjustManualControlsOpen;
+      _syncAdjustManualControlsUi();
+      if (adjustStatus) {
+        adjustStatus.textContent = adjustManualControlsOpen
+          ? 'Manual point selection expanded.'
+          : 'Manual point selection collapsed.';
+      }
+    });
+  }
+
+  if (btnAdjustLockX) {
+    btnAdjustLockX.addEventListener('change', () => {
+      adjustLockXValues = !!btnAdjustLockX.checked;
+      _syncAdjustLockXUi();
+      _renderAdjustSelectors();
+    });
+  }
+
+  if (btnAdjustDeletePoints) {
+    btnAdjustDeletePoints.addEventListener('change', () => {
+      if (!adjustOverlayMovementLocked) {
+        adjustDeletePointsEnabled = false;
+      } else {
+        adjustDeletePointsEnabled = !!btnAdjustDeletePoints.checked;
+        if (adjustDeletePointsEnabled) adjustAddPointsEnabled = false;
+      }
+      _syncAdjustDeletePointsUi(true);
+      _syncAdjustAddPointsUi(false);
+      _renderAdjustOverlay();
+    });
+  }
+
+  if (adjustAddCurveSelect) {
+    adjustAddCurveSelect.addEventListener('change', () => {
+      adjustAddPointCurveLabel = adjustAddCurveSelect.value || adjustSelectedCurveLabel || null;
+      if (adjustAddPointsEnabled && adjustStatus) {
+        adjustStatus.textContent = adjustAddPointCurveLabel
+          ? ('Add mode target curve: ' + adjustAddPointCurveLabel + '.')
+          : 'Add mode target curve not set.';
+      }
+    });
+  }
+
+  if (btnAdjustAddPoints) {
+    btnAdjustAddPoints.addEventListener('change', () => {
+      if (!adjustOverlayMovementLocked) {
+        adjustAddPointsEnabled = false;
+      } else {
+        adjustAddPointsEnabled = !!btnAdjustAddPoints.checked;
+        if (adjustAddPointsEnabled) adjustDeletePointsEnabled = false;
+      }
+      _syncAdjustDeletePointsUi(false);
+      _syncAdjustAddPointsUi(true);
+      _renderAdjustOverlay();
+    });
+  }
+
+  if (btnAdjustVisibleAll) {
+    btnAdjustVisibleAll.addEventListener('click', () => {
+      const labels = _adjustCurveLabels();
+      adjustVisibleCurveLabels = new Set(labels);
+      _renderAdjustVisibleCurvesUi(true);
+      _renderAdjustOverlay();
+    });
+  }
+
+  if (btnAdjustVisibleNone) {
+    btnAdjustVisibleNone.addEventListener('click', () => {
+      adjustVisibleCurveLabels = new Set();
+      _renderAdjustVisibleCurvesUi(true);
+      _renderAdjustOverlay();
+    });
+  }
+
+  if (adjustVisibleCurvesList) {
+    adjustVisibleCurvesList.addEventListener('change', (ev) => {
+      const t = ev.target;
+      if (!t || !t.matches || !t.matches('input[data-adjust-visible-curve]')) return;
+      const label = String(t.getAttribute('data-adjust-visible-curve') || '').trim();
+      if (!label) return;
+      if (t.checked) {
+        adjustVisibleCurveLabels.add(label);
+      } else {
+        adjustVisibleCurveLabels.delete(label);
+      }
+      _renderAdjustVisibleCurvesUi(true);
+      _renderAdjustOverlay();
+    });
+  }
+
+  if (btnAdjustOverlayMovement) {
+    btnAdjustOverlayMovement.addEventListener('change', () => {
+      adjustOverlayMovementLocked = !btnAdjustOverlayMovement.checked;
+      if (adjustOverlayMovementLocked) {
+        _finishAdjustOverlayDrag(null, true);
+        _ensureWorkingSaveOverlayAdjust();
+        _captureLatestLockedAdjustOverlay();
+      }
+      _syncAdjustOverlayMovementUi();
+      _syncAdjustLockXUi();
+      _syncAdjustDeletePointsUi(true);
+      _syncAdjustAddPointsUi(false);
+      _renderAdjustOverlay();
+    });
+  }
+
+  if (btnDownloadCurrentSave) {
+    btnDownloadCurrentSave.addEventListener('click', _downloadCurrentSaveCsv);
+  }
+
+  if (adjustCurvesOverlay) {
+    adjustCurvesOverlay.addEventListener('pointerdown', (ev) => {
+      if (!workingSave) return;
+      if (adjustOverlayMovementLocked) return;
+      const t = ev.target;
+      if (!t || !t.getAttribute) return;
+      const role = t.getAttribute('data-adjust-drag-role');
+      if (!role) return;
+      const started = _startAdjustOverlayDrag(ev, role);
+      if (started) ev.preventDefault();
+    });
+
+    adjustCurvesOverlay.addEventListener('pointermove', (ev) => {
+      if (!adjustOverlayDrag) return;
+      _updateAdjustOverlayDrag(ev);
+      ev.preventDefault();
+    });
+
+    adjustCurvesOverlay.addEventListener('pointerup', (ev) => {
+      if (!adjustOverlayDrag) return;
+      _finishAdjustOverlayDrag(ev, false);
+      ev.preventDefault();
+    });
+
+    adjustCurvesOverlay.addEventListener('pointercancel', (ev) => {
+      if (!adjustOverlayDrag) return;
+      _finishAdjustOverlayDrag(ev, true);
+    });
+
+    adjustCurvesOverlay.addEventListener('click', (ev) => {
+      if (!workingSave) return;
+      if (Date.now() < adjustOverlaySuppressClickUntil) return;
+      const t = ev.target;
+      if (t && t.getAttribute) {
+        const dragRole = t.getAttribute('data-adjust-drag-role');
+        if (dragRole) return;
+      }
+
+      if (adjustAddPointsEnabled) {
+        if (!adjustOverlayMovementLocked) return;
+        const natural = _adjustContainerToNaturalPx(ev);
+        if (!natural) return;
+        const sourceNatural = _adjustDisplayNaturalToOverlaySourcePx(
+          workingSave,
+          natural.x,
+          natural.y,
+          natural.naturalW,
+          natural.naturalH
+        );
+        const mapped = _adjustNaturalPxToData(workingSave, sourceNatural.x, sourceNatural.y, natural.naturalW, natural.naturalH);
+        if (!mapped) return;
+
+        const targetCurve = (adjustAddCurveSelect && adjustAddCurveSelect.value)
+          ? adjustAddCurveSelect.value
+          : (adjustAddPointCurveLabel || adjustSelectedCurveLabel || null);
+        const added = _addAdjustPoint(targetCurve, mapped.x, mapped.y);
+        if (added) {
+          _renderAdjustSelectors();
+          _renderAdjustVisibleCurvesUi(false);
+          _renderAdjustOverlay();
+          if (adjustStatus) {
+            adjustStatus.textContent = 'Added point to ' + targetCurve + (adjustLockXValues ? ' (X snapped to nearest integer).' : '.');
+          }
+        } else if (adjustStatus) {
+          adjustStatus.textContent = 'Add mode: could not add point. Select a valid target curve.';
+        }
+        return;
+      }
+
+      if (adjustDeletePointsEnabled && t && t.getAttribute) {
+        const label = t.getAttribute('data-curve-label');
+        const idx = t.getAttribute('data-point-index');
+        if (label && idx != null) {
+          const deleted = _deleteAdjustPoint(label, idx);
+          if (deleted) {
+            _renderAdjustSelectors();
+            _renderAdjustVisibleCurvesUi(false);
+            _renderAdjustOverlay();
+          }
+          return;
+        }
+      }
+
+      if (!adjustOverlayMovementLocked) return;
+
+      const natural = _adjustContainerToNaturalPx(ev);
+      if (!natural) return;
+      const sourceNatural = _adjustDisplayNaturalToOverlaySourcePx(
+        workingSave,
+        natural.x,
+        natural.y,
+        natural.naturalW,
+        natural.naturalH
+      );
+      const mapped = _adjustNaturalPxToData(workingSave, sourceNatural.x, sourceNatural.y, natural.naturalW, natural.naturalH);
+      if (!mapped) return;
+
+      const pts = _adjustCurrentCurvePoints();
+      if (!pts || !pts[adjustSelectedPointIndex]) return;
+      const cur = pts[adjustSelectedPointIndex];
+      const nextX = adjustLockXValues ? Number(cur.x) : mapped.x;
+      if (Number(nextX) === Number(cur.x) && Number(mapped.y) === Number(cur.y)) return;
+      _pushAdjustUndoSnapshot();
+      pts[adjustSelectedPointIndex] = { x: nextX, y: mapped.y };
+      _renderAdjustSelectors();
+      _renderAdjustOverlay();
+    });
+
+    adjustCurvesOverlay.addEventListener('contextmenu', (ev) => {
+      if (!workingSave) return;
+      ev.preventDefault();
+      const t = ev.target;
+      if (!t || !t.getAttribute) return;
+      const label = t.getAttribute('data-curve-label');
+      const idx = t.getAttribute('data-point-index');
+      if (!label || idx == null) return;
+      if (adjustDeletePointsEnabled) {
+        const deleted = _deleteAdjustPoint(label, idx);
+        if (deleted) {
+          _renderAdjustSelectors();
+          _renderAdjustVisibleCurvesUi(false);
+          _renderAdjustOverlay();
+        }
+        return;
+      }
+      adjustSelectedCurveLabel = label;
+      adjustSelectedPointIndex = Math.max(0, Number(idx) || 0);
+      _renderAdjustSelectors();
+      _renderAdjustOverlay();
+    });
+  }
 
   btnDownloadTrialsCsv.addEventListener('click', downloadTrialsCsv);
 
@@ -3521,11 +6485,11 @@
 
   if (overlayAxesModeGroup) {
     _loadReplotOverlayAxesModePref();
-    for (const btn of [btnOverlayAxesMinmax, btnOverlayAxesFull, btnOverlayAxesNone]) {
+    for (const btn of [btnOverlayAxesMinmax, btnOverlayAxesFull]) {
       if (!btn) continue;
       btn.addEventListener('click', () => {
         const mode = btn.dataset.mode || 'full';
-        if (mode !== 'minmax' && mode !== 'full' && mode !== 'none') return;
+        if (mode !== 'minmax' && mode !== 'full') return;
         replotOverlayAxesMode = mode;
         _syncOverlayAxesModeButtons();
         _saveReplotOverlayAxesModePref();
@@ -3534,159 +6498,40 @@
     }
   }
 
-  function _wireOverlayHold(btn, action) {
-    if (!btn) return;
-
-    const _canAdjustOverlay = () => {
-      if (!resultGallery) return false;
-      if (resultGallery.style.display === 'none') return false;
-      return !!resultGallery.querySelector('.imgReplotOverlayWrap');
-    };
-
-    let holdTimeoutId = null;
-    let repeatIntervalId = null;
-    let isPressed = false;
-    let didRepeat = false;
-    let pressShiftKey = false;
-    let holdStartedAt = 0;
-
-    const HOLD_DELAY_MS = 700;
-    const REPEAT_INTERVAL_MS = 95;
-    const REPEAT_INTERVAL_FAST_MS = 60;
-    const REPEAT_ACCEL_AFTER_MS = 2200;
-
-    const clearTimers = () => {
-      if (holdTimeoutId != null) {
-        clearTimeout(holdTimeoutId);
-        holdTimeoutId = null;
-      }
-      if (repeatIntervalId != null) {
-        clearInterval(repeatIntervalId);
-        repeatIntervalId = null;
-      }
-    };
-
-    const runAction = () => {
-      action({ shiftKey: pressShiftKey });
-      _renderOverlays();
-    };
-
-    const startRepeat = () => {
-      if (!isPressed) return;
-      didRepeat = true;
-      holdStartedAt = Date.now();
-      runAction();
-      let activeInterval = REPEAT_INTERVAL_MS;
-      repeatIntervalId = setInterval(() => {
-        if (!isPressed) return;
-        if (activeInterval !== REPEAT_INTERVAL_FAST_MS && (Date.now() - holdStartedAt) >= REPEAT_ACCEL_AFTER_MS) {
-          clearInterval(repeatIntervalId);
-          activeInterval = REPEAT_INTERVAL_FAST_MS;
-          repeatIntervalId = setInterval(() => {
-            if (!isPressed) return;
-            runAction();
-          }, activeInterval);
-          return;
-        }
-        runAction();
-      }, activeInterval);
-    };
-
-    const endPress = (shouldClick) => {
-      if (!isPressed) {
-        clearTimers();
-        return;
-      }
-      isPressed = false;
-      const shouldRunSingle = !!shouldClick && !didRepeat;
-      clearTimers();
-      if (shouldRunSingle) {
-        runAction();
-      }
-      didRepeat = false;
-    };
-
-    const start = (ev) => {
-      if (!_canAdjustOverlay()) return;
-      ev.preventDefault();
-      endPress(false);
-      isPressed = true;
-      didRepeat = false;
-      pressShiftKey = !!(ev && ev.shiftKey);
-      holdTimeoutId = setTimeout(() => {
-        holdTimeoutId = null;
-        startRepeat();
-      }, HOLD_DELAY_MS);
-
-      try {
-        if (ev.pointerId != null && btn.setPointerCapture) btn.setPointerCapture(ev.pointerId);
-      } catch (_) {}
-    };
-
-    btn.addEventListener('pointerdown', start);
-    btn.addEventListener('pointerup', () => endPress(true));
-    btn.addEventListener('pointercancel', () => endPress(false));
-    btn.addEventListener('pointerleave', () => endPress(false));
-    window.addEventListener('blur', () => endPress(false));
-  }
-
-  _wireOverlayHold(btnOverlayLeft, (ev) => {
-    const step = _overlayStepFromEvent(ev);
-    _applyAdjust((a) => (a.dx -= step));
-  });
-
-  _wireOverlayHold(btnOverlayRight, (ev) => {
-    const step = _overlayStepFromEvent(ev);
-    _applyAdjust((a) => (a.dx += step));
-  });
-
-  _wireOverlayHold(btnOverlayUp, (ev) => {
-    const step = _overlayStepFromEvent(ev);
-    _applyAdjust((a) => (a.dy -= step));
-  });
-
-  _wireOverlayHold(btnOverlayDown, (ev) => {
-    const step = _overlayStepFromEvent(ev);
-    _applyAdjust((a) => (a.dy += step));
-  });
-
-  _wireOverlayHold(btnOverlayWidthUp, (ev) => {
-    const k = _overlayScaleFromEvent(ev);
-    _applyAdjust((a) => (a.sx *= k));
-  });
-
-  _wireOverlayHold(btnOverlayWidthDown, (ev) => {
-    const k = _overlayScaleFromEvent(ev);
-    _applyAdjust((a) => (a.sx /= k));
-  });
-
-  _wireOverlayHold(btnOverlayHeightUp, (ev) => {
-    const k = _overlayScaleFromEvent(ev);
-    _applyAdjust((a) => (a.sy *= k));
-  });
-
-  _wireOverlayHold(btnOverlayHeightDown, (ev) => {
-    const k = _overlayScaleFromEvent(ev);
-    _applyAdjust((a) => (a.sy /= k));
-  });
-
-  // Reset is intentionally one-shot.
-  if (btnOverlayReset) {
-    btnOverlayReset.addEventListener('click', () => {
-      if (!resultGallery || resultGallery.style.display === 'none' || !resultGallery.querySelector('.imgReplotOverlayWrap')) return;
-      _applyAdjust((a) => {
-        a.sx = 1.0;
-        a.sy = 1.0;
-        a.dx = 0.0;
-        a.dy = 0.0;
-      });
+  if (btnResultsOverlayHandles) {
+    btnResultsOverlayHandles.addEventListener('change', () => {
+      resultsOverlayHandlesEnabled = !!btnResultsOverlayHandles.checked;
+      _syncResultsOverlayHandlesToggleUi();
+      _syncResultsOverlayDragUi(null);
       _renderOverlays();
     });
   }
 
-  downloadCsvConfirmedBtn.addEventListener('click', downloadConfirmedOnlyCsv);
+  if (btnResultsOverlayGuideAxes) {
+    btnResultsOverlayGuideAxes.addEventListener('change', () => {
+      resultsOverlayGuideAxesEnabled = !!btnResultsOverlayGuideAxes.checked;
+      _syncResultsOverlayGuideAxesToggleUi();
+      _renderOverlays();
+    });
+  }
+
+  if (downloadCsvConfirmedBtn) {
+    downloadCsvConfirmedBtn.addEventListener('click', downloadConfirmedOnlyCsv);
+  }
 
   // Wire up events
+  if (uiModeGroup) {
+    for (const btn of [btnModeRegular, btnModeDebug]) {
+      if (!btn) continue;
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.mode || UI_MODE_REGULAR;
+        if (mode !== UI_MODE_REGULAR && mode !== UI_MODE_DEBUG) return;
+        uiMode = mode;
+        _applyUiMode();
+      });
+    }
+  }
+
   promptSelect.addEventListener('change', onPromptChanged);
   if (llmProvider) {
     llmProvider.addEventListener('change', () => _refreshModelOptions(null));
@@ -3701,24 +6546,10 @@
     chkBackoffMode.addEventListener('change', _saveBackoffPref);
   }
 
-  function _overlayIconFallback(icon) {
-    try {
-      const btn = icon && icon.closest && icon.closest('.overlayBtn');
-      if (btn) btn.classList.add('overlayBtn--textFallback');
-    } catch (_) {}
-  }
-
-  // If overlay icon images fail to load, show Bigger/Smaller text instead.
-  // Note: images can fail *before* this script runs, so also check `naturalWidth`.
-  for (const icon of Array.from(document.querySelectorAll('img.overlayBtn__icon'))) {
-    icon.addEventListener('error', () => _overlayIconFallback(icon), { once: true });
-    try {
-      if (icon.complete && icon.naturalWidth === 0) {
-        _overlayIconFallback(icon);
-      }
-    } catch (_) {}
-  }
-  onPromptChanged();
+  _syncResultsOverlayHandlesToggleUi();
+  _syncResultsOverlayGuideAxesToggleUi();
+  _loadUiModePref();
+  _applyUiMode();
 
   dropzone.addEventListener('click', () => {
     if (testResultsMode) return;
@@ -3761,14 +6592,21 @@
 
   if (chkTestRunV1) {
     chkTestRunV1.addEventListener('change', () => {
-      _ensureAtLeastOneTestRun('v2');
+      _ensureAtLeastOneTestRun('v1');
       if (testResultsMode) _setTestResultsMode(true);
     });
   }
 
   if (chkTestRunV2) {
     chkTestRunV2.addEventListener('change', () => {
-      _ensureAtLeastOneTestRun('v1');
+      _ensureAtLeastOneTestRun('v2');
+      if (testResultsMode) _setTestResultsMode(true);
+    });
+  }
+
+  if (chkTestRunGH) {
+    chkTestRunGH.addEventListener('change', () => {
+      _ensureAtLeastOneTestRun('gh_v1');
       if (testResultsMode) _setTestResultsMode(true);
     });
   }
@@ -3804,6 +6642,7 @@
   refreshExamples();
   _loadSavedLlmSelection();
   _loadBackoffPref();
+  _applyUiMode();
 })();
 </script>
 </body>

@@ -293,6 +293,19 @@ def _format_stage_facts_dump(stage_number: int, accumulated_facts: dict) -> str:
     return f"{header}\n{payload}\n"
 
 
+def _safe_console_print(text: str) -> None:
+    """Print text robustly even when terminal encoding cannot represent all chars."""
+    try:
+        print(text)
+        return
+    except UnicodeEncodeError:
+        pass
+
+    enc = (getattr(sys.stdout, "encoding", None) or "utf-8")
+    safe_text = str(text).encode(enc, errors="backslashreplace").decode(enc, errors="replace")
+    print(safe_text)
+
+
 def _extract_json_object_from_text(text: str):
     """Best-effort JSON extraction.
 
@@ -1029,6 +1042,38 @@ def normalize_csv_to_wide(csv_text: str) -> str:
     return "\n".join(wide_lines)
 
 
+def _csv_has_usable_curve_points(csv_text: str, min_points_per_curve: int = 2) -> bool:
+    """Return True when CSV appears to contain usable extracted curve point series.
+
+    We normalize to wide format and run deterministic diagnostics. This guards
+    against non-curve tables (e.g., review/checklist CSVs) being treated as
+    extracted time-series data.
+    """
+    try:
+        text = str(csv_text or "").strip()
+        if not text:
+            return False
+
+        normalized = normalize_csv_to_wide(text)
+        diag = compute_csv_diagnostics_from_text(normalized)
+        curves = diag.get("curves", []) if isinstance(diag, dict) else []
+        if not isinstance(curves, list) or not curves:
+            return False
+
+        for c in curves:
+            if not isinstance(c, dict):
+                continue
+            n_points = c.get("n_points")
+            try:
+                if int(n_points) >= int(min_points_per_curve):
+                    return True
+            except Exception:
+                continue
+        return False
+    except Exception:
+        return False
+
+
 def _suffix_from_tags(*tags: str | None) -> str:
     parts: list[str] = []
     for t in tags:
@@ -1668,7 +1713,7 @@ for stage_index, stage_name in enumerate(EXTRACT_STAGES):
     # as an immutable snapshot (timeline semantics; no overwriting).
     stage_dump = _format_stage_facts_dump(stage_index + 1, accumulated_facts)
     console_timeline += stage_dump
-    print(stage_dump)
+    _safe_console_print(stage_dump)
     
     # Save real-time progress update for web UI (completed stage count increments here)
     save_stage_update(
@@ -1723,19 +1768,28 @@ tracker.mark_complete()
 final_stage = EXTRACT_STAGES[-1]
 data_raw = stage_context.get(final_stage, "")
 data_from_final = extract_csv_from_text(data_raw)
+final_csv_valid = _csv_has_usable_curve_points(data_from_final)
 
 # Check if we have a saved CSV from the data extraction stage
 stage4_csv = stage_context.get("_saved_csv", "")
 saved_csv_stage = stage_context.get("_saved_csv_stage", "")
+saved_csv_valid = _csv_has_usable_curve_points(stage4_csv)
 
 # Prefer final-stage CSV when the final stage differs from the data-extraction stage.
-if data_from_final and (not saved_csv_stage or final_stage != saved_csv_stage):
+if data_from_final and final_csv_valid and (not saved_csv_stage or final_stage != saved_csv_stage):
     data = data_from_final
     print(f"Using CSV from final stage: {final_stage}")
-elif stage4_csv:
+elif stage4_csv and saved_csv_valid:
     data = stage4_csv
     stage_label = saved_csv_stage or "data extraction stage"
     print(f"Using CSV from {stage_label} (data extraction stage)")
+elif stage4_csv:
+    data = stage4_csv
+    stage_label = saved_csv_stage or "data extraction stage"
+    print(f"Using CSV from {stage_label} (fallback; validation unavailable)")
+elif data_from_final:
+    data = data_from_final
+    print(f"Using CSV from final stage (fallback): {final_stage}")
 else:
     data = data_from_final
     print("Warning: No saved CSV found, using final stage output")

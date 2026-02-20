@@ -108,8 +108,23 @@ def _resolve_ui_example_to_plots_rel(example_rel_path: str) -> str | None:
     if not example_name:
         return None
 
+    example_stem = os.path.splitext(example_name)[0]
     example_name_lower = example_name.lower()
     example_stem_lower = os.path.splitext(example_name_lower)[0]
+
+    # Prefer canonical synthetic folder layout first:
+    #   plots/synthetic/<LETTER>/<NAME>/<NAME>.png
+    # This guarantees synthetic examples (e.g., GH/GI) resolve back to their
+    # source folders so extraction outputs are saved there.
+    if example_stem:
+        preferred = [
+            os.path.join(SYNTHETIC_DIR, example_stem[:1].upper(), example_stem, example_name),
+            os.path.join(SYNTHETIC_DIR, example_stem, example_name),
+        ]
+        for cand in preferred:
+            if os.path.isfile(cand):
+                return os.path.relpath(cand, PLOTS_DIR).replace('\\', '/')
+
     candidates = []
 
     for root, _dirs, files in os.walk(PLOTS_DIR):
@@ -2481,7 +2496,11 @@ def _scan_version_folder(folder_path, version_label, outputs, plots_dir):
                 label = f'Statistics ({version_label})'
             outputs['stats'].append({'path': rel_path, 'label': label, 'filename': f})
             
-        elif f.endswith('_data'):
+        elif (
+            f.endswith('_data')
+            or '.out_data_' in f
+            or f.endswith('.out_data')
+        ):
             outputs['data'].append({'path': rel_path, 'label': f'Extracted Data ({version_label})', 'filename': f})
 
         elif f.endswith('.csv'):

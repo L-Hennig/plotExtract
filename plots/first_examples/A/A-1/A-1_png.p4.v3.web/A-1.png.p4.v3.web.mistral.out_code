@@ -1,0 +1,58 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# Data
+time_blank = [0, 2, 4, 6, 8, 10, 12, 22, 24, 26]
+log_blank = [6.2, 9.0, 9.5, 10.0, 10.0, 10.0, 10.0, 9.5, 9.0, 9.0]
+
+time_col = [0, 2, 4, 6, 8, 10, 12, 22, 24, 26]
+log_col = [6.2, 7.0, 9.0, 9.5, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0]
+
+time_mino = [0, 2, 4, 6, 8, 10, 12, 22, 24, 26]
+log_mino = [6.2, 8.0, 8.5, 9.0, 9.5, 10.0, 10.0, 9.0, 8.5, 8.0]
+
+time_mem = [0, 2, 4, 6, 8, 10, 12, 22, 24]
+log_mem = [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+time_rfp = [0, 2, 4, 6, 8, 10, 12, 22, 24]
+log_rfp = [6.2, 0.0, 0.0, 0.0, 0.0, 1.0, 1.5, 0.0, 0.0]
+
+time_col_mem = [0, 2, 4, 6, 8, 10, 12, 22, 24, 26]
+log_col_mem = [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+time_col_mino = [0, 2, 4, 6, 8, 10, 12, 22, 24, 26]
+log_col_mino = [6.2, 0.0, 0.0, 1.0, 2.0, 2.0, 1.0, 0.0, 0.0, 0.0]
+
+time_col_rfp = [0, 2, 4, 6, 8, 10, 12, 22, 24, 26]
+log_col_rfp = [6.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+# Plot
+plt.figure(figsize=(8, 6))
+
+# Plotting each curve with specific line style, marker, and color
+plt.plot(time_blank, log_blank, linestyle=':', marker='x', color='black', label='Blank')
+plt.plot(time_col, log_col, linestyle='-', marker='s', color='black', label='COL 0.125µg/mL')
+plt.plot(time_mino, log_mino, linestyle='--', marker='^', color='black', label='MINO 1µg/mL')
+plt.plot(time_mem, log_mem, linestyle='-.', marker='o', color='black', fillstyle='none', label='MEM 4µg/mL')
+plt.plot(time_rfp, log_rfp, linestyle=':', marker='v', color='black', fillstyle='none', label='RFP 0.06µg/mL')
+plt.plot(time_col_mem, log_col_mem, linestyle='--', marker='o', color='black', fillstyle='none', label='COL 0.125µg/mL + MEM 4µg/mL')
+plt.plot(time_col_mino, log_col_mino, linestyle='--', marker='^', color='black', fillstyle='none', label='COL 0.125µg/mL + MINO 1µg/mL')
+plt.plot(time_col_rfp, log_col_rfp, linestyle=':', marker='v', color='black', label='COL 0.125µg/mL + RFP 0.06µg/mL')
+
+# Axis labels
+plt.xlabel('Time (h)')
+plt.ylabel('Log cfu/mL')
+
+# Axis range
+plt.xlim(0, 26)
+plt.ylim(0, 16)
+
+# Legend
+plt.legend(loc='upper right')
+
+# Save plot
+output_path = r"C:\Users\Lucas\OneDrive\UCL Internship\Plot_Extract\plots\first_examples\A\A-1_png.p4.v3.web\A-1_png-replot.p4.v3.web.png"
+os.makedirs(os.path.dirname(output_path), exist_ok=True)
+plt.savefig(output_path, bbox_inches='tight', dpi=300)
+plt.close()

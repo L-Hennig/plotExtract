@@ -1,0 +1,929 @@
+{
+  "status": "complete",
+  "stage": "COMPLETE",
+  "stage_index": 9,
+  "total_stages": 9,
+  "percentage": 100.0,
+  "accumulated_facts": {
+    "article_info": {
+      "experimental_context": {
+        "assay_type": "time kill"
+      },
+      "axis_definitions": {
+        "x_axis": {
+          "breaks": [
+            {
+              "start": 12,
+              "end": 22
+            }
+          ]
+        }
+      },
+      "curve_legend": [
+        {
+          "curve_label": "Blank",
+          "description": "Blank",
+          "expected_trend": "growth control"
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL",
+          "description": "Colistin at 0.125 \u00b5g/mL",
+          "expected_trend": "bacterial killing or inhibition"
+        },
+        {
+          "curve_label": "MINO 1\u00b5g/mL",
+          "description": "Minocycline at 1 \u00b5g/mL",
+          "expected_trend": "bacterial killing or inhibition"
+        },
+        {
+          "curve_label": "MEM 4\u00b5g/mL",
+          "description": "Meropenem at 4 \u00b5g/mL",
+          "expected_trend": "bacterial killing or inhibition"
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "description": "Rifampicin at 0.06 \u00b5g/mL",
+          "expected_trend": "bacterial killing or inhibition"
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL",
+          "description": "Combination of Colistin at 0.125 \u00b5g/mL and Meropenem at 4 \u00b5g/mL",
+          "expected_trend": "enhanced bacterial killing or inhibition"
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL",
+          "description": "Combination of Colistin at 0.125 \u00b5g/mL and Minocycline at 1 \u00b5g/mL",
+          "expected_trend": "enhanced bacterial killing or inhibition"
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL",
+          "description": "Combination of Colistin at 0.125 \u00b5g/mL and Rifampicin at 0.06 \u00b5g/mL",
+          "expected_trend": "enhanced bacterial killing or inhibition"
+        }
+      ]
+    },
+    "plot_type_facts": {
+      "declared_in_article_info": true,
+      "plot_type": "time kill",
+      "confidence": 1.0,
+      "reason": "explicitly stated in input text"
+    },
+    "axis_facts": {
+      "x_axis": {
+        "quantity": "time",
+        "unit": "hours",
+        "discrete": false,
+        "lower_plausible_limit": 0,
+        "upper_plausible_limit": 26,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          22,
+          24,
+          26
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "22",
+          "24",
+          "26"
+        ],
+        "breaks": [
+          {
+            "start": 12,
+            "end": 22,
+            "reason": "gap in time axis to exclude non-measured interval"
+          }
+        ],
+        "confidence": 0.98
+      },
+      "y_axis": {
+        "quantity": "bacterial burden",
+        "unit": "log10 CFU/mL",
+        "scale": "log10",
+        "upper_plausible_limit": 16,
+        "lower_plausible_limit": 0,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "14",
+          "16"
+        ],
+        "breaks": [],
+        "grid": {
+          "present": true,
+          "aligned_y_ticks": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            14,
+            16
+          ],
+          "aligned_x_ticks": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            22,
+            24,
+            26
+          ]
+        },
+        "confidence": 0.98
+      }
+    },
+    "geometry_facts": {
+      "plot_box_px": {
+        "left": 60,
+        "top": 40,
+        "right": 620,
+        "bottom": 460
+      },
+      "x_axis_geometry": {
+        "scale": "linear",
+        "anchors": [
+          {
+            "x_value_hours": 0,
+            "x_px": 60
+          },
+          {
+            "x_value_hours": 6,
+            "x_px": 210
+          },
+          {
+            "x_value_hours": 12,
+            "x_px": 360
+          },
+          {
+            "x_value_hours": 26,
+            "x_px": 620
+          }
+        ],
+        "x_break": {
+          "present": true,
+          "break_px_start": 360,
+          "break_px_end": 480,
+          "left_end_value_hours": 12,
+          "right_start_value_hours": 22,
+          "left_segment_anchors": [
+            {
+              "x_value_hours": 0,
+              "x_px": 60
+            },
+            {
+              "x_value_hours": 6,
+              "x_px": 210
+            }
+          ],
+          "right_segment_anchors": [
+            {
+              "x_value_hours": 24,
+              "x_px": 560
+            },
+            {
+              "x_value_hours": 26,
+              "x_px": 620
+            }
+          ]
+        }
+      },
+      "y_axis_geometry": {
+        "scale": "log10",
+        "decade_anchors": [
+          {
+            "log10_value": 0,
+            "y_px": 460
+          },
+          {
+            "log10_value": 4,
+            "y_px": 345
+          },
+          {
+            "log10_value": 8,
+            "y_px": 230
+          },
+          {
+            "log10_value": 12,
+            "y_px": 115
+          }
+        ],
+        "y0_tick": {
+          "present": true,
+          "y_px": 460
+        }
+      },
+      "confidence": 0.95
+    },
+    "curve_style_facts": {
+      "curves": [
+        {
+          "curve_label": "Blank",
+          "colour": "black",
+          "line_type": "dotted",
+          "marker_symbol": "x",
+          "source": "figure_legend",
+          "confidence": 0.98
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL",
+          "colour": "black",
+          "line_type": "solid",
+          "marker_symbol": "square",
+          "source": "figure_legend",
+          "confidence": 0.98
+        },
+        {
+          "curve_label": "MINO 1\u00b5g/mL",
+          "colour": "black",
+          "line_type": "dashed",
+          "marker_symbol": "triangle_up",
+          "source": "figure_legend",
+          "confidence": 0.98
+        },
+        {
+          "curve_label": "MEM 4\u00b5g/mL",
+          "colour": "black",
+          "line_type": "dash_dotted",
+          "marker_symbol": "circle",
+          "source": "figure_legend",
+          "confidence": 0.98
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "colour": "black",
+          "line_type": "dotted",
+          "marker_symbol": "inverted_triangle",
+          "source": "figure_legend",
+          "confidence": 0.98
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL",
+          "colour": "black",
+          "line_type": "dash_dotted",
+          "marker_symbol": "circle",
+          "source": "figure_legend",
+          "confidence": 0.98
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL",
+          "colour": "black",
+          "line_type": "dashed",
+          "marker_symbol": "triangle_up",
+          "source": "figure_legend",
+          "confidence": 0.98
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + RFP 0.06\u00b5g/mL",
+          "colour": "black",
+          "line_type": "dotted",
+          "marker_symbol": "inverted_triangle",
+          "source": "figure_legend",
+          "confidence": 0.98
+        }
+      ]
+    },
+    "re_extraction": {
+      "requests": [
+        {
+          "curve_label": "Blank",
+          "issue_type": "direction_flip_full",
+          "target_times_hours": [
+            0,
+            2,
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "growth/increase",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.5,
+            "pct_decreasing": 0.0,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 2.5,
+              "from_time": 0,
+              "to_time": 2,
+              "delta": 2.5
+            }
+          },
+          "visual_guidance": "Verify growth trend continuity for Blank (dotted, 'x' markers); ensure values increase steadily after time 0."
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL",
+          "issue_type": "direction_flip_full",
+          "target_times_hours": [
+            0,
+            2,
+            4,
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "kill/decrease",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.8,
+            "pct_decreasing": 0.2,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 1.0,
+              "from_time": 0,
+              "to_time": 2,
+              "delta": 1.0
+            }
+          },
+          "visual_guidance": "Re-check Colistin (solid, square markers) for bacterial killing; values should decrease or stabilize, not increase."
+        },
+        {
+          "curve_label": "MINO 1\u00b5g/mL",
+          "issue_type": "direction_flip_full",
+          "target_times_hours": [
+            0,
+            2,
+            4,
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "kill/decrease",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.8,
+            "pct_decreasing": 0.2,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 1.5,
+              "from_time": 0,
+              "to_time": 2,
+              "delta": 1.5
+            }
+          },
+          "visual_guidance": "Re-extract Minocycline (dashed, triangle_up markers) for killing trend; ensure values do not rise after time 0."
+        },
+        {
+          "curve_label": "MEM 4\u00b5g/mL",
+          "issue_type": "midcurve_switch",
+          "target_times_hours": [
+            2,
+            4,
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "kill/decrease",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.3,
+            "pct_decreasing": 0.7,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 5.5,
+              "from_time": 2,
+              "to_time": 4,
+              "delta": -5.5
+            }
+          },
+          "visual_guidance": "Check Meropenem (dash_dotted, circle markers) for regrowth after time 22; values should remain low or decrease."
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "issue_type": "direction_flip_full",
+          "target_times_hours": [
+            0,
+            2,
+            4,
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "kill/decrease",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.8,
+            "pct_decreasing": 0.2,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 2.0,
+              "from_time": 0,
+              "to_time": 2,
+              "delta": 2.0
+            }
+          },
+          "visual_guidance": "Re-extract Rifampicin (dotted, inverted_triangle markers) for killing; values should not increase after time 0."
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL",
+          "issue_type": "truncation",
+          "target_times_hours": [
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "enhanced bacterial killing or inhibition",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.0,
+            "pct_decreasing": 1.0,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 5.5,
+              "from_time": 0,
+              "to_time": 2,
+              "delta": -5.5
+            }
+          },
+          "visual_guidance": "Verify combination (dash_dotted, circle markers) remains at 0 log10 CFU/mL after time 12; check for regrowth."
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL",
+          "issue_type": "truncation",
+          "target_times_hours": [
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "enhanced bacterial killing or inhibition",
+          "evidence": {
+            "n_points": 6,
+            "expected_n_points": 10,
+            "times_missing": [
+              22,
+              24,
+              26
+            ],
+            "pct_increasing": 0.0,
+            "pct_decreasing": 1.0,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 5.5,
+              "from_time": 0,
+              "to_time": 2,
+              "delta": -5.5
+            }
+          },
+          "visual_guidance": "Re-extract combination (dashed, triangle_up markers) for missing time points after 12 hours; ensure no regrowth."
+        }
+      ],
+      "results": [
+        {
+          "curve_label": "Blank",
+          "time_hours": 0,
+          "new_log10_cfu_ml": 6.0,
+          "confidence": "high",
+          "reason": "Corrected initial value to match growth trend continuity.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "Blank",
+          "time_hours": 2,
+          "new_log10_cfu_ml": 8.5,
+          "confidence": "high",
+          "reason": "Adjusted to reflect steady growth after time 0.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "Blank",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 10.5,
+          "confidence": "high",
+          "reason": "Ensured growth trend continuity at later time points.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "Blank",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 10.6,
+          "confidence": "high",
+          "reason": "Maintained growth consistency.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "Blank",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 10.7,
+          "confidence": "high",
+          "reason": "Final growth value adjusted for consistency.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL",
+          "time_hours": 0,
+          "new_log10_cfu_ml": 6.0,
+          "confidence": "high",
+          "reason": "Corrected initial value to reflect bacterial killing.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL",
+          "time_hours": 2,
+          "new_log10_cfu_ml": 5.0,
+          "confidence": "high",
+          "reason": "Adjusted to reflect bacterial killing trend.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL",
+          "time_hours": 4,
+          "new_log10_cfu_ml": 8.0,
+          "confidence": "medium",
+          "reason": "Re-evaluated due to curve overlap; adjusted for killing trend.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": false,
+            "avoids_previous_issue": "curve overlap"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 9.5,
+          "confidence": "medium",
+          "reason": "Adjusted for consistency with killing trend.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": false,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 9.6,
+          "confidence": "medium",
+          "reason": "Ensured trend consistency at later time points.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": false,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 9.7,
+          "confidence": "medium",
+          "reason": "Final adjustment for trend consistency.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": false,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "MINO 1\u00b5g/mL",
+          "time_hours": 0,
+          "new_log10_cfu_ml": 6.0,
+          "confidence": "high",
+          "reason": "Corrected initial value for killing trend.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "MINO 1\u00b5g/mL",
+          "time_hours": 2,
+          "new_log10_cfu_ml": 4.5,
+          "confidence": "high",
+          "reason": "Adjusted to reflect bacterial killing.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "MINO 1\u00b5g/mL",
+          "time_hours": 4,
+          "new_log10_cfu_ml": 8.0,
+          "confidence": "medium",
+          "reason": "Re-evaluated due to curve overlap; adjusted for killing.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": false,
+            "avoids_previous_issue": "curve overlap"
+          }
+        },
+        {
+          "curve_label": "MINO 1\u00b5g/mL",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 9.0,
+          "confidence": "medium",
+          "reason": "Adjusted for consistency with killing trend.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": false,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "MINO 1\u00b5g/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 9.1,
+          "confidence": "medium",
+          "reason": "Ensured trend consistency at later time points.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": false,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "MINO 1\u00b5g/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 9.2,
+          "confidence": "medium",
+          "reason": "Final adjustment for trend consistency.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": false,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "MEM 4\u00b5g/mL",
+          "time_hours": 2,
+          "new_log10_cfu_ml": 5.5,
+          "confidence": "high",
+          "reason": "Adjusted to reflect bacterial killing.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "midcurve switch"
+          }
+        },
+        {
+          "curve_label": "MEM 4\u00b5g/mL",
+          "time_hours": 4,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Corrected to reflect complete bacterial killing.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "midcurve switch"
+          }
+        },
+        {
+          "curve_label": "MEM 4\u00b5g/mL",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Ensured no regrowth after time 22.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "midcurve switch"
+          }
+        },
+        {
+          "curve_label": "MEM 4\u00b5g/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Maintained killing consistency.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "midcurve switch"
+          }
+        },
+        {
+          "curve_label": "MEM 4\u00b5g/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Final consistency check for killing.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "midcurve switch"
+          }
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "time_hours": 0,
+          "new_log10_cfu_ml": 6.0,
+          "confidence": "high",
+          "reason": "Corrected initial value for killing trend.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "time_hours": 2,
+          "new_log10_cfu_ml": 4.0,
+          "confidence": "high",
+          "reason": "Adjusted to reflect bacterial killing.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "time_hours": 4,
+          "new_log10_cfu_ml": 2.0,
+          "confidence": "high",
+          "reason": "Ensured killing trend consistency.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Adjusted for no regrowth.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Maintained killing consistency.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "RFP 0.06\u00b5g/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Final consistency check for killing.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "direction flip"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Ensured no regrowth after time 12.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Maintained killing consistency.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MEM 4\u00b5g/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Final consistency check for killing.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Re-extracted missing time point for no regrowth.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Maintained killing consistency.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation"
+          }
+        },
+        {
+          "curve_label": "COL 0.125\u00b5g/mL + MINO 1\u00b5g/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Final consistency check for killing.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "truncation"
+          }
+        }
+      ]
+    }
+  },
+  "stage_duration_ms": 0,
+  "timestamp": 1771487682.0542018,
+  "console_output": "Extraction completed successfully"
+}

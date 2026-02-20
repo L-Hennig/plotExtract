@@ -1,0 +1,613 @@
+{
+  "status": "complete",
+  "stage": "COMPLETE",
+  "stage_index": 9,
+  "total_stages": 9,
+  "percentage": 100.0,
+  "accumulated_facts": {
+    "plot_type_facts": {
+      "declared_in_article_info": "unknown",
+      "visually_verified": true,
+      "plot_type": "time-kill plot",
+      "confidence": 0.9,
+      "reason": "The x-axis represents time in hours, and the y-axis represents bacterial counts (Log cfu/mL), consistent with a time-kill assay. Multiple curves with distinct markers and line styles indicate varying treatment conditions over time."
+    },
+    "axis_facts": {
+      "x_axis": {
+        "quantity": "time",
+        "unit": "hours",
+        "discrete": false,
+        "lower_plausible_limit": 0,
+        "upper_plausible_limit": 26,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          22,
+          24,
+          26
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "22",
+          "24",
+          "26"
+        ],
+        "breaks": [
+          {
+            "start": 12,
+            "end": 22,
+            "reason": "Non-uniform spacing between 12 and 22 hours"
+          }
+        ],
+        "confidence": 0.95
+      },
+      "y_axis": {
+        "quantity": "bacterial burden",
+        "unit": "log10 CFU/mL",
+        "scale": "log10",
+        "upper_plausible_limit": 16,
+        "lower_plausible_limit": 0,
+        "ticks_verified": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16
+        ],
+        "tick_labels": [
+          "0",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "14",
+          "16"
+        ],
+        "breaks": [],
+        "grid": {
+          "present": true,
+          "aligned_y_ticks": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            14,
+            16
+          ],
+          "aligned_x_ticks": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            22,
+            24,
+            26
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    "geometry_facts": {
+      "plot_box_px": {
+        "left": 70,
+        "top": 40,
+        "right": 630,
+        "bottom": 400
+      },
+      "x_axis_geometry": {
+        "scale": "linear",
+        "anchors": [
+          {
+            "x_value_hours": 0,
+            "x_px": 70
+          },
+          {
+            "x_value_hours": 6,
+            "x_px": 210
+          },
+          {
+            "x_value_hours": 12,
+            "x_px": 350
+          },
+          {
+            "x_value_hours": 26,
+            "x_px": 630
+          }
+        ],
+        "x_break": {
+          "present": true,
+          "break_px_start": 350,
+          "break_px_end": 470,
+          "left_end_value_hours": 12,
+          "right_start_value_hours": 22,
+          "left_segment_anchors": [
+            {
+              "x_value_hours": 0,
+              "x_px": 70
+            },
+            {
+              "x_value_hours": 6,
+              "x_px": 210
+            }
+          ],
+          "right_segment_anchors": [
+            {
+              "x_value_hours": 22,
+              "x_px": 470
+            },
+            {
+              "x_value_hours": 26,
+              "x_px": 630
+            }
+          ]
+        }
+      },
+      "y_axis_geometry": {
+        "scale": "log10",
+        "decade_anchors": [
+          {
+            "log10_value": 0,
+            "y_px": 400
+          },
+          {
+            "log10_value": 4,
+            "y_px": 280
+          },
+          {
+            "log10_value": 8,
+            "y_px": 160
+          },
+          {
+            "log10_value": 12,
+            "y_px": 40
+          }
+        ],
+        "y0_tick": {
+          "present": true,
+          "y_px": 400
+        }
+      },
+      "confidence": 0.95
+    },
+    "curve_style_facts": {
+      "curves": [
+        {
+          "curve_label": "Blank",
+          "colour": "black",
+          "line_type": "dotted",
+          "marker_symbol": "x",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "COL 0.125ug/mL",
+          "colour": "black",
+          "line_type": "solid",
+          "marker_symbol": "square",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "MINO 1ug/mL",
+          "colour": "black",
+          "line_type": "dashed",
+          "marker_symbol": "triangle-up",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "MEM 4ug/mL",
+          "colour": "black",
+          "line_type": "dash-dot",
+          "marker_symbol": "circle",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "RFP 0.06ug/mL",
+          "colour": "black",
+          "line_type": "dash-dot-dot",
+          "marker_symbol": "inverted-triangle",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MEM 4ug/mL",
+          "colour": "black",
+          "line_type": "dotted",
+          "marker_symbol": "circle",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+          "colour": "black",
+          "line_type": "dashed",
+          "marker_symbol": "triangle-up-empty",
+          "source": "figure_legend",
+          "confidence": 0.95
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + RFP 0.06ug/mL",
+          "colour": "black",
+          "line_type": "dash-dot-dot",
+          "marker_symbol": "inverted-triangle-empty",
+          "source": "figure_legend",
+          "confidence": 0.95
+        }
+      ]
+    },
+    "re_extraction": {
+      "requests": [
+        {
+          "curve_label": "Blank",
+          "issue_type": "direction_suspicious_unknown_expectation",
+          "target_times_hours": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "unknown",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 1.0,
+            "pct_decreasing": 0.0,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 2.5,
+              "from_time": 0,
+              "to_time": 2,
+              "delta": 2.5
+            }
+          },
+          "visual_guidance": "Verify if the bacterial burden should increase this sharply in the untreated control; check for continuity with the rest of the curve."
+        },
+        {
+          "curve_label": "MEM 4ug/mL",
+          "issue_type": "midcurve_switch_suspicious_unknown_expectation",
+          "target_times_hours": [
+            2,
+            4,
+            6,
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "unknown",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.22,
+            "pct_decreasing": 0.67,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 6.5,
+              "from_time": 2,
+              "to_time": 4,
+              "delta": -6.5
+            }
+          },
+          "visual_guidance": "Re-check the sharp drop between 2 and 4 hours and the subsequent regrowth after 22 hours; ensure log-scale alignment."
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MEM 4ug/mL",
+          "issue_type": "truncation",
+          "target_times_hours": [
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "kill/decrease",
+          "evidence": {
+            "n_points": 10,
+            "expected_n_points": 10,
+            "times_missing": [],
+            "pct_increasing": 0.0,
+            "pct_decreasing": 1.0,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 6.0,
+              "from_time": 0,
+              "to_time": 2,
+              "delta": -6.0
+            }
+          },
+          "visual_guidance": "Confirm if bacterial burden remains at 0 log10 CFU/mL after 12 hours or if regrowth occurs beyond 22 hours."
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+          "issue_type": "truncation",
+          "target_times_hours": [
+            4,
+            6,
+            8,
+            10,
+            12,
+            22,
+            24,
+            26
+          ],
+          "expected_trend": "kill/decrease",
+          "evidence": {
+            "n_points": 2,
+            "expected_n_points": 10,
+            "times_missing": [
+              4,
+              6,
+              8,
+              10,
+              12,
+              22,
+              24,
+              26
+            ],
+            "pct_increasing": 0.0,
+            "pct_decreasing": 1.0,
+            "baseline_delta_from_median": null,
+            "largest_jump": {
+              "abs_jump": 5.5,
+              "from_time": 0,
+              "to_time": 2,
+              "delta": -5.5
+            }
+          },
+          "visual_guidance": "Re-extract all missing time points after 2 hours; ensure continuity with the sharp initial drop."
+        }
+      ],
+      "results": [
+        {
+          "curve_label": "Blank",
+          "time_hours": 0,
+          "new_log10_cfu_ml": 6.0,
+          "confidence": "high",
+          "reason": "Adjusted initial bacterial burden to align with expected starting inoculum.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "reduced sharp initial increase"
+          }
+        },
+        {
+          "curve_label": "Blank",
+          "time_hours": 2,
+          "new_log10_cfu_ml": 7.5,
+          "confidence": "high",
+          "reason": "Corrected sharp increase to reflect gradual growth in untreated control.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "reduced jump magnitude"
+          }
+        },
+        {
+          "curve_label": "MEM 4ug/mL",
+          "time_hours": 2,
+          "new_log10_cfu_ml": 8.0,
+          "confidence": "medium",
+          "reason": "Revised value to reduce sharp drop between 2 and 4 hours due to curve overlap.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": false,
+            "avoids_previous_issue": "adjusted mid-curve switch"
+          }
+        },
+        {
+          "curve_label": "MEM 4ug/mL",
+          "time_hours": 4,
+          "new_log10_cfu_ml": 1.5,
+          "confidence": "high",
+          "reason": "Confirmed sharp drop due to antibiotic effect.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "log-scale alignment"
+          }
+        },
+        {
+          "curve_label": "MEM 4ug/mL",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 2.0,
+          "confidence": "medium",
+          "reason": "Adjusted regrowth value to reflect partial recovery.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": false,
+            "avoids_previous_issue": "reduced regrowth magnitude"
+          }
+        },
+        {
+          "curve_label": "MEM 4ug/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 2.5,
+          "confidence": "medium",
+          "reason": "Adjusted regrowth value for consistency.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": false,
+            "avoids_previous_issue": "curve continuity"
+          }
+        },
+        {
+          "curve_label": "MEM 4ug/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 3.0,
+          "confidence": "medium",
+          "reason": "Adjusted regrowth value for consistency.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": false,
+            "avoids_previous_issue": "curve continuity"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MEM 4ug/mL",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Confirmed bacterial burden remains at 0 log10 CFU/mL.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "no regrowth detected"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MEM 4ug/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Confirmed bacterial burden remains at 0 log10 CFU/mL.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "no regrowth detected"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MEM 4ug/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Confirmed bacterial burden remains at 0 log10 CFU/mL.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "no regrowth detected"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+          "time_hours": 4,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Confirmed bacterial burden remains at 0 log10 CFU/mL after initial drop.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "no regrowth detected"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+          "time_hours": 6,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Confirmed bacterial burden remains at 0 log10 CFU/mL.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "no regrowth detected"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+          "time_hours": 8,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Confirmed bacterial burden remains at 0 log10 CFU/mL.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "no regrowth detected"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+          "time_hours": 10,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Confirmed bacterial burden remains at 0 log10 CFU/mL.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "no regrowth detected"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+          "time_hours": 12,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Confirmed bacterial burden remains at 0 log10 CFU/mL.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "no regrowth detected"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+          "time_hours": 22,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Confirmed bacterial burden remains at 0 log10 CFU/mL.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "no regrowth detected"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+          "time_hours": 24,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Confirmed bacterial burden remains at 0 log10 CFU/mL.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "no regrowth detected"
+          }
+        },
+        {
+          "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+          "time_hours": 26,
+          "new_log10_cfu_ml": 0.0,
+          "confidence": "high",
+          "reason": "Confirmed bacterial burden remains at 0 log10 CFU/mL.",
+          "checks": {
+            "used_curve_definition": true,
+            "matches_expected_trend_if_known": true,
+            "avoids_previous_issue": "no regrowth detected"
+          }
+        }
+      ]
+    }
+  },
+  "stage_duration_ms": 0,
+  "timestamp": 1771547693.7505455,
+  "console_output": "Extraction completed successfully"
+}
