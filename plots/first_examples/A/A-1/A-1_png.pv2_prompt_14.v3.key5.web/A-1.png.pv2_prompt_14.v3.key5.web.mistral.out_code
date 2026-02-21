@@ -1,0 +1,156 @@
+import os
+import matplotlib.pyplot as plt
+import numpy as np
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\Plot_Extract\plots\first_examples/A/A-1\A-1_png.pv2_prompt_14.v3.key5.web\A-1_png-replot.pv2_prompt_14.v3.key5.web.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data points extracted from the plot
+marker_facts = {
+    "curves": [
+        {
+            "curve_label": "Blank",
+            "points": [
+                (0, 6.0), (2, 9.0), (4, 9.5), (6, 9.8), (8, 10.0),
+                (10, 10.1), (12, 10.2), (22, 10.3), (24, 10.2), (26, 10.3)
+            ],
+            "colour": "black",
+            "line_type": "dotted",
+            "marker_symbol": "x"
+        },
+        {
+            "curve_label": "COL 0.125ug/mL",
+            "points": [
+                (0, 6.0), (2, 7.0), (4, 8.0), (6, 8.5), (8, 9.0),
+                (10, 9.5), (12, 9.8), (22, 10.0), (24, 10.1), (26, 10.2)
+            ],
+            "colour": "black",
+            "line_type": "solid",
+            "marker_symbol": "s"
+        },
+        {
+            "curve_label": "MINO 1ug/mL",
+            "points": [
+                (0, 6.0), (2, 6.5), (4, 7.0), (6, 7.5), (8, 8.0),
+                (10, 8.2), (12, 8.5), (22, 8.7), (24, 8.8), (26, 8.9)
+            ],
+            "colour": "black",
+            "line_type": "dashed",
+            "marker_symbol": "^"
+        },
+        {
+            "curve_label": "MEM 4ug/mL",
+            "points": [
+                (0, 6.0), (2, 0.0), (4, 0.0), (6, 0.0), (8, 0.0),
+                (10, 0.0), (12, 0.0), (22, 0.0), (24, 0.0), (26, 0.0)
+            ],
+            "colour": "black",
+            "line_type": "dashdot",
+            "marker_symbol": "o"
+        },
+        {
+            "curve_label": "RFP 0.06ug/mL",
+            "points": [
+                (0, 6.0), (2, 2.0), (4, 1.0), (6, 0.5), (8, 0.0),
+                (10, 0.0), (12, 0.0), (22, 1.0), (24, 1.5), (26, 2.0)
+            ],
+            "colour": "black",
+            "line_type": (0, [1, 1, 1, 1, 1, 1]),
+            "marker_symbol": "v"
+        },
+        {
+            "curve_label": "COL 0.125ug/mL + MEM 4ug/mL",
+            "points": [
+                (0, 6.0), (2, 0.0), (4, 0.0), (6, 0.0), (8, 0.0),
+                (10, 0.0), (12, 0.0), (22, 0.0), (24, 0.0), (26, 0.0)
+            ],
+            "colour": "black",
+            "line_type": "dotted",
+            "marker_symbol": "o"
+        },
+        {
+            "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+            "points": [
+                (0, 6.0), (2, 0.0), (4, 0.0), (6, 0.0), (8, 0.0),
+                (10, 0.0), (12, 0.0), (22, 0.0), (24, 0.0), (26, 0.0)
+            ],
+            "colour": "black",
+            "line_type": "dashed",
+            "marker_symbol": "^"
+        },
+        {
+            "curve_label": "COL 0.125ug/mL + RFP 0.06ug/mL",
+            "points": [
+                (0, 6.0), (2, 0.0), (4, 0.0), (6, 0.0), (8, 0.0),
+                (10, 0.0), (12, 0.0), (22, 0.0), (24, 0.0), (26, 0.0)
+            ],
+            "colour": "black",
+            "line_type": (0, [1, 1, 1, 1, 1, 1]),
+            "marker_symbol": "v"
+        }
+    ]
+}
+
+# Create the plot
+plt.figure(figsize=(8, 6))
+
+# Plot each curve
+for curve in marker_facts["curves"]:
+    x_vals, y_vals = zip(*curve["points"])
+    if curve["line_type"] == "dotted":
+        line_style = (0, [1, 1])
+    elif curve["line_type"] == "dashed":
+        line_style = "dashed"
+    elif curve["line_type"] == "dashdot":
+        line_style = "dashdot"
+    elif curve["line_type"] == "solid":
+        line_style = "solid"
+    else:
+        line_style = curve["line_type"]
+
+    if curve["marker_symbol"] == "x":
+        marker = "x"
+    elif curve["marker_symbol"] == "s":
+        marker = "s"
+    elif curve["marker_symbol"] == "^":
+        marker = "^"
+    elif curve["marker_symbol"] == "o":
+        marker = "o"
+    elif curve["marker_symbol"] == "v":
+        marker = "v"
+    elif curve["marker_symbol"] == "triangle-up-empty":
+        marker = "^"
+        fillstyle = "none"
+    elif curve["marker_symbol"] == "inverted-triangle-empty":
+        marker = "v"
+        fillstyle = "none"
+    else:
+        marker = "o"
+
+    if "fillstyle" in locals():
+        plt.plot(x_vals, y_vals, linestyle=line_style, color=curve["colour"],
+                 marker=marker, fillstyle=fillstyle, label=curve["curve_label"])
+        del fillstyle
+    else:
+        plt.plot(x_vals, y_vals, linestyle=line_style, color=curve["colour"],
+                 marker=marker, label=curve["curve_label"])
+
+# Set axis labels and limits
+plt.xlabel("Time (h)")
+plt.ylabel("Log cfu/mL")
+plt.xlim(0, 26)
+plt.ylim(0, 16)
+
+# Set ticks
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 22, 24, 26])
+plt.yticks([0, 2, 4, 6, 8, 10, 12, 14, 16])
+
+# Add grid
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+
+# Add legend
+plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)
+plt.close()

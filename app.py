@@ -2859,6 +2859,7 @@ def run_all():
 
     # Optional: EX1 (v1) model selection (passed to plotExtract.py via env)
     llm_model = (data.get('llm_model') or data.get('llmModel') or '').strip() or None
+    persist_result = bool(data.get('persist_result', True))
 
     # Optional: batch metadata (for persistent batch results page)
     batch_number = data.get('batch_number')
@@ -2878,6 +2879,7 @@ def run_all():
             'batch_number': batch_number
             ,
             'llm_model': llm_model,
+            'persist_result': persist_result,
             'cancel_requested': False,
             'active_pid': None,
         }
@@ -2886,7 +2888,7 @@ def run_all():
     thread = threading.Thread(
         target=run_extraction_task,
         args=(task_id, image_path, prompt_file, run_interpolation, run_pointwise, 
-              left_x, right_x, bottom_y, top_y, llm_model)
+              left_x, right_x, bottom_y, top_y, llm_model, persist_result)
     )
     thread.daemon = True
     thread.start()
@@ -2902,9 +2904,20 @@ def run_all_v2():
     image_path = data.get('image')
     prompt_name = data.get('prompt') or data.get('prompt_name')
     article_info = data.get('articleInfo', '').strip()
+    llm_key = str(data.get('llmKey') or data.get('llm_key') or '').strip()
+    if not llm_key:
+        llm_key = '4'
     llm_provider = (data.get('llm_provider') or data.get('llmProvider') or '').strip() or None
     llm_model = (data.get('llm_model') or data.get('llmModel') or '').strip() or None
+    if (not llm_provider) and llm_key in ('1', '2', '4', '5'):
+        if llm_key == '2':
+            llm_provider = 'google'
+            llm_model = llm_model or 'gemma-3-27b-it'
+        else:
+            llm_provider = 'mistral'
+            llm_model = llm_model or 'mistral-large-2512'
     debug_mode = bool(data.get('debug', False))
+    persist_result = bool(data.get('persist_result', True))
     run_interpolation = data.get('runInterpolation', False)
     run_pointwise = data.get('runPointwise', False)
     left_x = str(data.get('leftX', 0))
@@ -2923,6 +2936,8 @@ def run_all_v2():
             'prompt_name': prompt_name,
             'pipeline': 'v2',
             'debug': debug_mode,
+            'llm_key': llm_key,
+            'persist_result': persist_result,
             'cancel_requested': False,
             'active_pid': None,
         }
@@ -2930,7 +2945,7 @@ def run_all_v2():
     thread = threading.Thread(
         target=run_extraction_task_v2,
                 args=(task_id, image_path, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
-                            left_x, right_x, bottom_y, top_y, llm_provider, llm_model)
+                    left_x, right_x, bottom_y, top_y, llm_provider, llm_model, llm_key, persist_result)
     )
     thread.daemon = True
     thread.start()
@@ -3029,8 +3044,18 @@ def run_batch_v2():
     prompt_file = data.get('prompt', 'prompt_1.py')
     batch_name = data.get('batch_name')
     article_info = data.get('articleInfo', '')
+    llm_key = str(data.get('llmKey') or data.get('llm_key') or '').strip()
+    if not llm_key:
+        llm_key = '4'
     llm_provider = (data.get('llm_provider') or data.get('llmProvider') or '').strip() or None
     llm_model = (data.get('llm_model') or data.get('llmModel') or '').strip() or None
+    if (not llm_provider) and llm_key in ('1', '2', '4', '5'):
+        if llm_key == '2':
+            llm_provider = 'google'
+            llm_model = llm_model or 'gemma-3-27b-it'
+        else:
+            llm_provider = 'mistral'
+            llm_model = llm_model or 'mistral-large-2512'
     debug_mode = bool(data.get('debug', False))
     run_interpolation = bool(data.get('runInterpolation', False))
     run_pointwise = bool(data.get('runPointwise', False))
@@ -3095,7 +3120,7 @@ def run_batch_v2():
     thread = threading.Thread(
         target=run_batch_task_v2,
                 args=(task_id, images, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
-                            left_x, right_x, bottom_y, top_y, llm_provider, llm_model),
+                            left_x, right_x, bottom_y, top_y, llm_provider, llm_model, llm_key),
     )
     thread.daemon = True
     thread.start()
@@ -3155,7 +3180,7 @@ def cancel_task_v1(task_id):
 
 
 def run_batch_task_v2(task_id, images, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
-                      left_x, right_x, bottom_y, top_y, llm_provider=None, llm_model=None):
+                      left_x, right_x, bottom_y, top_y, llm_provider=None, llm_model=None, llm_key=None):
     """Background batch runner.
 
     This orchestrates multiple single-image v2 tasks sequentially on the server,
@@ -3232,6 +3257,7 @@ def run_batch_task_v2(task_id, images, prompt_name, article_info, debug_mode, ru
                 top_y,
                 llm_provider,
                 llm_model,
+                llm_key,
             )
             with extraction_tasks_lock:
                 child = extraction_tasks.get(child_task_id, {})
@@ -3421,7 +3447,7 @@ def get_extraction_console(image_name, prompt_name):
 
 
 def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run_pointwise,
-                        left_x, right_x, bottom_y, top_y, llm_model=None):
+                        left_x, right_x, bottom_y, top_y, llm_model=None, persist_result: bool = True):
     """Background task that runs the extraction pipeline."""
     import re
     
@@ -3755,11 +3781,13 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
         except Exception as e:
             print(f"Batch registry update failed (batch {batch_number}): {e}")
     
-    # Save to file for persistence
-    save_extraction_state(final_result)
+    # Save to file for persistence (optional)
+    if persist_result:
+        save_extraction_state(final_result)
 
 def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
-                           left_x, right_x, bottom_y, top_y, llm_provider=None, llm_model=None):
+                           left_x, right_x, bottom_y, top_y, llm_provider=None, llm_model=None, llm_key=None,
+                           persist_result: bool = True):
     """Background task for PlotExtractV2 pipeline."""
     import re
 
@@ -3807,10 +3835,13 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug
         if debug_mode:
             env_overrides['PLOTEXTRACT_DEBUG'] = '1'
         provider_norm = (str(llm_provider) if llm_provider is not None else '').strip().lower()
+        key_norm = (str(llm_key) if llm_key is not None else '').strip()
         if llm_provider:
             env_overrides['PLOTEXTRACT_LLM_PROVIDER'] = str(llm_provider)
-        # Record which API key slot is being used (requested: key1/key2)
-        if provider_norm == 'google':
+        # Record which API key slot is being used (supports key5 for Mistral free plan).
+        if key_norm in ('1', '2', '4', '5'):
+            env_overrides['PLOTEXTRACT_LLM_KEY'] = key_norm
+        elif provider_norm == 'google':
             env_overrides['PLOTEXTRACT_LLM_KEY'] = '2'
         elif provider_norm == 'mistral':
             env_overrides['PLOTEXTRACT_LLM_KEY'] = '4'
@@ -3885,7 +3916,9 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug
         name_for_folder = image_name.replace('.', '_')
         # If we know which key/provider was selected, include it in the folder suffix.
         key_suffix = ''
-        if provider_norm == 'google':
+        if key_norm in ('1', '2', '4', '5'):
+            key_suffix = f'.key{key_norm}'
+        elif provider_norm == 'google':
             key_suffix = '.key2'
         elif provider_norm == 'mistral':
             key_suffix = '.key4'
@@ -4066,7 +4099,8 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug
             extraction_tasks[task_id]['status'] = 'completed'
             extraction_tasks[task_id]['result'] = final_result
 
-    save_extraction_state(final_result)
+    if persist_result:
+        save_extraction_state(final_result)
 
 @app.route('/task_status/<task_id>')
 def task_status(task_id):

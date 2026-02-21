@@ -1,0 +1,87 @@
+import os
+import matplotlib.pyplot as plt
+import numpy as np
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\Plot_Extract\plots\first_examples/A/A-1\A-1_png.pv2_prompt_14.v2.key5.web\A-1_png-replot.pv2_prompt_14.v2.key5.web.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data points extracted from re_extraction results and original data
+curve_data = {
+    "Blank": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+        "y": [6.0, 8.0, 9.0, 9.5, 9.8, 10.0, 10.2, 10.5, 10.8, 11.0]
+    },
+    "COL 0.125ug/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+        "y": [6.0, 7.0, 8.5, 9.0, 9.5, 9.8, 10.0, 10.2, 10.3, 10.3]
+    },
+    "MINO 1ug/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+        "y": [6.0, 7.5, 8.0, 8.2, 8.5, 8.7, 9.0, 9.2, 9.3, 9.4]
+    },
+    "MEM 4ug/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+        "y": [6.0, 0.5, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    },
+    "RFP 0.06ug/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+        "y": [6.0, 5.0, 3.0, 2.0, 1.5, 1.0, 0.5, 0.0, 0.0, 0.0]
+    },
+    "COL 0.125ug/mL + MEM 4ug/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+        "y": [6.0, 2.0, 0.5, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    },
+    "COL 0.125ug/mL + MINO 1ug/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+        "y": [6.0, 3.0, 3.0, 1.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0]
+    },
+    "COL 0.125ug/mL + RFP 0.06ug/mL": {
+        "x": [0, 2, 4, 6, 8, 10, 12, 22, 24, 26],
+        "y": [6.0, 4.0, 2.5, 2.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    }
+}
+
+# Curve styles from the facts
+curve_styles = {
+    "Blank": {"color": "black", "linestyle": ":", "marker": "x", "label": "Blank"},
+    "COL 0.125ug/mL": {"color": "black", "linestyle": "-", "marker": "s", "label": "COL 0.125μg/mL"},
+    "MINO 1ug/mL": {"color": "black", "linestyle": "--", "marker": "^", "label": "MINO 1μg/mL"},
+    "MEM 4ug/mL": {"color": "black", "linestyle": ":", "marker": "o", "label": "MEM 4μg/mL"},
+    "RFP 0.06ug/mL": {"color": "black", "linestyle": "--", "marker": "v", "label": "RFP 0.06μg/mL"},
+    "COL 0.125ug/mL + MEM 4ug/mL": {"color": "black", "linestyle": ":", "marker": "o", "markerfacecolor": "none", "label": "COL 0.125μg/mL + MEM 4μg/mL"},
+    "COL 0.125ug/mL + MINO 1ug/mL": {"color": "black", "linestyle": "--", "marker": "^", "markerfacecolor": "none", "label": "COL 0.125μg/mL + MINO 1μg/mL"},
+    "COL 0.125ug/mL + RFP 0.06ug/mL": {"color": "black", "linestyle": "-.", "marker": "v", "markerfacecolor": "none", "label": "COL 0.125μg/mL + RFP 0.06μg/mL"}
+}
+
+# Create the plot
+plt.figure(figsize=(8, 6))
+
+# Plot each curve with its specific style
+for curve_name, data in curve_data.items():
+    style = curve_styles[curve_name]
+    plt.plot(data["x"], data["y"],
+             color=style["color"],
+             linestyle=style["linestyle"],
+             marker=style["marker"],
+             markerfacecolor=style.get("markerfacecolor", "black"),
+             label=style["label"])
+
+# Set axis labels and limits
+plt.xlabel("Time (h)")
+plt.ylabel("Log cfu/mL")
+plt.xlim(0, 26)
+plt.ylim(0, 16)
+
+# Set ticks
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 22, 24, 26])
+plt.yticks([0, 2, 4, 6, 8, 10, 12, 14, 16])
+
+# Add grid
+plt.grid(True, which='both', linestyle=':', linewidth=0.5)
+
+# Add legend
+plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)
+plt.close()

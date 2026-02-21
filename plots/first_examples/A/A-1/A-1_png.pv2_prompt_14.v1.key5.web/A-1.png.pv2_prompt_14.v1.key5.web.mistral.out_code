@@ -1,0 +1,111 @@
+import os
+import matplotlib.pyplot as plt
+import numpy as np
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\Plot_Extract\plots\first_examples/A/A-1\A-1_png.pv2_prompt_14.v1.key5.web\A-1_png-replot.pv2_prompt_14.v1.key5.web.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data points extracted from the plot
+marker_facts = {
+    "curves": [
+        {
+            "curve_label": "Blank",
+            "points": [
+                (0, 6.0), (2, 9.0), (4, 9.5), (6, 9.8), (8, 10.0),
+                (10, 10.1), (12, 10.2), (22, 10.3), (24, 10.2), (26, 10.3)
+            ]
+        },
+        {
+            "curve_label": "COL 0.125ug/mL",
+            "points": [
+                (0, 6.0), (2, 7.0), (4, 8.0), (6, 8.5), (8, 9.0),
+                (10, 9.5), (12, 9.8), (22, 10.0), (24, 10.1), (26, 10.2)
+            ]
+        },
+        {
+            "curve_label": "MINO 1ug/mL",
+            "points": [
+                (0, 6.0), (2, 7.5), (4, 8.2), (6, 8.5), (8, 8.7),
+                (10, 8.8), (12, 9.0), (22, 9.2), (24, 9.1), (26, 9.3)
+            ]
+        },
+        {
+            "curve_label": "MEM 4ug/mL",
+            "points": [
+                (0, 6.0), (2, 0.5), (4, 0.0), (6, 0.0), (8, 0.0),
+                (10, 0.0), (12, 0.0), (22, 0.0), (24, 0.0), (26, 0.0)
+            ]
+        },
+        {
+            "curve_label": "RFP 0.06ug/mL",
+            "points": [
+                (0, 6.0), (2, 2.0), (4, 1.0), (6, 0.5), (8, 0.0),
+                (10, 0.0), (12, 0.0), (22, 1.0), (24, 1.5), (26, 2.0)
+            ]
+        },
+        {
+            "curve_label": "COL 0.125ug/mL + MEM 4ug/mL",
+            "points": [
+                (0, 6.0), (2, 0.0), (4, 0.0), (6, 0.0), (8, 0.0),
+                (10, 0.0), (12, 0.0), (22, 0.0), (24, 0.0), (26, 0.0)
+            ]
+        },
+        {
+            "curve_label": "COL 0.125ug/mL + MINO 1ug/mL",
+            "points": [
+                (0, 6.0), (2, 1.0), (4, 0.5), (6, 0.0), (8, 0.0),
+                (10, 0.0), (12, 0.0), (22, 0.0), (24, 0.0), (26, 0.0)
+            ]
+        },
+        {
+            "curve_label": "COL 0.125ug/mL + RFP 0.06ug/mL",
+            "points": [
+                (0, 6.0), (2, 0.0), (4, 0.0), (6, 0.0), (8, 0.0),
+                (10, 0.0), (12, 0.0), (22, 0.0), (24, 0.0), (26, 0.0)
+            ]
+        }
+    ]
+}
+
+# Create the plot
+plt.figure(figsize=(8, 6))
+
+# Plot each curve with its specific style
+for curve in marker_facts["curves"]:
+    x_vals, y_vals = zip(*curve["points"])
+    if curve["curve_label"] == "Blank":
+        plt.plot(x_vals, y_vals, color='black', linestyle=':', marker='x', label=curve["curve_label"])
+    elif curve["curve_label"] == "COL 0.125ug/mL":
+        plt.plot(x_vals, y_vals, color='black', linestyle='-', marker='s', label=curve["curve_label"])
+    elif curve["curve_label"] == "MINO 1ug/mL":
+        plt.plot(x_vals, y_vals, color='black', linestyle='--', marker='^', label=curve["curve_label"])
+    elif curve["curve_label"] == "MEM 4ug/mL":
+        plt.plot(x_vals, y_vals, color='black', linestyle='-.', marker='o', label=curve["curve_label"])
+    elif curve["curve_label"] == "RFP 0.06ug/mL":
+        plt.plot(x_vals, y_vals, color='black', linestyle=(0, (3, 5, 1, 5, 1, 5)), marker='v', label=curve["curve_label"])
+    elif curve["curve_label"] == "COL 0.125ug/mL + MEM 4ug/mL":
+        plt.plot(x_vals, y_vals, color='black', linestyle=':', marker='o', label=curve["curve_label"])
+    elif curve["curve_label"] == "COL 0.125ug/mL + MINO 1ug/mL":
+        plt.plot(x_vals, y_vals, color='black', linestyle='--', marker='^', fillstyle='none', label=curve["curve_label"])
+    elif curve["curve_label"] == "COL 0.125ug/mL + RFP 0.06ug/mL":
+        plt.plot(x_vals, y_vals, color='black', linestyle=(0, (3, 5, 1, 5, 1, 5)), marker='v', fillstyle='none', label=curve["curve_label"])
+
+# Set axis labels and limits
+plt.xlabel('Time (h)')
+plt.ylabel('Log cfu/mL')
+plt.xlim(0, 26)
+plt.ylim(0, 16)
+
+# Set ticks
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 22, 24, 26])
+plt.yticks([0, 2, 4, 6, 8, 10, 12, 14, 16])
+
+# Add grid
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+
+# Add legend
+plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)
+plt.close()

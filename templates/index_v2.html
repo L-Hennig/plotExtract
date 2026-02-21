@@ -834,11 +834,12 @@
                         <select id="llmKey" onchange="onLlmKeyChange()">
                             <option value="1">Key 1 (API_KEY_1 — Mistral)</option>
                             <option value="4">Key 4 (Mistral — default)</option>
+                            <option value="5">Key 5 (Mistral — free plan)</option>
                             <option value="2">Key 2 (API_KEY_2 — Google / Gemma)</option>
                         </select>
                     </div>
                     <small style="display: block; margin-top: 4px; color: #666;">
-                        Key 2 defaults to Gemma 3 27B Vision. Google mode requires <code>google-generativeai</code>.
+                        Key 1/4/5 use Mistral (default model: <code>mistral-large-2512</code>). Key 2 defaults to Gemma 3 27B Vision.
                     </small>
                 </div>
             </div>
@@ -1090,11 +1091,12 @@
 
             if (key === '2') {
                 // Key 2 => Google/Gemma, default model (overrideable server-side via env vars).
-                return { llm_provider: 'google', llm_model: 'gemma-3-27b-it' };
+                return { llm_provider: 'google', llm_model: 'gemma-3-27b-it', llm_key: '2', llmKey: '2' };
             }
 
-            // Key 1/4 => Mistral
-            return { llm_provider: 'mistral', llm_model: 'mistral-large-2512' };
+            // Key 1/4/5 => Mistral
+            const mistralKey = (key === '1' || key === '4' || key === '5') ? key : '4';
+            return { llm_provider: 'mistral', llm_model: 'mistral-large-2512', llm_key: mistralKey, llmKey: mistralKey };
         }
         
         function onImageSelect() {

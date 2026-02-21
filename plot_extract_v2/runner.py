@@ -1074,6 +1074,27 @@ def _csv_has_usable_curve_points(csv_text: str, min_points_per_curve: int = 2) -
         return False
 
 
+def _extract_usable_csv_from_stage_text(stage_text: str) -> str:
+    """Extract and normalize CSV from stage text, returning empty string when unusable."""
+    candidate = normalize_csv_to_wide(extract_csv_from_text(stage_text or "") or "")
+    if _csv_has_usable_curve_points(candidate):
+        return candidate
+    return ""
+
+
+def _find_best_prior_csv(stage_context: dict, stage_order: list[str], current_stage_index: int) -> tuple[str, str | None]:
+    """Find the nearest prior stage that contains usable curve CSV."""
+    for idx in range(int(current_stage_index) - 1, -1, -1):
+        stage_name = stage_order[idx]
+        stage_text = stage_context.get(stage_name, "")
+        if not stage_text:
+            continue
+        candidate = _extract_usable_csv_from_stage_text(stage_text)
+        if candidate:
+            return candidate, stage_name
+    return "", None
+
+
 def _suffix_from_tags(*tags: str | None) -> str:
     parts: list[str] = []
     for t in tags:
@@ -1484,12 +1505,14 @@ for stage_index, stage_name in enumerate(EXTRACT_STAGES):
 
     if "{csv_text}" in prompt_payload or "{csv_diagnostics_json}" in prompt_payload:
         # Prefer the preserved CSV from the marker_facts-emitting stage
-        candidate_csv = stage_context.get("_saved_csv", "")
+        candidate_csv = normalize_csv_to_wide(stage_context.get("_saved_csv", "") or "")
+        if candidate_csv and not _csv_has_usable_curve_points(candidate_csv):
+            candidate_csv = ""
         if not candidate_csv:
-            # fallback: attempt to extract from immediate previous stage output
-            prev_stage = EXTRACT_STAGES[stage_index - 1] if stage_index > 0 else None
-            if prev_stage and prev_stage in stage_context:
-                candidate_csv = extract_csv_from_text(stage_context.get(prev_stage, ""))
+            # fallback: search backwards for nearest stage with usable CSV
+            candidate_csv, candidate_stage = _find_best_prior_csv(stage_context, EXTRACT_STAGES, stage_index)
+            if candidate_csv and candidate_stage:
+                print(f"[CSV CONTEXT] Using prior stage CSV from {candidate_stage}")
 
         candidate_csv = normalize_csv_to_wide(candidate_csv or "")
         csv_text_for_stage = candidate_csv
@@ -1693,14 +1716,17 @@ for stage_index, stage_name in enumerate(EXTRACT_STAGES):
                 import traceback
                 traceback.print_exc()
             
-            if csv_data and csv_data != "None" and not csv_data.startswith("Here is the"):
+            normalized_csv_data = normalize_csv_to_wide(csv_data or "")
+            if normalized_csv_data and _csv_has_usable_curve_points(normalized_csv_data):
                 # Store in a module-level variable for reuse if Stage 5 fails
-                stage_context["_saved_csv"] = csv_data
+                stage_context["_saved_csv"] = normalized_csv_data
                 stage_context["_saved_csv_stage"] = stage_name
                 csv_backup_path = output_out + f"_data_{stage_name.lower()}"
                 with open(csv_backup_path, "w", encoding="utf-8") as f:
-                    f.write(csv_data)
+                    f.write(normalized_csv_data)
                 print(f"CSV data successfully saved from {stage_name}")
+            elif csv_data:
+                print(f"[CSV REJECTED] Extracted CSV from {stage_name} was not usable; ignoring it.")
         except Exception as e:
             print(f"Warning: Could not save CSV from {stage_name}: {e}")
     
@@ -1796,6 +1822,16 @@ else:
 
 # Normalize CSV to wide format if it came back in long format
 data = normalize_csv_to_wide(data)
+
+# If selected CSV is unusable, try deterministic rebuild from accumulated marker_facts
+if data and not _csv_has_usable_curve_points(data):
+    rebuilt_data = rebuild_csv_from_json_curves(accumulated_facts)
+    if rebuilt_data and _csv_has_usable_curve_points(rebuilt_data):
+        print("Recovered CSV by rebuilding from accumulated marker_facts curves")
+        data = rebuilt_data
+    else:
+        print("Warning: Selected CSV content is not usable curve data")
+        data = ""
 
 # If still no valid CSV, try to recover from earlier stages
 if not data or data.startswith("Here is the") or data == "accumulated_facts":

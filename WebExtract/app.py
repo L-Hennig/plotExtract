@@ -3096,6 +3096,7 @@ def run_all():
 
     # Optional: rate-limit backoff mode (slower, disables server-side extraction timeout)
     rate_limit_backoff = bool(data.get('rate_limit_backoff') or data.get('rateLimitBackoff') or False)
+    persist_result = bool(data.get('persist_result', True))
 
     # Optional: batch metadata (for persistent batch results page)
     batch_number = data.get('batch_number')
@@ -3116,6 +3117,7 @@ def run_all():
             ,
             'llm_model': llm_model,
             'rate_limit_backoff': rate_limit_backoff,
+            'persist_result': persist_result,
             'cancel_requested': False,
             'active_pid': None,
         }
@@ -3124,7 +3126,7 @@ def run_all():
     thread = threading.Thread(
         target=run_extraction_task,
         args=(task_id, image_path, prompt_file, run_interpolation, run_pointwise, 
-              left_x, right_x, bottom_y, top_y, llm_model, rate_limit_backoff)
+              left_x, right_x, bottom_y, top_y, llm_model, rate_limit_backoff, persist_result)
     )
     thread.daemon = True
     thread.start()
@@ -3145,7 +3147,7 @@ def run_all_v2():
         llm_key = '4'
     llm_provider = (data.get('llm_provider') or data.get('llmProvider') or '').strip() or None
     llm_model = (data.get('llm_model') or data.get('llmModel') or '').strip() or None
-    if (not llm_provider) and llm_key in ('1', '2', '4'):
+    if (not llm_provider) and llm_key in ('1', '2', '4', '5'):
         if llm_key == '2':
             llm_provider = 'google'
             llm_model = llm_model or 'gemma-3-27b-it'
@@ -3154,6 +3156,12 @@ def run_all_v2():
             llm_model = llm_model or 'mistral-large-2512'
     debug_mode = bool(data.get('debug', False))
     rate_limit_backoff = bool(data.get('rate_limit_backoff') or data.get('rateLimitBackoff') or False)
+    persist_result = bool(data.get('persist_result', True))
+    # Regular (normal) mode sends persist_result=False. Force Key5 there.
+    if not persist_result:
+        llm_key = '5'
+        llm_provider = 'mistral'
+        llm_model = llm_model or 'mistral-large-2512'
     run_interpolation = data.get('runInterpolation', False)
     run_pointwise = data.get('runPointwise', False)
     left_x = str(data.get('leftX', 0))
@@ -3172,7 +3180,9 @@ def run_all_v2():
             'prompt_name': prompt_name,
             'pipeline': 'v2',
             'debug': debug_mode,
+            'llm_key': llm_key,
             'rate_limit_backoff': rate_limit_backoff,
+            'persist_result': persist_result,
             'cancel_requested': False,
             'active_pid': None,
         }
@@ -3180,7 +3190,7 @@ def run_all_v2():
     thread = threading.Thread(
         target=run_extraction_task_v2,
           args=(task_id, image_path, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
-                            left_x, right_x, bottom_y, top_y, llm_provider, llm_model, rate_limit_backoff)
+                                                        left_x, right_x, bottom_y, top_y, llm_provider, llm_model, llm_key, rate_limit_backoff, persist_result)
     )
     thread.daemon = True
     thread.start()
@@ -3284,7 +3294,7 @@ def run_batch_v2():
         llm_key = '4'
     llm_provider = (data.get('llm_provider') or data.get('llmProvider') or '').strip() or None
     llm_model = (data.get('llm_model') or data.get('llmModel') or '').strip() or None
-    if (not llm_provider) and llm_key in ('1', '2', '4'):
+    if (not llm_provider) and llm_key in ('1', '2', '4', '5'):
         if llm_key == '2':
             llm_provider = 'google'
             llm_model = llm_model or 'gemma-3-27b-it'
@@ -3355,7 +3365,7 @@ def run_batch_v2():
     thread = threading.Thread(
         target=run_batch_task_v2,
         args=(task_id, images, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
-              left_x, right_x, bottom_y, top_y, llm_provider, llm_model),
+              left_x, right_x, bottom_y, top_y, llm_provider, llm_model, llm_key),
     )
     thread.daemon = True
     thread.start()
@@ -3415,7 +3425,7 @@ def cancel_task_v1(task_id):
 
 
 def run_batch_task_v2(task_id, images, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
-                      left_x, right_x, bottom_y, top_y, llm_provider=None, llm_model=None):
+                      left_x, right_x, bottom_y, top_y, llm_provider=None, llm_model=None, llm_key=None):
     """Background batch runner.
 
     This orchestrates multiple single-image v2 tasks sequentially on the server,
@@ -3492,6 +3502,7 @@ def run_batch_task_v2(task_id, images, prompt_name, article_info, debug_mode, ru
                 top_y,
                 llm_provider,
                 llm_model,
+                llm_key,
             )
             with extraction_tasks_lock:
                 child = extraction_tasks.get(child_task_id, {})
@@ -3681,7 +3692,8 @@ def get_extraction_console(image_name, prompt_name):
 
 
 def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run_pointwise,
-                        left_x, right_x, bottom_y, top_y, llm_model=None, rate_limit_backoff: bool = False):
+                        left_x, right_x, bottom_y, top_y, llm_model=None, rate_limit_backoff: bool = False,
+                        persist_result: bool = True):
     """Background task that runs the extraction pipeline."""
     import re
     
@@ -4022,11 +4034,13 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
         except Exception as e:
             print(f"Batch registry update failed (batch {batch_number}): {e}")
     
-    # Save to file for persistence
-    save_extraction_state(final_result)
+    # Save to file for persistence (optional)
+    if persist_result:
+        save_extraction_state(final_result)
 
 def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
-                           left_x, right_x, bottom_y, top_y, llm_provider=None, llm_model=None, rate_limit_backoff: bool = False):
+                           left_x, right_x, bottom_y, top_y, llm_provider=None, llm_model=None,
+                           llm_key=None, rate_limit_backoff: bool = False, persist_result: bool = True):
     """Background task for PlotExtractV2 pipeline."""
     import re
 
@@ -4082,10 +4096,13 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug
             # Disable per-request timeout in the Mistral client (0 => no timeout)
             env_overrides.setdefault('PLOTEXTRACT_MISTRAL_TIMEOUT_MS', '0')
         provider_norm = (str(llm_provider) if llm_provider is not None else '').strip().lower()
+        key_norm = (str(llm_key) if llm_key is not None else '').strip()
         if llm_provider:
             env_overrides['PLOTEXTRACT_LLM_PROVIDER'] = str(llm_provider)
-        # Record which API key slot is being used (requested: key1/key2)
-        if provider_norm == 'google':
+        # Record which API key slot is being used.
+        if key_norm in ('1', '2', '4', '5'):
+            env_overrides['PLOTEXTRACT_LLM_KEY'] = key_norm
+        elif provider_norm == 'google':
             env_overrides['PLOTEXTRACT_LLM_KEY'] = '2'
         elif provider_norm == 'mistral':
             env_overrides['PLOTEXTRACT_LLM_KEY'] = '4'
@@ -4337,7 +4354,8 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug
             extraction_tasks[task_id]['status'] = 'completed'
             extraction_tasks[task_id]['result'] = final_result
 
-    save_extraction_state(final_result)
+    if persist_result:
+        save_extraction_state(final_result)
 
 @app.route('/task_status/<task_id>')
 def task_status(task_id):

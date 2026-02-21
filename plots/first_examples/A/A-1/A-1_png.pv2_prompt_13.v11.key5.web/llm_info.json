@@ -1,0 +1,6 @@
+{
+  "llm_provider": "mistral",
+  "llm_model": "mistral-large-2512",
+  "llm_key": "key5",
+  "llm_key_index": "5"
+}

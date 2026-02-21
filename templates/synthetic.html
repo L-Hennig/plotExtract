@@ -637,8 +637,8 @@
                 </div>
             </div>
             
-            <!-- Axis Break -->
-            <div class="section">
+            <!-- Axis Break (temporarily hidden) -->
+            <div class="section" style="display: none;">
                 <h3>Axis Break</h3>
                 <div class="checkbox-row">
                     <input type="checkbox" id="axisBreakEnabled" onchange="toggleAxisBreak()">
@@ -847,10 +847,10 @@
             document.getElementById('xTickMode').value = settings.x_tick_mode || 'custom';
             document.getElementById('xTickInterval').value = settings.x_tick_interval || 2;
             
-            // Axis break settings
-            document.getElementById('axisBreakEnabled').checked = settings.axis_break_enabled || false;
-            document.getElementById('axisBreakStart').value = settings.axis_break_start || '';
-            document.getElementById('axisBreakEnd').value = settings.axis_break_end || '';
+            // Axis break is temporarily hidden/disabled in UI
+            document.getElementById('axisBreakEnabled').checked = false;
+            document.getElementById('axisBreakStart').value = '';
+            document.getElementById('axisBreakEnd').value = '';
             
             document.getElementById('plotTitle').value = settings.title || '';
             // Convert stored inches to pixels for display (settings store inches, UI shows pixels)
@@ -897,10 +897,10 @@
                 x_tick_mode: document.getElementById('xTickMode').value,
                 x_tick_interval: parseFloat(document.getElementById('xTickInterval').value) || 0,
                 
-                axis_break_enabled: document.getElementById('axisBreakEnabled').checked,
+                axis_break_enabled: false,
                 axis_break_type: 'x',
-                axis_break_start: document.getElementById('axisBreakStart').value,
-                axis_break_end: document.getElementById('axisBreakEnd').value,
+                axis_break_start: '',
+                axis_break_end: '',
                 
                 title: document.getElementById('plotTitle').value,
                 figure_width: parseFloat(document.getElementById('figWidth').value) / 150,  // Convert pixels to inches

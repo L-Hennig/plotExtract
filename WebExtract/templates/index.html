@@ -107,9 +107,11 @@
           </div>
 
           <div id="articleInfoWrap" style="display:none; margin-top: 12px;">
-            <label class="label" for="articleInfo">Additional information (EX 2)</label>
-            <textarea id="articleInfo" class="textarea" rows="6" placeholder="Optional: paste figure caption/legend or short experimental context. This can improve extraction for some prompts."></textarea>
-            <div class="muted" style="margin-top: 6px;">Shown only for EX 2 prompts.</div>
+            <details id="articleInfoDetails">
+              <summary style="cursor: pointer; font-size: 13px; color: var(--muted); font-weight: 600; margin-bottom: 8px;">Additional information (EX 2)</summary>
+              <textarea id="articleInfo" class="textarea" rows="6" placeholder="Optional: paste figure caption/legend or short experimental context. This can improve extraction for some prompts."></textarea>
+              <div class="muted" style="margin-top: 6px;">Shown only for EX 2 prompts.</div>
+            </details>
           </div>
         </div>
 
@@ -133,6 +135,7 @@
             <div class="row">
               <select id="llmProvider" class="select" aria-label="LLM provider">
                 <option value="mistral">Key4 — Mistral</option>
+                <option value="mistral_free">Key5 (Free plan) — Mistral</option>
                 <option value="google">Key2 — Google</option>
               </select>
               <select id="llmModel" class="select" aria-label="LLM model"></select>
@@ -164,6 +167,23 @@
 
           <div id="resultWrap" style="display:none; margin-top: 14px;">
             <h3 class="h3">Result</h3>
+            <details id="resultInstructions" class="notice" style="margin-bottom: 10px;" open>
+              <summary style="font-weight: 700; margin-bottom: 6px; cursor: pointer;">How to use Results</summary>
+              <div style="font-size: 13px; color: var(--muted); margin: 6px 0;">
+                Use this section to review extraction outputs, compare overlays, select preferred curves, and proceed to Adjust.
+              </div>
+              <div style="font-size: 13px; line-height: 1.45;">
+                <div><strong>Suggested steps:</strong></div>
+                <ol style="margin: 6px 0 8px 18px; padding: 0;">
+                  <li>Check <strong>Result summary</strong> and any warning message first.</li>
+                  <li>Review <strong>Images</strong> (original, replot, comparisons) and visually verify alignment/quality.</li>
+                  <li>In <strong>Overlay adjust</strong>, use <strong>Min/Max</strong> or <strong>Full</strong> axes mode, then refine with <strong>Drag handles</strong> and optional <strong>Red axes</strong> (helps highlight where the overlay axes are).</li>
+                  <li>In <strong>Curves</strong>, use <strong>Select all</strong>/<strong>Clear all</strong> and choose the trials/curves you want to keep.</li>
+                  <li>If multiple runs are selected for the same curve, the selected runs for that curve are automatically averaged.</li>
+                  <li>Click <strong>Save selected and continue down</strong> to open the Adjust section for point-level edits.</li>
+                </ol>
+              </div>
+            </details>
             <div id="resultSummary" class="notice"></div>
             <div id="resultWarning" class="notice notice--warn" style="display:none"></div>
 
@@ -210,18 +230,25 @@
                     </label>
                     <span id="resultsOverlayGuideAxesState" class="muted">Off</span>
                   </div>
+                  <div class="row adjustMovementRow" style="margin-top: 6px; align-items: center; display: none;">
+                    <label class="toggle" for="btnResultsOverlayXBreak">
+                      <input id="btnResultsOverlayXBreak" class="toggle__input" type="checkbox" />
+                      <span class="toggle__track"><span class="toggle__thumb"></span></span>
+                      <span class="toggle__label">X-axis break overlay</span>
+                    </label>
+                    <span id="resultsOverlayXBreakState" class="muted">Off</span>
+                  </div>
+                  <div class="row adjustMovementRow" style="margin-top: 6px; align-items: center; display: none;">
+                    <input id="inputResultsOverlayBreakStart" class="select" type="number" step="any" placeholder="break start x" aria-label="Overlay break start" />
+                    <input id="inputResultsOverlayBreakEnd" class="select" type="number" step="any" placeholder="break end x" aria-label="Overlay break end" />
+                    <button id="btnApplyResultsOverlayBreak" class="btn" type="button">Apply</button>
+                    <button id="btnClearResultsOverlayBreak" class="btn" type="button">Clear</button>
+                  </div>
                 </div>
 
                 <div id="curvesTableWrap" class="tableWrap" style="display:none;"></div>
 
                 <div id="trialsGridWrap" class="tableWrap" style="display:none;"></div>
-
-                <div id="trialExportControls" class="row" style="display:none; margin: 10px 0 10px;">
-                  <span id="trialDownloadTooltipWrap" style="display:inline-flex; position: relative;" title="" data-tooltip="">
-                    <button id="btnDownloadTrialsCsv" class="btn btn-primary" type="button" disabled>Download CSV (selected / averaged)</button>
-                    <span id="trialDownloadTooltip" style="display:none; position:absolute; left:0; top:calc(100% + 6px); z-index:20; max-width:360px; padding:6px 8px; border-radius:8px; font-size:12px; line-height:1.35; background:#111827; color:#fff; box-shadow:0 2px 10px rgba(0,0,0,0.25); white-space:normal;"></span>
-                  </span>
-                </div>
 
                 <div class="divider" style="margin: 12px 0;">downloads</div>
                 <div class="row">
@@ -249,6 +276,27 @@
 
     <section id="adjustSection" class="card" style="display:none; margin-top: 14px;">
       <h2 class="h2">Adjust</h2>
+      <details id="adjustInstructions" class="notice" style="margin-bottom: 10px;" open>
+        <summary style="font-weight: 700; margin-bottom: 6px; cursor: pointer;">How to use Adjust</summary>
+        <div style="font-size: 13px; color: var(--muted); margin: 6px 0;">
+          Use this section to fine-tune extracted curves on top of the original image, then save the corrected result.
+        </div>
+        <div style="font-size: 13px; line-height: 1.45;">
+          <div><strong>Suggested steps:</strong></div>
+          <ol style="margin: 6px 0 8px 18px; padding: 0;">
+            <li>Review <strong>Image + overlay</strong> and align the overlay if needed.</li>
+            <li>Use <strong>Overlay movement</strong> (On/Off) to move/resize the red overlay box by dragging edges or center.</li>
+            <li>Set <strong>Overlay movement</strong> to <strong>Off</strong> to edit points. Then use <strong>right-click</strong> to select a point and <strong>left-click</strong> to move it.</li>
+            <li>Toggle <strong>Lock X values</strong> to keep X fixed while adjusting Y (or unlock for free X edits).</li>
+            <li>Use <strong>Delete points</strong> to remove incorrect points and <strong>Add points</strong> to insert new ones (choose target curve first).</li>
+            <li>Use <strong>Visible curves</strong> (All/None + per-curve checkboxes) to focus on specific curves.</li>
+            <li>Use <strong>Undo</strong>/<strong>Redo</strong> while iterating, then click <strong>Save adjustment</strong>.</li>
+            <li>Optionally use <strong>Save history</strong> to review/download saved versions.</li>
+            <li>To download a specific version, click the save entry you want in <strong>Save history</strong>, then click <strong>Download current selected save</strong>.</li>
+          </ol>
+          <div style="margin-top: 6px;"><strong>Note:</strong> <strong>Manual point selection</strong> is also available if you prefer choosing curve/point and editing X/Y directly.</div>
+        </div>
+      </details>
       <div id="adjustEmpty" class="muted">Click “Save selected and continue down” in Results to start adjusting points.</div>
 
       <div id="adjustMain" class="adjustLayout" style="display:none;">
@@ -280,6 +328,16 @@
 
             <label class="label" for="adjustYInput" style="margin-top: 10px;">Y value</label>
             <input id="adjustYInput" class="adjustInput" type="number" step="any" />
+          </div>
+
+          <div class="row adjustMovementRow" style="margin-top: 10px; align-items: center;">
+            <label class="toggle" for="btnAdjustOverlayMovement">
+              <input id="btnAdjustOverlayMovement" class="toggle__input" type="checkbox" checked />
+              <span class="toggle__track"><span class="toggle__thumb"></span></span>
+              <span class="toggle__label">Overlay movement</span>
+            </label>
+            <span id="adjustOverlayMovementState" class="muted">On</span>
+            <span id="adjustOverlayMovementTip" class="muted" title="Unlock overlay movement, then drag edges of the red dashed box to resize (opposite edge stays fixed) or drag the center dot to move the whole overlay. Lock again to prevent accidental movement.">ⓘ How to use</span>
           </div>
 
           <div class="row" style="margin-top: 10px; align-items: center;">
@@ -324,16 +382,6 @@
             <button id="btnAdjustUndo" class="btn" type="button" title="Undo latest adjust action">Undo</button>
             <button id="btnAdjustRedo" class="btn" type="button" title="Redo latest undone adjust action">Redo</button>
             <button id="btnSaveAdjustment" class="btn btn-primary" type="button">Save adjustment</button>
-          </div>
-
-          <div class="row adjustMovementRow" style="margin-top: 10px; align-items: center;">
-            <label class="toggle" for="btnAdjustOverlayMovement">
-              <input id="btnAdjustOverlayMovement" class="toggle__input" type="checkbox" checked />
-              <span class="toggle__track"><span class="toggle__thumb"></span></span>
-              <span class="toggle__label">Overlay movement</span>
-            </label>
-            <span id="adjustOverlayMovementState" class="muted">On</span>
-            <span id="adjustOverlayMovementTip" class="muted" title="Unlock overlay movement, then drag edges of the red dashed box to resize (opposite edge stays fixed) or drag the center dot to move the whole overlay. Lock again to prevent accidental movement.">ⓘ How to use</span>
           </div>
 
           <div id="adjustStatus" class="muted" style="margin-top: 8px;"></div>
@@ -465,6 +513,12 @@
   const resultsOverlayHandlesState = document.getElementById('resultsOverlayHandlesState');
   const btnResultsOverlayGuideAxes = document.getElementById('btnResultsOverlayGuideAxes');
   const resultsOverlayGuideAxesState = document.getElementById('resultsOverlayGuideAxesState');
+  const btnResultsOverlayXBreak = document.getElementById('btnResultsOverlayXBreak');
+  const resultsOverlayXBreakState = document.getElementById('resultsOverlayXBreakState');
+  const inputResultsOverlayBreakStart = document.getElementById('inputResultsOverlayBreakStart');
+  const inputResultsOverlayBreakEnd = document.getElementById('inputResultsOverlayBreakEnd');
+  const btnApplyResultsOverlayBreak = document.getElementById('btnApplyResultsOverlayBreak');
+  const btnClearResultsOverlayBreak = document.getElementById('btnClearResultsOverlayBreak');
 
   let currentImagePath = null; // plots-relative path (e.g., batch_uploads/ui_xxx.png)
   let currentTaskId = null;
@@ -478,6 +532,8 @@
   let accumulatedFacts = null;
   let extractedCsvMeta = null;
   let extractedCsvTextCache = null;
+  const overlayCurveSeriesCache = new Map(); // csv_path -> Map(curve_label -> [{x,y}])
+  const overlayCurveSeriesInflight = new Set(); // csv_path currently loading
   let curveStyles = []; // [{curve_label, colour, line_type, marker_symbol}]
   let curvePolylinesPx = new Map(); // curve_label -> [{x,y} in ORIGINAL image pixels]
   let overlayEnabled = false;
@@ -673,6 +729,14 @@
   function _selectRegularDefaultPrompt() {
     if (!promptSelect) return;
     const opts = Array.from(promptSelect.querySelectorAll('option'));
+    const ex2Prompt14 = opts.find(o => {
+      const v = String(o.value || '').toLowerCase();
+      return v.startsWith('ex2::') && v.includes('prompt_14');
+    });
+    if (ex2Prompt14) {
+      promptSelect.value = ex2Prompt14.value;
+      return;
+    }
     const ex2Prompt13 = opts.find(o => {
       const v = String(o.value || '').toLowerCase();
       return v.startsWith('ex2::') && v.includes('prompt_13');
@@ -687,7 +751,7 @@
 
   function _applyRegularDefaults() {
     _selectRegularDefaultPrompt();
-    if (llmProvider) llmProvider.value = 'mistral';
+    if (llmProvider) llmProvider.value = 'mistral_free';
     _refreshModelOptions('mistral-large-2512');
     if (llmModel) llmModel.value = 'mistral-large-2512';
     if (chkBackoffMode) chkBackoffMode.checked = false;
@@ -759,6 +823,9 @@
   let resultsOverlayDrag = null;
   let resultsOverlayHandlesEnabled = true;
   let resultsOverlayGuideAxesEnabled = false;
+  let resultsOverlayXBreakEnabled = false;
+  let resultsOverlayXBreakStart = null;
+  let resultsOverlayXBreakEnd = null;
   let latestLockedAdjustOverlay = null;
 
   function _syncResultsOverlayHandlesToggleUi() {
@@ -779,6 +846,79 @@
     if (resultsOverlayGuideAxesState) {
       resultsOverlayGuideAxesState.textContent = resultsOverlayGuideAxesEnabled ? 'On' : 'Off';
     }
+  }
+
+  function _getResultsXAxisRange() {
+    let xMin = null;
+    let xMax = null;
+    try {
+      const axisFacts = accumulatedFacts && accumulatedFacts.axis_facts && accumulatedFacts.axis_facts.x_axis;
+      const ticksRaw = axisFacts && axisFacts.ticks_verified;
+      const ticks = Array.isArray(ticksRaw)
+        ? ticksRaw.map(v => _safeNumber(v)).filter(v => Number.isFinite(v))
+        : [];
+      if (ticks.length >= 2) {
+        xMin = Math.min(...ticks);
+        xMax = Math.max(...ticks);
+      }
+      if (!(Number.isFinite(xMin) && Number.isFinite(xMax) && xMax > xMin)) {
+        const lo = _safeNumber(axisFacts && axisFacts.lower_plausible_limit);
+        const hi = _safeNumber(axisFacts && axisFacts.upper_plausible_limit);
+        if (Number.isFinite(lo) && Number.isFinite(hi) && hi > lo) {
+          xMin = lo;
+          xMax = hi;
+        }
+      }
+    } catch (_) {}
+    if (!(Number.isFinite(xMin) && Number.isFinite(xMax) && xMax > xMin)) return null;
+    return { xMin, xMax };
+  }
+
+  function _syncResultsOverlayXBreakUi() {
+    if (btnResultsOverlayXBreak) {
+      btnResultsOverlayXBreak.checked = !!resultsOverlayXBreakEnabled;
+      btnResultsOverlayXBreak.setAttribute('aria-checked', resultsOverlayXBreakEnabled ? 'true' : 'false');
+    }
+    if (resultsOverlayXBreakState) {
+      if (resultsOverlayXBreakEnabled && Number.isFinite(resultsOverlayXBreakStart) && Number.isFinite(resultsOverlayXBreakEnd)) {
+        resultsOverlayXBreakState.textContent = `On (${resultsOverlayXBreakStart}→${resultsOverlayXBreakEnd})`;
+      } else {
+        resultsOverlayXBreakState.textContent = 'Off';
+      }
+    }
+    const disableInputs = !resultsOverlayXBreakEnabled;
+    if (inputResultsOverlayBreakStart) inputResultsOverlayBreakStart.disabled = disableInputs;
+    if (inputResultsOverlayBreakEnd) inputResultsOverlayBreakEnd.disabled = disableInputs;
+    if (btnApplyResultsOverlayBreak) btnApplyResultsOverlayBreak.disabled = disableInputs;
+  }
+
+  function _applyResultsOverlayXBreakFromInputs() {
+    const start = _safeNumber(inputResultsOverlayBreakStart && inputResultsOverlayBreakStart.value);
+    const end = _safeNumber(inputResultsOverlayBreakEnd && inputResultsOverlayBreakEnd.value);
+    const range = _getResultsXAxisRange();
+    if (!(range && Number.isFinite(start) && Number.isFinite(end) && end > start)) {
+      setNotice(uploadStatus, 'Invalid break values. Enter numeric start/end with end > start.', 'warn');
+      return;
+    }
+    if (start <= range.xMin || end >= range.xMax) {
+      setNotice(uploadStatus, `Break must be inside x-range (${range.xMin} to ${range.xMax}).`, 'warn');
+      return;
+    }
+    resultsOverlayXBreakStart = start;
+    resultsOverlayXBreakEnd = end;
+    resultsOverlayXBreakEnabled = true;
+    _syncResultsOverlayXBreakUi();
+    _renderOverlays();
+  }
+
+  function _clearResultsOverlayXBreak() {
+    resultsOverlayXBreakEnabled = false;
+    resultsOverlayXBreakStart = null;
+    resultsOverlayXBreakEnd = null;
+    if (inputResultsOverlayBreakStart) inputResultsOverlayBreakStart.value = '';
+    if (inputResultsOverlayBreakEnd) inputResultsOverlayBreakEnd.value = '';
+    _syncResultsOverlayXBreakUi();
+    _renderOverlays();
   }
 
   function _captureLatestLockedAdjustOverlay() {
@@ -1141,6 +1281,11 @@
       { id: 'pixtral-large-2411', label: 'pixtral-large-2411' },
       { id: 'pixtral-large-latest', label: 'pixtral-large-latest' }
     ],
+    mistral_free: [
+      { id: 'mistral-large-2512', label: 'mistral-large-2512' },
+      { id: 'pixtral-large-2411', label: 'pixtral-large-2411' },
+      { id: 'pixtral-large-latest', label: 'pixtral-large-latest' }
+    ],
     google: [
       { id: 'gemma-3-27b-it', label: 'gemma-3-27b-it' },
       { id: 'gemini-2.0-flash', label: 'gemini-2.0-flash' }
@@ -1182,10 +1327,22 @@
   }
 
   function getLlmSelection() {
-    const provider = llmProvider ? (llmProvider.value || '') : '';
+    const providerRaw = llmProvider ? (llmProvider.value || '') : '';
     const model = llmModel ? (llmModel.value || '') : '';
-    if (!provider) return { llm_provider: null, llm_model: null };
-    return { llm_provider: provider, llm_model: model || null };
+    let provider = null;
+    let llmKey = null;
+    if (providerRaw === 'google') {
+      provider = 'google';
+      llmKey = '2';
+    } else if (providerRaw === 'mistral_free') {
+      provider = 'mistral';
+      llmKey = '5';
+    } else if (providerRaw === 'mistral') {
+      provider = 'mistral';
+      llmKey = '4';
+    }
+    if (!provider) return { llm_provider: null, llm_model: null, llm_key: null };
+    return { llm_provider: provider, llm_model: model || null, llm_key: llmKey };
   }
 
   function _loadBackoffPref() {
@@ -1278,8 +1435,8 @@
 
     trialSelectionWarning.style.display = 'none';
     trialSelectionWarning.textContent = '';
-    trialExportControls.style.display = 'none';
-    btnDownloadTrialsCsv.disabled = true;
+    if (trialExportControls) trialExportControls.style.display = 'none';
+    if (btnDownloadTrialsCsv) btnDownloadTrialsCsv.disabled = true;
     trialsGridWrap.style.display = 'none';
     trialsGridWrap.innerHTML = '';
 
@@ -1295,6 +1452,8 @@
     accumulatedFacts = null;
     extractedCsvMeta = null;
     extractedCsvTextCache = null;
+    overlayCurveSeriesCache.clear();
+    overlayCurveSeriesInflight.clear();
     curveStyles = [];
     curvePolylinesPx = new Map();
     overlayEnabled = false;
@@ -2648,7 +2807,7 @@
 
     if (trialsMode) {
       _updateTrialExportState();
-      if (btnDownloadTrialsCsv.disabled) {
+      if (_hasMissingTrialSelections()) {
         alert('Select a run for every curve before saving a snapshot.');
         return null;
       }
@@ -3183,6 +3342,282 @@
     } catch (_) {
       return null;
     }
+  }
+
+  function _overlayCurveSeriesKey(csvMeta) {
+    const p = String(csvMeta && csvMeta.path ? csvMeta.path : '').trim();
+    return p || null;
+  }
+
+  function _getOverlayCurveSeriesSync(csvMeta) {
+    const key = _overlayCurveSeriesKey(csvMeta);
+    if (!key) return null;
+    return overlayCurveSeriesCache.get(key) || null;
+  }
+
+  async function _primeOverlayCurveSeries(csvMeta, preferText = null) {
+    const key = _overlayCurveSeriesKey(csvMeta);
+    if (!key) return;
+    if (overlayCurveSeriesCache.has(key) || overlayCurveSeriesInflight.has(key)) return;
+    overlayCurveSeriesInflight.add(key);
+    try {
+      let csvText = (typeof preferText === 'string') ? preferText : null;
+      if (csvText == null) {
+        csvText = await _fetchText('/plots/' + key);
+      }
+      const parsed = _extractCurveSeriesFromWideCsv(csvText, null);
+      overlayCurveSeriesCache.set(key, parsed instanceof Map ? parsed : new Map());
+    } catch (_) {
+      overlayCurveSeriesCache.set(key, new Map());
+    } finally {
+      overlayCurveSeriesInflight.delete(key);
+      _renderOverlays();
+    }
+  }
+
+  function _requestOverlayCurveSeries(csvMeta, preferText = null) {
+    const key = _overlayCurveSeriesKey(csvMeta);
+    if (!key) return null;
+    const cached = overlayCurveSeriesCache.get(key);
+    if (cached) return cached;
+    _primeOverlayCurveSeries(csvMeta, preferText);
+    return null;
+  }
+
+  function _overlayLineDashPattern(lineTypeRaw) {
+    const lineType = String(lineTypeRaw == null ? '' : lineTypeRaw).trim().toLowerCase().replace(/\s+/g, '_').replace(/-/g, '_');
+    if (!lineType || lineType === 'solid') return null;
+    if (lineType === 'dashed' || lineType === 'broken' || lineType === '__') return '8 5';
+    if (lineType === 'dotted' || lineType === 'dot' || lineType === 'points') return '2 4';
+    if (lineType === 'dash_dot' || lineType === 'dashdot' || lineType === 'dot_dash') return '8 4 2 4';
+    return null;
+  }
+
+  function _overlayMarkerShape(markerRaw) {
+    const marker = String(markerRaw == null ? '' : markerRaw).trim().toLowerCase().replace(/\s+/g, '_').replace(/-/g, '_');
+    if (!marker || marker === 'circle' || marker === 'o') return 'circle';
+    if (marker === 'none' || marker === 'no_marker') return 'none';
+    if (marker === 'square' || marker === 's') return 'square';
+    if (marker === 'diamond' || marker === 'd') return 'diamond';
+    if (marker === 'triangle' || marker === 'triangle_up' || marker === 'triangleup' || marker === '^') return 'triangle_up';
+    if (marker === 'triangle_down' || marker === 'triangledown' || marker === 'v') return 'triangle_down';
+    if (marker === 'x' || marker === 'cross' || marker === 'times') return 'x';
+    if (marker === 'plus' || marker === '+') return 'plus';
+    return 'circle';
+  }
+
+  function _appendOverlayMarker(root, shape, x, y, color) {
+    const ns = 'http://www.w3.org/2000/svg';
+    const stroke = color || '#dc2626';
+    const fill = color || '#dc2626';
+    const r = 2.8;
+
+    if (shape === 'none') return;
+    if (shape === 'circle') {
+      const el = document.createElementNS(ns, 'circle');
+      el.setAttribute('cx', String(x));
+      el.setAttribute('cy', String(y));
+      el.setAttribute('r', String(r));
+      el.setAttribute('fill', fill);
+      el.setAttribute('stroke', stroke);
+      el.setAttribute('stroke-width', '1');
+      root.appendChild(el);
+      return;
+    }
+    if (shape === 'square') {
+      const s = r * 2;
+      const el = document.createElementNS(ns, 'rect');
+      el.setAttribute('x', String(x - (s / 2)));
+      el.setAttribute('y', String(y - (s / 2)));
+      el.setAttribute('width', String(s));
+      el.setAttribute('height', String(s));
+      el.setAttribute('fill', fill);
+      el.setAttribute('stroke', stroke);
+      el.setAttribute('stroke-width', '1');
+      root.appendChild(el);
+      return;
+    }
+    if (shape === 'diamond') {
+      const d = r + 0.5;
+      const el = document.createElementNS(ns, 'polygon');
+      el.setAttribute('points', [
+        x + ',' + (y - d),
+        (x + d) + ',' + y,
+        x + ',' + (y + d),
+        (x - d) + ',' + y,
+      ].join(' '));
+      el.setAttribute('fill', fill);
+      el.setAttribute('stroke', stroke);
+      el.setAttribute('stroke-width', '1');
+      root.appendChild(el);
+      return;
+    }
+    if (shape === 'triangle_up' || shape === 'triangle_down') {
+      const d = r + 1;
+      const el = document.createElementNS(ns, 'polygon');
+      if (shape === 'triangle_up') {
+        el.setAttribute('points', [x + ',' + (y - d), (x + d) + ',' + (y + d), (x - d) + ',' + (y + d)].join(' '));
+      } else {
+        el.setAttribute('points', [x + ',' + (y + d), (x + d) + ',' + (y - d), (x - d) + ',' + (y - d)].join(' '));
+      }
+      el.setAttribute('fill', fill);
+      el.setAttribute('stroke', stroke);
+      el.setAttribute('stroke-width', '1');
+      root.appendChild(el);
+      return;
+    }
+
+    const mkLine = (x1, y1, x2, y2) => {
+      const line = document.createElementNS(ns, 'line');
+      line.setAttribute('x1', String(x1));
+      line.setAttribute('y1', String(y1));
+      line.setAttribute('x2', String(x2));
+      line.setAttribute('y2', String(y2));
+      line.setAttribute('stroke', stroke);
+      line.setAttribute('stroke-width', '1.4');
+      line.setAttribute('stroke-linecap', 'round');
+      root.appendChild(line);
+    };
+    const span = r + 1;
+    if (shape === 'x') {
+      mkLine(x - span, y - span, x + span, y + span);
+      mkLine(x - span, y + span, x + span, y - span);
+      return;
+    }
+    if (shape === 'plus') {
+      mkLine(x - span, y, x + span, y);
+      mkLine(x, y - span, x, y + span);
+      return;
+    }
+  }
+
+  function _renderBrokenDataOverlay(overlayWrap, cfg) {
+    const ns = 'http://www.w3.org/2000/svg';
+    if (!overlayWrap || !cfg) return false;
+    const {
+      sourceBounds,
+      scaleX,
+      scaleY,
+      activeLabels,
+      styles,
+      curveToSeries,
+      axisRanges,
+      breakStart,
+      breakEnd,
+    } = cfg;
+
+    const xMin = _safeNumber(axisRanges && axisRanges.x_min);
+    const xMax = _safeNumber(axisRanges && axisRanges.x_max);
+    const yMin = _safeNumber(axisRanges && axisRanges.y_min);
+    const yMax = _safeNumber(axisRanges && axisRanges.y_max);
+    if (!(Number.isFinite(xMin) && Number.isFinite(xMax) && xMax > xMin)) return false;
+    if (!(Number.isFinite(yMin) && Number.isFinite(yMax) && yMax > yMin)) return false;
+    if (!(Number.isFinite(breakStart) && Number.isFinite(breakEnd) && breakEnd > breakStart && breakStart > xMin && breakEnd < xMax)) return false;
+
+    const left = Number(sourceBounds.left || 0);
+    const right = Number(sourceBounds.right || 0);
+    const top = Number(sourceBounds.top || 0);
+    const bottom = Number(sourceBounds.bottom || 0);
+    const plotW = Math.max(1, right - left);
+    const plotH = Math.max(1, bottom - top);
+
+    const leftSpan = Math.max(1e-9, breakStart - xMin);
+    const rightSpan = Math.max(1e-9, xMax - breakEnd);
+    const keptGap = Math.min(12, Math.max(3, 0.018 * plotW));
+    const usableW = Math.max(8, plotW - keptGap);
+    const leftW = usableW * (leftSpan / Math.max(1e-9, (leftSpan + rightSpan)));
+    const rightW = Math.max(1, usableW - leftW);
+
+    const mapX = (xRaw) => {
+      const x = Number(xRaw);
+      if (!Number.isFinite(x)) return null;
+      if (x <= breakStart) {
+        const t = (x - xMin) / leftSpan;
+        return left + Math.max(0, Math.min(1, t)) * leftW;
+      }
+      if (x >= breakEnd) {
+        const t = (x - breakEnd) / rightSpan;
+        return left + leftW + keptGap + Math.max(0, Math.min(1, t)) * rightW;
+      }
+      return null;
+    };
+    const mapY = (yRaw) => {
+      const y = Number(yRaw);
+      if (!Number.isFinite(y)) return null;
+      const t = (y - yMin) / Math.max(1e-9, (yMax - yMin));
+      return bottom - Math.max(0, Math.min(1, t)) * plotH;
+    };
+
+    let svg = overlayWrap.querySelector('svg.imgReplotDataOverlay');
+    if (!svg) {
+      svg = document.createElementNS(ns, 'svg');
+      svg.classList.add('imgReplotDataOverlay');
+      svg.setAttribute('aria-hidden', 'true');
+      overlayWrap.appendChild(svg);
+    }
+
+    const wrapEl = overlayWrap.parentElement;
+    const wrapW = wrapEl ? Math.max(1, wrapEl.clientWidth || 0) : Math.max(1, right);
+    const wrapH = wrapEl ? Math.max(1, wrapEl.clientHeight || 0) : Math.max(1, bottom);
+    svg.setAttribute('viewBox', `0 0 ${wrapW} ${wrapH}`);
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '100%');
+    svg.innerHTML = '';
+    try { svg.style.transform = `scale(${Number(scaleX || 1).toFixed(6)}, ${Number(scaleY || 1).toFixed(6)})`; } catch (_) {}
+
+    const styleByLabel = new Map();
+    for (const st of (Array.isArray(styles) ? styles : [])) {
+      const lbl = String(st && st.curve_label ? st.curve_label : '').trim();
+      if (lbl) styleByLabel.set(lbl, st || {});
+    }
+    const labelLookup = _buildCurveLabelLookup(Array.from(curveToSeries.keys()));
+
+    let drewAny = false;
+    for (const label of Array.from(activeLabels || [])) {
+      const resolved = _resolveCurveLabelFromLookup(label, labelLookup) || label;
+      const series = curveToSeries.get(resolved);
+      if (!Array.isArray(series) || series.length === 0) continue;
+
+      const style = styleByLabel.get(label) || styleByLabel.get(resolved) || {};
+      const color = String(style.colour || '#dc2626');
+      const dash = _overlayLineDashPattern(style.line_type);
+      const markerShape = _overlayMarkerShape(style.marker_symbol);
+
+      const segments = [];
+      let curSeg = [];
+      for (const p of series) {
+        if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) continue;
+        const px = mapX(p.x);
+        const py = mapY(p.y);
+        if (!Number.isFinite(px) || !Number.isFinite(py)) {
+          if (curSeg.length >= 2) segments.push(curSeg);
+          curSeg = [];
+          continue;
+        }
+        curSeg.push({ x: px, y: py });
+      }
+      if (curSeg.length >= 2) segments.push(curSeg);
+      if (segments.length === 0) continue;
+
+      for (const seg of segments) {
+        const poly = document.createElementNS(ns, 'polyline');
+        poly.setAttribute('fill', 'none');
+        poly.setAttribute('stroke', color);
+        poly.setAttribute('stroke-width', '2');
+        if (dash) poly.setAttribute('stroke-dasharray', dash);
+        poly.setAttribute('points', seg.map(pt => `${pt.x},${pt.y}`).join(' '));
+        svg.appendChild(poly);
+      }
+
+      for (const seg of segments) {
+        for (const pt of seg) {
+          _appendOverlayMarker(svg, markerShape, pt.x, pt.y, color);
+        }
+      }
+      drewAny = true;
+    }
+    try { svg.style.display = drewAny ? 'block' : 'none'; } catch (_) {}
+    return drewAny;
   }
 
   // ========= TIDY (long) CFU EXPORT (Excel template: sheet `cfu`) =========
@@ -3988,6 +4423,18 @@
       axisX.className = 'imgReplotGuideAxis imgReplotGuideAxis--x';
       layer.appendChild(axisX);
 
+      const breakBand = document.createElement('div');
+      breakBand.className = 'imgReplotBreakBand';
+      layer.appendChild(breakBand);
+
+      const breakStart = document.createElement('div');
+      breakStart.className = 'imgReplotGuideBreak imgReplotGuideBreak--start';
+      layer.appendChild(breakStart);
+
+      const breakEnd = document.createElement('div');
+      breakEnd.className = 'imgReplotGuideBreak imgReplotGuideBreak--end';
+      layer.appendChild(breakEnd);
+
       const center = document.createElement('div');
       center.className = 'imgReplotAdjustCenter';
       center.setAttribute('data-overlay-drag-role', 'center');
@@ -4043,6 +4490,7 @@
     const thick = Math.max(12, Math.min(18, 0.018 * Math.max(ctx.wrapW, ctx.wrapH)));
     const centerR = Math.max(8, Math.min(14, 0.012 * Math.max(ctx.wrapW, ctx.wrapH)));
     const edgeInset = 2;
+    const handleInset = 6;
     const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
     const frame = layer.querySelector('.imgReplotAdjustFrame');
@@ -4060,6 +4508,9 @@
     const center = layer.querySelector('.imgReplotAdjustCenter');
     const axisY = layer.querySelector('.imgReplotGuideAxis--y');
     const axisX = layer.querySelector('.imgReplotGuideAxis--x');
+    const breakBand = layer.querySelector('.imgReplotBreakBand');
+    const breakStart = layer.querySelector('.imgReplotGuideBreak--start');
+    const breakEnd = layer.querySelector('.imgReplotGuideBreak--end');
 
     const handlesVisible = !!resultsOverlayHandlesEnabled;
 
@@ -4084,6 +4535,40 @@
       axisX.style.width = boxW + 'px';
     }
 
+    const xRange = _getResultsXAxisRange();
+    const showBreak = !!(
+      resultsOverlayXBreakEnabled
+      && xRange
+      && Number.isFinite(resultsOverlayXBreakStart)
+      && Number.isFinite(resultsOverlayXBreakEnd)
+      && resultsOverlayXBreakEnd > resultsOverlayXBreakStart
+    );
+    if (showBreak) {
+      const t0 = clamp((resultsOverlayXBreakStart - xRange.xMin) / Math.max(1e-9, (xRange.xMax - xRange.xMin)), 0, 1);
+      const t1 = clamp((resultsOverlayXBreakEnd - xRange.xMin) / Math.max(1e-9, (xRange.xMax - xRange.xMin)), 0, 1);
+      const x0 = b.left + (boxW * Math.min(t0, t1));
+      const x1 = b.left + (boxW * Math.max(t0, t1));
+      if (breakBand) {
+        breakBand.style.display = 'block';
+        breakBand.style.left = x0 + 'px';
+        breakBand.style.top = b.top + 'px';
+        breakBand.style.width = Math.max(1, x1 - x0) + 'px';
+        breakBand.style.height = boxH + 'px';
+      }
+      for (const el of [breakStart, breakEnd]) {
+        if (!el) continue;
+        el.style.display = 'block';
+        el.style.top = b.top + 'px';
+        el.style.height = boxH + 'px';
+      }
+      if (breakStart) breakStart.style.left = x0 + 'px';
+      if (breakEnd) breakEnd.style.left = x1 + 'px';
+    } else {
+      if (breakBand) breakBand.style.display = 'none';
+      if (breakStart) breakStart.style.display = 'none';
+      if (breakEnd) breakEnd.style.display = 'none';
+    }
+
     if (handlesVisible && left) {
       const x = clamp(b.left + edgeInset, 0, Math.max(0, ctx.wrapW - thick));
       left.style.left = x + 'px';
@@ -4100,14 +4585,14 @@
     }
     if (handlesVisible && top) {
       top.style.left = b.left + 'px';
-      const y = clamp(b.top + edgeInset, 0, Math.max(0, ctx.wrapH - thick));
+      const y = clamp(b.top + edgeInset, handleInset, Math.max(handleInset, ctx.wrapH - thick - handleInset));
       top.style.top = y + 'px';
       top.style.width = boxW + 'px';
       top.style.height = thick + 'px';
     }
     if (handlesVisible && bottom) {
       bottom.style.left = b.left + 'px';
-      const y = clamp(b.bottom - thick - edgeInset, 0, Math.max(0, ctx.wrapH - thick));
+      const y = clamp(b.bottom - thick - edgeInset, handleInset, Math.max(handleInset, ctx.wrapH - thick - handleInset));
       bottom.style.top = y + 'px';
       bottom.style.width = boxW + 'px';
       bottom.style.height = thick + 'px';
@@ -4303,42 +4788,48 @@
         }
       }
 
-      // Remove stale curve layers.
-      for (const el of Array.from(curvesLayer.querySelectorAll('img.imgReplotOverlay--curve'))) {
-        const idx = Number(el.dataset.curveIndex || '0');
-        if (!activeIndices.has(idx)) el.remove();
-      }
-
-      // Add current active curve layers.
-      for (const idx of activeIndices) {
-        let el = curvesLayer.querySelector(`img.imgReplotOverlay--curve[data-curve-index="${idx}"]`);
-        if (!el) {
-          el = document.createElement('img');
-          el.className = 'imgReplotOverlay imgReplotOverlay--curve';
-          el.alt = '';
-          el.loading = 'lazy';
-          el.dataset.curveIndex = String(idx);
-          el.addEventListener('error', () => {
-            try { el.remove(); } catch (_) {}
-          }, { once: true });
-          curvesLayer.appendChild(el);
-        }
-        const src = curveTemplate.replace('{i}', String(idx));
-        if (el.getAttribute('src') !== src) el.src = src;
-        try {
-          el.style.opacity = '1';
-          if (trialsMode && overlayRunIndex === 1) {
-            // Run 2: keep overlay behavior same as run 1, but recolor only chroma to blue.
-            // Hue rotation keeps neutral blacks (axes/text) black instead of tinting them blue.
-            el.style.filter = 'hue-rotate(195deg) saturate(165%)';
-            // Hide black/neutral overlay artifacts while preserving colored curve strokes.
-            el.style.mixBlendMode = 'screen';
-          } else {
-            el.style.filter = '';
-            el.style.mixBlendMode = '';
+      const _syncCurveLayerImages = (targetLayer) => {
+        if (!targetLayer) return;
+        if (!curveTemplate || activeIndices.size === 0) {
+          for (const el of Array.from(targetLayer.querySelectorAll('img.imgReplotOverlay--curve'))) {
+            el.remove();
           }
-        } catch (_) {}
-      }
+          return;
+        }
+        for (const el of Array.from(targetLayer.querySelectorAll('img.imgReplotOverlay--curve'))) {
+          const idx = Number(el.dataset.curveIndex || '0');
+          if (!activeIndices.has(idx)) el.remove();
+        }
+        for (const idx of activeIndices) {
+          let el = targetLayer.querySelector(`img.imgReplotOverlay--curve[data-curve-index="${idx}"]`);
+          if (!el) {
+            el = document.createElement('img');
+            el.className = 'imgReplotOverlay imgReplotOverlay--curve';
+            el.alt = '';
+            el.loading = 'lazy';
+            el.dataset.curveIndex = String(idx);
+            el.addEventListener('error', () => {
+              try { el.remove(); } catch (_) {}
+            }, { once: true });
+            targetLayer.appendChild(el);
+          }
+          const src = curveTemplate.replace('{i}', String(idx));
+          if (el.getAttribute('src') !== src) el.src = src;
+          try {
+            el.style.opacity = '1';
+            if (trialsMode && overlayRunIndex === 1) {
+              el.style.filter = 'hue-rotate(195deg) saturate(165%)';
+              el.style.mixBlendMode = 'screen';
+            } else {
+              el.style.filter = '';
+              el.style.mixBlendMode = '';
+            }
+          } catch (_) {}
+        }
+      };
+
+      // Remove stale curve layers.
+      _syncCurveLayerImages(curvesLayer);
 
       // Apply manual adjustments to the OVERLAY REPLOT layer.
       const adj = overlayAdjust && overlayAdjust.replot ? overlayAdjust.replot : null;
@@ -4437,6 +4928,55 @@
             top: offY + minY * containScale,
             bottom: offY + maxY * containScale,
           };
+        }
+
+        const xRange = _getResultsXAxisRange();
+        const hasManualBreak = !!(
+          resultsOverlayXBreakEnabled
+          && xRange
+          && Number.isFinite(resultsOverlayXBreakStart)
+          && Number.isFinite(resultsOverlayXBreakEnd)
+          && resultsOverlayXBreakEnd > resultsOverlayXBreakStart
+        );
+
+        let dataOverlayDrawn = false;
+        if (hasManualBreak) {
+          const runObj = (trialsMode && overlayRunIndex >= 0) ? trialRuns[overlayRunIndex] : null;
+          const csvMetaForRun = runObj ? runObj.extractedCsvMeta : extractedCsvMeta;
+          const factsForRun = runObj ? runObj.accumulatedFacts : accumulatedFacts;
+          const stylesForRun = runObj && Array.isArray(runObj.curveStyles) ? runObj.curveStyles : curveStyles;
+
+          const preferCsvText = (!trialsMode && csvMetaForRun && extractedCsvMeta && csvMetaForRun.path === extractedCsvMeta.path)
+            ? extractedCsvTextCache
+            : null;
+          const curveToSeries = _requestOverlayCurveSeries(csvMetaForRun, preferCsvText);
+          if (curveToSeries instanceof Map && curveToSeries.size > 0) {
+            const axisRanges = _extractAxisRangesFromFacts(factsForRun, curveToSeries);
+            dataOverlayDrawn = _renderBrokenDataOverlay(overlayWrap, {
+              sourceBounds,
+              scaleX: sx * modeScale,
+              scaleY: sy * modeScale,
+              activeLabels,
+              styles: stylesForRun,
+              curveToSeries,
+              axisRanges,
+              breakStart: resultsOverlayXBreakStart,
+              breakEnd: resultsOverlayXBreakEnd,
+            });
+          }
+        }
+
+        const dataOverlay = overlayWrap.querySelector('svg.imgReplotDataOverlay');
+        if (dataOverlayDrawn) {
+          try { axesImg.style.display = 'none'; } catch (_) {}
+          try { curvesLayer.style.display = 'none'; } catch (_) {}
+          try { dataOverlay.style.display = 'block'; } catch (_) {}
+        } else {
+          try { axesImg.style.display = showAxes ? 'block' : 'none'; } catch (_) {}
+          try { curvesLayer.style.display = 'block'; } catch (_) {}
+          if (dataOverlay) {
+            try { dataOverlay.style.display = 'none'; } catch (_) {}
+          }
         }
 
         const candidate = {
@@ -5125,11 +5665,20 @@
 
     if (missing.length > 0) {
       _setTrialWarning('Select at least 1 run for: ' + missing.join(', '));
-      btnDownloadTrialsCsv.disabled = true;
+      if (btnDownloadTrialsCsv) btnDownloadTrialsCsv.disabled = true;
     } else {
       _setTrialWarning('');
-      btnDownloadTrialsCsv.disabled = false;
+      if (btnDownloadTrialsCsv) btnDownloadTrialsCsv.disabled = false;
     }
+  }
+
+  function _hasMissingTrialSelections() {
+    if (!trialsMode) return false;
+    for (const label of unionCurveLabels) {
+      const s = trialSelections.get(label);
+      if (!s || s.size === 0) return true;
+    }
+    return false;
   }
 
   function _renderTrialsGrid() {
@@ -5523,6 +6072,7 @@
       bottomY: 0,
       topY: 100,
       rate_limit_backoff: _getBackoffMode(),
+      persist_result: uiMode !== UI_MODE_REGULAR,
     };
 
     let url = '/run_all';
@@ -5530,9 +6080,15 @@
       url = '/v2/run_all';
       payload.articleInfo = (articleInfo.value || '').trim();
       payload.debug = false;
-      const { llm_provider, llm_model } = getLlmSelection();
-      if (llm_provider) payload.llm_provider = llm_provider;
+      const { llm_provider, llm_model, llm_key } = getLlmSelection();
+      if (uiMode === UI_MODE_REGULAR) {
+        payload.llm_provider = 'mistral';
+        payload.llm_key = '5';
+      } else if (llm_provider) {
+        payload.llm_provider = llm_provider;
+      }
       if (llm_model) payload.llm_model = llm_model;
+      if (uiMode !== UI_MODE_REGULAR && llm_key) payload.llm_key = llm_key;
     } else {
       // EX1: allow selecting Mistral model
       const { llm_model } = getLlmSelection();
@@ -5553,8 +6109,8 @@
       overlayAdjustControls.style.display = 'block';
       highlightStatus.textContent = '';
 
-      trialExportControls.style.display = 'flex';
-      btnDownloadTrialsCsv.disabled = true;
+      if (trialExportControls) trialExportControls.style.display = 'none';
+      if (btnDownloadTrialsCsv) btnDownloadTrialsCsv.disabled = true;
 
       // Clear any prior polling.
       if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
@@ -5737,8 +6293,8 @@
     overlayAdjustControls.style.display = 'block';
     highlightStatus.textContent = '';
 
-    trialExportControls.style.display = (n > 1) ? 'flex' : 'none';
-    btnDownloadTrialsCsv.disabled = true;
+    if (trialExportControls) trialExportControls.style.display = 'none';
+    if (btnDownloadTrialsCsv) btnDownloadTrialsCsv.disabled = true;
 
     // Clear any prior polling.
     if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
@@ -6137,15 +6693,6 @@
     };
   }
 
-  async function downloadTrialsCsv() {
-    if (!trialsMode || trialRuns.length <= 1) return;
-    _updateTrialExportState();
-    if (btnDownloadTrialsCsv.disabled) return;
-    const out = await _buildTrialsSelectedOrAveragedOutput();
-    if (!out || !out.csvOut) return;
-    _downloadBlob(out.csvOut, 'extracted_trials_selected_or_averaged_tidy_cfu.csv');
-  }
-
   btnCopyConsole.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(resultConsole.textContent || '');
@@ -6467,7 +7014,10 @@
     });
   }
 
-  btnDownloadTrialsCsv.addEventListener('click', downloadTrialsCsv);
+  if (btnDownloadTrialsCsv) {
+    btnDownloadTrialsCsv.style.display = 'none';
+    btnDownloadTrialsCsv.disabled = true;
+  }
 
   // Console collapse/expand
   if (btnToggleConsole && consoleWrap) {
@@ -6515,6 +7065,22 @@
     });
   }
 
+  if (btnResultsOverlayXBreak) {
+    btnResultsOverlayXBreak.addEventListener('change', () => {
+      resultsOverlayXBreakEnabled = !!btnResultsOverlayXBreak.checked;
+      _syncResultsOverlayXBreakUi();
+      _renderOverlays();
+    });
+  }
+
+  if (btnApplyResultsOverlayBreak) {
+    btnApplyResultsOverlayBreak.addEventListener('click', _applyResultsOverlayXBreakFromInputs);
+  }
+
+  if (btnClearResultsOverlayBreak) {
+    btnClearResultsOverlayBreak.addEventListener('click', _clearResultsOverlayXBreak);
+  }
+
   if (downloadCsvConfirmedBtn) {
     downloadCsvConfirmedBtn.addEventListener('click', downloadConfirmedOnlyCsv);
   }
@@ -6548,6 +7114,7 @@
 
   _syncResultsOverlayHandlesToggleUi();
   _syncResultsOverlayGuideAxesToggleUi();
+  _syncResultsOverlayXBreakUi();
   _loadUiModePref();
   _applyUiMode();
 

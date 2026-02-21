@@ -1,0 +1,128 @@
+import os
+import matplotlib.pyplot as plt
+import numpy as np
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\Plot_Extract\plots\first_examples/A/A-1\A-1_png.pv2_prompt_13.v11.key5.web\A-1_png-replot.pv2_prompt_13.v11.key5.web.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data from marker_facts
+curves_data = {
+    "Blank": [
+        (0, 6.0), (2, 8.5), (4, 9.5), (6, 10.0), (8, 10.2), (10, 10.3),
+        (12, 10.3), (22, 10.0), (24, 10.2), (26, 10.3)
+    ],
+    "COL 0.125ug/mL": [
+        (0, 6.0), (2, 7.0), (4, 8.5), (6, 9.0), (8, 9.5), (10, 9.8),
+        (12, 10.0), (22, 9.8), (24, 10.0), (26, 10.2)
+    ],
+    "MINO 1ug/mL": [
+        (0, 6.0), (2, 7.5), (4, 8.0), (6, 8.5), (8, 8.8), (10, 8.7),
+        (12, 8.5), (22, 8.0), (24, 8.2), (26, 8.3)
+    ],
+    "MEM 4ug/mL": [
+        (0, 6.0), (2, 0.5), (4, 0.0), (6, 0.0), (8, 0.0), (10, 0.0),
+        (12, 0.0), (22, 0.0), (24, 0.0), (26, 0.0)
+    ],
+    "RFP 0.06ug/mL": [
+        (0, 6.0), (2, 0.5), (4, 1.5), (6, 1.0), (8, 1.0), (10, 0.0),
+        (12, 0.0), (22, 0.0), (24, 0.0), (26, 0.0)
+    ],
+    "COL 0.125ug/mL + MEM 4ug/mL": [
+        (0, 6.0), (2, 0.0), (4, 0.0), (6, 0.0), (8, 0.0), (10, 0.0),
+        (12, 0.0), (22, 0.0), (24, 0.0), (26, 0.0)
+    ],
+    "COL 0.125ug/mL + MINO 1ug/mL": [
+        (0, 6.0), (2, 0.0), (4, 0.0), (6, 0.0), (8, 0.0), (10, 0.0),
+        (12, 0.0), (22, 0.0), (24, 0.0), (26, 0.0)
+    ],
+    "COL 0.125ug/mL + RFP 0.06ug/mL": [
+        (0, 6.0), (2, 0.0), (4, 0.0), (6, 0.0), (8, 0.0), (10, 0.0),
+        (12, 0.0), (22, 0.0), (24, 0.0), (26, 0.0)
+    ]
+}
+
+# Re-extracted data from re_extraction.results
+re_extracted_data = {
+    "RFP 0.06ug/mL": [
+        (0, 6.0), (2, 0.5), (10, 0.0), (12, 0.0), (22, 0.0), (24, 0.0), (26, 0.0)
+    ],
+    "COL 0.125ug/mL": [
+        (0, 6.0), (2, 5.0), (22, 7.0), (24, 7.2), (26, 7.3)
+    ],
+    "MINO 1ug/mL": [
+        (0, 6.0), (2, 6.0), (10, 5.0), (12, 4.8), (22, 4.0), (24, 4.2), (26, 4.3)
+    ]
+}
+
+# Update curves_data with re-extracted points
+for curve_label, points in re_extracted_data.items():
+    if curve_label in curves_data:
+        # Create a dictionary for quick lookup
+        points_dict = dict(points)
+        # Update only the points that exist in re_extracted_data
+        updated_points = []
+        for x, y in curves_data[curve_label]:
+            if x in points_dict:
+                updated_points.append((x, points_dict[x]))
+            else:
+                updated_points.append((x, y))
+        curves_data[curve_label] = updated_points
+
+# Curve styles from curve_style_facts
+curve_styles = {
+    "Blank": {"color": "black", "linestyle": ":", "marker": "x", "label": "Blank"},
+    "COL 0.125ug/mL": {"color": "black", "linestyle": "-", "marker": "s", "label": "COL 0.125ug/mL"},
+    "MINO 1ug/mL": {"color": "black", "linestyle": "--", "marker": "^", "label": "MINO 1ug/mL"},
+    "MEM 4ug/mL": {"color": "black", "linestyle": "-.", "marker": "o", "label": "MEM 4ug/mL"},
+    "RFP 0.06ug/mL": {"color": "black", "linestyle": ":", "marker": "v", "label": "RFP 0.06ug/mL"},
+    "COL 0.125ug/mL + MEM 4ug/mL": {"color": "black", "linestyle": (0, (3, 1, 1, 1, 1, 1)), "marker": "o", "label": "COL 0.125ug/mL + MEM 4ug/mL"},
+    "COL 0.125ug/mL + MINO 1ug/mL": {"color": "black", "linestyle": (0, (5, 5)), "marker": "^", "label": "COL 0.125ug/mL + MINO 1ug/mL"},
+    "COL 0.125ug/mL + RFP 0.06ug/mL": {"color": "black", "linestyle": "-.", "marker": "v", "label": "COL 0.125ug/mL + RFP 0.06ug/mL"}
+}
+
+# Create the plot
+plt.figure(figsize=(8, 6))
+
+# Plot each curve with its style
+for curve_label, points in curves_data.items():
+    x_vals, y_vals = zip(*points)
+    plt.plot(x_vals, y_vals,
+             color=curve_styles[curve_label]["color"],
+             linestyle=curve_styles[curve_label]["linestyle"],
+             marker=curve_styles[curve_label]["marker"],
+             label=curve_styles[curve_label]["label"])
+
+# Axis break
+plt.axvline(x=12, ymin=0.05, ymax=0.95, color='white', linewidth=2)
+plt.axvline(x=22, ymin=0.05, ymax=0.95, color='white', linewidth=2)
+plt.axvspan(12, 22, color='white', alpha=1)
+
+# Add break lines
+plt.plot([12, 12], [0, 16], color='black', linestyle='-', linewidth=1)
+plt.plot([22, 22], [0, 16], color='black', linestyle='-', linewidth=1)
+plt.plot([12, 12.5], [0, 0], color='black', linestyle='-', linewidth=1)
+plt.plot([21.5, 22], [0, 0], color='black', linestyle='-', linewidth=1)
+plt.plot([12, 12.5], [16, 16], color='black', linestyle='-', linewidth=1)
+plt.plot([21.5, 22], [16, 16], color='black', linestyle='-', linewidth=1)
+
+# Axis labels and limits
+plt.xlabel("Time (h)", fontsize=12)
+plt.ylabel("Log cfu/mL", fontsize=12)
+plt.xlim(0, 26)
+plt.ylim(0, 16)
+
+# Ticks
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 22, 24, 26], [0, 2, 4, 6, 8, 10, 12, 22, 24, 26])
+plt.yticks([0, 2, 4, 6, 8, 10, 12, 14, 16], [0, 2, 4, 6, 8, 10, 12, 14, 16])
+
+# Grid
+plt.grid(True, which='both', linestyle=':', linewidth=0.5)
+
+# Legend
+plt.legend(loc='upper left', fontsize=8, frameon=False)
+
+# Title
+plt.title("A", loc='left', fontsize=14, fontweight='bold')
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)

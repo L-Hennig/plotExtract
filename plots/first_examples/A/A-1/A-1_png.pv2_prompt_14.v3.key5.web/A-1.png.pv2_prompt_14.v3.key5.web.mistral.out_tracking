@@ -1,0 +1,156 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\Plot_Extract\\plots\\first_examples/A/A-1/A-1.png",
+  "prompt_name": "prompt_14",
+  "overall_status": "completed",
+  "validation_status": "yes",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 410,
+      "execution_time_ms": 3001.936912536621,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T16:20:53.544067",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 511,
+      "execution_time_ms": 3811.5360736846924,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T16:20:56.548650",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 925,
+      "execution_time_ms": 4742.34938621521,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T16:21:00.362927",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3A": {
+      "stage_name": "EXTRACT_STAGE_3A",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1578,
+      "execution_time_ms": 6924.740314483643,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T16:21:05.108425",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 5417,
+      "execution_time_ms": 19655.378818511963,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T16:21:12.037829",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 11285,
+      "execution_time_ms": 43516.23249053955,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T16:21:31.698263",
+      "notes": []
+    },
+    "EXTRACT_STAGE_6": {
+      "stage_name": "EXTRACT_STAGE_6",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 59,
+      "execution_time_ms": 964.7347927093506,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T16:22:15.221352",
+      "notes": []
+    },
+    "EXTRACT_STAGE_7": {
+      "stage_name": "EXTRACT_STAGE_7",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 58,
+      "execution_time_ms": 1666.6326522827148,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T16:22:16.190751",
+      "notes": []
+    },
+    "EXTRACT_STAGE_8": {
+      "stage_name": "EXTRACT_STAGE_8",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 3,
+        "num_rows": 4,
+        "columns": [
+          "Since the Stage 7 output JSON contains an empty `results` array (`\"results\": []`)",
+          " there are no corrections to apply to the original CSV. Therefore",
+          " the output is the original CSV unchanged."
+        ],
+        "axis_labels": [
+          "Since the Stage 7 output JSON contains an empty `results` array (`\"results\": []`)",
+          " there are no corrections to apply to the original CSV. Therefore",
+          " the output is the original CSV unchanged."
+        ]
+      },
+      "output_length": 504,
+      "execution_time_ms": 2283.949375152588,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T16:22:17.862135",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_8": {
+      "num_columns": 3,
+      "num_rows": 4,
+      "columns": [
+        "Since the Stage 7 output JSON contains an empty `results` array (`\"results\": []`)",
+        " there are no corrections to apply to the original CSV. Therefore",
+        " the output is the original CSV unchanged."
+      ],
+      "axis_labels": [
+        "Since the Stage 7 output JSON contains an empty `results` array (`\"results\": []`)",
+        " there are no corrections to apply to the original CSV. Therefore",
+        " the output is the original CSV unchanged."
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 126.766172,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes.",
+      "y_axis": "Yes",
+      "num_points": "Yes",
+      "trend": "Yes"
+    }
+  }
+}

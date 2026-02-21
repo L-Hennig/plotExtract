@@ -1,0 +1,152 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\Plot_Extract\\plots\\first_examples/A/A-1/A-1.png",
+  "prompt_name": "prompt_13",
+  "overall_status": "completed",
+  "validation_status": "yes",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 410,
+      "execution_time_ms": 3235.508441925049,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T15:28:34.635614",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 511,
+      "execution_time_ms": 4090.592622756958,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T15:28:37.873638",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 925,
+      "execution_time_ms": 4912.314176559448,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T15:28:41.966951",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3A": {
+      "stage_name": "EXTRACT_STAGE_3A",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1578,
+      "execution_time_ms": 7358.062744140625,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T15:28:46.882445",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 5417,
+      "execution_time_ms": 19220.690965652466,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T15:28:54.244448",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 11303,
+      "execution_time_ms": 42746.90580368042,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T15:29:13.470332",
+      "notes": []
+    },
+    "EXTRACT_STAGE_6": {
+      "stage_name": "EXTRACT_STAGE_6",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 2259,
+      "execution_time_ms": 8938.526391983032,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T15:29:56.224065",
+      "notes": []
+    },
+    "EXTRACT_STAGE_7": {
+      "stage_name": "EXTRACT_STAGE_7",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 6032,
+      "execution_time_ms": 20208.768129348755,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T15:30:05.174974",
+      "notes": []
+    },
+    "EXTRACT_STAGE_8": {
+      "stage_name": "EXTRACT_STAGE_8",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 2,
+        "num_rows": 20,
+        "columns": [
+          "Since the original CSV wasn't provided in full",
+          " I'll reconstruct what the updated CSV would look like based on the given data structure and the re-extraction results. Here's how the updated CSV would appear (showing only the relevant columns for clarity):"
+        ],
+        "axis_labels": [
+          "Since the original CSV wasn't provided in full",
+          " I'll reconstruct what the updated CSV would look like based on the given data structure and the re-extraction results. Here's how the updated CSV would appear (showing only the relevant columns for clarity):"
+        ]
+      },
+      "output_length": 1042,
+      "execution_time_ms": 6092.1311378479,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-21T15:30:25.391200",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_8": {
+      "num_columns": 2,
+      "num_rows": 20,
+      "columns": [
+        "Since the original CSV wasn't provided in full",
+        " I'll reconstruct what the updated CSV would look like based on the given data structure and the re-extraction results. Here's how the updated CSV would appear (showing only the relevant columns for clarity):"
+      ],
+      "axis_labels": [
+        "Since the original CSV wasn't provided in full",
+        " I'll reconstruct what the updated CSV would look like based on the given data structure and the re-extraction results. Here's how the updated CSV would appear (showing only the relevant columns for clarity):"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 198.505132,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "Yes",
+      "num_points": "Yes",
+      "trend": "Yes"
+    }
+  }
+}

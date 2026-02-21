@@ -1,0 +1,17 @@
+Since the original CSV wasn't provided in full, I'll reconstruct what the updated CSV would look like based on the given data structure and the re-extraction results. Here's how the updated CSV would appear (showing only the relevant columns for clarity):
+curve_label,Time (hours),MEM (4ug/mL),RFP (0.06ug/mL),COL+MEM (0.125ug/mL + 4ug/mL)
+MEM 4ug/mL,6,0.0,,,
+MEM 4ug/mL,8,0.0,,,
+MEM 4ug/mL,10,0.0,,,
+MEM 4ug/mL,12,0.0,,,
+MEM 4ug/mL,22,0.0,,,
+MEM 4ug/mL,24,0.0,,,
+MEM 4ug/mL,26,0.0,,,
+RFP 0.06ug/mL,12,,9.0,
+RFP 0.06ug/mL,22,,0.0,
+RFP 0.06ug/mL,24,,0.0,
+RFP 0.06ug/mL,26,,0.0,
+COL 0.125ug/mL + MEM 4ug/mL,22,,,0.0
+COL 0.125ug/mL + MEM 4ug/mL,24,,,0.0
+COL 0.125ug/mL + MEM 4ug/mL,26,,,0.0
+Note: The actual output would include all original columns and rows from the original CSV, with only the specified y-values updated. The above shows just the modified values for clarity. The full CSV would maintain all original structure and data, only changing the specific log10 CFU/mL values that were corrected in the re-extraction results.
