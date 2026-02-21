@@ -27,11 +27,13 @@ def _select_mistral_api_key() -> str:
     return os.getenv("API_KEY_3") or os.getenv("API_KEY_1") or ""
   if key == "4":
     return os.getenv("API_KEY_4") or os.getenv("API_KEY_3") or os.getenv("API_KEY_1") or ""
-  return os.getenv("API_KEY_4") or os.getenv("API_KEY_3") or os.getenv("API_KEY_1") or ""
+  if key == "5":
+    return os.getenv("API_KEY_5") or os.getenv("API_KEY_4") or os.getenv("API_KEY_3") or os.getenv("API_KEY_1") or ""
+  return os.getenv("API_KEY_5") or os.getenv("API_KEY_4") or os.getenv("API_KEY_3") or os.getenv("API_KEY_1") or ""
 
 api_key = _select_mistral_api_key()
 if not api_key:
-  raise RuntimeError("Missing Mistral API key. Set API_KEY_4 (preferred), or API_KEY_3, or API_KEY_1")
+  raise RuntimeError("Missing Mistral API key. Set API_KEY_5 (preferred for key5), or API_KEY_4, or API_KEY_3, or API_KEY_1")
 
 input_plot = sys.argv[1]
 input_dir = os.path.dirname(input_plot)

@@ -48,6 +48,7 @@ load_dotenv(override=True)
 API_KEY_MISTRAL_1 = os.getenv("API_KEY_1")
 API_KEY_MISTRAL_3 = os.getenv("API_KEY_3")
 API_KEY_MISTRAL_4 = os.getenv("API_KEY_4")
+API_KEY_MISTRAL_5 = os.getenv("API_KEY_5")
 API_KEY_GOOGLE = os.getenv("API_KEY_2")
 
 LLM_PROVIDER = (os.getenv("PLOTEXTRACT_LLM_PROVIDER") or "mistral").strip().lower()
@@ -203,6 +204,7 @@ def _select_mistral_api_key(llm_key_used: str) -> Optional[str]:
     - key1  -> API_KEY_1
     - key3  -> API_KEY_3
     - key4  -> API_KEY_4 (preferred), else API_KEY_3, else API_KEY_1
+    - key5  -> API_KEY_5 (preferred), else API_KEY_4, else API_KEY_3, else API_KEY_1
     """
     k = (llm_key_used or "").strip()
     if k == "1":
@@ -211,8 +213,10 @@ def _select_mistral_api_key(llm_key_used: str) -> Optional[str]:
         return API_KEY_MISTRAL_3 or API_KEY_MISTRAL_1
     if k == "4":
         return API_KEY_MISTRAL_4 or API_KEY_MISTRAL_3 or API_KEY_MISTRAL_1
+    if k == "5":
+        return API_KEY_MISTRAL_5 or API_KEY_MISTRAL_4 or API_KEY_MISTRAL_3 or API_KEY_MISTRAL_1
     # Unknown/empty: best-effort fallback
-    return API_KEY_MISTRAL_4 or API_KEY_MISTRAL_3 or API_KEY_MISTRAL_1
+    return API_KEY_MISTRAL_5 or API_KEY_MISTRAL_4 or API_KEY_MISTRAL_3 or API_KEY_MISTRAL_1
 
 # Debug mode (writes per-stage prompts/outputs to disk)
 DEBUG_VERBOSE = str(os.getenv("PLOTEXTRACT_DEBUG", "")).strip().lower() in {"1", "true", "yes", "on"}
@@ -1315,7 +1319,7 @@ if LLM_PROVIDER == "mistral":
     if not api_key_mistral:
         raise RuntimeError(
             "Missing Mistral API key for selected key slot. "
-            "Set API_KEY_4 (preferred for key4), or API_KEY_3, or API_KEY_1."
+            "Set API_KEY_5 (preferred for key5), or API_KEY_4, or API_KEY_3, or API_KEY_1."
         )
     if Mistral is None:
         raise RuntimeError("Mistral provider requested but 'mistralai' is not installed")

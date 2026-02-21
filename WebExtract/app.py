@@ -248,6 +248,80 @@ def _list_v2_version_dirs(image_path: str, prompt_name: str) -> list[tuple[int, 
     return out
 
 
+def _resolve_requested_v2_version_dir(image_path: str, prompt_name: str, version_dir_req: str) -> str | None:
+    """Best-effort resolver for explicitly requested v2 version dirs.
+
+    Handles hosted/runtime differences where key suffixes (e.g. key1 vs key4)
+    or `.web` suffix may differ from the preconfigured UI test run path.
+    """
+    import re
+
+    if not version_dir_req:
+        return None
+
+    direct = _safe_abs_under_plots(version_dir_req)
+    if direct and os.path.isdir(direct):
+        return direct
+
+    image_abs = _safe_abs_under_plots(image_path)
+    if not image_abs:
+        return None
+
+    image_dir = os.path.dirname(image_abs)
+    image_name = os.path.basename(image_abs)
+    base_name = os.path.splitext(image_name)[0]
+    name_for_folder = image_name.replace('.', '_')
+    full_prompt_name = f"pv2_{prompt_name}"
+
+    req_name = os.path.basename((version_dir_req or '').replace('\\', '/').rstrip('/'))
+    req_version_num = None
+    m_req = re.search(r'\.v(\d+)', req_name)
+    if m_req:
+        try:
+            req_version_num = int(m_req.group(1))
+        except Exception:
+            req_version_num = None
+
+    pattern_new = re.compile(
+        rf'^{re.escape(name_for_folder)}\.{re.escape(full_prompt_name)}\.v(\d+)(?:\.key(\d+))?(?:\.(web))?$'
+    )
+    pattern_old = re.compile(
+        rf'^{re.escape(base_name)}\.{re.escape(full_prompt_name)}\.v(\d+)(?:\.key(\d+))?(?:\.(web))?$'
+    )
+
+    candidates: list[tuple[int, int, int, str]] = []
+    # tuple = (version_num, has_web, key_num, abs_path)
+    if os.path.isdir(image_dir):
+        for item in os.listdir(image_dir):
+            item_path = os.path.join(image_dir, item)
+            if not os.path.isdir(item_path):
+                continue
+            m = pattern_new.match(item) or pattern_old.match(item)
+            if not m:
+                continue
+            try:
+                vnum = int(m.group(1))
+            except Exception:
+                continue
+            if req_version_num is not None and vnum != req_version_num:
+                continue
+            key_num = 0
+            if m.group(2):
+                try:
+                    key_num = int(m.group(2))
+                except Exception:
+                    key_num = 0
+            has_web = 1 if m.group(3) else 0
+            candidates.append((vnum, has_web, key_num, item_path))
+
+    if not candidates:
+        return None
+
+    # Prefer .web folder and higher key number for same version.
+    candidates.sort(key=lambda t: (t[0], t[1], t[2]), reverse=True)
+    return candidates[0][3]
+
+
 def _read_v2_progress_snapshot(version_dir: str) -> dict:
     """Return parsed _extraction_progress.json for a v2 run folder, else {}."""
     version_dir = _resolve_path_under_plots(version_dir)
@@ -3030,7 +3104,7 @@ def v2_load_saved_runs():
 
     # Optional: load one specific saved run directory.
     if version_dir_req:
-        version_abs = _safe_abs_under_plots(version_dir_req)
+        version_abs = _resolve_requested_v2_version_dir(image_path, prompt_name, version_dir_req)
         if (not version_abs) or (not os.path.isdir(version_abs)):
             return jsonify({
                 'success': False,
