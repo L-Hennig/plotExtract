@@ -5525,5 +5525,8 @@ def parse_interpolation_stats(stats_path):
 if __name__ == '__main__':
     print(f"Synthetic plots will be saved to: {SYNTHETIC_DIR}")
     print("Starting PlotExtract Web Application...")
-    print("Open http://127.0.0.1:5000 in your browser")
-    app.run(debug=True, port=5000)
+    host = os.environ.get('HOST', '0.0.0.0')
+    port = int(os.environ.get('PORT', '5000'))
+    debug = str(os.environ.get('FLASK_DEBUG', '')).strip().lower() in {'1', 'true', 'yes', 'on'}
+    print(f"Listening on http://{host}:{port}")
+    app.run(host=host, port=port, debug=debug)
