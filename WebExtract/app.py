@@ -31,6 +31,23 @@ UI_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Repo root: Plot_Extract/
 REPO_ROOT = os.path.abspath(os.path.join(UI_DIR, '..'))
+REPO_PLOTS_DIR = os.path.join(REPO_ROOT, 'plots')
+
+
+def _default_data_root() -> str:
+    configured = (os.getenv('PLOTEXTRACT_DATA_ROOT') or '').strip()
+    if configured:
+        return os.path.abspath(configured)
+
+    # Render persistent disk is typically mounted at /var/data when configured.
+    if os.getenv('RENDER') and os.path.isdir('/var/data'):
+        return os.path.join('/var/data', 'plot_extract')
+
+    # Local/default behavior: use repo folders directly.
+    return REPO_ROOT
+
+
+DATA_ROOT = _default_data_root()
 
 # Serve templates/static from the WebExtract folder, but run the backend
 # pipelines using the Prototype folder (scripts, plots, prompts).
@@ -45,7 +62,8 @@ app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024
 
 # Base directory (backend/scripts root)
 BASE_DIR = REPO_ROOT
-PLOTS_DIR = os.path.join(BASE_DIR, 'plots')
+PLOTS_DIR = os.path.join(DATA_ROOT, 'plots')
+STATE_DIR = os.path.join(DATA_ROOT, 'state')
 PROMPTS_DIR = os.path.join(BASE_DIR, 'prompts')
 PROMPTS_V2_DIR = os.path.join(BASE_DIR, 'plot_extract_v2', 'prompts')
 PROMPTS_V2_CHAINS_DIR = os.path.join(PROMPTS_V2_DIR, 'chains')
@@ -55,6 +73,35 @@ SYNTHETIC_DIR = os.path.join(PLOTS_DIR, 'synthetic')
 UI_EXAMPLES_DIR = os.path.join(UI_DIR, 'examples')
 
 ALLOWED_IMAGE_EXTS = {'.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff', '.webp'}
+
+
+def _ensure_runtime_layout():
+    """Ensure runtime write paths exist and seed plots for hosted environments.
+
+    Local behavior is unchanged when DATA_ROOT == REPO_ROOT.
+    On hosted environments with a persistent disk, this prepares a writable
+    plots/state area so uploads/extraction outputs survive restarts.
+    """
+    os.makedirs(DATA_ROOT, exist_ok=True)
+    os.makedirs(STATE_DIR, exist_ok=True)
+
+    same_plots_dir = os.path.abspath(PLOTS_DIR) == os.path.abspath(REPO_PLOTS_DIR)
+    if same_plots_dir:
+        os.makedirs(PLOTS_DIR, exist_ok=True)
+        return
+
+    if not os.path.isdir(PLOTS_DIR):
+        try:
+            if os.path.isdir(REPO_PLOTS_DIR):
+                shutil.copytree(REPO_PLOTS_DIR, PLOTS_DIR, dirs_exist_ok=True)
+            else:
+                os.makedirs(PLOTS_DIR, exist_ok=True)
+        except Exception as e:
+            print(f"Warning: could not seed plots into DATA_ROOT: {e}")
+            os.makedirs(PLOTS_DIR, exist_ok=True)
+
+
+_ensure_runtime_layout()
 
 def _pick_python_exe() -> str:
     # Prefer repo-root venv so subprocesses see the same installed packages
@@ -284,8 +331,6 @@ def _resolve_path_under_plots(path_value):
 
 # Create synthetic folder if it doesn't exist
 os.makedirs(SYNTHETIC_DIR, exist_ok=True)
-
-STATE_DIR = UI_DIR
 
 # Settings/state files (kept under WebExtract so this UI stays isolated)
 SETTINGS_FILE = os.path.join(STATE_DIR, 'synthetic_settings.json')
