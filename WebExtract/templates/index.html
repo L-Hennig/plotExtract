@@ -5996,6 +5996,10 @@
     const elapsed = (status && typeof status.elapsed === 'number') ? status.elapsed : null;
     elapsedText.textContent = elapsed != null ? (Math.round(elapsed) + 's elapsed') : '—';
 
+    if (status && status.status === 'completed') {
+      return { done: true, result: status.result };
+    }
+
     const progressLine = (status && status.progress) ? status.progress : 'Running…';
 
     let percent = null;
@@ -6020,10 +6024,6 @@
     }
 
     progressText.textContent = stage ? (stage + ' — ' + progressLine) : progressLine;
-
-    if (status && status.status === 'completed') {
-      return { done: true, result: status.result };
-    }
 
     return { done: false };
   }
