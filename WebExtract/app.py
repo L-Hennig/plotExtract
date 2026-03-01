@@ -3160,16 +3160,48 @@ def api_test_runs_health():
 
 
 def _iter_example_files():
-    if not os.path.isdir(UI_EXAMPLES_DIR):
-        return
-    for root, _dirs, files in os.walk(UI_EXAMPLES_DIR):
-        for name in files:
-            ext = os.path.splitext(name)[1].lower()
-            if ext not in ALLOWED_IMAGE_EXTS:
-                continue
-            full_path = os.path.join(root, name)
-            rel_path = os.path.relpath(full_path, UI_EXAMPLES_DIR).replace('\\', '/')
-            yield rel_path
+    yielded = set()
+
+    # 1) UI-local examples (WebExtract/examples)
+    if os.path.isdir(UI_EXAMPLES_DIR):
+        for root, _dirs, files in os.walk(UI_EXAMPLES_DIR):
+            for name in files:
+                ext = os.path.splitext(name)[1].lower()
+                if ext not in ALLOWED_IMAGE_EXTS:
+                    continue
+                full_path = os.path.join(root, name)
+                rel_path = os.path.relpath(full_path, UI_EXAMPLES_DIR).replace('\\', '/')
+                if rel_path not in yielded:
+                    yielded.add(rel_path)
+                    yield rel_path
+
+    # 2) Plots-backed examples (Render-safe, deployed with repo/runtime plots)
+    #    We intentionally scope this to known example-bearing folders.
+    roots = [
+        os.path.join(PLOTS_DIR, 'synthetic'),
+        os.path.join(PLOTS_DIR, 'first_examples'),
+        os.path.join(PLOTS_DIR, 'quick_test'),
+        os.path.join(REPO_PLOTS_DIR, 'synthetic'),
+        os.path.join(REPO_PLOTS_DIR, 'first_examples'),
+        os.path.join(REPO_PLOTS_DIR, 'quick_test'),
+    ]
+
+    for top in roots:
+        if not os.path.isdir(top):
+            continue
+        for root, _dirs, files in os.walk(top):
+            for name in files:
+                ext = os.path.splitext(name)[1].lower()
+                if ext not in ALLOWED_IMAGE_EXTS:
+                    continue
+                full_path = os.path.join(root, name)
+                rel_path = _plots_rel_from_abs(full_path)
+                if not rel_path:
+                    continue
+                rel_path = rel_path.replace('\\', '/')
+                if rel_path not in yielded:
+                    yielded.add(rel_path)
+                    yield rel_path
 
 
 @app.route('/ui/examples')
@@ -3180,8 +3212,21 @@ def ui_examples():
 
 @app.route('/ui/examples/<path:filename>')
 def ui_examples_file(filename):
-    """Serve a UI example image for preview."""
-    return send_from_directory(UI_EXAMPLES_DIR, filename)
+    """Serve a UI example image for preview.
+
+    Supports both:
+    - WebExtract/examples-relative paths
+    - plots-relative paths (synthetic/..., first_examples/..., quick_test/...)
+    """
+    safe_ui_abs = _safe_abs_under_ui_examples(filename)
+    if safe_ui_abs and os.path.isfile(safe_ui_abs):
+        return send_from_directory(UI_EXAMPLES_DIR, filename)
+
+    plot_abs = _existing_plot_abs(filename)
+    if plot_abs and os.path.isfile(plot_abs):
+        return send_from_directory(os.path.dirname(plot_abs), os.path.basename(plot_abs))
+
+    return jsonify({'success': False, 'error': 'example_not_found', 'example_path': filename}), 404
 
 
 def _is_allowed_image(filename: str) -> bool:
@@ -3227,29 +3272,46 @@ def ui_prepare_example():
     if not example_path:
         return jsonify({'success': False, 'error': 'missing_example_path'}), 400
 
-    src_full = _safe_abs_under_ui_examples(example_path)
-    if not src_full:
-        return jsonify({'success': False, 'error': 'invalid_example_path'}), 400
+    src_full = None
+    src_kind = None  # 'ui' | 'plots'
 
-    if not os.path.isfile(src_full):
+    ui_abs = _safe_abs_under_ui_examples(example_path)
+    if ui_abs and os.path.isfile(ui_abs):
+        src_full = ui_abs
+        src_kind = 'ui'
+    else:
+        plot_abs = _existing_plot_abs(example_path)
+        if plot_abs and os.path.isfile(plot_abs):
+            src_full = plot_abs
+            src_kind = 'plots'
+
+    if not src_full:
         return jsonify({'success': False, 'error': 'example_not_found'}), 404
 
     if not _is_allowed_image(src_full):
         return jsonify({'success': False, 'error': 'unsupported_file_type'}), 400
 
-    rel_image_path = None
-    if EPHEMERAL_RUNTIME:
+    def _copy_example_into_batch(src_abs: str) -> str:
         os.makedirs(BATCH_DIR, exist_ok=True)
         token = str(uuid.uuid4())[:8]
-        ext = os.path.splitext(src_full)[1].lower()
+        ext = os.path.splitext(src_abs)[1].lower()
         copied_name = f"ui_example_{token}{ext}"
         copied_full = os.path.join(BATCH_DIR, copied_name)
-        shutil.copy2(src_full, copied_full)
-        rel_image_path = os.path.relpath(copied_full, PLOTS_DIR).replace('\\', '/')
+        shutil.copy2(src_abs, copied_full)
+        return os.path.relpath(copied_full, PLOTS_DIR).replace('\\', '/')
+
+    rel_image_path = None
+    if EPHEMERAL_RUNTIME:
+        rel_image_path = _copy_example_into_batch(src_full)
     else:
-        rel_image_path = _resolve_ui_example_to_plots_rel(example_path)
-        if not rel_image_path:
-            return jsonify({'success': False, 'error': 'example_not_mapped_in_plots'}), 400
+        if src_kind == 'plots':
+            rel_image_path = _plots_rel_from_abs(src_full)
+        else:
+            # UI example selected: map to canonical plots location when possible,
+            # otherwise copy into batch_uploads so hosted deployments can use it.
+            rel_image_path = _resolve_ui_example_to_plots_rel(example_path)
+            if not rel_image_path:
+                rel_image_path = _copy_example_into_batch(src_full)
 
     return jsonify({
         'success': True,
