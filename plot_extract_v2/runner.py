@@ -2401,6 +2401,8 @@ if code:
 # Validation (uses prompts from the loaded prompt set)
 # -----------------------------------------------------------------------------
 
+skip_visual_validation = str(os.getenv('PLOTEXTRACT_SKIP_VISUAL_VALIDATION', '')).strip().lower() in {'1', 'true', 'yes', 'on'}
+
 # Only validate if we successfully generated a replot
 if code and error_output != "SKIP_REPLOT" and not error_output:
     comparison_original = api_image_path if original_ext == ".svg" else input_plot
@@ -2429,57 +2431,69 @@ if stacked:
         _, validate_resp = prompt_llm(client, msg)
         return validate_resp
 
-    # Get comparison prompts from the loaded prompts module
-    compare_x = getattr(prompts_module, 'COMPARE_X', 'Do the X axes match?')
-    compare_y = getattr(prompts_module, 'COMPARE_Y', 'Do the Y axes match?')
-    compare_number = getattr(prompts_module, 'COMPARE_NUMBER', 'Do the number of points match?')
-    compare_trend = getattr(prompts_module, 'COMPARE_TREND', 'Does the trend match?')
+    if skip_visual_validation:
+        print("Visual validation disabled by PLOTEXTRACT_SKIP_VISUAL_VALIDATION; skipping.")
+        with open(output_out + "_validate", "w", encoding="utf-8") as file:
+            file.write("skipped")
+        tracker.set_validation_result("skipped", {"reason": "disabled_by_env"})
+    else:
+        try:
+            # Get comparison prompts from the loaded prompts module
+            compare_x = getattr(prompts_module, 'COMPARE_X', 'Do the X axes match?')
+            compare_y = getattr(prompts_module, 'COMPARE_Y', 'Do the Y axes match?')
+            compare_number = getattr(prompts_module, 'COMPARE_NUMBER', 'Do the number of points match?')
+            compare_trend = getattr(prompts_module, 'COMPARE_TREND', 'Does the trend match?')
 
-    validate_x = run_validation(compare_x)
-    validation_details['x_axis'] = validate_x
-    print(f"\n\nAxis x (result: {validate_x})")
-    if "no" in validate_x.lower().strip()[:10]:
-        wrong = True
-        wrong_why += "X; "
+            validate_x = run_validation(compare_x)
+            validation_details['x_axis'] = validate_x
+            print(f"\n\nAxis x (result: {validate_x})")
+            if "no" in validate_x.lower().strip()[:10]:
+                wrong = True
+                wrong_why += "X; "
 
-    validate_y = run_validation(compare_y)
-    validation_details['y_axis'] = validate_y
-    print(f"Axis y (result: {validate_y})")
-    if "no" in validate_y.lower().strip()[:10]:
-        wrong = True
-        wrong_why += "Y; "
+            validate_y = run_validation(compare_y)
+            validation_details['y_axis'] = validate_y
+            print(f"Axis y (result: {validate_y})")
+            if "no" in validate_y.lower().strip()[:10]:
+                wrong = True
+                wrong_why += "Y; "
 
-    validate_n = run_validation(compare_number)
-    validation_details['num_points'] = validate_n
-    print(f"Points n (result: {validate_n})")
-    if "no" in validate_n.lower().strip()[:10]:
-        wrong = True
-        wrong_why += "N; "
+            validate_n = run_validation(compare_number)
+            validation_details['num_points'] = validate_n
+            print(f"Points n (result: {validate_n})")
+            if "no" in validate_n.lower().strip()[:10]:
+                wrong = True
+                wrong_why += "N; "
 
-    validate_t = run_validation(compare_trend)
-    validation_details['trend'] = validate_t
-    print(f"Trends (result: {validate_t})")
-    if "no" in validate_t.lower().strip()[:10]:
-        wrong = True
-        wrong_why += "T"
+            validate_t = run_validation(compare_trend)
+            validation_details['trend'] = validate_t
+            print(f"Trends (result: {validate_t})")
+            if "no" in validate_t.lower().strip()[:10]:
+                wrong = True
+                wrong_why += "T"
 
-    with open(output_out + "_validate", "w", encoding="utf-8") as file:
-        if wrong:
-            file.write("no")
-        else:
-            file.write("yes")
-    if wrong:
-        with open(output_out + "_validate_why", "w", encoding="utf-8") as file:
-            file.write(wrong_why)
-    result_flag = "no" if wrong else "yes"
-    
-    # Track validation results
-    tracker.set_validation_result(result_flag, validation_details)
-    print(f"\nFINISHED (result: {result_flag})")
+            with open(output_out + "_validate", "w", encoding="utf-8") as file:
+                if wrong:
+                    file.write("no")
+                else:
+                    file.write("yes")
+            if wrong:
+                with open(output_out + "_validate_why", "w", encoding="utf-8") as file:
+                    file.write(wrong_why)
+            result_flag = "no" if wrong else "yes"
 
-    print("Stacking original and replotted images for comparison... ", end="", flush=True)
-    stack_images_vertically(comparison_original, replot_plot, "no" if wrong else "yes", version_dir, prompt_name, version_num, key_tag=key_tag, output_tag=(output_tag or None))
-    print("FINISHED")
+            # Track validation results
+            tracker.set_validation_result(result_flag, validation_details)
+            print(f"\nFINISHED (result: {result_flag})")
+
+            print("Stacking original and replotted images for comparison... ", end="", flush=True)
+            stack_images_vertically(comparison_original, replot_plot, "no" if wrong else "yes", version_dir, prompt_name, version_num, key_tag=key_tag, output_tag=(output_tag or None))
+            print("FINISHED")
+        except Exception as e:
+            print(f"[WARN] Visual validation failed (non-fatal): {e}")
+            with open(output_out + "_validate", "w", encoding="utf-8") as file:
+                file.write("skipped")
+            tracker.set_validation_result("skipped", {"reason": "validation_error", "error": str(e)})
 else:
     print("Skipping visual validation (comparison image could not be generated)")
     with open(output_out + "_validate", "w", encoding="utf-8") as file:

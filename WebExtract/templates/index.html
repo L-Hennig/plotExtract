@@ -2337,13 +2337,21 @@
     if (showAxes && pb && Number.isFinite(pb.left) && Number.isFinite(pb.top) && Number.isFinite(pb.right) && Number.isFinite(pb.bottom)) {
       const gAxis = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       gAxis.setAttribute('transform', transform);
-      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      rect.setAttribute('x', String(pb.left));
-      rect.setAttribute('y', String(pb.top));
-      rect.setAttribute('width', String(Math.max(1, pb.right - pb.left)));
-      rect.setAttribute('height', String(Math.max(1, pb.bottom - pb.top)));
-      rect.setAttribute('class', 'adjustAxesRect');
-      gAxis.appendChild(rect);
+      const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      xAxis.setAttribute('x1', String(pb.left));
+      xAxis.setAttribute('y1', String(pb.bottom));
+      xAxis.setAttribute('x2', String(pb.right));
+      xAxis.setAttribute('y2', String(pb.bottom));
+      xAxis.setAttribute('class', 'adjustAxesRect');
+      gAxis.appendChild(xAxis);
+
+      const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      yAxis.setAttribute('x1', String(pb.left));
+      yAxis.setAttribute('y1', String(pb.bottom));
+      yAxis.setAttribute('x2', String(pb.left));
+      yAxis.setAttribute('y2', String(pb.top));
+      yAxis.setAttribute('class', 'adjustAxesRect');
+      gAxis.appendChild(yAxis);
 
       const tickLen = Math.max(6, Math.min(14, 0.012 * Math.max(nw, nh)));
       const xMinLabel = _formatAxisTickValue(xMin);
@@ -2401,27 +2409,6 @@
       curveStyleByLabel.set(styleLabel, style || {});
     }
 
-    const _styleToken = (value) => String(value == null ? '' : value).trim().toLowerCase().replace(/\s+/g, '_').replace(/-/g, '_');
-    const _lineDashPattern = (lineTypeRaw) => {
-      const lineType = _styleToken(lineTypeRaw);
-      if (!lineType || lineType === 'solid') return null;
-      if (lineType === 'dashed' || lineType === 'broken' || lineType === '__') return '8 5';
-      if (lineType === 'dotted' || lineType === 'dot' || lineType === 'points') return '2 4';
-      if (lineType === 'dash_dot' || lineType === 'dashdot' || lineType === 'dot_dash') return '8 4 2 4';
-      return null;
-    };
-    const _markerShape = (markerRaw) => {
-      const marker = _styleToken(markerRaw);
-      if (!marker || marker === 'circle' || marker === 'o') return 'circle';
-      if (marker === 'none' || marker === 'no_marker') return 'none';
-      if (marker === 'square' || marker === 's') return 'square';
-      if (marker === 'diamond' || marker === 'd') return 'diamond';
-      if (marker === 'triangle' || marker === 'triangle_up' || marker === 'triangleup' || marker === '^') return 'triangle_up';
-      if (marker === 'triangle_down' || marker === 'triangledown' || marker === 'v') return 'triangle_down';
-      if (marker === 'x' || marker === 'cross' || marker === 'times') return 'x';
-      if (marker === 'plus' || marker === '+') return 'plus';
-      return 'circle';
-    };
     const _decoratePointElement = (el, label, pointIndex, isSelected) => {
       if (!el) return;
       el.setAttribute('class', isSelected ? 'adjustPoint adjustPoint--selected' : 'adjustPoint');
@@ -2565,10 +2552,10 @@
       const pxPoints = points.map(p => _adjustDataToNaturalPx(workingSave, p.x, p.y, nw, nh)).filter(Boolean);
       if (pxPoints.length < 1) continue;
 
-      const color = adjustOverlayColor;
       const style = curveStyleByLabel.get(label) || {};
-      const dashPattern = _lineDashPattern(style.line_type);
-      const markerType = _markerShape(style.marker_symbol);
+      const color = String(style.colour || adjustOverlayColor);
+      const dashPattern = _overlayLineDashPattern(style.line_type);
+      const markerType = _overlayMarkerShape(style.marker_symbol);
 
       if (pxPoints.length >= 2) {
         const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');

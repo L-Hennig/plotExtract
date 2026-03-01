@@ -22,6 +22,7 @@ import shutil
 import threading
 import time
 import uuid
+import tempfile
 from collections import Counter
 from flask import Flask, render_template, request, jsonify, send_from_directory, redirect
 from jinja2 import TemplateNotFound
@@ -34,7 +35,22 @@ REPO_ROOT = os.path.abspath(os.path.join(UI_DIR, '..'))
 REPO_PLOTS_DIR = os.path.join(REPO_ROOT, 'plots')
 
 
+def _env_truthy(name: str, default: bool = False) -> bool:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    return str(raw).strip().lower() in {'1', 'true', 'yes', 'on'}
+
+
+APP_DEBUG = _env_truthy('FLASK_DEBUG', default=False)
+FORCE_PERSISTENT_DATA = _env_truthy('PLOTEXTRACT_FORCE_PERSISTENT_DATA', default=False)
+EPHEMERAL_RUNTIME = (not APP_DEBUG) and (not FORCE_PERSISTENT_DATA)
+
+
 def _default_data_root() -> str:
+    if EPHEMERAL_RUNTIME:
+        return os.path.join(tempfile.gettempdir(), 'plot_extract_webextract_runtime')
+
     configured = (os.getenv('PLOTEXTRACT_DATA_ROOT') or '').strip()
     if configured:
         return os.path.abspath(configured)
@@ -90,6 +106,10 @@ def _ensure_runtime_layout():
         os.makedirs(PLOTS_DIR, exist_ok=True)
         return
 
+    if EPHEMERAL_RUNTIME:
+        os.makedirs(PLOTS_DIR, exist_ok=True)
+        return
+
     if not os.path.isdir(PLOTS_DIR):
         try:
             if os.path.isdir(REPO_PLOTS_DIR):
@@ -131,6 +151,51 @@ def _safe_abs_under_plots(rel_path: str) -> str | None:
     if not abs_p.startswith(os.path.abspath(PLOTS_DIR)):
         return None
     return abs_p
+
+
+def _safe_abs_under_repo_plots(rel_path: str) -> str | None:
+    """Return absolute path under REPO_PLOTS_DIR for a plots-relative path, else None."""
+    if not rel_path:
+        return None
+    try:
+        p = str(rel_path).replace('\\', '/').lstrip('/')
+    except Exception:
+        return None
+    if any(part == '..' for part in p.split('/')):
+        return None
+    abs_p = os.path.abspath(os.path.join(REPO_PLOTS_DIR, p.replace('/', os.sep)))
+    if not abs_p.startswith(os.path.abspath(REPO_PLOTS_DIR)):
+        return None
+    return abs_p
+
+
+def _materialize_plot_asset(rel_path: str) -> str | None:
+    """Ensure a plot asset exists under runtime PLOTS_DIR by copying from repo plots if needed."""
+    runtime_abs = _safe_abs_under_plots(rel_path)
+    if not runtime_abs:
+        return None
+
+    if os.path.isfile(runtime_abs):
+        return rel_path
+
+    repo_abs = _safe_abs_under_repo_plots(rel_path)
+    if not repo_abs or not os.path.isfile(repo_abs):
+        return None
+
+    os.makedirs(os.path.dirname(runtime_abs), exist_ok=True)
+    shutil.copy2(repo_abs, runtime_abs)
+
+    base_name = os.path.splitext(os.path.basename(rel_path))[0]
+    runtime_dir = os.path.dirname(runtime_abs)
+    repo_dir = os.path.dirname(repo_abs)
+
+    for sibling_name in (f"{base_name}-original.csv", f"{base_name}.context.json"):
+        repo_sibling = os.path.join(repo_dir, sibling_name)
+        runtime_sibling = os.path.join(runtime_dir, sibling_name)
+        if os.path.isfile(repo_sibling) and not os.path.exists(runtime_sibling):
+            shutil.copy2(repo_sibling, runtime_sibling)
+
+    return rel_path
 
 
 def _safe_abs_under_ui_examples(rel_path: str) -> str | None:
@@ -2788,7 +2853,15 @@ def index_v2():
 @app.route('/plots/<path:filename>')
 def serve_plot(filename):
     """Serve files from the plots directory."""
-    return send_from_directory(PLOTS_DIR, filename)
+    runtime_abs = _safe_abs_under_plots(filename)
+    if runtime_abs and os.path.exists(runtime_abs):
+        return send_from_directory(PLOTS_DIR, filename)
+
+    repo_abs = _safe_abs_under_repo_plots(filename)
+    if repo_abs and os.path.exists(repo_abs):
+        return send_from_directory(REPO_PLOTS_DIR, filename)
+
+    return ('Not found', 404)
 
 
 # =============================================================================
@@ -2883,9 +2956,19 @@ def ui_prepare_example():
     if not _is_allowed_image(src_full):
         return jsonify({'success': False, 'error': 'unsupported_file_type'}), 400
 
-    rel_image_path = _resolve_ui_example_to_plots_rel(example_path)
-    if not rel_image_path:
-        return jsonify({'success': False, 'error': 'example_not_mapped_in_plots'}), 400
+    rel_image_path = None
+    if EPHEMERAL_RUNTIME:
+        os.makedirs(BATCH_DIR, exist_ok=True)
+        token = str(uuid.uuid4())[:8]
+        ext = os.path.splitext(src_full)[1].lower()
+        copied_name = f"ui_example_{token}{ext}"
+        copied_full = os.path.join(BATCH_DIR, copied_name)
+        shutil.copy2(src_full, copied_full)
+        rel_image_path = os.path.relpath(copied_full, PLOTS_DIR).replace('\\', '/')
+    else:
+        rel_image_path = _resolve_ui_example_to_plots_rel(example_path)
+        if not rel_image_path:
+            return jsonify({'success': False, 'error': 'example_not_mapped_in_plots'}), 400
 
     return jsonify({
         'success': True,
@@ -2899,6 +2982,7 @@ def check_csv():
     """Check if CSV files exist for the selected image."""
     image_path = request.json.get('image_path')
     prompt_file = request.json.get('prompt_file')
+    _materialize_plot_asset(image_path)
     
     result = check_csv_exists(image_path, prompt_file)
     return jsonify(result)
@@ -2908,6 +2992,7 @@ def check_csv_v2():
     """Check CSV existence for PlotExtractV2 outputs."""
     image_path = request.json.get('image_path')
     prompt_name = request.json.get('prompt_name') or request.json.get('prompt_file')
+    _materialize_plot_asset(image_path)
 
     result = check_csv_exists_v2(image_path, prompt_name)
     return jsonify(result)
@@ -2949,6 +3034,7 @@ def get_axis_ranges():
     import pandas as pd
     
     image_path = request.json.get('image_path')
+    _materialize_plot_asset(image_path)
     
     # Get the original CSV path
     csv_paths = get_csv_paths(os.path.join(PLOTS_DIR, image_path))
@@ -3004,6 +3090,7 @@ def get_outputs():
     image_path = request.json.get('image_path')
     prompt_file = request.json.get('prompt_file')
     version_dir_param = request.json.get('version_dir')  # Optional: specific version to show
+    _materialize_plot_asset(image_path)
     
     # If no specific version requested, find the latest version for this image+prompt
     if not version_dir_param and prompt_file:
@@ -3041,6 +3128,7 @@ def get_outputs_v2():
     image_path = request.json.get('image_path')
     prompt_name = request.json.get('prompt_name') or request.json.get('prompt_file')
     version_dir_param = request.json.get('version_dir')
+    _materialize_plot_asset(image_path)
 
     if not version_dir_param and prompt_name:
         image_dir = os.path.dirname(os.path.join(PLOTS_DIR, image_path))
@@ -3202,6 +3290,8 @@ def run_all():
     
     data = request.json
     image_path = data.get('image')
+    if not _materialize_plot_asset(image_path):
+        return jsonify({'error': 'image_not_found', 'image_path': image_path}), 404
     prompt_file = data.get('prompt')
     run_interpolation = data.get('runInterpolation', False)
     run_pointwise = data.get('runPointwise', False)
@@ -3216,6 +3306,8 @@ def run_all():
     # Optional: rate-limit backoff mode (slower, disables server-side extraction timeout)
     rate_limit_backoff = bool(data.get('rate_limit_backoff') or data.get('rateLimitBackoff') or False)
     persist_result = bool(data.get('persist_result', True))
+    if EPHEMERAL_RUNTIME:
+        persist_result = False
 
     # Optional: batch metadata (for persistent batch results page)
     batch_number = data.get('batch_number')
@@ -3259,6 +3351,8 @@ def run_all_v2():
 
     data = request.json
     image_path = data.get('image')
+    if not _materialize_plot_asset(image_path):
+        return jsonify({'error': 'image_not_found', 'image_path': image_path}), 404
     prompt_name = data.get('prompt') or data.get('prompt_name')
     article_info = data.get('articleInfo', '').strip()
     llm_key = str(data.get('llmKey') or data.get('llm_key') or '').strip()
@@ -3276,6 +3370,8 @@ def run_all_v2():
     debug_mode = bool(data.get('debug', False))
     rate_limit_backoff = bool(data.get('rate_limit_backoff') or data.get('rateLimitBackoff') or False)
     persist_result = bool(data.get('persist_result', True))
+    if EPHEMERAL_RUNTIME:
+        persist_result = False
     # Regular (normal) mode sends persist_result=False. Force Key5 there.
     if not persist_result:
         llm_key = '5'
@@ -4205,6 +4301,8 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug
     try:
         env_overrides = {}
         env_overrides['PLOTEXTRACT_OUTPUT_TAG'] = 'web'
+        if not debug_mode:
+            env_overrides['PLOTEXTRACT_SKIP_VISUAL_VALIDATION'] = '1'
         if debug_mode:
             env_overrides['PLOTEXTRACT_DEBUG'] = '1'
         if rate_limit_backoff:
@@ -5643,6 +5741,7 @@ def parse_interpolation_stats(stats_path):
 
 if __name__ == '__main__':
     print(f"Synthetic plots will be saved to: {SYNTHETIC_DIR}")
+    print(f"Runtime mode: {'debug/persistent' if not EPHEMERAL_RUNTIME else 'normal/ephemeral'}")
     print("Starting PlotExtract Web Application...")
     host = os.environ.get('HOST', '0.0.0.0')
     port = int(os.environ.get('PORT', '5000'))
