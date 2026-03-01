@@ -32,10 +32,20 @@
         <div class="panel">
           <h2 class="h2">1) Choose image</h2>
 
-          <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Upload image">
-            <div class="dropzone__title">Drag and drop an image here</div>
-            <div class="dropzone__subtitle">or click to choose a file</div>
-            <input id="fileInput" class="dropzone__input" type="file" accept="image/*" />
+          <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Upload one or more images">
+            <div class="dropzone__title">Drag and drop one or more images</div>
+            <div class="dropzone__subtitle">or click to choose multiple files</div>
+            <input id="fileInput" class="dropzone__input" type="file" accept="image/*" multiple />
+          </div>
+          <div class="muted" style="margin-top: 8px; font-size: 12px; line-height: 1.4;">
+            Tip: select multiple files in the picker (Ctrl/Shift) or drop several files at once. They run sequentially.
+          </div>
+          <div style="margin-top: 8px; border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; background: var(--surface-soft);">
+            <div id="selectedQueueMeta" class="muted" style="font-size: 12px; margin-bottom: 4px;">No images queued yet.</div>
+            <div id="selectedQueueList" class="mono" style="font-size: 12px; white-space: pre-line; max-height: 96px; overflow: auto;"></div>
+            <div class="row" style="margin-top: 8px;">
+              <button id="btnClearQueue" class="btn" type="button" style="display:none">Clear queued images</button>
+            </div>
           </div>
 
           <div class="divider">or</div>
@@ -45,7 +55,7 @@
             <select id="exampleSelect" class="select">
               <option value="">(no example selected)</option>
             </select>
-            <button id="btnLoadExample" class="btn" type="button">Use example</button>
+            <button id="btnLoadExample" class="btn" type="button">Add example to queue</button>
           </div>
 
           <div id="testResultsOptions" style="margin-top: 10px;">
@@ -167,6 +177,11 @@
 
           <div id="resultWrap" style="display:none; margin-top: 14px;">
             <h3 class="h3">Result</h3>
+            <div id="resultImageNav" class="row" style="display:none; margin: 6px 0 10px; align-items: center;">
+              <button id="btnResultPrevImage" class="btn" type="button">← Prev image</button>
+              <div id="resultImageNavLabel" class="muted" style="min-width: 220px; text-align: center;">Image 1/1</div>
+              <button id="btnResultNextImage" class="btn" type="button">Next image →</button>
+            </div>
             <details id="resultInstructions" class="notice" style="margin-bottom: 10px;" open>
               <summary style="font-weight: 700; margin-bottom: 6px; cursor: pointer;">How to use Results</summary>
               <div style="font-size: 13px; color: var(--muted); margin: 6px 0;">
@@ -276,6 +291,11 @@
 
     <section id="adjustSection" class="card" style="display:none; margin-top: 14px;">
       <h2 class="h2">Adjust</h2>
+      <div id="adjustImageNav" class="row" style="display:none; margin: 6px 0 10px; align-items: center;">
+        <button id="btnAdjustPrevImage" class="btn" type="button">← Prev image</button>
+        <div id="adjustImageNavLabel" class="muted" style="min-width: 220px; text-align: center;">Image 1/1</div>
+        <button id="btnAdjustNextImage" class="btn" type="button">Next image →</button>
+      </div>
       <details id="adjustInstructions" class="notice" style="margin-bottom: 10px;" open>
         <summary style="font-weight: 700; margin-bottom: 6px; cursor: pointer;">How to use Adjust</summary>
         <div style="font-size: 13px; color: var(--muted); margin: 6px 0;">
@@ -306,6 +326,7 @@
             <img id="adjustImage" class="adjustImage" alt="Adjust original" />
             <svg id="adjustAxesOverlay" class="adjustOverlay adjustOverlay--axes" preserveAspectRatio="none"></svg>
             <svg id="adjustCurvesOverlay" class="adjustOverlay adjustOverlay--curves" preserveAspectRatio="none"></svg>
+            <div id="adjustOverlayClickHint" style="display:none; position:absolute; left:0; top:0; transform: translate(10px, 10px); z-index: 12; pointer-events:none; max-width: 320px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 12px; line-height: 1.35; box-shadow: 0 6px 16px rgba(0,0,0,0.12);">Turn off movement to select or move points.</div>
           </div>
         </div>
 
@@ -406,6 +427,9 @@
   const previewImg = document.getElementById('previewImg');
   const previewEmpty = document.getElementById('previewEmpty');
   const selectedFileLabel = document.getElementById('selectedFileLabel');
+  const selectedQueueMeta = document.getElementById('selectedQueueMeta');
+  const selectedQueueList = document.getElementById('selectedQueueList');
+  const btnClearQueue = document.getElementById('btnClearQueue');
   const uploadStatus = document.getElementById('uploadStatus');
 
   const exampleSelect = document.getElementById('exampleSelect');
@@ -442,6 +466,10 @@
   const elapsedText = document.getElementById('elapsedText');
 
   const resultWrap = document.getElementById('resultWrap');
+  const resultImageNav = document.getElementById('resultImageNav');
+  const btnResultPrevImage = document.getElementById('btnResultPrevImage');
+  const btnResultNextImage = document.getElementById('btnResultNextImage');
+  const resultImageNavLabel = document.getElementById('resultImageNavLabel');
   const resultSummary = document.getElementById('resultSummary');
   const resultWarning = document.getElementById('resultWarning');
   const resultGallery = document.getElementById('resultGallery');
@@ -455,12 +483,17 @@
   const btnCopyConsole = document.getElementById('btnCopyConsole');
 
   const adjustSection = document.getElementById('adjustSection');
+  const adjustImageNav = document.getElementById('adjustImageNav');
+  const btnAdjustPrevImage = document.getElementById('btnAdjustPrevImage');
+  const btnAdjustNextImage = document.getElementById('btnAdjustNextImage');
+  const adjustImageNavLabel = document.getElementById('adjustImageNavLabel');
   const adjustEmpty = document.getElementById('adjustEmpty');
   const adjustMain = document.getElementById('adjustMain');
   const adjustCanvasWrap = document.getElementById('adjustCanvasWrap');
   const adjustImage = document.getElementById('adjustImage');
   const adjustAxesOverlay = document.getElementById('adjustAxesOverlay');
   const adjustCurvesOverlay = document.getElementById('adjustCurvesOverlay');
+  const adjustOverlayClickHint = document.getElementById('adjustOverlayClickHint');
   const btnAdjustManualControls = document.getElementById('btnAdjustManualControls');
   const adjustManualControls = document.getElementById('adjustManualControls');
   const adjustManualChevron = document.getElementById('adjustManualChevron');
@@ -521,6 +554,9 @@
   const btnClearResultsOverlayBreak = document.getElementById('btnClearResultsOverlayBreak');
 
   let currentImagePath = null; // plots-relative path (e.g., batch_uploads/ui_xxx.png)
+  let selectedImageQueue = []; // [{ imagePath, label }]
+  let imageRunPages = []; // [{ imagePath, label, trialsMode, trialRuns, lastResult, saveHistory, selectedSaveIndex, workingSave }]
+  let activeImagePageIndex = -1;
   let currentTaskId = null;
   let currentPipeline = null;
   let pollTimer = null;
@@ -560,6 +596,8 @@
   const UI_MODE_REGULAR = 'regular';
   const UI_MODE_DEBUG = 'debug';
   let uiMode = UI_MODE_REGULAR;
+  let debugAuthEnabled = false;
+  let debugAuthorized = false;
   const TEST_RUNS = [
     {
       id: 'v1',
@@ -674,6 +712,7 @@
     try { fileInput.disabled = !!disabled; } catch (_) {}
     try { exampleSelect.disabled = !!disabled; } catch (_) {}
     try { btnLoadExample.disabled = !!disabled; } catch (_) {}
+    try { if (btnClearQueue) btnClearQueue.disabled = !!disabled; } catch (_) {}
     try { promptSelect.disabled = !!disabled; } catch (_) {}
     try { articleInfo.disabled = !!disabled; } catch (_) {}
   }
@@ -690,8 +729,11 @@
     const activePlotLabel = activeRun ? String(activeRun.plotLabel || activeRun.plotId || 'test') : 'test';
 
     if (testResultsMode) {
+      selectedImageQueue = activeImagePath
+        ? [{ imagePath: activeImagePath, label: activePlotLabel + ' (test mode)' }]
+        : [];
       currentImagePath = activeImagePath;
-      selectedFileLabel.textContent = activeImagePath || '—';
+      _syncSelectedQueueLabel();
       if (activeImagePath) setPreviewFromUrl('/plots/' + activeImagePath);
 
       clearNotice(uploadStatus);
@@ -724,6 +766,74 @@
       btn.classList.toggle('segmented__btn--active', active);
       btn.setAttribute('aria-pressed', active ? 'true' : 'false');
     }
+    if (btnModeDebug) {
+      btnModeDebug.title = debugAuthEnabled
+        ? (debugAuthorized ? 'Debug mode unlocked for this session.' : 'Debug mode requires password.')
+        : 'Debug mode is disabled on this server (password not configured).';
+    }
+  }
+
+  async function _fetchDebugAuthStatus() {
+    try {
+      const res = await fetch('/api/debug_auth/status', { cache: 'no-store' });
+      const j = await res.json();
+      debugAuthEnabled = !!(j && j.enabled);
+      debugAuthorized = !!(j && j.authorized);
+      return { enabled: debugAuthEnabled, authorized: debugAuthorized };
+    } catch (_) {
+      debugAuthEnabled = false;
+      debugAuthorized = false;
+      return { enabled: false, authorized: false };
+    }
+  }
+
+  async function _ensureDebugAuth() {
+    const status = await _fetchDebugAuthStatus();
+    if (!status.enabled) {
+      setNotice(uploadStatus, 'Debug mode is disabled on this server (password not configured).', 'warn');
+      return false;
+    }
+    if (status.authorized) return true;
+
+    const pw = window.prompt('Enter debug mode password:');
+    if (!pw) return false;
+
+    try {
+      const res = await fetch('/api/debug_auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw }),
+      });
+      const j = await res.json().catch(() => ({}));
+      if (res.ok && j && j.ok) {
+        debugAuthEnabled = !!j.enabled;
+        debugAuthorized = !!j.authorized;
+        setNotice(uploadStatus, 'Debug mode unlocked for this session.', 'info');
+        return true;
+      }
+      if (j && j.error === 'too_many_attempts' && j.retry_after_s) {
+        setNotice(uploadStatus, 'Too many attempts. Retry in ' + j.retry_after_s + 's.', 'warn');
+      } else {
+        setNotice(uploadStatus, 'Debug password incorrect.', 'warn');
+      }
+      return false;
+    } catch (_) {
+      setNotice(uploadStatus, 'Could not verify debug password.', 'warn');
+      return false;
+    }
+  }
+
+  async function _requestUiMode(mode) {
+    if (mode === UI_MODE_DEBUG) {
+      const ok = await _ensureDebugAuth();
+      if (!ok) {
+        uiMode = UI_MODE_REGULAR;
+        _applyUiMode();
+        return;
+      }
+    }
+    uiMode = mode;
+    _applyUiMode();
   }
 
   function _selectRegularDefaultPrompt() {
@@ -816,6 +926,7 @@
   let adjustVisibleCurveLabelsKnown = new Set();
   let adjustOverlayDrag = null;
   let adjustOverlaySuppressClickUntil = 0;
+  let adjustOverlayHintTimer = null;
   const ADJUST_HISTORY_LIMIT = 100;
   let adjustUndoStack = [];
   let adjustRedoStack = [];
@@ -1364,12 +1475,16 @@
     return !!(chkBackoffMode && chkBackoffMode.checked);
   }
 
-  async function uploadFile(file) {
+  async function uploadFile(file, options = {}) {
+    const append = options && options.append !== false;
     clearNotice(uploadStatus);
-    currentImagePath = null;
+    if (!append) {
+      selectedImageQueue = [];
+      currentImagePath = null;
+    }
 
     setPreviewFromFile(file);
-    selectedFileLabel.textContent = file.name;
+    selectedFileLabel.textContent = String(file && file.name ? file.name : 'image');
     setNotice(uploadStatus, 'Uploading…', 'info');
 
     const form = new FormData();
@@ -1384,20 +1499,67 @@
     }
 
     currentImagePath = data.image_path;
+    selectedImageQueue.push({ imagePath: currentImagePath, label: String(file.name || data.filename || currentImagePath) });
+    _syncSelectedQueueLabel();
     setPreviewFromUrl(data.preview_url);
-    setNotice(uploadStatus, 'Uploaded. Ready to extract.', 'success');
+    setNotice(uploadStatus, 'Queued 1 image. Total queued: ' + selectedImageQueue.length + '.', 'success');
   }
 
-  async function prepareExample(examplePath) {
+  async function uploadFiles(files, options = {}) {
+    const append = options && options.append !== false;
+    const arr = Array.from(files || []).filter(Boolean);
+    if (!arr.length) return;
     clearNotice(uploadStatus);
-    currentImagePath = null;
+    if (!append) {
+      selectedImageQueue = [];
+      currentImagePath = null;
+    }
+
+    setNotice(uploadStatus, 'Uploading ' + arr.length + ' images…', 'info');
+    let uploadedCount = 0;
+    let lastPreviewUrl = '';
+    let lastImagePath = '';
+    for (let i = 0; i < arr.length; i++) {
+      const file = arr[i];
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch('/ui/upload', { method: 'POST', body: form });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success || !data.image_path) {
+        setNotice(uploadStatus, 'Upload failed on file #' + (i + 1) + ': ' + (data.error || 'unknown_error'), 'error');
+        continue;
+      }
+      selectedImageQueue.push({ imagePath: String(data.image_path), label: String(file.name || data.filename || data.image_path) });
+      uploadedCount++;
+      lastImagePath = String(data.image_path);
+      lastPreviewUrl = String(data.preview_url || '');
+    }
+
+    if (uploadedCount > 0) {
+      currentImagePath = lastImagePath || currentImagePath;
+      if (lastPreviewUrl) setPreviewFromUrl(lastPreviewUrl);
+    }
+
+    _syncSelectedQueueLabel();
+    if (uploadedCount > 0) {
+      setNotice(uploadStatus, 'Queued ' + uploadedCount + ' image(s). Total queued: ' + selectedImageQueue.length + '.', 'success');
+    }
+  }
+
+  async function prepareExample(examplePath, options = {}) {
+    const append = options && options.append !== false;
+    clearNotice(uploadStatus);
+    if (!append) {
+      selectedImageQueue = [];
+      currentImagePath = null;
+    }
 
     if (!examplePath) {
       setNotice(uploadStatus, 'Select an example first.', 'warn');
       return;
     }
 
-    selectedFileLabel.textContent = examplePath;
+    selectedFileLabel.textContent = String(examplePath || 'example');
     setPreviewFromUrl('/ui/examples/' + encodeURI(examplePath));
     setNotice(uploadStatus, 'Preparing example…', 'info');
 
@@ -1414,8 +1576,202 @@
     }
 
     currentImagePath = data.image_path;
+    selectedImageQueue.push({ imagePath: currentImagePath, label: String(data.filename || examplePath || currentImagePath) });
+    _syncSelectedQueueLabel();
     setPreviewFromUrl(data.preview_url);
-    setNotice(uploadStatus, 'Example ready. Click “Run extraction”.', 'success');
+    setNotice(uploadStatus, 'Example queued. Total queued: ' + selectedImageQueue.length + '.', 'success');
+  }
+
+  function _basenamePath(p) {
+    const s = String(p || '').replace(/\\/g, '/');
+    const i = s.lastIndexOf('/');
+    return i >= 0 ? s.slice(i + 1) : s;
+  }
+
+  function _syncSelectedQueueLabel() {
+    if (!selectedImageQueue.length) {
+      selectedFileLabel.textContent = '—';
+      _syncSelectedQueuePreview();
+      return;
+    }
+    if (selectedImageQueue.length === 1) {
+      selectedFileLabel.textContent = String(selectedImageQueue[0].label || selectedImageQueue[0].imagePath || '—');
+      _syncSelectedQueuePreview();
+      return;
+    }
+    selectedFileLabel.textContent = selectedImageQueue.length + ' images selected';
+    _syncSelectedQueuePreview();
+  }
+
+  function _syncSelectedQueuePreview() {
+    if (!selectedQueueMeta || !selectedQueueList) return;
+    const n = selectedImageQueue.length;
+    if (!n) {
+      selectedQueueMeta.textContent = 'No images queued yet.';
+      selectedQueueList.textContent = '';
+      if (btnClearQueue) btnClearQueue.style.display = 'none';
+      return;
+    }
+
+    const maxShown = 8;
+    const lines = [];
+    for (let i = 0; i < Math.min(n, maxShown); i++) {
+      const item = selectedImageQueue[i] || {};
+      const label = String(item.label || item.imagePath || ('image_' + (i + 1)));
+      lines.push((i + 1) + '. ' + label);
+    }
+    if (n > maxShown) {
+      lines.push('… +' + (n - maxShown) + ' more');
+    }
+
+    selectedQueueMeta.textContent = n + ' image(s) queued for sequential extraction.';
+    selectedQueueList.textContent = lines.join('\n');
+    if (btnClearQueue) btnClearQueue.style.display = testResultsMode ? 'none' : 'inline-flex';
+  }
+
+  function _captureCurrentImagePage(labelOverride = '') {
+    if (!currentImagePath) return null;
+    const trialSelectionsEntries = [];
+    try {
+      for (const [label, idxSet] of (trialSelections || new Map()).entries()) {
+        trialSelectionsEntries.push([String(label), Array.from(idxSet || [])]);
+      }
+    } catch (_) {}
+
+    return {
+      imagePath: String(currentImagePath),
+      label: String(labelOverride || _basenamePath(currentImagePath) || currentImagePath),
+      trialsMode: !!trialsMode,
+      trialRuns: _deepClone(trialRuns || []),
+      lastResult: _deepClone(lastResult || null),
+      confirmedCurves: Array.from(confirmedCurves || []),
+      trialSelections: trialSelectionsEntries,
+      unionCurveLabels: Array.from(unionCurveLabels || []),
+      accumulatedFacts: _deepClone(accumulatedFacts || null),
+      curveStyles: _deepClone(curveStyles || []),
+      extractedCsvMeta: _deepClone(extractedCsvMeta || null),
+      extractedCsvTextCache: (typeof extractedCsvTextCache === 'string') ? extractedCsvTextCache : null,
+      saveHistory: _deepClone(saveHistory || []),
+      selectedSaveIndex: Number.isFinite(selectedSaveIndex) ? selectedSaveIndex : -1,
+      workingSave: _deepClone(workingSave || null),
+      adjustSelectedCurveLabel: adjustSelectedCurveLabel != null ? String(adjustSelectedCurveLabel) : null,
+      adjustSelectedPointIndex: Math.max(0, Number(adjustSelectedPointIndex) || 0),
+      adjustAddPointCurveLabel: adjustAddPointCurveLabel != null ? String(adjustAddPointCurveLabel) : null,
+      adjustVisibleCurveLabels: Array.from(adjustVisibleCurveLabels || []),
+      adjustVisibleCurveLabelsKnown: Array.from(adjustVisibleCurveLabelsKnown || []),
+      adjustVisibleCurveLabelsInitialized: !!adjustVisibleCurveLabelsInitialized,
+    };
+  }
+
+  function _syncImageNavUi() {
+    const n = imageRunPages.length;
+    const show = n > 1;
+    if (resultImageNav) resultImageNav.style.display = show ? 'flex' : 'none';
+    if (adjustImageNav) adjustImageNav.style.display = show ? 'flex' : 'none';
+    if (!show) return;
+
+    const idx = Math.max(0, Math.min(n - 1, activeImagePageIndex));
+    const page = imageRunPages[idx] || null;
+    const label = page ? String(page.label || _basenamePath(page.imagePath || '')) : '';
+    const text = 'Image ' + (idx + 1) + ' / ' + n + (label ? (' — ' + label) : '');
+    if (resultImageNavLabel) resultImageNavLabel.textContent = text;
+    if (adjustImageNavLabel) adjustImageNavLabel.textContent = text;
+    if (btnResultPrevImage) btnResultPrevImage.disabled = idx <= 0;
+    if (btnResultNextImage) btnResultNextImage.disabled = idx >= (n - 1);
+    if (btnAdjustPrevImage) btnAdjustPrevImage.disabled = idx <= 0;
+    if (btnAdjustNextImage) btnAdjustNextImage.disabled = idx >= (n - 1);
+  }
+
+  async function _renderImagePageAt(index) {
+    if (!Number.isFinite(index) || index < 0 || index >= imageRunPages.length) return;
+    activeImagePageIndex = index;
+    const page = imageRunPages[index];
+    if (!page) return;
+
+    currentImagePath = String(page.imagePath || '') || null;
+    if (currentImagePath) setPreviewFromUrl('/plots/' + currentImagePath);
+
+    trialsMode = !!page.trialsMode;
+    trialRuns = _deepClone(page.trialRuns || []);
+    lastResult = _deepClone(page.lastResult || null);
+    confirmedCurves = new Set(Array.isArray(page.confirmedCurves) ? page.confirmedCurves : []);
+    trialSelections = new Map();
+    if (Array.isArray(page.trialSelections)) {
+      for (const entry of page.trialSelections) {
+        if (!Array.isArray(entry) || entry.length < 2) continue;
+        const label = String(entry[0] || '').trim();
+        if (!label) continue;
+        const arr = Array.isArray(entry[1]) ? entry[1] : [];
+        trialSelections.set(label, new Set(arr));
+      }
+    }
+    unionCurveLabels = Array.isArray(page.unionCurveLabels) ? page.unionCurveLabels.slice() : [];
+    accumulatedFacts = _deepClone(page.accumulatedFacts || null);
+    curveStyles = _deepClone(page.curveStyles || []);
+    extractedCsvMeta = _deepClone(page.extractedCsvMeta || null);
+    extractedCsvTextCache = (typeof page.extractedCsvTextCache === 'string' && page.extractedCsvTextCache.length)
+      ? page.extractedCsvTextCache
+      : null;
+    overlayCurveSeriesCache.clear();
+    overlayCurveSeriesInflight.clear();
+
+    saveHistory = _deepClone(page.saveHistory || []);
+    selectedSaveIndex = Number.isFinite(page.selectedSaveIndex) ? page.selectedSaveIndex : -1;
+    workingSave = _deepClone(page.workingSave || null);
+    adjustSelectedCurveLabel = page.adjustSelectedCurveLabel != null ? String(page.adjustSelectedCurveLabel) : null;
+    adjustSelectedPointIndex = Math.max(0, Number(page.adjustSelectedPointIndex) || 0);
+    adjustAddPointCurveLabel = page.adjustAddPointCurveLabel != null ? String(page.adjustAddPointCurveLabel) : null;
+    adjustVisibleCurveLabels = new Set(Array.isArray(page.adjustVisibleCurveLabels) ? page.adjustVisibleCurveLabels : []);
+    adjustVisibleCurveLabelsKnown = new Set(Array.isArray(page.adjustVisibleCurveLabelsKnown) ? page.adjustVisibleCurveLabelsKnown : []);
+    adjustVisibleCurveLabelsInitialized = !!page.adjustVisibleCurveLabelsInitialized;
+
+    resultWrap.style.display = 'block';
+    if (trialsMode) {
+      const savedTrialSelections = new Map(trialSelections);
+      let combinedConsole = '';
+      let anyFailures = false;
+      for (let i = 0; i < trialRuns.length; i++) {
+        const run = trialRuns[i] || {};
+        combinedConsole += '\n\n===== RUN ' + (i + 1) + ' =====\n' + String(run.consoleText || '') + '\n';
+        if (!run.ok) anyFailures = true;
+      }
+      setNotice(resultSummary, 'Loaded image results (' + trialRuns.length + ' runs).', anyFailures ? 'warn' : 'success');
+      renderConsole(combinedConsole.trim());
+      _buildUnionCurveLabels();
+      _initDefaultTrialSelections();
+      if (savedTrialSelections && savedTrialSelections.size > 0) {
+        for (const curveLabel of unionCurveLabels) {
+          const saved = savedTrialSelections.get(curveLabel);
+          if (!saved || saved.size === 0) continue;
+          const valid = Array.from(saved).filter(idx => Number.isInteger(idx) && idx >= 0 && idx < trialRuns.length);
+          if (valid.length > 0) {
+            trialSelections.set(curveLabel, new Set(valid));
+          }
+        }
+      }
+      await Promise.all(trialRuns.map((_r, idx2) => _ensureTrialOverlayBuilt(idx2)));
+      curvesEmpty.style.display = (unionCurveLabels.length === 0) ? 'block' : 'none';
+      renderTrialGallery();
+      _renderTrialsGrid();
+      btnSaveSelectedContinue.style.display = trialRuns.length > 0 ? 'inline-flex' : 'none';
+    } else {
+      btnSaveSelectedContinue.style.display = 'none';
+      const result = lastResult || null;
+      const ok = !!(result && result.success);
+      const consoleText = (result && result.console) ? String(result.console) : '';
+      setNotice(resultSummary, ok ? 'Extraction completed.' : 'Extraction finished with errors.', ok ? 'success' : 'warn');
+      renderConsole(consoleText);
+      if (result && result.outputs) {
+        renderPrimaryResults(result.outputs);
+        renderOutputs(result.outputs);
+      }
+      await renderCurvesFromFactsOrConsole(result);
+      await _buildCurvePolylinesIfPossible();
+      _renderOverlays();
+    }
+
+    _renderAdjustSection();
+    _syncImageNavUi();
   }
 
   function resetResult() {
@@ -1933,6 +2289,37 @@
       ny = Math.max(0, Math.min(nh, ny));
     }
     return { x: nx, y: ny, naturalW: nw, naturalH: nh };
+  }
+
+  function _hideAdjustClickHint() {
+    if (adjustOverlayHintTimer) {
+      clearTimeout(adjustOverlayHintTimer);
+      adjustOverlayHintTimer = null;
+    }
+    if (!adjustOverlayClickHint) return;
+    adjustOverlayClickHint.style.display = 'none';
+  }
+
+  function _showAdjustClickHint(ev, msg = 'Turn off movement to select or move points.') {
+    if (!adjustOverlayClickHint || !adjustCanvasWrap || !ev) return;
+    const rect = adjustCanvasWrap.getBoundingClientRect();
+    const localX = Math.max(0, Number(ev.clientX) - rect.left);
+    const localY = Math.max(0, Number(ev.clientY) - rect.top);
+    const pad = 10;
+    const maxX = Math.max(pad, rect.width - 260);
+    const maxY = Math.max(pad, rect.height - 44);
+    const x = Math.max(pad, Math.min(maxX, localX + 12));
+    const y = Math.max(pad, Math.min(maxY, localY + 12));
+
+    adjustOverlayClickHint.textContent = String(msg || 'Turn off movement to select or move points.');
+    adjustOverlayClickHint.style.display = 'block';
+    adjustOverlayClickHint.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+
+    if (adjustOverlayHintTimer) clearTimeout(adjustOverlayHintTimer);
+    adjustOverlayHintTimer = setTimeout(() => {
+      if (adjustOverlayClickHint) adjustOverlayClickHint.style.display = 'none';
+      adjustOverlayHintTimer = null;
+    }, 1600);
   }
 
   function _adjustSourceBox(save, naturalW, naturalH) {
@@ -6022,13 +6409,7 @@
       _applyRegularDefaults();
     }
 
-    if (!currentImagePath) {
-      setNotice(uploadStatus, 'Upload an image or prepare an example first.', 'warn');
-      return;
-    }
-
     if (testResultsMode) {
-      // Load precomputed runs from disk (no extraction)
       const selectedRuns = _ensureAtLeastOneTestRun('v1');
       await runSavedTestResults(selectedRuns.length, selectedRuns);
       return;
@@ -6040,7 +6421,19 @@
       return;
     }
 
+    let queue = (selectedImageQueue || []).filter(x => x && x.imagePath);
+    if (!queue.length && currentImagePath) {
+      queue = [{ imagePath: currentImagePath, label: _basenamePath(currentImagePath) }];
+    }
+    if (!queue.length) {
+      setNotice(uploadStatus, 'Upload an image or prepare an example first.', 'warn');
+      return;
+    }
+
     currentPipeline = pipeline;
+    imageRunPages = [];
+    activeImagePageIndex = -1;
+    trialsCancelRequested = false;
 
     btnExtract.disabled = true;
     btnCancel.style.display = 'inline-flex';
@@ -6049,211 +6442,187 @@
     progressText.textContent = 'Starting…';
     elapsedText.textContent = '—';
 
-    const payload = {
-      image: currentImagePath,
-      prompt: prompt,
-      runInterpolation: false,
-      runPointwise: false,
-      leftX: 0,
-      rightX: 100,
-      bottomY: 0,
-      topY: 100,
-      rate_limit_backoff: _getBackoffMode(),
-      persist_result: uiMode !== UI_MODE_REGULAR,
-    };
-
-    let url = '/run_all';
-    if (pipeline === 'ex2') {
-      url = '/v2/run_all';
-      payload.articleInfo = (articleInfo.value || '').trim();
-      payload.debug = false;
-      const { llm_provider, llm_model, llm_key } = getLlmSelection();
-      if (uiMode === UI_MODE_REGULAR) {
-        payload.llm_provider = 'mistral';
-        payload.llm_key = '5';
-      } else if (llm_provider) {
-        payload.llm_provider = llm_provider;
-      }
-      if (llm_model) payload.llm_model = llm_model;
-      if (uiMode !== UI_MODE_REGULAR && llm_key) payload.llm_key = llm_key;
-    } else {
-      // EX1: allow selecting Mistral model
-      const { llm_model } = getLlmSelection();
-      if (llm_model) payload.llm_model = llm_model;
-    }
-
     const nTrials = _getTrialCount();
-    if (nTrials > 1) {
-      // Run sequentially to reduce rate-limit pressure.
-      trialsMode = true;
-      trialsCancelRequested = false;
-      trialRuns = [];
 
-      btnSaveSelectedContinue.style.display = 'none';
-      if (downloadCsvConfirmedBtn) downloadCsvConfirmedBtn.style.display = 'none';
-      curvesControls.style.display = 'none';
-      curvesTableWrap.style.display = 'none';
-      overlayAdjustControls.style.display = 'block';
-      highlightStatus.textContent = '';
+    let finishedImages = 0;
+    let failedImages = 0;
 
-      if (trialExportControls) trialExportControls.style.display = 'none';
-      if (btnDownloadTrialsCsv) btnDownloadTrialsCsv.disabled = true;
+    for (let q = 0; q < queue.length; q++) {
+      if (trialsCancelRequested) break;
 
-      // Clear any prior polling.
-      if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+      const item = queue[q];
+      currentImagePath = String(item.imagePath || '');
+      if (!currentImagePath) continue;
+      const imageLabel = String(item.label || _basenamePath(currentImagePath) || ('image ' + (q + 1)));
+      setPreviewFromUrl('/plots/' + currentImagePath);
 
-      let completed = 0;
-      let anyFailures = false;
-      let combinedConsole = '';
+      const payload = {
+        image: currentImagePath,
+        prompt: prompt,
+        runInterpolation: false,
+        runPointwise: false,
+        leftX: 0,
+        rightX: 100,
+        bottomY: 0,
+        topY: 100,
+        rate_limit_backoff: _getBackoffMode(),
+        persist_result: uiMode !== UI_MODE_REGULAR,
+      };
 
-      for (let i = 0; i < nTrials; i++) {
-        if (trialsCancelRequested) break;
+      let url = '/run_all';
+      if (pipeline === 'ex2') {
+        url = '/v2/run_all';
+        payload.articleInfo = (articleInfo.value || '').trim();
+        payload.debug = (uiMode === UI_MODE_DEBUG);
+        const { llm_provider, llm_model, llm_key } = getLlmSelection();
+        if (uiMode === UI_MODE_REGULAR) {
+          payload.llm_provider = 'mistral';
+          payload.llm_key = '5';
+        } else if (llm_provider) {
+          payload.llm_provider = llm_provider;
+        }
+        if (llm_model) payload.llm_model = llm_model;
+        if (uiMode !== UI_MODE_REGULAR && llm_key) payload.llm_key = llm_key;
+      } else {
+        const { llm_model } = getLlmSelection();
+        if (llm_model) payload.llm_model = llm_model;
+      }
 
-        progressFill.style.width = Math.round((completed / nTrials) * 100) + '%';
-        progressText.textContent = 'Starting run ' + (i + 1) + ' / ' + nTrials + '…';
+      if (nTrials > 1) {
+        trialsMode = true;
+        trialRuns = [];
+        btnSaveSelectedContinue.style.display = 'none';
+        curvesControls.style.display = 'none';
+        curvesTableWrap.style.display = 'none';
+        overlayAdjustControls.style.display = 'block';
+        if (trialExportControls) trialExportControls.style.display = 'none';
+        if (btnDownloadTrialsCsv) btnDownloadTrialsCsv.disabled = true;
+
+        let completed = 0;
+        let anyFailures = false;
+        let combinedConsole = '';
+
+        for (let i = 0; i < nTrials; i++) {
+          if (trialsCancelRequested) break;
+          progressText.textContent = 'Image ' + (q + 1) + '/' + queue.length + ' · run ' + (i + 1) + '/' + nTrials + '…';
+          progressFill.style.width = Math.round(((q + (i / Math.max(1, nTrials))) / queue.length) * 100) + '%';
+
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data.task_id) {
+            anyFailures = true;
+            combinedConsole += '\n\n===== RUN ' + (i + 1) + ' START FAILED =====\n' + (data.error || 'unknown_error') + '\n';
+            continue;
+          }
+
+          currentTaskId = data.task_id;
+          while (true) {
+            if (trialsCancelRequested) break;
+            const { done, result } = await pollTask(currentTaskId, pipeline);
+            if (done) {
+              completed++;
+              const runInfo = _extractTrialRunInfo(result || null);
+              runInfo.taskId = currentTaskId;
+              trialRuns.push(runInfo);
+              anyFailures = anyFailures || !runInfo.ok;
+              combinedConsole += '\n\n===== RUN ' + (i + 1) + ' (task ' + currentTaskId + ') =====\n' + (runInfo.consoleText || '') + '\n';
+              break;
+            }
+            await _sleep(900);
+          }
+        }
+
+        resultWrap.style.display = 'block';
+        setNotice(resultSummary,
+          'Image ' + (q + 1) + '/' + queue.length + ' · trials finished: ' + completed + ' / ' + nTrials + (trialsCancelRequested ? ' (cancelled)' : '') + '.',
+          (anyFailures || completed < nTrials) ? 'warn' : 'success'
+        );
+        renderConsole(combinedConsole.trim());
+        _buildUnionCurveLabels();
+        _initDefaultTrialSelections();
+        await Promise.all(trialRuns.map((_r, idx) => _ensureTrialOverlayBuilt(idx)));
+        curvesEmpty.style.display = (unionCurveLabels.length === 0) ? 'block' : 'none';
+        renderTrialGallery();
+        _renderTrialsGrid();
+        if (trialRuns.length > 0) btnSaveSelectedContinue.style.display = 'inline-flex';
+        highlightStatus.textContent = 'Hover the trials table to highlight a curve (overlay).';
+        _renderOverlays();
+
+        if (anyFailures) failedImages++;
+      } else {
+        progressText.textContent = 'Image ' + (q + 1) + '/' + queue.length + ' · starting…';
+        progressFill.style.width = Math.round((q / queue.length) * 100) + '%';
 
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-
         const data = await res.json().catch(() => ({}));
         if (!res.ok || !data.task_id) {
-          anyFailures = true;
-          combinedConsole += '\n\n===== RUN ' + (i + 1) + ' START FAILED =====\n' + (data.error || 'unknown_error') + '\n';
+          failedImages++;
+          setNotice(uploadStatus, 'Failed on ' + imageLabel + ': ' + (data.error || 'unknown_error'), 'error');
           continue;
         }
 
         currentTaskId = data.task_id;
-
-        // Poll this run to completion.
+        let doneResult = null;
         while (true) {
           if (trialsCancelRequested) break;
           const { done, result } = await pollTask(currentTaskId, pipeline);
           if (done) {
-            completed++;
-            const runInfo = _extractTrialRunInfo(result || null);
-            runInfo.taskId = currentTaskId;
-            trialRuns.push(runInfo);
-            anyFailures = anyFailures || !runInfo.ok;
-            combinedConsole += '\n\n===== RUN ' + (i + 1) + ' (task ' + currentTaskId + ') =====\n' + (runInfo.consoleText || '') + '\n';
+            doneResult = result || null;
             break;
           }
           await _sleep(900);
         }
 
-        if (trialsCancelRequested) break;
-      }
+        resultWrap.style.display = 'block';
+        lastResult = doneResult || null;
+        const ok = !!(doneResult && doneResult.success);
+        const consoleText = (doneResult && doneResult.console) ? String(doneResult.console) : '';
+        const hasOutputs = !!(doneResult && doneResult.outputs);
+        setNotice(resultSummary,
+          'Image ' + (q + 1) + '/' + queue.length + ' · ' + (ok ? 'Extraction completed.' : 'Extraction finished with errors.'),
+          ok ? 'success' : 'warn'
+        );
 
-      btnExtract.disabled = false;
-      btnCancel.style.display = 'none';
-      progressFill.style.width = '100%';
-
-      resultWrap.style.display = 'block';
-      setNotice(resultSummary,
-        'Trials finished: ' + completed + ' / ' + nTrials + (trialsCancelRequested ? ' (cancelled)' : '') + '.',
-        (anyFailures || completed < nTrials) ? 'warn' : 'success'
-      );
-
-      renderConsole(combinedConsole.trim());
-
-      _buildUnionCurveLabels();
-      _initDefaultTrialSelections();
-      await Promise.all(trialRuns.map((_r, idx) => _ensureTrialOverlayBuilt(idx)));
-      curvesEmpty.style.display = (unionCurveLabels.length === 0) ? 'block' : 'none';
-      renderTrialGallery();
-      _renderTrialsGrid();
-      if (trialRuns.length > 0) {
-        btnSaveSelectedContinue.style.display = 'inline-flex';
-      }
-
-      // Keep overlays working in trials mode: hover the trials table to choose (curve, run).
-      try {
-        if (resizeObserver) resizeObserver.disconnect();
-        resizeObserver = new ResizeObserver(() => {
-          _fitResultsOriginalImages();
-          _renderOverlays();
-        });
-        for (const img of Array.from(resultGallery.querySelectorAll('img.gallery__img'))) {
-          resizeObserver.observe(img);
+        if (!ok && _looksLikeRateLimit(consoleText)) {
+          _setWarning('Extraction hit rate limit (HTTP 429). Partial outputs are available.');
+        } else {
+          _setWarning('');
         }
-      } catch (_) {}
 
-      highlightStatus.textContent = 'Hover the trials table to highlight a curve (overlay).';
-      _renderOverlays();
-      return;
+        renderConsole(consoleText);
+        if (hasOutputs) {
+          renderPrimaryResults(doneResult.outputs);
+          renderOutputs(doneResult.outputs);
+        }
+        await renderCurvesFromFactsOrConsole(doneResult);
+        await _buildCurvePolylinesIfPossible();
+        _renderOverlays();
+
+        if (!ok) failedImages++;
+      }
+
+      const page = _captureCurrentImagePage(imageLabel);
+      if (page) imageRunPages.push(page);
+      finishedImages++;
     }
 
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    btnExtract.disabled = false;
+    btnCancel.style.display = 'none';
+    progressFill.style.width = '100%';
 
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok || !data.task_id) {
-      btnExtract.disabled = false;
-      btnCancel.style.display = 'none';
-      setNotice(uploadStatus, 'Failed to start extraction: ' + (data.error || 'unknown_error'), 'error');
-      return;
+    if (imageRunPages.length > 0) {
+      await _renderImagePageAt(imageRunPages.length - 1);
+      const msg = 'Finished ' + finishedImages + ' / ' + queue.length + ' images' + (trialsCancelRequested ? ' (cancelled)' : '') + '.';
+      setNotice(resultSummary, msg, failedImages > 0 ? 'warn' : 'success');
     }
-
-    currentTaskId = data.task_id;
-
-    if (pollTimer) clearInterval(pollTimer);
-    pollTimer = setInterval(async () => {
-      try {
-        const { done, result } = await pollTask(currentTaskId, pipeline);
-        if (done) {
-          clearInterval(pollTimer);
-          pollTimer = null;
-          btnExtract.disabled = false;
-          btnCancel.style.display = 'none';
-          progressFill.style.width = '100%';
-
-          resultWrap.style.display = 'block';
-          lastResult = result || null;
-          const ok = !!(result && result.success);
-          const consoleText = (result && result.console) ? String(result.console) : '';
-          const hasOutputs = !!(result && result.outputs);
-
-          setNotice(resultSummary, ok ? 'Extraction completed.' : 'Extraction finished with errors.', ok ? 'success' : 'warn');
-
-          if (!ok && _looksLikeRateLimit(consoleText)) {
-            _setWarning('Extraction hit rate limit (HTTP 429). Partial outputs are available.');
-          } else {
-            _setWarning('');
-          }
-
-          renderConsole(consoleText);
-          if (hasOutputs) {
-            renderPrimaryResults(result.outputs);
-            renderOutputs(result.outputs);
-          }
-          await renderCurvesFromFactsOrConsole(result);
-
-          // Build overlays (geometry + CSV) if possible, but never block UI.
-          await _buildCurvePolylinesIfPossible();
-
-          // Watch for layout changes to keep overlays aligned.
-          try {
-            if (resizeObserver) resizeObserver.disconnect();
-            resizeObserver = new ResizeObserver(() => {
-              _fitResultsOriginalImages();
-              _renderOverlays();
-            });
-            for (const img of Array.from(resultGallery.querySelectorAll('img.gallery__img'))) {
-              resizeObserver.observe(img);
-            }
-          } catch (_) {}
-
-          _renderOverlays();
-        }
-      } catch (e) {
-        // keep polling
-      }
-    }, 900);
   }
 
   async function runSavedTestResults(nTrials, selectedRuns) {
@@ -6452,8 +6821,8 @@
   }
 
   async function cancelTask() {
+    trialsCancelRequested = true;
     if (!currentTaskId) return;
-    if (trialsMode) trialsCancelRequested = true;
     try {
       const url = (currentPipeline === 'ex2')
         ? ('/v2/cancel_task/' + encodeURIComponent(currentTaskId))
@@ -6902,13 +7271,17 @@
       if (!workingSave) return;
       if (Date.now() < adjustOverlaySuppressClickUntil) return;
       const t = ev.target;
+      const dragRole = (t && t.getAttribute) ? t.getAttribute('data-adjust-drag-role') : null;
       if (t && t.getAttribute) {
-        const dragRole = t.getAttribute('data-adjust-drag-role');
         if (dragRole) return;
       }
 
+      if (!adjustOverlayMovementLocked) {
+        _showAdjustClickHint(ev, 'Turn off movement to select or move points.');
+        return;
+      }
+
       if (adjustAddPointsEnabled) {
-        if (!adjustOverlayMovementLocked) return;
         const natural = _adjustContainerToNaturalPx(ev);
         if (!natural) return;
         const sourceNatural = _adjustDisplayNaturalToOverlaySourcePx(
@@ -6938,21 +7311,21 @@
         return;
       }
 
-      if (adjustDeletePointsEnabled && t && t.getAttribute) {
-        const label = t.getAttribute('data-curve-label');
-        const idx = t.getAttribute('data-point-index');
-        if (label && idx != null) {
-          const deleted = _deleteAdjustPoint(label, idx);
-          if (deleted) {
-            _renderAdjustSelectors();
-            _renderAdjustVisibleCurvesUi(false);
-            _renderAdjustOverlay();
+      if (adjustDeletePointsEnabled) {
+        if (t && t.getAttribute) {
+          const label = t.getAttribute('data-curve-label');
+          const idx = t.getAttribute('data-point-index');
+          if (label && idx != null) {
+            const deleted = _deleteAdjustPoint(label, idx);
+            if (deleted) {
+              _renderAdjustSelectors();
+              _renderAdjustVisibleCurvesUi(false);
+              _renderAdjustOverlay();
+            }
           }
-          return;
         }
+        return;
       }
-
-      if (!adjustOverlayMovementLocked) return;
 
       const natural = _adjustContainerToNaturalPx(ev);
       if (!natural) return;
@@ -6981,6 +7354,19 @@
       if (!workingSave) return;
       ev.preventDefault();
       const t = ev.target;
+      const dragRole = (t && t.getAttribute) ? t.getAttribute('data-adjust-drag-role') : null;
+      if (dragRole) return;
+
+      if (!adjustOverlayMovementLocked) {
+        _showAdjustClickHint(ev, 'Turn off movement to select points.');
+        return;
+      }
+
+      if (adjustAddPointsEnabled) {
+        if (adjustStatus) adjustStatus.textContent = 'Add mode is on: choose target curve and left-click to add points.';
+        return;
+      }
+
       if (!t || !t.getAttribute) return;
       const label = t.getAttribute('data-curve-label');
       const idx = t.getAttribute('data-point-index');
@@ -6998,6 +7384,10 @@
       adjustSelectedPointIndex = Math.max(0, Number(idx) || 0);
       _renderAdjustSelectors();
       _renderAdjustOverlay();
+    });
+
+    adjustCurvesOverlay.addEventListener('pointerleave', () => {
+      _hideAdjustClickHint();
     });
   }
 
@@ -7076,11 +7466,10 @@
   if (uiModeGroup) {
     for (const btn of [btnModeRegular, btnModeDebug]) {
       if (!btn) continue;
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const mode = btn.dataset.mode || UI_MODE_REGULAR;
         if (mode !== UI_MODE_REGULAR && mode !== UI_MODE_DEBUG) return;
-        uiMode = mode;
-        _applyUiMode();
+        await _requestUiMode(mode);
       });
     }
   }
@@ -7103,7 +7492,13 @@
   _syncResultsOverlayGuideAxesToggleUi();
   _syncResultsOverlayXBreakUi();
   _loadUiModePref();
-  _applyUiMode();
+  (async () => {
+    await _fetchDebugAuthStatus();
+    if (uiMode === UI_MODE_DEBUG && !debugAuthorized) {
+      uiMode = UI_MODE_REGULAR;
+    }
+    _applyUiMode();
+  })();
 
   dropzone.addEventListener('click', () => {
     if (testResultsMode) return;
@@ -7123,15 +7518,62 @@
     e.preventDefault();
     dropzone.classList.remove('dropzone--over');
     if (testResultsMode) return;
-    const file = e.dataTransfer.files && e.dataTransfer.files[0];
-    if (file) await uploadFile(file);
+    const dt = e.dataTransfer || null;
+    let files = [];
+    if (dt && dt.items && dt.items.length) {
+      files = Array.from(dt.items)
+        .map(item => {
+          try { return item.kind === 'file' ? item.getAsFile() : null; } catch (_) { return null; }
+        })
+        .filter(f => !!f);
+    }
+    if (!files.length) {
+      files = Array.from((dt && dt.files) ? dt.files : []).filter(f => !!f);
+    }
+    if (files.length > 0) {
+      if (files.length === 1) await uploadFile(files[0], { append: true });
+      else await uploadFiles(files, { append: true });
+    }
   });
 
   fileInput.addEventListener('change', async () => {
     if (testResultsMode) return;
-    const file = fileInput.files && fileInput.files[0];
-    if (file) await uploadFile(file);
+    const files = Array.from(fileInput.files || []);
+    if (files.length > 0) {
+      if (files.length === 1) await uploadFile(files[0], { append: true });
+      else await uploadFiles(files, { append: true });
+    }
   });
+
+  async function _gotoImagePage(newIndex) {
+    if (!Number.isFinite(newIndex) || newIndex < 0 || newIndex >= imageRunPages.length) return;
+    if (activeImagePageIndex >= 0 && activeImagePageIndex < imageRunPages.length) {
+      const snap = _captureCurrentImagePage(imageRunPages[activeImagePageIndex] ? imageRunPages[activeImagePageIndex].label : '');
+      if (snap) imageRunPages[activeImagePageIndex] = snap;
+    }
+    await _renderImagePageAt(newIndex);
+  }
+
+  if (btnResultPrevImage) {
+    btnResultPrevImage.addEventListener('click', async () => {
+      await _gotoImagePage(activeImagePageIndex - 1);
+    });
+  }
+  if (btnResultNextImage) {
+    btnResultNextImage.addEventListener('click', async () => {
+      await _gotoImagePage(activeImagePageIndex + 1);
+    });
+  }
+  if (btnAdjustPrevImage) {
+    btnAdjustPrevImage.addEventListener('click', async () => {
+      await _gotoImagePage(activeImagePageIndex - 1);
+    });
+  }
+  if (btnAdjustNextImage) {
+    btnAdjustNextImage.addEventListener('click', async () => {
+      await _gotoImagePage(activeImagePageIndex + 1);
+    });
+  }
 
   btnLoadExample.addEventListener('click', async () => {
     if (testResultsMode) return;
@@ -7162,6 +7604,20 @@
     chkTestRunGH.addEventListener('change', () => {
       _ensureAtLeastOneTestRun('gh_v1');
       if (testResultsMode) _setTestResultsMode(true);
+    });
+  }
+
+  if (btnClearQueue) {
+    btnClearQueue.addEventListener('click', () => {
+      if (testResultsMode) return;
+      selectedImageQueue = [];
+      currentImagePath = null;
+      try { fileInput.value = ''; } catch (_) {}
+      previewImg.removeAttribute('src');
+      previewImg.style.display = 'none';
+      previewEmpty.style.display = 'block';
+      _syncSelectedQueueLabel();
+      setNotice(uploadStatus, 'Cleared queued images.', 'info');
     });
   }
 
@@ -7196,6 +7652,7 @@
   refreshExamples();
   _loadSavedLlmSelection();
   _loadBackoffPref();
+  _syncSelectedQueueLabel();
   _applyUiMode();
 })();
 </script>

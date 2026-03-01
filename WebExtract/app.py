@@ -23,8 +23,10 @@ import threading
 import time
 import uuid
 import tempfile
+import hmac
+import secrets
 from collections import Counter
-from flask import Flask, render_template, request, jsonify, send_from_directory, redirect
+from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, session
 from jinja2 import TemplateNotFound
 from werkzeug.utils import secure_filename
 
@@ -33,6 +35,49 @@ UI_DIR = os.path.dirname(os.path.abspath(__file__))
 # Repo root: Plot_Extract/
 REPO_ROOT = os.path.abspath(os.path.join(UI_DIR, '..'))
 REPO_PLOTS_DIR = os.path.join(REPO_ROOT, 'plots')
+
+
+def _load_env_file(path: str):
+    """Minimal .env loader (no external dependency)."""
+    if not path or not os.path.isfile(path):
+        return
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            for raw_line in f:
+                line = raw_line.strip()
+                if not line or line.startswith('#'):
+                    continue
+                if '=' not in line:
+                    continue
+                key, value = line.split('=', 1)
+                key = key.strip()
+                if not key:
+                    continue
+
+                value = value.strip()
+                if not value:
+                    os.environ.setdefault(key, '')
+                    continue
+
+                quoted = False
+                if (value.startswith('"') and '"' in value[1:]):
+                    quoted = True
+                    end = value.find('"', 1)
+                    parsed = value[1:end]
+                elif (value.startswith("'") and "'" in value[1:]):
+                    quoted = True
+                    end = value.find("'", 1)
+                    parsed = value[1:end]
+                else:
+                    parsed = value.split('#', 1)[0].strip()
+
+                # Only set if not already provided by real environment.
+                os.environ.setdefault(key, parsed if quoted else parsed)
+    except Exception:
+        pass
+
+
+_load_env_file(os.path.join(REPO_ROOT, '.env'))
 
 
 def _env_truthy(name: str, default: bool = False) -> bool:
@@ -72,6 +117,19 @@ app = Flask(
     template_folder=os.path.join(UI_DIR, 'templates'),
     static_folder=os.path.join(UI_DIR, 'static'),
 )
+
+_configured_secret_key = (
+    (os.getenv('FLASK_SECRET_KEY') or '').strip()
+    or (os.getenv('SECRET_KEY') or '').strip()
+    or (os.getenv('PLOTEXTRACT_SECRET_KEY') or '').strip()
+)
+if not _configured_secret_key:
+    _configured_secret_key = secrets.token_urlsafe(32)
+
+app.config['SECRET_KEY'] = _configured_secret_key
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = bool(os.getenv('RENDER')) and (not APP_DEBUG)
 
 # Limit upload size (25 MB)
 app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024
@@ -114,6 +172,38 @@ PRECOMPUTED_TEST_RUNS = [
         'version_dir': 'precomputed_tests/GH/GH_png.pv2_prompt_13.v1.key4.web',
     },
 ]
+
+
+def _get_debug_password() -> str:
+    for key in (
+        'PLOTEXTRACT_DEBUG_PASSWORD',
+        'WEBEXTRACT_DEBUG_PASSWORD',
+        'DEBUG_MODE_PASSWORD',
+        'DEBUG_PASSWORD',
+        'PLOTEXTRACT_PASSWORD',
+        'PASSWORD',
+    ):
+        value = (os.getenv(key) or '').strip()
+        if value:
+            return value
+    return ''
+
+
+def _debug_auth_enabled() -> bool:
+    return bool(_get_debug_password())
+
+
+def _is_debug_authorized() -> bool:
+    if not _debug_auth_enabled():
+        return False
+    return bool(session.get('debug_auth') is True)
+
+
+def _debug_auth_status_payload() -> dict:
+    return {
+        'enabled': _debug_auth_enabled(),
+        'authorized': _is_debug_authorized(),
+    }
 
 
 def _ensure_runtime_layout():
@@ -2918,6 +3008,9 @@ def check_csv_exists_v2(image_path, prompt_name=None):
 
 @app.route('/')
 def index():
+    # Require re-auth for debug mode after each hard page load.
+    session.pop('debug_auth', None)
+    session.pop('debug_auth_at', None)
     ex1_prompts = get_prompts()
     ex2_prompts = get_prompts_v2()
     return render_template('index.html', ex1_prompts=ex1_prompts, ex2_prompts=ex2_prompts)
@@ -2952,6 +3045,47 @@ def ui_prompts():
         'ex1': get_prompts(),
         'ex2': get_prompts_v2(),
     })
+
+
+@app.route('/api/debug_auth/status', methods=['GET'])
+def api_debug_auth_status():
+    return jsonify(_debug_auth_status_payload())
+
+
+@app.route('/api/debug_auth/login', methods=['POST'])
+def api_debug_auth_login():
+    if not _debug_auth_enabled():
+        return jsonify({'ok': False, 'error': 'debug_auth_not_configured'}), 403
+
+    data = request.get_json(force=True, silent=True) or {}
+    provided = str(data.get('password') or '')
+
+    now = time.time()
+    block_until = float(session.get('debug_auth_block_until') or 0.0)
+    if now < block_until:
+        retry_after_s = max(1, int(math.ceil(block_until - now)))
+        return jsonify({'ok': False, 'error': 'too_many_attempts', 'retry_after_s': retry_after_s}), 429
+
+    expected = _get_debug_password()
+    if hmac.compare_digest(provided, expected):
+        session['debug_auth'] = True
+        session['debug_auth_at'] = now
+        session.pop('debug_auth_failures', None)
+        session.pop('debug_auth_block_until', None)
+        return jsonify({'ok': True, **_debug_auth_status_payload()})
+
+    failures = int(session.get('debug_auth_failures') or 0) + 1
+    session['debug_auth_failures'] = failures
+    backoff_s = min(300, 2 ** min(failures, 8))
+    session['debug_auth_block_until'] = now + backoff_s
+    return jsonify({'ok': False, 'error': 'invalid_password', 'retry_after_s': backoff_s}), 401
+
+
+@app.route('/api/debug_auth/logout', methods=['POST'])
+def api_debug_auth_logout():
+    session.pop('debug_auth', None)
+    session.pop('debug_auth_at', None)
+    return jsonify({'ok': True, **_debug_auth_status_payload()})
 
 
 @app.route('/api/test_runs_health', methods=['GET'])
@@ -3528,6 +3662,12 @@ def run_all_v2():
             llm_provider = 'mistral'
             llm_model = llm_model or 'mistral-large-2512'
     debug_mode = bool(data.get('debug', False))
+    if debug_mode:
+        if not _debug_auth_enabled():
+            return jsonify({'error': 'debug_auth_not_configured'}), 403
+        if not _is_debug_authorized():
+            return jsonify({'error': 'debug_auth_required'}), 403
+
     rate_limit_backoff = bool(data.get('rate_limit_backoff') or data.get('rateLimitBackoff') or False)
     persist_result = bool(data.get('persist_result', True))
     if EPHEMERAL_RUNTIME:
@@ -3677,6 +3817,12 @@ def run_batch_v2():
             llm_provider = 'mistral'
             llm_model = llm_model or 'mistral-large-2512'
     debug_mode = bool(data.get('debug', False))
+    if debug_mode:
+        if not _debug_auth_enabled():
+            return jsonify({'error': 'debug_auth_not_configured'}), 403
+        if not _is_debug_authorized():
+            return jsonify({'error': 'debug_auth_required'}), 403
+
     run_interpolation = bool(data.get('runInterpolation', False))
     run_pointwise = bool(data.get('runPointwise', False))
     left_x = str(data.get('leftX', '0'))
