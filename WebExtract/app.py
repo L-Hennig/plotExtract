@@ -90,6 +90,31 @@ UI_EXAMPLES_DIR = os.path.join(UI_DIR, 'examples')
 
 ALLOWED_IMAGE_EXTS = {'.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff', '.webp'}
 
+# Precomputed test runs used by the WebExtract UI test-results mode.
+PRECOMPUTED_TEST_RUNS = [
+    {
+        'id': 'v1',
+        'plot_label': 'GA_copy1',
+        'image_path': 'precomputed_tests/GA_copy1/GA_copy1.png',
+        'prompt_name': 'prompt_13',
+        'version_dir': 'precomputed_tests/GA_copy1/GA_copy1_png.pv2_prompt_13.v5.key4.web',
+    },
+    {
+        'id': 'v2',
+        'plot_label': 'GA_copy1',
+        'image_path': 'precomputed_tests/GA_copy1/GA_copy1.png',
+        'prompt_name': 'prompt_13',
+        'version_dir': 'precomputed_tests/GA_copy1/GA_copy1_png.pv2_prompt_13.v6.key4.web',
+    },
+    {
+        'id': 'gh_v1',
+        'plot_label': 'GH',
+        'image_path': 'precomputed_tests/GH/GH.png',
+        'prompt_name': 'prompt_13',
+        'version_dir': 'precomputed_tests/GH/GH_png.pv2_prompt_13.v1.key4.web',
+    },
+]
+
 
 def _ensure_runtime_layout():
     """Ensure runtime write paths exist and seed plots for hosted environments.
@@ -2929,6 +2954,77 @@ def ui_prompts():
     })
 
 
+@app.route('/api/test_runs_health', methods=['GET'])
+def api_test_runs_health():
+    """Validate deploy-time availability of UI precomputed test runs."""
+    checks = []
+    ok_all = True
+
+    for run in PRECOMPUTED_TEST_RUNS:
+        image_path = run.get('image_path')
+        image_abs = _existing_plot_abs(image_path)
+
+        version_dir_rel = run.get('version_dir')
+        version_abs = _existing_plot_abs(version_dir_rel)
+        version_exists = bool(version_abs and os.path.isdir(version_abs))
+
+        missing = []
+        if not image_abs or not os.path.isfile(image_abs):
+            missing.append('image')
+        if not version_exists:
+            missing.append('version_dir')
+
+        expected_data = None
+        expected_tracking = None
+        expected_progress = None
+        data_exists = False
+        tracking_exists = False
+        progress_exists = False
+
+        if version_exists:
+            image_name = os.path.basename(image_path or '')
+            prompt_name = run.get('prompt_name') or ''
+            folder_name = os.path.basename(version_abs)
+
+            expected_data = os.path.join(version_abs, f"{image_name}.pv2_{prompt_name}.{folder_name.split('.pv2_')[-1]}.mistral.out_data")
+            expected_tracking = os.path.join(version_abs, f"{image_name}.pv2_{prompt_name}.{folder_name.split('.pv2_')[-1]}.mistral.out_tracking")
+            expected_progress = os.path.join(version_abs, '_extraction_progress.json')
+
+            data_exists = bool(glob.glob(os.path.join(version_abs, '*.mistral.out_data')))
+            tracking_exists = bool(glob.glob(os.path.join(version_abs, '*.mistral.out_tracking')))
+            progress_exists = os.path.isfile(expected_progress)
+
+            if not data_exists:
+                missing.append('out_data')
+            if not tracking_exists:
+                missing.append('out_tracking')
+            if not progress_exists:
+                missing.append('_extraction_progress.json')
+
+        ok = len(missing) == 0
+        ok_all = ok_all and ok
+
+        checks.append({
+            'id': run.get('id'),
+            'plot_label': run.get('plot_label'),
+            'image_path': image_path,
+            'image_found': bool(image_abs and os.path.isfile(image_abs)),
+            'version_dir': version_dir_rel,
+            'version_dir_found': version_exists,
+            'has_out_data': data_exists,
+            'has_out_tracking': tracking_exists,
+            'has_progress_json': progress_exists,
+            'ok': ok,
+            'missing': missing,
+        })
+
+    return jsonify({
+        'ok': ok_all,
+        'count': len(checks),
+        'checks': checks,
+    })
+
+
 def _iter_example_files():
     if not os.path.isdir(UI_EXAMPLES_DIR):
         return
@@ -3247,12 +3343,21 @@ def v2_load_saved_runs():
     if version_dir_req:
         version_abs = _resolve_requested_v2_version_dir(image_path, prompt_name, version_dir_req)
         if (not version_abs) or (not os.path.isdir(version_abs)):
+            available = []
+            try:
+                for _v, _abs in _list_v2_version_dirs(image_path, prompt_name):
+                    rel = _plots_rel_from_abs(_abs)
+                    if rel:
+                        available.append(rel)
+            except Exception:
+                available = []
             return jsonify({
                 'success': False,
                 'error': 'version_dir_not_found',
                 'version_dir': version_dir_req,
                 'image_path': image_path,
                 'prompt_name': prompt_name,
+                'available_version_dirs': available,
             }), 404
 
         progress_snapshot = _read_v2_progress_snapshot(version_abs)

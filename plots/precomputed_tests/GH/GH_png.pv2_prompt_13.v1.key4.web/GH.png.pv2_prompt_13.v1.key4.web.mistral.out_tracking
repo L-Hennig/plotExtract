@@ -1,0 +1,211 @@
+{
+  "image_path": "C:\\Users\\Lucas\\OneDrive\\UCL Internship\\Plot_Extract\\plots\\synthetic/G/GH/GH.png",
+  "prompt_name": "prompt_13",
+  "overall_status": "completed",
+  "validation_status": "no",
+  "total_confidence": 0.7,
+  "stages": {
+    "EXTRACT_STAGE_1": {
+      "stage_name": "EXTRACT_STAGE_1",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 388,
+      "execution_time_ms": 3397.244453430176,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T13:45:00.368833",
+      "notes": []
+    },
+    "EXTRACT_STAGE_2": {
+      "stage_name": "EXTRACT_STAGE_2",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 404,
+      "execution_time_ms": 3961.386203765869,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T13:45:03.768380",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3": {
+      "stage_name": "EXTRACT_STAGE_3",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 960,
+      "execution_time_ms": 4907.514333724976,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T13:45:07.731977",
+      "notes": []
+    },
+    "EXTRACT_STAGE_3A": {
+      "stage_name": "EXTRACT_STAGE_3A",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 1009,
+      "execution_time_ms": 5368.657350540161,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T13:45:12.642169",
+      "notes": []
+    },
+    "EXTRACT_STAGE_4": {
+      "stage_name": "EXTRACT_STAGE_4",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 5817,
+      "execution_time_ms": 20585.962295532227,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T13:45:18.014031",
+      "notes": []
+    },
+    "EXTRACT_STAGE_5": {
+      "stage_name": "EXTRACT_STAGE_5",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 1,
+        "num_rows": 88,
+        "columns": [
+          "```json"
+        ],
+        "axis_labels": [
+          "```json"
+        ]
+      },
+      "output_length": 3685,
+      "execution_time_ms": 20473.947048187256,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T13:45:38.606113",
+      "notes": []
+    },
+    "EXTRACT_STAGE_6": {
+      "stage_name": "EXTRACT_STAGE_6",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 2588,
+      "execution_time_ms": 10432.471752166748,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T13:45:59.089472",
+      "notes": []
+    },
+    "EXTRACT_STAGE_7": {
+      "stage_name": "EXTRACT_STAGE_7",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {},
+      "output_length": 9871,
+      "execution_time_ms": 40589.599609375,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T13:46:09.529915",
+      "notes": []
+    },
+    "EXTRACT_STAGE_8": {
+      "stage_name": "EXTRACT_STAGE_8",
+      "status": "completed",
+      "confidence": 0.7,
+      "facts_extracted": {
+        "num_columns": 12,
+        "num_rows": 8,
+        "columns": [
+          "Time (hours)",
+          "log10 CFU/mL (Blank)",
+          "Time (hours)",
+          "log10 CFU/mL (COL 0.125 \u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (MINO 1 \u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (COL 0.125 \u00b5g/mL + MEM 4 \u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (COL 0.125 \u00b5g/mL + MINO 1 \u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (MEM 4 \u00b5g/mL)"
+        ],
+        "axis_labels": [
+          "Time (hours)",
+          "log10 CFU/mL (Blank)",
+          "Time (hours)",
+          "log10 CFU/mL (COL 0.125 \u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (MINO 1 \u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (COL 0.125 \u00b5g/mL + MEM 4 \u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (COL 0.125 \u00b5g/mL + MINO 1 \u00b5g/mL)",
+          "Time (hours)",
+          "log10 CFU/mL (MEM 4 \u00b5g/mL)"
+        ]
+      },
+      "output_length": 581,
+      "execution_time_ms": 5514.852285385132,
+      "error": null,
+      "validation_result": null,
+      "timestamp": "2026-02-20T13:46:50.129152",
+      "notes": []
+    }
+  },
+  "facts_by_stage": {
+    "EXTRACT_STAGE_5": {
+      "num_columns": 1,
+      "num_rows": 88,
+      "columns": [
+        "```json"
+      ],
+      "axis_labels": [
+        "```json"
+      ]
+    },
+    "EXTRACT_STAGE_8": {
+      "num_columns": 12,
+      "num_rows": 8,
+      "columns": [
+        "Time (hours)",
+        "log10 CFU/mL (Blank)",
+        "Time (hours)",
+        "log10 CFU/mL (COL 0.125 \u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (MINO 1 \u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (COL 0.125 \u00b5g/mL + MEM 4 \u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (COL 0.125 \u00b5g/mL + MINO 1 \u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (MEM 4 \u00b5g/mL)"
+      ],
+      "axis_labels": [
+        "Time (hours)",
+        "log10 CFU/mL (Blank)",
+        "Time (hours)",
+        "log10 CFU/mL (COL 0.125 \u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (MINO 1 \u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (COL 0.125 \u00b5g/mL + MEM 4 \u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (COL 0.125 \u00b5g/mL + MINO 1 \u00b5g/mL)",
+        "Time (hours)",
+        "log10 CFU/mL (MEM 4 \u00b5g/mL)"
+      ]
+    }
+  },
+  "contradictions": [],
+  "execution_time_seconds": 146.173159,
+  "output_files": {
+    "validation_details": {
+      "x_axis": "Yes",
+      "y_axis": "No",
+      "num_points": "No",
+      "trend": "Yes"
+    }
+  }
+}

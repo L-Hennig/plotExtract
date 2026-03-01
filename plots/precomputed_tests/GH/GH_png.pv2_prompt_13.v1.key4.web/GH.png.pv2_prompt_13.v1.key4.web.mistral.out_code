@@ -1,0 +1,70 @@
+import matplotlib.pyplot as plt
+import os
+
+replot_path = r"C:\Users\Lucas\OneDrive\UCL Internship\Plot_Extract\plots\synthetic/G/GH\GH_png.pv2_prompt_13.v1.key4.web\GH_png-replot.pv2_prompt_13.v1.key4.web.png"
+os.makedirs(os.path.dirname(replot_path), exist_ok=True)
+
+# Data from marker_facts (using re-extracted points where applicable)
+curve_data = {
+    "Blank": [
+        (0, 6.1), (2, 6.0), (4, 6.5), (6, 7.0), (8, 7.5), (10, 7.8), (12, 8.0), (24, 8.0)
+    ],
+    "COL 0.125 µg/mL": [
+        (0, 6.1), (2, 5.8), (4, 5.5), (6, 5.0), (8, 4.5), (10, 4.0), (12, 3.5), (24, 2.0)
+    ],
+    "MINO 1 µg/mL": [
+        (0, 6.1), (2, 6.5), (4, 6.8), (6, 7.0), (8, 7.2), (10, 7.3), (12, 7.3), (24, 7.5)
+    ],
+    "COL 0.125 µg/mL + MEM 4 µg/mL": [
+        (0, 6.1), (2, 1.0), (4, 0.5), (6, 0.5), (8, 0.5), (10, 0.5), (12, 0.5), (24, 3.0)
+    ],
+    "COL 0.125 µg/mL + MINO 1 µg/mL": [
+        (0, 6.1), (2, 5.5), (4, 5.0), (6, 4.5), (8, 4.0), (10, 3.5), (12, 3.0), (24, 2.0)
+    ],
+    "MEM 4 µg/mL": [
+        (0, 6.1), (2, 2.0), (4, 1.8), (6, 1.5), (8, 1.5), (10, 1.5), (12, 1.5), (24, 1.5)
+    ]
+}
+
+# Curve styles from curve_style_facts
+curve_styles = {
+    "Blank": {"color": "black", "linestyle": "-", "marker": "s", "label": "Blank"},
+    "COL 0.125 µg/mL": {"color": "black", "linestyle": "--", "marker": "^", "label": "COL 0.125 µg/mL"},
+    "MINO 1 µg/mL": {"color": "black", "linestyle": ":", "marker": "o", "label": "MINO 1 µg/mL"},
+    "COL 0.125 µg/mL + MEM 4 µg/mL": {"color": "black", "linestyle": "-", "marker": "o", "label": "COL 0.125 µg/mL + MEM 4 µg/mL"},
+    "COL 0.125 µg/mL + MINO 1 µg/mL": {"color": "black", "linestyle": ":", "marker": "v", "label": "COL 0.125 µg/mL + MINO 1 µg/mL"},
+    "MEM 4 µg/mL": {"color": "black", "linestyle": "--", "marker": "s", "label": "MEM 4 µg/mL"}
+}
+
+# Create the plot
+plt.figure(figsize=(8, 6))
+
+# Plot each curve with its style
+for curve_name, points in curve_data.items():
+    x_vals = [p[0] for p in points]
+    y_vals = [p[1] for p in points]
+    style = curve_styles[curve_name]
+    plt.plot(x_vals, y_vals,
+             color=style["color"],
+             linestyle=style["linestyle"],
+             marker=style["marker"],
+             label=style["label"])
+
+# Set axis labels and limits
+plt.xlabel("Time (hours)")
+plt.ylabel("Bacterial Count (CFU/mL) (log10 scale)")
+plt.xlim(0, 24)
+plt.ylim(0, 10)
+
+# Set ticks
+plt.xticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])
+plt.yticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+# Add grid
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+
+# Add legend
+plt.legend()
+
+# Save the plot
+plt.savefig(replot_path, bbox_inches='tight', dpi=300)
