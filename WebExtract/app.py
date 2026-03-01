@@ -3269,17 +3269,14 @@ def ui_prepare_example():
         return os.path.relpath(copied_full, PLOTS_DIR).replace('\\', '/')
 
     rel_image_path = None
-    if EPHEMERAL_RUNTIME:
-        rel_image_path = _copy_example_into_batch(src_full)
+    if src_kind == 'plots':
+        # Already in plots tree; use directly.
+        rel_image_path = _plots_rel_from_abs(src_full)
     else:
-        if src_kind == 'plots':
-            rel_image_path = _plots_rel_from_abs(src_full)
-        else:
-            # UI example selected: map to canonical plots location when possible,
-            # otherwise copy into batch_uploads so hosted deployments can use it.
-            rel_image_path = _resolve_ui_example_to_plots_rel(example_path)
-            if not rel_image_path:
-                rel_image_path = _copy_example_into_batch(src_full)
+        # UI examples are always materialized into a concrete plots path.
+        # This avoids hosted path-mapping edge cases and guarantees that
+        # subsequent extraction/result endpoints resolve the same image.
+        rel_image_path = _copy_example_into_batch(src_full)
 
     return jsonify({
         'success': True,
