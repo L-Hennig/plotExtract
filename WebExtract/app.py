@@ -3160,48 +3160,16 @@ def api_test_runs_health():
 
 
 def _iter_example_files():
-    yielded = set()
-
-    # 1) UI-local examples (WebExtract/examples)
-    if os.path.isdir(UI_EXAMPLES_DIR):
-        for root, _dirs, files in os.walk(UI_EXAMPLES_DIR):
-            for name in files:
-                ext = os.path.splitext(name)[1].lower()
-                if ext not in ALLOWED_IMAGE_EXTS:
-                    continue
-                full_path = os.path.join(root, name)
-                rel_path = os.path.relpath(full_path, UI_EXAMPLES_DIR).replace('\\', '/')
-                if rel_path not in yielded:
-                    yielded.add(rel_path)
-                    yield rel_path
-
-    # 2) Plots-backed examples (Render-safe, deployed with repo/runtime plots)
-    #    We intentionally scope this to known example-bearing folders.
-    roots = [
-        os.path.join(PLOTS_DIR, 'synthetic'),
-        os.path.join(PLOTS_DIR, 'first_examples'),
-        os.path.join(PLOTS_DIR, 'quick_test'),
-        os.path.join(REPO_PLOTS_DIR, 'synthetic'),
-        os.path.join(REPO_PLOTS_DIR, 'first_examples'),
-        os.path.join(REPO_PLOTS_DIR, 'quick_test'),
-    ]
-
-    for top in roots:
-        if not os.path.isdir(top):
-            continue
-        for root, _dirs, files in os.walk(top):
-            for name in files:
-                ext = os.path.splitext(name)[1].lower()
-                if ext not in ALLOWED_IMAGE_EXTS:
-                    continue
-                full_path = os.path.join(root, name)
-                rel_path = _plots_rel_from_abs(full_path)
-                if not rel_path:
-                    continue
-                rel_path = rel_path.replace('\\', '/')
-                if rel_path not in yielded:
-                    yielded.add(rel_path)
-                    yield rel_path
+    if not os.path.isdir(UI_EXAMPLES_DIR):
+        return
+    for root, _dirs, files in os.walk(UI_EXAMPLES_DIR):
+        for name in files:
+            ext = os.path.splitext(name)[1].lower()
+            if ext not in ALLOWED_IMAGE_EXTS:
+                continue
+            full_path = os.path.join(root, name)
+            rel_path = os.path.relpath(full_path, UI_EXAMPLES_DIR).replace('\\', '/')
+            yield rel_path
 
 
 @app.route('/ui/examples')
