@@ -169,6 +169,29 @@ def _safe_abs_under_repo_plots(rel_path: str) -> str | None:
     return abs_p
 
 
+def _existing_plot_abs(rel_path: str) -> str | None:
+    """Return existing absolute path for a plots-relative asset across runtime/repo roots."""
+    runtime_abs = _safe_abs_under_plots(rel_path)
+    if runtime_abs and os.path.exists(runtime_abs):
+        return runtime_abs
+    repo_abs = _safe_abs_under_repo_plots(rel_path)
+    if repo_abs and os.path.exists(repo_abs):
+        return repo_abs
+    return None
+
+
+def _plots_rel_from_abs(abs_path: str) -> str | None:
+    """Convert absolute path under runtime/repo plots roots into a plots-relative path."""
+    if not abs_path:
+        return None
+    abs_p = os.path.abspath(abs_path)
+    for root in (PLOTS_DIR, REPO_PLOTS_DIR):
+        root_abs = os.path.abspath(root)
+        if abs_p == root_abs or abs_p.startswith(root_abs + os.sep):
+            return os.path.relpath(abs_p, root_abs).replace('\\', '/')
+    return None
+
+
 def _materialize_plot_asset(rel_path: str) -> str | None:
     """Ensure a plot asset exists under runtime PLOTS_DIR by copying from repo plots if needed."""
     runtime_abs = _safe_abs_under_plots(rel_path)
@@ -279,7 +302,7 @@ def _list_v2_version_dirs(image_path: str, prompt_name: str) -> list[tuple[int, 
     if not image_path or not prompt_name:
         return []
 
-    image_abs = _safe_abs_under_plots(image_path)
+    image_abs = _existing_plot_abs(image_path)
     if not image_abs:
         return []
 
@@ -324,11 +347,14 @@ def _resolve_requested_v2_version_dir(image_path: str, prompt_name: str, version
     if not version_dir_req:
         return None
 
-    direct = _safe_abs_under_plots(version_dir_req)
-    if direct and os.path.isdir(direct):
-        return direct
+    direct_runtime = _safe_abs_under_plots(version_dir_req)
+    if direct_runtime and os.path.isdir(direct_runtime):
+        return direct_runtime
+    direct_repo = _safe_abs_under_repo_plots(version_dir_req)
+    if direct_repo and os.path.isdir(direct_repo):
+        return direct_repo
 
-    image_abs = _safe_abs_under_plots(image_path)
+    image_abs = _existing_plot_abs(image_path)
     if not image_abs:
         return None
 
@@ -456,13 +482,24 @@ def _resolve_path_under_plots(path_value):
     marker = '/plots/'
     if marker in norm:
         suffix = norm.split(marker, 1)[1]
-        candidate = os.path.join(PLOTS_DIR, suffix.replace('/', os.sep))
-        return candidate
+        candidate_runtime = os.path.join(PLOTS_DIR, suffix.replace('/', os.sep))
+        if os.path.exists(candidate_runtime):
+            return candidate_runtime
+        candidate_repo = os.path.join(REPO_PLOTS_DIR, suffix.replace('/', os.sep))
+        if os.path.exists(candidate_repo):
+            return candidate_repo
+        return candidate_runtime
 
     # If it looks relative, assume it's relative to plots.
     try:
         if not os.path.isabs(raw):
-            return os.path.join(PLOTS_DIR, raw.replace('/', os.sep))
+            candidate_runtime = os.path.join(PLOTS_DIR, raw.replace('/', os.sep))
+            if os.path.exists(candidate_runtime):
+                return candidate_runtime
+            candidate_repo = os.path.join(REPO_PLOTS_DIR, raw.replace('/', os.sep))
+            if os.path.exists(candidate_repo):
+                return candidate_repo
+            return candidate_runtime
     except Exception:
         pass
 
@@ -2442,7 +2479,8 @@ def find_extracted_csv(image_path, prompt_file):
     Folder names use underscores instead of dots for the extension: A-1_png.p2.v1/"""
     import re
     
-    image_dir = os.path.dirname(os.path.join(PLOTS_DIR, image_path))
+    image_abs = _existing_plot_abs(image_path)
+    image_dir = os.path.dirname(image_abs) if image_abs else os.path.dirname(os.path.join(PLOTS_DIR, image_path))
     image_name = os.path.basename(image_path)
     base_name = os.path.splitext(image_name)[0]
     # Folder naming uses underscore: A-1.png -> A-1_png
@@ -2481,7 +2519,7 @@ def find_extracted_csv(image_path, prompt_file):
                     latest_file = extracted_file
     
     if latest_file:
-        return os.path.relpath(latest_file, PLOTS_DIR).replace('\\', '/')
+        return _plots_rel_from_abs(latest_file)
     return None
 
 def _get_prompt_name_v2(chain_file):
@@ -2493,7 +2531,8 @@ def find_extracted_csv_v2(image_path, prompt_name):
     """Find extracted data file for v2 prompt set outputs."""
     import re
 
-    image_dir = os.path.dirname(os.path.join(PLOTS_DIR, image_path))
+    image_abs = _existing_plot_abs(image_path)
+    image_dir = os.path.dirname(image_abs) if image_abs else os.path.dirname(os.path.join(PLOTS_DIR, image_path))
     image_name = os.path.basename(image_path)
     base_name = os.path.splitext(image_name)[0]
     name_for_folder = image_name.replace('.', '_')
@@ -2521,14 +2560,15 @@ def find_extracted_csv_v2(image_path, prompt_name):
                     latest_file = extracted_file
 
     if latest_file:
-        return os.path.relpath(latest_file, PLOTS_DIR).replace('\\', '/')
+        return _plots_rel_from_abs(latest_file)
     return None
 
 def get_output_files_v2(image_path, prompt_name=None, version_dir=None):
     """Get output files for PlotExtractV2 runs."""
     if version_dir:
         version_dir = _resolve_path_under_plots(version_dir)
-    image_dir = os.path.dirname(os.path.join(PLOTS_DIR, image_path))
+    image_abs = _existing_plot_abs(image_path)
+    image_dir = os.path.dirname(image_abs) if image_abs else os.path.dirname(os.path.join(PLOTS_DIR, image_path))
     image_name = os.path.basename(image_path)
     base_name = os.path.splitext(image_name)[0]
     full_prompt_name = f"pv2_{prompt_name}" if prompt_name else None
@@ -2546,19 +2586,23 @@ def get_output_files_v2(image_path, prompt_name=None, version_dir=None):
 
     original_path = os.path.join(image_dir, image_name)
     if os.path.exists(original_path):
-        outputs['images'].append({
-            'path': os.path.relpath(original_path, PLOTS_DIR).replace('\\', '/'),
-            'label': 'Original Input',
-            'filename': image_name
-        })
+        rel_original = _plots_rel_from_abs(original_path)
+        if rel_original:
+            outputs['images'].append({
+                'path': rel_original,
+                'label': 'Original Input',
+                'filename': image_name
+            })
 
     original_csv = os.path.join(image_dir, f"{base_name}-original.csv")
     if os.path.exists(original_csv):
-        outputs['data'].append({
-            'path': os.path.relpath(original_csv, PLOTS_DIR).replace('\\', '/'),
-            'label': 'Original Data',
-            'filename': f"{base_name}-original.csv"
-        })
+        rel_original_csv = _plots_rel_from_abs(original_csv)
+        if rel_original_csv:
+            outputs['data'].append({
+                'path': rel_original_csv,
+                'label': 'Original Data',
+                'filename': f"{base_name}-original.csv"
+            })
 
     if version_dir and os.path.exists(version_dir):
         version_label = os.path.basename(version_dir)
@@ -2586,7 +2630,8 @@ def get_output_files(image_path, prompt_file=None, version_dir=None):
     """Get output files related to an image. If version_dir is provided, only show that version."""
     if version_dir:
         version_dir = _resolve_path_under_plots(version_dir)
-    image_dir = os.path.dirname(os.path.join(PLOTS_DIR, image_path))
+    image_abs = _existing_plot_abs(image_path)
+    image_dir = os.path.dirname(image_abs) if image_abs else os.path.dirname(os.path.join(PLOTS_DIR, image_path))
     image_name = os.path.basename(image_path)
     base_name = os.path.splitext(image_name)[0]
     
@@ -2604,20 +2649,24 @@ def get_output_files(image_path, prompt_file=None, version_dir=None):
     # Add the original image
     original_path = os.path.join(image_dir, image_name)
     if os.path.exists(original_path):
-        outputs['images'].append({
-            'path': os.path.relpath(original_path, PLOTS_DIR).replace('\\', '/'),
-            'label': 'Original Input',
-            'filename': image_name
-        })
+        rel_original = _plots_rel_from_abs(original_path)
+        if rel_original:
+            outputs['images'].append({
+                'path': rel_original,
+                'label': 'Original Input',
+                'filename': image_name
+            })
     
     # Add original CSV if exists
     original_csv = os.path.join(image_dir, f"{base_name}-original.csv")
     if os.path.exists(original_csv):
-        outputs['data'].append({
-            'path': os.path.relpath(original_csv, PLOTS_DIR).replace('\\', '/'),
-            'label': 'Original Data',
-            'filename': f"{base_name}-original.csv"
-        })
+        rel_original_csv = _plots_rel_from_abs(original_csv)
+        if rel_original_csv:
+            outputs['data'].append({
+                'path': rel_original_csv,
+                'label': 'Original Data',
+                'filename': f"{base_name}-original.csv"
+            })
     
     # If version_dir is specified, only scan that folder
     if version_dir and os.path.exists(version_dir):
@@ -2646,7 +2695,9 @@ def _scan_version_folder(folder_path, version_label, outputs, plots_dir):
     """Helper to scan a version folder and add files to outputs."""
     for f in os.listdir(folder_path):
         full_path = os.path.join(folder_path, f)
-        rel_path = os.path.relpath(full_path, plots_dir).replace('\\', '/')
+        rel_path = _plots_rel_from_abs(full_path)
+        if not rel_path:
+            continue
         
         label = None
         
@@ -2786,8 +2837,8 @@ def check_csv_exists(image_path, prompt_file=None):
     """Check if original and extracted CSVs exist."""
     csv_info = get_csv_paths(image_path)
     
-    original_full = os.path.join(PLOTS_DIR, csv_info['original'])
-    original_exists = os.path.exists(original_full)
+    original_full = _existing_plot_abs(csv_info['original'])
+    original_exists = bool(original_full and os.path.exists(original_full))
     
     extracted_exists = False
     extracted_path = None
@@ -2815,8 +2866,8 @@ def check_csv_exists_v2(image_path, prompt_name=None):
     """Check if original and v2 extracted CSVs exist."""
     csv_info = get_csv_paths(image_path)
 
-    original_full = os.path.join(PLOTS_DIR, csv_info['original'])
-    original_exists = os.path.exists(original_full)
+    original_full = _existing_plot_abs(csv_info['original'])
+    original_exists = bool(original_full and os.path.exists(original_full))
 
     extracted_exists = False
     extracted_path = None
@@ -3007,22 +3058,22 @@ def get_context_v2():
     if not image_path.lower().startswith('synthetic/'):
         return jsonify({'found': False, 'reason': 'non_synthetic'})
 
-    full_image_path = os.path.join(PLOTS_DIR, image_path)
-    if not os.path.exists(full_image_path):
+    full_image_path = _existing_plot_abs(image_path)
+    if not full_image_path or not os.path.exists(full_image_path):
         return jsonify({'found': False, 'reason': 'image_missing'})
 
     base_name = os.path.splitext(os.path.basename(full_image_path))[0]
     context_path = os.path.join(os.path.dirname(full_image_path), f"{base_name}.context.json")
 
     if not os.path.exists(context_path):
-        return jsonify({'found': False, 'reason': 'context_missing', 'context_path': os.path.relpath(context_path, PLOTS_DIR)})
+        return jsonify({'found': False, 'reason': 'context_missing', 'context_path': _plots_rel_from_abs(context_path)})
 
     try:
         with open(context_path, 'r', encoding='utf-8') as f:
             content = f.read()
         return jsonify({
             'found': True,
-            'context_path': os.path.relpath(context_path, PLOTS_DIR),
+            'context_path': _plots_rel_from_abs(context_path),
             'content': content
         })
     except Exception as e:
@@ -3037,10 +3088,10 @@ def get_axis_ranges():
     _materialize_plot_asset(image_path)
     
     # Get the original CSV path
-    csv_paths = get_csv_paths(os.path.join(PLOTS_DIR, image_path))
-    original_csv_path = os.path.join(PLOTS_DIR, csv_paths['original'])
+    csv_paths = get_csv_paths(image_path)
+    original_csv_path = _existing_plot_abs(csv_paths['original'])
     
-    if not os.path.exists(original_csv_path):
+    if not original_csv_path or not os.path.exists(original_csv_path):
         return jsonify({
             'success': False, 
             'error': f'Original CSV not found: {csv_paths["original"]}',
@@ -3094,7 +3145,8 @@ def get_outputs():
     
     # If no specific version requested, find the latest version for this image+prompt
     if not version_dir_param and prompt_file:
-        image_dir = os.path.dirname(os.path.join(PLOTS_DIR, image_path))
+        image_abs = _existing_plot_abs(image_path)
+        image_dir = os.path.dirname(image_abs) if image_abs else os.path.dirname(os.path.join(PLOTS_DIR, image_path))
         image_name = os.path.basename(image_path)
         base_name = os.path.splitext(image_name)[0]
         name_for_folder = image_name.replace('.', '_')  # New format with extension underscore
@@ -3131,7 +3183,8 @@ def get_outputs_v2():
     _materialize_plot_asset(image_path)
 
     if not version_dir_param and prompt_name:
-        image_dir = os.path.dirname(os.path.join(PLOTS_DIR, image_path))
+        image_abs = _existing_plot_abs(image_path)
+        image_dir = os.path.dirname(image_abs) if image_abs else os.path.dirname(os.path.join(PLOTS_DIR, image_path))
         image_name = os.path.basename(image_path)
         base_name = os.path.splitext(image_name)[0]
         name_for_folder = image_name.replace('.', '_')
@@ -3183,7 +3236,7 @@ def v2_load_saved_runs():
         n = 3
     n = max(1, min(10, n))
 
-    image_abs = _safe_abs_under_plots(image_path)
+    image_abs = _existing_plot_abs(image_path)
     if not image_abs or not os.path.isfile(image_abs):
         return jsonify({'success': False, 'error': 'image_not_found', 'image_path': image_path}), 404
 
@@ -3207,7 +3260,7 @@ def v2_load_saved_runs():
         outputs = get_output_files_v2(image_path, prompt_name, version_abs)
         run = {
             'version': 0,
-            'version_dir': os.path.relpath(version_abs, PLOTS_DIR).replace('\\', '/'),
+            'version_dir': _plots_rel_from_abs(version_abs),
             'result': {
                 'success': bool(ok),
                 'outputs': outputs,
@@ -3247,7 +3300,7 @@ def v2_load_saved_runs():
         outputs = get_output_files_v2(image_path, prompt_name, vdir)
         runs.append({
             'version': v,
-            'version_dir': os.path.relpath(vdir, PLOTS_DIR).replace('\\', '/'),
+            'version_dir': _plots_rel_from_abs(vdir),
             'result': {
                 'success': bool(ok),
                 'outputs': outputs,
@@ -3272,7 +3325,9 @@ def read_file_route():
     file_path = request.json.get('file_path')
     # Convert forward slashes to OS-appropriate separators
     file_path = file_path.replace('/', os.sep)
-    full_path = os.path.join(PLOTS_DIR, file_path)
+    full_path = _existing_plot_abs(file_path)
+    if not full_path:
+        full_path = os.path.join(PLOTS_DIR, file_path)
     try:
         with open(full_path, 'r', encoding='latin1') as f:
             content = f.read()
