@@ -144,9 +144,8 @@
             <label class="label" for="llmProvider" style="margin-top: 2px;">LLM</label>
             <div class="row">
               <select id="llmProvider" class="select" aria-label="LLM provider">
-                <option value="mistral">Key4 — Mistral</option>
-                <option value="mistral_free">Key5 (Free plan) — Mistral</option>
-                <option value="google">Key2 — Google</option>
+                <option value="mistral">Available key 4 — Mistral</option>
+                <option value="mistral_free">Available key 5 — Mistral (more likely to hit rate limits)</option>
               </select>
               <select id="llmModel" class="select" aria-label="LLM model"></select>
             </div>
@@ -157,13 +156,17 @@
               </label>
               <div class="muted" style="margin-top: 4px;">Adds pacing between LLM calls and disables the server-side extraction timeout.</div>
             </div>
-            <div class="muted" style="margin-top: 6px;">EX1: model only (Mistral). EX2: provider + model.</div>
+            <div class="muted" style="margin-top: 6px;">Debug mode available keys: key 4 or key 5 (Mistral only). Key 5 is subject to rate limit errors.</div>
           </div>
 
           <div style="margin: 8px 0 12px;">
-            <label class="label" for="mistralApiKeyInput" style="margin-top: 2px;">Mistral API key (optional)</label>
+            <label class="check" style="margin-bottom: 6px;">
+              <input id="chkUseOwnApiKey" type="checkbox" />
+              Use own API key
+            </label>
+            <label class="label" for="mistralApiKeyInput" style="margin-top: 2px;">Mistral API key</label>
             <input id="mistralApiKeyInput" class="adjustInput" type="password" autocomplete="off" spellcheck="false" placeholder="Enter your own Mistral API key to use for extraction" />
-            <div class="muted" style="margin-top: 4px;">When set, this key is used in both Regular and Debug mode (Mistral model only).</div>
+            <div id="mistralApiKeyModeNote" class="muted" style="margin-top: 4px;">Using available key. In Debug mode choose key 4 or key 5 above; key 5 is subject to rate limit errors. In Regular mode available key defaults to key 5.</div>
           </div>
 
           <div class="row">
@@ -459,7 +462,9 @@
   const llmControls = document.getElementById('llmControls');
   const llmProvider = document.getElementById('llmProvider');
   const llmModel = document.getElementById('llmModel');
+  const chkUseOwnApiKey = document.getElementById('chkUseOwnApiKey');
   const mistralApiKeyInput = document.getElementById('mistralApiKeyInput');
+  const mistralApiKeyModeNote = document.getElementById('mistralApiKeyModeNote');
   const chkBackoffMode = document.getElementById('chkBackoffMode');
 
   const chkTestResults = document.getElementById('chkTestResults');
@@ -892,6 +897,8 @@
     } else {
       onPromptChanged();
     }
+
+    _syncOwnApiKeyUi();
 
     _syncUiModeButtons();
     try { localStorage.setItem('plotextract_ui_mode', uiMode); } catch (_) {}
@@ -1482,7 +1489,51 @@
     return !!(chkBackoffMode && chkBackoffMode.checked);
   }
 
+  function _useOwnApiKeyEnabled() {
+    return !!(chkUseOwnApiKey && chkUseOwnApiKey.checked);
+  }
+
+  function _syncOwnApiKeyUi() {
+    const useOwn = _useOwnApiKeyEnabled();
+    const isRegular = uiMode === UI_MODE_REGULAR;
+    if (mistralApiKeyInput) {
+      mistralApiKeyInput.disabled = !useOwn;
+      mistralApiKeyInput.placeholder = useOwn
+        ? 'Enter your own Mistral API key to use for extraction'
+        : 'Enable “Use own API key” to enter a custom key';
+    }
+    if (mistralApiKeyModeNote) {
+      if (useOwn) {
+        mistralApiKeyModeNote.textContent = isRegular
+          ? 'Using your own Mistral API key for extraction in Regular mode.'
+          : 'Using your own Mistral API key for extraction in Debug mode.';
+      } else {
+        mistralApiKeyModeNote.textContent = isRegular
+          ? 'Using available key in Regular mode (defaults to key 5, which is subject to rate limit errors).'
+          : 'Using available key in Debug mode. Choose key 4 or key 5 above; key 5 is subject to rate limit errors.';
+      }
+    }
+  }
+
+  function _loadOwnApiKeyPref() {
+    if (!chkUseOwnApiKey) return;
+    try {
+      const v = localStorage.getItem('plotextract_use_own_mistral_key');
+      chkUseOwnApiKey.checked = (v === '1');
+    } catch (_) {}
+    _syncOwnApiKeyUi();
+  }
+
+  function _saveOwnApiKeyPref() {
+    if (!chkUseOwnApiKey) return;
+    try {
+      localStorage.setItem('plotextract_use_own_mistral_key', chkUseOwnApiKey.checked ? '1' : '0');
+    } catch (_) {}
+    _syncOwnApiKeyUi();
+  }
+
   function _getUserMistralApiKey() {
+    if (!_useOwnApiKeyEnabled()) return null;
     const v = mistralApiKeyInput ? (mistralApiKeyInput.value || '') : '';
     const key = String(v).trim();
     return key || null;
@@ -6443,6 +6494,13 @@
       return;
     }
 
+    const useOwnApiKey = _useOwnApiKeyEnabled();
+    const userMistralApiKey = _getUserMistralApiKey();
+    if (useOwnApiKey && !userMistralApiKey) {
+      setNotice(uploadStatus, '“Use own API key” is enabled, but no key was entered.', 'warn');
+      return;
+    }
+
     currentPipeline = pipeline;
     imageRunPages = [];
     activeImagePageIndex = -1;
@@ -6481,7 +6539,6 @@
         rate_limit_backoff: _getBackoffMode(),
         persist_result: uiMode !== UI_MODE_REGULAR,
       };
-      const userMistralApiKey = _getUserMistralApiKey();
       if (userMistralApiKey) {
         payload.llm_api_key = userMistralApiKey;
       }
@@ -7512,6 +7569,9 @@
       localStorage.setItem('plotextract_llm_model_web', llmModel.value || '');
     });
   }
+  if (chkUseOwnApiKey) {
+    chkUseOwnApiKey.addEventListener('change', _saveOwnApiKeyPref);
+  }
   if (chkBackoffMode) {
     chkBackoffMode.addEventListener('change', _saveBackoffPref);
   }
@@ -7680,6 +7740,7 @@
   refreshExamples();
   _loadSavedLlmSelection();
   _loadBackoffPref();
+  _loadOwnApiKeyPref();
   _syncSelectedQueueLabel();
   _applyUiMode();
 })();
