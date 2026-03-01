@@ -50,6 +50,7 @@ API_KEY_MISTRAL_3 = os.getenv("API_KEY_3")
 API_KEY_MISTRAL_4 = os.getenv("API_KEY_4")
 API_KEY_MISTRAL_5 = os.getenv("API_KEY_5")
 API_KEY_GOOGLE = os.getenv("API_KEY_2")
+DIRECT_MISTRAL_API_KEY = (os.getenv("PLOTEXTRACT_MISTRAL_API_KEY") or "").strip()
 
 LLM_PROVIDER = (os.getenv("PLOTEXTRACT_LLM_PROVIDER") or "mistral").strip().lower()
 LLM_MODEL = (os.getenv("PLOTEXTRACT_LLM_MODEL") or "").strip()
@@ -206,6 +207,8 @@ def _select_mistral_api_key(llm_key_used: str) -> Optional[str]:
     - key4  -> API_KEY_4 (preferred), else API_KEY_3, else API_KEY_1
     - key5  -> API_KEY_5 (preferred), else API_KEY_4, else API_KEY_3, else API_KEY_1
     """
+    if DIRECT_MISTRAL_API_KEY:
+        return DIRECT_MISTRAL_API_KEY
     k = (llm_key_used or "").strip()
     if k == "1":
         return API_KEY_MISTRAL_1

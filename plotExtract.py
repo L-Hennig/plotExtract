@@ -20,6 +20,9 @@ if len(sys.argv) < 3:
 
 # Loads API key from .env file
 def _select_mistral_api_key() -> str:
+  direct = (os.getenv("PLOTEXTRACT_MISTRAL_API_KEY") or "").strip()
+  if direct:
+    return direct
   key = (os.getenv("PLOTEXTRACT_LLM_KEY") or "").strip() or "4"
   if key == "1":
     return os.getenv("API_KEY_1") or ""

@@ -160,6 +160,12 @@
             <div class="muted" style="margin-top: 6px;">EX1: model only (Mistral). EX2: provider + model.</div>
           </div>
 
+          <div style="margin: 8px 0 12px;">
+            <label class="label" for="mistralApiKeyInput" style="margin-top: 2px;">Mistral API key (optional)</label>
+            <input id="mistralApiKeyInput" class="adjustInput" type="password" autocomplete="off" spellcheck="false" placeholder="Enter your own Mistral API key to use for extraction" />
+            <div class="muted" style="margin-top: 4px;">When set, this key is used in both Regular and Debug mode (Mistral model only).</div>
+          </div>
+
           <div class="row">
             <button id="btnExtract" class="btn btn-primary" type="button">Run extraction</button>
             <button id="btnCancel" class="btn" type="button" style="display:none">Cancel</button>
@@ -453,6 +459,7 @@
   const llmControls = document.getElementById('llmControls');
   const llmProvider = document.getElementById('llmProvider');
   const llmModel = document.getElementById('llmModel');
+  const mistralApiKeyInput = document.getElementById('mistralApiKeyInput');
   const chkBackoffMode = document.getElementById('chkBackoffMode');
 
   const chkTestResults = document.getElementById('chkTestResults');
@@ -1473,6 +1480,12 @@
 
   function _getBackoffMode() {
     return !!(chkBackoffMode && chkBackoffMode.checked);
+  }
+
+  function _getUserMistralApiKey() {
+    const v = mistralApiKeyInput ? (mistralApiKeyInput.value || '') : '';
+    const key = String(v).trim();
+    return key || null;
   }
 
   async function uploadFile(file, options = {}) {
@@ -6468,6 +6481,10 @@
         rate_limit_backoff: _getBackoffMode(),
         persist_result: uiMode !== UI_MODE_REGULAR,
       };
+      const userMistralApiKey = _getUserMistralApiKey();
+      if (userMistralApiKey) {
+        payload.llm_api_key = userMistralApiKey;
+      }
 
       let url = '/run_all';
       if (pipeline === 'ex2') {
@@ -6475,16 +6492,27 @@
         payload.articleInfo = (articleInfo.value || '').trim();
         payload.debug = (uiMode === UI_MODE_DEBUG);
         const { llm_provider, llm_model, llm_key } = getLlmSelection();
-        if (uiMode === UI_MODE_REGULAR) {
+        if (userMistralApiKey) {
+          payload.llm_provider = 'mistral';
+          payload.llm_model = llm_model || 'mistral-large-2512';
+        } else if (uiMode === UI_MODE_REGULAR) {
           payload.llm_provider = 'mistral';
           payload.llm_key = '5';
         } else if (llm_provider) {
           payload.llm_provider = llm_provider;
         }
-        if (llm_model) payload.llm_model = llm_model;
+        if (!userMistralApiKey && llm_model) {
+          payload.llm_model = llm_model;
+        } else if (userMistralApiKey && llm_model) {
+          const lm = String(llm_model || '').toLowerCase();
+          if (lm.includes('mistral') || lm.includes('pixtral')) {
+            payload.llm_model = llm_model;
+          }
+        }
         if (uiMode !== UI_MODE_REGULAR && llm_key) payload.llm_key = llm_key;
       } else {
         const { llm_model } = getLlmSelection();
+        if (userMistralApiKey) payload.llm_provider = 'mistral';
         if (llm_model) payload.llm_model = llm_model;
       }
 

@@ -3596,6 +3596,7 @@ def run_all():
 
     # Optional: EX1 model selection (passed to plotExtract.py via env)
     llm_model = (data.get('llm_model') or data.get('llmModel') or '').strip() or None
+    llm_api_key = (data.get('llm_api_key') or data.get('llmApiKey') or data.get('mistral_api_key') or '').strip() or None
 
     # Optional: rate-limit backoff mode (slower, disables server-side extraction timeout)
     rate_limit_backoff = bool(data.get('rate_limit_backoff') or data.get('rateLimitBackoff') or False)
@@ -3631,7 +3632,7 @@ def run_all():
     thread = threading.Thread(
         target=run_extraction_task,
         args=(task_id, image_path, prompt_file, run_interpolation, run_pointwise, 
-              left_x, right_x, bottom_y, top_y, llm_model, rate_limit_backoff, persist_result)
+              left_x, right_x, bottom_y, top_y, llm_model, llm_api_key, rate_limit_backoff, persist_result)
     )
     thread.daemon = True
     thread.start()
@@ -3652,8 +3653,12 @@ def run_all_v2():
     llm_key = str(data.get('llmKey') or data.get('llm_key') or '').strip()
     if not llm_key:
         llm_key = '4'
+    llm_api_key = (data.get('llm_api_key') or data.get('llmApiKey') or data.get('mistral_api_key') or '').strip() or None
     llm_provider = (data.get('llm_provider') or data.get('llmProvider') or '').strip() or None
     llm_model = (data.get('llm_model') or data.get('llmModel') or '').strip() or None
+    if llm_api_key:
+        llm_provider = 'mistral'
+        llm_model = llm_model or 'mistral-large-2512'
     if (not llm_provider) and llm_key in ('1', '2', '4', '5'):
         if llm_key == '2':
             llm_provider = 'google'
@@ -3672,8 +3677,8 @@ def run_all_v2():
     persist_result = bool(data.get('persist_result', True))
     if EPHEMERAL_RUNTIME:
         persist_result = False
-    # Regular (normal) mode sends persist_result=False. Force Key5 there.
-    if not persist_result:
+    # Regular (normal) mode sends persist_result=False. Force Key5 there when no custom API key.
+    if (not persist_result) and (not llm_api_key):
         llm_key = '5'
         llm_provider = 'mistral'
         llm_model = llm_model or 'mistral-large-2512'
@@ -3705,7 +3710,7 @@ def run_all_v2():
     thread = threading.Thread(
         target=run_extraction_task_v2,
           args=(task_id, image_path, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
-                                                        left_x, right_x, bottom_y, top_y, llm_provider, llm_model, llm_key, rate_limit_backoff, persist_result)
+                                                                                                                left_x, right_x, bottom_y, top_y, llm_provider, llm_model, llm_key, llm_api_key, rate_limit_backoff, persist_result)
     )
     thread.daemon = True
     thread.start()
@@ -3807,8 +3812,12 @@ def run_batch_v2():
     llm_key = str(data.get('llmKey') or data.get('llm_key') or '').strip()
     if not llm_key:
         llm_key = '4'
+    llm_api_key = (data.get('llm_api_key') or data.get('llmApiKey') or data.get('mistral_api_key') or '').strip() or None
     llm_provider = (data.get('llm_provider') or data.get('llmProvider') or '').strip() or None
     llm_model = (data.get('llm_model') or data.get('llmModel') or '').strip() or None
+    if llm_api_key:
+        llm_provider = 'mistral'
+        llm_model = llm_model or 'mistral-large-2512'
     if (not llm_provider) and llm_key in ('1', '2', '4', '5'):
         if llm_key == '2':
             llm_provider = 'google'
@@ -3886,7 +3895,7 @@ def run_batch_v2():
     thread = threading.Thread(
         target=run_batch_task_v2,
         args=(task_id, images, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
-              left_x, right_x, bottom_y, top_y, llm_provider, llm_model, llm_key),
+              left_x, right_x, bottom_y, top_y, llm_provider, llm_model, llm_key, llm_api_key),
     )
     thread.daemon = True
     thread.start()
@@ -3946,7 +3955,7 @@ def cancel_task_v1(task_id):
 
 
 def run_batch_task_v2(task_id, images, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
-                      left_x, right_x, bottom_y, top_y, llm_provider=None, llm_model=None, llm_key=None):
+                      left_x, right_x, bottom_y, top_y, llm_provider=None, llm_model=None, llm_key=None, llm_api_key=None):
     """Background batch runner.
 
     This orchestrates multiple single-image v2 tasks sequentially on the server,
@@ -4024,6 +4033,7 @@ def run_batch_task_v2(task_id, images, prompt_name, article_info, debug_mode, ru
                 llm_provider,
                 llm_model,
                 llm_key,
+                llm_api_key,
             )
             with extraction_tasks_lock:
                 child = extraction_tasks.get(child_task_id, {})
@@ -4213,7 +4223,7 @@ def get_extraction_console(image_name, prompt_name):
 
 
 def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run_pointwise,
-                        left_x, right_x, bottom_y, top_y, llm_model=None, rate_limit_backoff: bool = False,
+                        left_x, right_x, bottom_y, top_y, llm_model=None, llm_api_key=None, rate_limit_backoff: bool = False,
                         persist_result: bool = True):
     """Background task that runs the extraction pipeline."""
     import re
@@ -4275,6 +4285,11 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
                 'PLOTEXTRACT_LLM_MODEL': str(llm_model),
                 'PLOTEXTRACT_MISTRAL_MODEL': str(llm_model),
                 'PLOTEXTRACT_LLM_KEY': '4',
+            })
+        if llm_api_key:
+            env_overrides.update({
+                'PLOTEXTRACT_LLM_PROVIDER': 'mistral',
+                'PLOTEXTRACT_MISTRAL_API_KEY': str(llm_api_key),
             })
         extraction_timeout_s = None
         if not rate_limit_backoff:
@@ -4561,7 +4576,7 @@ def run_extraction_task(task_id, image_path, prompt_file, run_interpolation, run
 
 def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug_mode, run_interpolation, run_pointwise,
                            left_x, right_x, bottom_y, top_y, llm_provider=None, llm_model=None,
-                           llm_key=None, rate_limit_backoff: bool = False, persist_result: bool = True):
+                           llm_key=None, llm_api_key=None, rate_limit_backoff: bool = False, persist_result: bool = True):
     """Background task for PlotExtractV2 pipeline."""
     import re
 
@@ -4620,8 +4635,14 @@ def run_extraction_task_v2(task_id, image_path, prompt_name, article_info, debug
             env_overrides.setdefault('PLOTEXTRACT_MISTRAL_TIMEOUT_MS', '0')
         provider_norm = (str(llm_provider) if llm_provider is not None else '').strip().lower()
         key_norm = (str(llm_key) if llm_key is not None else '').strip()
+        api_key_norm = (str(llm_api_key) if llm_api_key is not None else '').strip()
+        if api_key_norm:
+            provider_norm = 'mistral'
+            env_overrides['PLOTEXTRACT_MISTRAL_API_KEY'] = api_key_norm
         if llm_provider:
             env_overrides['PLOTEXTRACT_LLM_PROVIDER'] = str(llm_provider)
+        if api_key_norm:
+            env_overrides['PLOTEXTRACT_LLM_PROVIDER'] = 'mistral'
         # Record which API key slot is being used.
         if key_norm in ('1', '2', '4', '5'):
             env_overrides['PLOTEXTRACT_LLM_KEY'] = key_norm
